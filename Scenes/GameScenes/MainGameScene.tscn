@@ -17,6 +17,9 @@
 [ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="18_iaaki"]
 
 [sub_resource type="Environment" id="Environment_jbabp"]
+background_mode = 3
+tonemap_mode = 1
+glow_enabled = true
 
 [node name="MainGameScene" type="Node2D"]
 script = ExtResource("1_dcv5v")
