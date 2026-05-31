@@ -1,10 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://bq5gktnvtvvop"]
 
 [ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_5nrrw"]
-[ext_resource type="Texture2D" uid="uid://c1v56vyheog76" path="res://Assets/Textures/UIs/SaveSlotRed.tres" id="2_2hftq"]
+[ext_resource type="Texture2D" uid="uid://w35jx2tu8n3b" path="res://Assets/Textures/Tools/轮子.png" id="2_2hftq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2hftq"]
-size = Vector2(16.5, 18)
+size = Vector2(40, 40)
 
 [node name="HurtBox" type="Area2D"]
 scale = Vector2(2, 2)
@@ -15,9 +15,8 @@ position = Vector2(-2.682209e-07, 0)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_2hftq")
 region_enabled = true
-region_rect = Rect2(0, 0, 33, 36)
+region_rect = Rect2(0, 0, 112, 112)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 16
-position = Vector2(0.25, 0)
 shape = SubResource("RectangleShape2D_2hftq")

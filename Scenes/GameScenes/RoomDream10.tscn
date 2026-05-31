@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_83itb"]
 [ext_resource type="TileSet" uid="uid://rw50ujtjoc61" path="res://Assets/Textures/Tiles/基础背景瓦片示范.tres" id="3_auxex"]
-[ext_resource type="TileSet" uid="uid://bk5rjrfis3j5e" path="res://Assets/Textures/Tiles/基础瓦片示范.tres" id="3_hofoq"]
+[ext_resource type="TileSet" uid="uid://bk5rjrfis3j5e" path="res://Assets/Textures/Tiles/基础3D瓦片示范.tres" id="3_hofoq"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="4_auxex"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="5_6vpoh"]
 [ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="5_hofoq"]

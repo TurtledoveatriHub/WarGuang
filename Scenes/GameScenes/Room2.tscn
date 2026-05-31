@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=4 uid="uid://dbiq0bp6upwiq"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_exdrf"]
-[ext_resource type="TileSet" uid="uid://bk5rjrfis3j5e" path="res://Assets/Textures/Tiles/基础瓦片示范.tres" id="3_3br1t"]
+[ext_resource type="TileSet" uid="uid://bk5rjrfis3j5e" path="res://Assets/Textures/Tiles/基础3D瓦片示范.tres" id="3_3br1t"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="4_h7qsl"]
 [ext_resource type="PackedScene" uid="uid://bjlvqrcplff4s" path="res://Scenes/NPCs/ManiacNPC.tscn" id="6_2hr80"]
 [ext_resource type="Script" uid="uid://cmr8exyv7c35t" path="res://Scripts/Components/ChallengeController.gd" id="7_rumk0"]

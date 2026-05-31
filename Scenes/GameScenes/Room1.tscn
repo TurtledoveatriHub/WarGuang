@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="2_5m2yc"]
 [ext_resource type="Texture2D" uid="uid://b8m7xj4t4q3ic" path="res://Assets/Textures/UIs/SceneUIs/2.png" id="2_qxijn"]
 [ext_resource type="TileSet" uid="uid://dee5uwgjn243" path="res://Assets/Textures/Tiles/基础大瓦片示范.tres" id="3_ofoer"]
-[ext_resource type="TileSet" uid="uid://bk5rjrfis3j5e" path="res://Assets/Textures/Tiles/基础瓦片示范.tres" id="3_qxijn"]
+[ext_resource type="TileSet" uid="uid://bk5rjrfis3j5e" path="res://Assets/Textures/Tiles/基础3D瓦片示范.tres" id="3_qxijn"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="4_37qyv"]
 [ext_resource type="PackedScene" uid="uid://dkf8hj58symgr" path="res://Scenes/Instances/HealthUpgradeItem.tscn" id="4_qqk48"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="5_5m2yc"]
