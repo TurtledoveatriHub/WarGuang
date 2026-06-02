@@ -161,6 +161,8 @@ func _load_from_save():
 			if the_player.has_method("sync_camera_to_player_center"):
 				the_player.sync_camera_to_player_center(true)
 		else:
+			if RoomManager and RoomManager.has_method("prepare_room_background_for_entry"):
+				RoomManager.prepare_room_background_for_entry(target_room_id, the_player.global_position)
 			RoomManager.load_room(target_room_id)
 			RoomManager.update_camera_limits()
 			_snap_camera_to_player_immediately(the_player)

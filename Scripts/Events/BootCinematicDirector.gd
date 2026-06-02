@@ -19,11 +19,11 @@ enum IntroStepType {
 ## 所有事件步骤（TEXT/VISUAL/BLACK_HOLD）的统一淡入淡出时长（秒）。
 @export var unified_step_fade_duration: float = 0.3
 ## BLACK_HOLD 的统一停留时长（秒）。
-@export var unified_black_hold_duration: float = 1.0
+@export var unified_black_hold_duration: float = 1.5
 ## 文本步骤缺失独立停留时长时的统一兜底时长（秒）。
 @export var unified_text_hold_fallback_duration: float = 1.2
 ## 视觉步骤缺失独立停留时长时的统一兜底时长（秒）。
-@export var unified_visual_hold_fallback_duration: float = 1.6
+@export var unified_visual_hold_fallback_duration: float = 2.2
 ## 揭黑默认时长（秒）。
 const DEFAULT_REVEAL_DURATION: float = 2.5
 ## 掉落流程最长运行时间（秒），用于避免异常情况下永不解控。

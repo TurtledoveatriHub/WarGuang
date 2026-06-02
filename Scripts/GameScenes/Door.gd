@@ -94,6 +94,9 @@ func teleport_player(player):
 	# 传送窗口内临时抑制 RoomTrigger 切房回调，防止角点门附近二次切房竞态
 	if RoomManager and RoomManager.has_method("suppress_player_room_enter"):
 		RoomManager.suppress_player_room_enter(0.45)
+	# 切房前先向目标房间广播入场锚点，用于背景预对齐。
+	if RoomManager and RoomManager.has_method("prepare_room_background_for_entry"):
+		RoomManager.prepare_room_background_for_entry(target_room_id, target_position)
 	
 	RoomManager.load_room(target_room_id)
 	

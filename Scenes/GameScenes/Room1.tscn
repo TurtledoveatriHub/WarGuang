@@ -1,11 +1,13 @@
-[gd_scene load_steps=21 format=4 uid="uid://dmmevbmmo24d7"]
+[gd_scene load_steps=23 format=4 uid="uid://dmmevbmmo24d7"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_am8bf"]
+[ext_resource type="Script" uid="uid://xk1mvnb134oq" path="res://Scripts/GameScenes/NineSliceParallaxBackgroundController.gd" id="2_4it2x"]
 [ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="2_5m2yc"]
-[ext_resource type="Texture2D" uid="uid://b8m7xj4t4q3ic" path="res://Assets/Textures/UIs/SceneUIs/2.png" id="2_qxijn"]
 [ext_resource type="TileSet" uid="uid://dee5uwgjn243" path="res://Assets/Textures/Tiles/基础大瓦片示范.tres" id="3_ofoer"]
+[ext_resource type="Texture2D" uid="uid://dvi0fwdkqjh2u" path="res://Assets/Textures/Backgrounds/1.png" id="3_qo7ek"]
 [ext_resource type="TileSet" uid="uid://bk5rjrfis3j5e" path="res://Assets/Textures/Tiles/基础3D瓦片示范.tres" id="3_qxijn"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="4_37qyv"]
+[ext_resource type="Texture2D" uid="uid://yr64w1p2oclf" path="res://Assets/Instances/SettingsScene.tres" id="4_j0vry"]
 [ext_resource type="PackedScene" uid="uid://dkf8hj58symgr" path="res://Scenes/Instances/HealthUpgradeItem.tscn" id="4_qqk48"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="5_5m2yc"]
 [ext_resource type="PackedScene" uid="uid://dvyyx1gsopmfx" path="res://Scenes/Instances/Coins/Coin.tscn" id="6_ofoer"]
@@ -30,21 +32,25 @@ room_bgm = "BGM1"
 room_color = Color(0.39118537, 0.39118534, 0.39118534, 1)
 room_bounds = NodePath("RoomBounds1")
 
-[node name="Background" type="Sprite2D" parent="."]
-visible = false
-position = Vector2(3772, -660.00006)
-scale = Vector2(449.5, 122.5)
-texture = ExtResource("2_qxijn")
-region_enabled = true
-region_rect = Rect2(0, 16, 16, 16)
+[node name="BGControllers" type="Node2D" parent="."]
 
-[node name="ColorRect" type="ColorRect" parent="."]
-offset_left = -888.0
-offset_top = -1552.0
-offset_right = -874.56
-offset_bottom = -1535.36
-scale = Vector2(100, 100)
-color = Color(0.1536, 0.32, 0.2368, 0.9764706)
+[node name="BG1Controller" type="Node2D" parent="BGControllers" node_paths=PackedStringArray("source_background")]
+script = ExtResource("2_4it2x")
+target_room_id = "Room1"
+source_background = NodePath("Background")
+
+[node name="Background" type="Sprite2D" parent="BGControllers/BG1Controller"]
+scale = Vector2(4, 4)
+texture = ExtResource("3_qo7ek")
+region_rect = Rect2(0, 0, 384, 216)
+
+[node name="BG2Controller" type="Node2D" parent="BGControllers"]
+
+[node name="Background" type="Sprite2D" parent="BGControllers/BG2Controller"]
+self_modulate = Color(0.7764706, 1, 1, 0.39215687)
+scale = Vector2(4, 4)
+texture = ExtResource("4_j0vry")
+region_rect = Rect2(0, 0, 384, 216)
 
 [node name="RoomTrigger" type="Area2D" parent="."]
 
@@ -190,7 +196,7 @@ debug_color = Color(0, 0.824, 0.588, 0.235)
 metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
 
 [node name="Area2D" type="Area2D" parent="."]
-position = Vector2(3032, 232)
+position = Vector2(2858, -288)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2(-0.5, -0.5)

@@ -100,7 +100,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 地面减速度 (0-1，越大减速越快)
 @export var ground_deceleration: float = 0.8
 ## 空中移动控制力 (0-1，越小控制力越弱)
-@export var air_control: float = 0.35
+@export var air_control: float = 0.3
 ## 空中无输入时 JUMP 状态的基础衰减倍率（越大停得越快）
 @export var air_no_input_deceleration_multiplier_jump: float = 0.8
 ## 空中无输入时 DOWN 状态的基础衰减倍率（越大停得越快）
@@ -127,9 +127,9 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 跳跃缓冲时间（提前按跳跃的有效时间）
 @export var jump_buffer_time: float = 0.15
 ## 触发落地抖动的最小DOWN状态持续时间
-@export var land_shake_min_down_time: float = 1.1
+@export var land_shake_min_down_time: float = 0.9
 ## 触发落地抖动后的操控禁用时间（秒）
-@export var land_shake_control_lock_time: float = 0.9
+@export var land_shake_control_lock_time: float = 0.8
 
 ## 滑翔设置
 @export_category("滑翔设置")
@@ -201,7 +201,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 
 @export_category("后撤步设置")
 ## 后撤步持续时间（秒）
-@export var backstep_duration: float = 0.14
+@export var backstep_duration: float = 0.12
 ## 后撤步移动速度
 @export var backstep_move_speed: float = 260.0
 ## 后撤步防反有效窗口（秒）：<=0 时自动使用后撤步持续时间。
@@ -292,15 +292,15 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 离墙后触发墙跳的缓冲窗口（秒）
 @export var wall_jump_escape_buffer_time: float = 0.12  
 ## 墙跳水平初速度（离开墙体的水平速度）
-@export var wall_jump_h_speed: float = 120.0
+@export var wall_jump_h_speed: float = 80.0
 ## 墙跳垂直速度
-@export var wall_jump_v_speed: float = -240.0
+@export var wall_jump_v_speed: float = -200.0
 ## 墙跳后重新附着延迟（秒）
 @export var wall_jump_reattach_delay: float = 0.1
 ## 墙跳最大按住时间（秒）
 @export var wall_jump_max_hold_time: float = 0.3
 ## 墙跳额外垂直速度（长按期间每帧增加）
-@export var wall_jump_hold_boost: float = -30.0
+@export var wall_jump_hold_boost: float = -40.0
 
 @export_category("特殊状态设置")
 ## IDLE状态进入SLEEP状态的时间（秒）
@@ -328,7 +328,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 跳跃边缘修正的最大尝试次数
 @export var jump_edge_correction_steps: int = 8
 ## 墙跳边缘修正的单步偏移（像素）
-@export var wall_jump_edge_correction_step: float = 0.2
+@export var wall_jump_edge_correction_step: float = 0.8
 ## 墙跳边缘修正的最大尝试次数
 @export var wall_jump_edge_correction_steps: int = 8
 ## 冲刺边缘修正的单步偏移（像素）

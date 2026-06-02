@@ -22,7 +22,7 @@ class AfterimageConfig:
 
 ## 低级残影配置：慢动作期间引用。
 @export_group("低级残影配置")
-@export var low_color: Color = Color.from_rgba8(250, 250, 250, 255)
+@export var low_color: Color = Color.from_rgba8(250, 250, 250, 200)
 @export var low_lifetime: float = 0.4
 @export var low_interval: float = 0.2
 @export var low_pool_size: int = 20
@@ -32,7 +32,7 @@ class AfterimageConfig:
 
 ## 普通残影配置：普通冲刺、JumpBox普通触发二段跳引用。
 @export_group("普通残影配置")
-@export var normal_color: Color = Color.from_rgba8(250, 250, 250, 255)
+@export var normal_color: Color = Color.from_rgba8(250, 250, 250, 200)
 @export var normal_lifetime: float = 0.2
 @export var normal_interval: float = 0.05
 @export var normal_pool_size: int = 20
@@ -42,7 +42,7 @@ class AfterimageConfig:
 
 ## 高级残影配置：超级冲刺、后撤步引用。
 @export_group("高级残影配置")
-@export var advanced_color: Color = Color.from_rgba8(250, 250, 250, 255)
+@export var advanced_color: Color = Color.from_rgba8(250, 250, 250, 200)
 @export var advanced_lifetime: float = 0.4
 @export var advanced_interval: float = 0.1
 @export var advanced_pool_size: int = 30
@@ -52,7 +52,7 @@ class AfterimageConfig:
 
 ## 黑色残影配置：黑暗冲刺引用。
 @export_group("黑色残影配置")
-@export var black_color: Color = Color.from_rgba8(25, 25, 25, 255)
+@export var black_color: Color = Color.from_rgba8(25, 25, 25, 200)
 @export var black_lifetime: float = 0.25
 @export var black_interval: float = 0.03
 @export var black_pool_size: int = 30
@@ -62,7 +62,7 @@ class AfterimageConfig:
 
 ## 粉色残影配置：JumpBox完美触发二段跳引用。
 @export_group("粉色残影配置")
-@export var pink_color: Color = Color.from_rgba8(230, 155, 255, 255)
+@export var pink_color: Color = Color.from_rgba8(230, 155, 255, 200)
 @export var pink_lifetime: float = 0.4
 @export var pink_interval: float = 0.05
 @export var pink_pool_size: int = 40
@@ -72,7 +72,7 @@ class AfterimageConfig:
 
 ## 暗红色残影配置：ManiacNPC 移动引用。
 @export_group("暗红色残影配置")
-@export var dark_red_color: Color = Color.from_rgba8(80, 30, 40, 255)
+@export var dark_red_color: Color = Color.from_rgba8(80, 30, 40, 200)
 @export var dark_red_lifetime: float = 0.6
 @export var dark_red_interval: float = 0.9
 @export var dark_red_pool_size: int = 20

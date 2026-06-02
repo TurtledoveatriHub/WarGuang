@@ -27,10 +27,10 @@ extends CanvasLayer
 @export var shadow_hurt_intensity: float = 1.4  
 
 ## 普通受伤效果Vignette颜色
-@export var hurt_color: Color = Color(0.118, 0.0, 0.0, 1.0)
+@export var hurt_color: Color = Color.from_rgba8(30, 0, 0, 200)
 
 ## 阴影受伤效果Vignette颜色
-@export var shadow_hurt_color: Color = Color(0.078, 0.0, 0.0, 1.0)
+@export var shadow_hurt_color: Color = Color.from_rgba8(20, 0, 0, 200)
 
 ## 受伤效果内圈半径 - 范围：0.0到1.0
 ## 0.0：从中心开始，0.5：从屏幕一半开始，1.0：从边缘开始
@@ -46,7 +46,7 @@ extends CanvasLayer
 
 ## 受伤效果脉冲幅度 - 范围：0.0到1.0（建议：0.0-0.5）
 ## 值越大脉冲变化幅度越大
-@export var hurt_pulse_amount: float = 0.1  
+@export var hurt_pulse_amount: float = 0.2  
 
 ## 低血量效果设置
 @export_category("低血量效果设置")
@@ -54,11 +54,11 @@ extends CanvasLayer
 @export var low_health_intensity: float = 0.6  
 
 ## 低血量效果Vignette颜色
-@export var low_health_color: Color = Color(0.157, 0.0, 0.0, 1.0)
+@export var low_health_color: Color = Color.from_rgba8(50, 0, 0, 200)
 
 ## 低血量效果内圈半径 - 范围：0.0到1.0
 ## 0.0：从中心开始，0.5：从屏幕一半开始，1.0：从边缘开始
-@export var low_health_inner_radius: float = 0
+@export var low_health_inner_radius: float = 0.2
 
 ## 低血量效果外圈半径 - 范围：0.0到1.0
 ## 必须大于inner_radius，控制效果结束位置

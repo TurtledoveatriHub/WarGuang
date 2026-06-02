@@ -36,6 +36,8 @@ static func sync_room_and_camera_for_respawn(player: Node, preferred_room_id: St
 		if target_room_id != "":
 			if RoomManager.has_method("suppress_player_room_enter"):
 				RoomManager.suppress_player_room_enter(1.25)
+			if RoomManager.has_method("prepare_room_background_for_entry"):
+				RoomManager.prepare_room_background_for_entry(target_room_id, player.global_position)
 			if player:
 				PlayerCameraBridgeServiceScript.clear_observe_offset_runtime(player)
 			if player and player.camera_controller and player.camera_controller.has_method("begin_blackout_camera_transition"):

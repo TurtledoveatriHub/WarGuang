@@ -102,6 +102,22 @@ func ensure_room_loaded(room_id: String) -> void:
 	else:
 		update_camera_limits()
 
+## 在切房前向目标房间广播入场锚点，用于背景预对齐。
+func prepare_room_background_for_entry(room_id: String, entry_world_pos: Vector2) -> void:
+	if room_id == "" or not rooms.has(room_id):
+		return
+	var room_node: Node = rooms[room_id].get("node", null)
+	if not is_instance_valid(room_node):
+		return
+	_notify_room_entry_anchor(room_node, entry_world_pos)
+
+## 递归通知房间节点树中实现了 prepare_entry_anchor 的控制器。
+func _notify_room_entry_anchor(node: Node, entry_world_pos: Vector2) -> void:
+	if node.has_method("prepare_entry_anchor"):
+		node.prepare_entry_anchor(entry_world_pos)
+	for child in node.get_children():
+		_notify_room_entry_anchor(child, entry_world_pos)
+
 ## 清理被摧毁的石墙（切换房间时调用）
 func cleanup_destroyed_walls():
 	# 获取当前场景中所有 DestructibleWall 节点
