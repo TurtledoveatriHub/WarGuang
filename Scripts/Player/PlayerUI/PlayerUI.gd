@@ -38,7 +38,7 @@ var game_setting_instance: Node = null
 ## 血量布局参数
 @export_category("血量 UI 布局设置")
 ## 血量单位之间的水平间距
-@export var health_unit_spacing: float = 1.0
+@export var health_unit_spacing: float = 2.0
 ## 第一个血量单位的 X 坐标
 @export var health_unit_start_x: float = 0.0
 ## 所有血量单位的 Y 坐标

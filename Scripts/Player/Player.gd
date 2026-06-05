@@ -100,7 +100,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 地面减速度 (0-1，越大减速越快)
 @export var ground_deceleration: float = 0.8
 ## 空中移动控制力 (0-1，越小控制力越弱)
-@export var air_control: float = 0.3
+@export var air_control: float = 0.5
 ## 空中无输入时 JUMP 状态的基础衰减倍率（越大停得越快）
 @export var air_no_input_deceleration_multiplier_jump: float = 0.8
 ## 空中无输入时 DOWN 状态的基础衰减倍率（越大停得越快）
@@ -109,11 +109,11 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 跳跃设置
 @export_category("跳跃设置")
 ## 跳跃移动速度（像素/秒）
-@export var jump_move_speed: float = 120.0
+@export var jump_move_speed: float = 90.0
 ## 一段跳初始速度
-@export var jump_velocity: float = -120.0
+@export var jump_velocity: float = -90.0
 ## 二段跳初始速度
-@export var double_jump_velocity: float = -80.0
+@export var double_jump_velocity: float = -60.0
 ## 最大跳跃按住时间（秒）
 @export var max_jump_hold_time: float = 0.3
 ## 跳跃额外速度（长按期间每帧增加）
@@ -237,6 +237,8 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 @export var quick_tap_time_window: float = 0.3
 ## 奔跑撞墙后的操控禁用时间（秒）
 @export var run_wall_bump_control_lock_time: float = 0.5
+## 奔跑保持判定所需的最小正向水平速度（像素/秒），必须大于该值才算有效
+@export var run_jump_keep_min_horizontal_speed: float = 10.0
 ## 撞墙反弹的X轴速度
 @export var wall_bump_rebound_x: float = 180.0
 ## 撞墙反弹的Y轴速度  
@@ -245,13 +247,11 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 奔跑跳跃设置
 @export_category("奔跑跳跃设置")
 ## 奔跑跳跃水平速度加成
-@export var run_jump_boost_speed: float = 120.0
+@export var run_jump_boost_speed: float = 90.0
 ## 奔跑跳跃加成持续时间（秒）
-@export var run_jump_boost_duration: float = 0.3
+@export var run_jump_boost_duration: float = 0.6
 ## 奔跑跳跃衰减时间（秒）
-@export var run_jump_decay_time: float = 0.6
-## 奔跑保持判定所需的最小正向水平速度（像素/秒），必须大于该值才算有效
-@export var run_jump_keep_min_horizontal_speed: float = 10.0
+@export var run_jump_decay_time: float = 0.3
 
 ## 二段跳旋转设置
 @export_category("二段跳旋转设置")
