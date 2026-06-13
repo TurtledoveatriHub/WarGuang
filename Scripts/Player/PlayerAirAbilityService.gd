@@ -54,6 +54,13 @@ static func handle_jump2_rotation(player: Node, fixed_delta: float) -> void:
 	if player.current_animation == "JUMP2" and player.has_double_jumped and player.is_double_jump_holding:
 		player.jump2_rotation += player.jump2_rotation_speed * fixed_delta
 		player.animated_sprite.rotation_degrees = fmod(player.jump2_rotation, 360)
+	elif player.current_state == player.PlayerState.DASH and player.dash_locked_vector.y != 0:
+		# 垂直冲刺纹理旋转：朝右时向上-90°/向下+90°，朝左时反转（因 flip_h 镜像）。
+		var is_flipped: bool = player.animated_sprite.flip_h
+		if player.dash_locked_vector.y < 0:
+			player.animated_sprite.rotation_degrees = -90.0 if not is_flipped else 90.0
+		else:
+			player.animated_sprite.rotation_degrees = 90.0 if not is_flipped else -90.0
 	else:
 		if player.animated_sprite.rotation_degrees != 0:
 			player.animated_sprite.rotation_degrees = 0

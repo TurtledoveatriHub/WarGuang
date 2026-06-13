@@ -5,11 +5,21 @@ class_name PlayerStateTransitionService
 static func apply_exit_state(player: Node, from_state: int) -> void:
 	match from_state:
 		player.PlayerState.DASH:
-			var dash_dir: int = player.dash_locked_direction
-			if dash_dir == 0:
-				dash_dir = 1 if player.is_facing_right else -1
-			player.velocity.x = player.dash_inertia_speed * player.effective_horizontal_multiplier * dash_dir
-			player.dash_locked_direction = dash_dir
+			if player.dash_locked_vector.y == 0:
+				# 水平冲刺退出：应用水平惯性
+				player.velocity.x = player.dash_inertia_speed * player.effective_horizontal_multiplier * sign(player.dash_locked_vector.x)
+			else:
+				# 垂直冲刺退出：终止跳跃按住时间加成（切换状态后不应继续生效）。
+				player.jump_hold_timer = player.max_jump_hold_time
+				# 地面垂直冲刺退出时启用空中能力（二段跳、滑翔等）。
+				if not player.has_dashed_in_air:
+					player.is_jumping = true
+					player.jump_count = 1
+					player.has_double_jumped = false
+					player.can_double_jump = true
+					player.can_glide = false
+					player.is_double_jump_holding = false
+			player.dash_locked_vector = player.dash_locked_vector.normalized()
 			player.can_reattach_to_wall = true
 
 		player.PlayerState.JUMP:
@@ -66,8 +76,8 @@ static func apply_enter_state(player: Node, to_state: int, from_state: int) -> v
 			player.animated_sprite.modulate.a = 0.5
 
 		player.PlayerState.DASH:
-			if player.dash_locked_direction == 0:
-				player.dash_locked_direction = 1 if player.is_facing_right else -1
+			if player.dash_locked_vector == Vector2.ZERO:
+				player.dash_locked_vector = Vector2.RIGHT if player.is_facing_right else Vector2.LEFT
 			if from_state == int(player.PlayerState.WALLJUMP):
 				player.can_reattach_to_wall = false
 
@@ -78,7 +88,6 @@ static func apply_enter_state(player: Node, to_state: int, from_state: int) -> v
 			player.has_double_jumped = false
 			player.can_double_jump = true
 			player.has_dashed_in_air = false
-			player.can_dash = true
 			player.current_animation = "WALLGRIP"
 			player.animated_sprite.play("WALLGRIP")
 

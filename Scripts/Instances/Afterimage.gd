@@ -142,6 +142,8 @@ func reset_afterimage():
 	global_position = Vector2.ZERO
 	rotation_degrees = 0
 	rotation = 0
+	if is_instance_valid(sprite):
+		sprite.rotation_degrees = 0
 
 func reset_afterimage_force():
 	reset_afterimage()

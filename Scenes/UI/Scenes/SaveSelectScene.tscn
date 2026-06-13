@@ -1,12 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://cwp2nnedkebnl"]
+[gd_scene load_steps=16 format=3 uid="uid://cwp2nnedkebnl"]
 
 [ext_resource type="Script" uid="uid://c8ybqtmdpgils" path="res://Scripts/UI/Scenes/SaveSelectScene.gd" id="1_6ahw5"]
 [ext_resource type="Script" uid="uid://c6yjpi17utwg8" path="res://Scripts/UI/Scenes/UITransitionAnimator.gd" id="1_transition_animator"]
 [ext_resource type="Texture2D" uid="uid://dmxv540ejjtkg" path="res://Assets/Textures/UIs/SaveSlotBlue.tres" id="2_1iexe"]
 [ext_resource type="PackedScene" uid="uid://b81s4uybrdtsf" path="res://Scenes/UI/Scenes/DeleteConfirmDialog.tscn" id="2_axbvp"]
-[ext_resource type="Texture2D" uid="uid://dtkgdvtvivq4r" path="res://Assets/Lights/2d_lights.webp" id="3_1ibob"]
 [ext_resource type="Texture2D" uid="uid://c1v56vyheog76" path="res://Assets/Textures/UIs/SaveSlotRed.tres" id="3_283jm"]
-[ext_resource type="Texture2D" uid="uid://lv2f6kd1slvx" path="res://Assets/Textures/UIs/SceneUIs/3.png" id="5_xxd4s"]
+[ext_resource type="Texture2D" uid="uid://fwgvvrpd0hkd" path="res://Assets/Textures/UIs/PlayerUIs/1.png" id="6_xxd4s"]
 [ext_resource type="Texture2D" uid="uid://xygjp77wxevl" path="res://Assets/Textures/UIs/SceneUIs/tres/回退1.tres" id="7_nc2wn"]
 [ext_resource type="Texture2D" uid="uid://40v6kkfpqldt" path="res://Assets/Textures/UIs/SceneUIs/tres/回退3.tres" id="8_xxd4s"]
 [ext_resource type="Texture2D" uid="uid://bv4wcsihjxeaa" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭1.tres" id="9_1ibob"]
@@ -14,6 +13,14 @@
 [ext_resource type="Texture2D" uid="uid://kxm2uujj5ma4" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭3.tres" id="10_nc2wn"]
 [ext_resource type="Texture2D" uid="uid://byixw77mgxbb1" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭2.tres" id="11_xxd4s"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="14_c6mq1"]
+
+[sub_resource type="Gradient" id="Gradient_xxd4s"]
+offsets = PackedFloat32Array(0, 0.51111114, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.8333333, 0.8333333, 0.8333333, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_c6mq1"]
+gradient = SubResource("Gradient_xxd4s")
+fill_from = Vector2(1, 1)
 
 [node name="SaveSelectScene" type="CanvasLayer"]
 script = ExtResource("1_6ahw5")
@@ -31,22 +38,20 @@ title_path = NodePath("")
 extra_target_paths = Array[NodePath]([NodePath("../SaveSlot1"), NodePath("../SaveSlot2"), NodePath("../SaveSlot3"), NodePath("../BackButton")])
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0.41215247, 0.41215247, 0.41215247, 1)
+color = Color(0.68514574, 0.6851458, 0.6851457, 1)
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
-position = Vector2(639.50006, 359.99997)
-scale = Vector2(5, 5)
+position = Vector2(633.5, 380)
+scale = Vector2(21.671875, 13.656249)
 color = Color(0.60784316, 0.60784316, 0.48235294, 0.7490196)
 range_layer_min = 1
 range_layer_max = 1
-texture = ExtResource("3_1ibob")
+texture = SubResource("GradientTexture2D_c6mq1")
 
 [node name="Background" type="Sprite2D" parent="."]
-position = Vector2(640, 359.5)
-scale = Vector2(5, 5)
-texture = ExtResource("5_xxd4s")
-region_enabled = true
-region_rect = Rect2(0, 144, 256, 144)
+position = Vector2(640.00006, 361.00003)
+scale = Vector2(2.5, 2.5)
+texture = ExtResource("6_xxd4s")
 
 [node name="BackButton" type="TextureButton" parent="."]
 offset_left = 1214.0

@@ -38,7 +38,7 @@ var game_setting_instance: Node = null
 ## 血量布局参数
 @export_category("血量 UI 布局设置")
 ## 血量单位之间的水平间距
-@export var health_unit_spacing: float = 2.0
+@export var health_unit_spacing: float = 0.0
 ## 第一个血量单位的 X 坐标
 @export var health_unit_start_x: float = 0.0
 ## 所有血量单位的 Y 坐标
@@ -141,7 +141,7 @@ func initialize_health_display():
 	for i in range(max_health):
 		var health_unit = health_unit_scene.instantiate()
 		
-		health_unit.position = Vector2(health_unit_start_x + (i * health_unit_spacing), health_unit_y)
+		health_unit.position = Vector2(health_unit_start_x + (i * 0.5 * health_unit_spacing), health_unit_y)
 		health_unit.scale = Vector2(2, 2)
 		health_container.add_child(health_unit)
 		health_units.append(health_unit)

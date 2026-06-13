@@ -111,7 +111,9 @@ func _on_state_changed(payload: Dictionary) -> void:
 			run_started = true
 			run_timer = 0.0
 		player.PlayerState.DASH:
-			_spawn_fx("DashAnchor", _get_fx_world_position("DashAnchor"), player.animated_sprite.flip_h)
+			# 仅地面水平冲刺触发 DashAnchor 纹理特效，其他情况不需要。
+			if player.is_on_floor() and player.dash_locked_vector.y == 0:
+				_spawn_fx("DashAnchor", _get_fx_world_position("DashAnchor"), player.animated_sprite.flip_h)
 		player.PlayerState.JUMP:
 			if player.has_double_jumped:
 				return

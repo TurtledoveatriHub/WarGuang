@@ -33,12 +33,12 @@ class AfterimageConfig:
 ## 普通残影配置：普通冲刺、JumpBox普通触发二段跳引用。
 @export_group("普通残影配置")
 @export var normal_color: Color = Color.from_rgba8(250, 250, 250, 200)
-@export var normal_lifetime: float = 0.2
+@export var normal_lifetime: float = 0.22
 @export var normal_interval: float = 0.05
 @export var normal_pool_size: int = 20
 @export var normal_solid_color: bool = true
 @export var normal_fade_scale_effect: bool = true
-@export var normal_move_distance: float = 40.0
+@export var normal_move_distance: float = 30.0
 
 ## 高级残影配置：超级冲刺、后撤步引用。
 @export_group("高级残影配置")
@@ -48,17 +48,17 @@ class AfterimageConfig:
 @export var advanced_pool_size: int = 30
 @export var advanced_solid_color: bool = true
 @export var advanced_fade_scale_effect: bool = true
-@export var advanced_move_distance: float = 30.0
+@export var advanced_move_distance: float = 40.0
 
 ## 黑色残影配置：黑暗冲刺引用。
 @export_group("黑色残影配置")
 @export var black_color: Color = Color.from_rgba8(25, 25, 25, 200)
-@export var black_lifetime: float = 0.25
-@export var black_interval: float = 0.03
+@export var black_lifetime: float = 0.26
+@export var black_interval: float = 0.04
 @export var black_pool_size: int = 30
 @export var black_solid_color: bool = true
 @export var black_fade_scale_effect: bool = true
-@export var black_move_distance: float = 60.0
+@export var black_move_distance: float = 40.0
 
 ## 粉色残影配置：JumpBox完美触发二段跳引用。
 @export_group("粉色残影配置")

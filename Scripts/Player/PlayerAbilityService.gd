@@ -11,7 +11,8 @@ static func get_ability_status(player: Node) -> Dictionary:
 		"glide": player.glide_unlocked,
 		"black_dash": player.black_dash_unlocked,
 		"wall_grip": player.wall_grip_unlocked,
-		"backstep": player.backstep_unlocked
+		"backstep": player.backstep_unlocked,
+		"vertical_dash": player.vertical_dash_unlocked
 	}
 
 static func set_abilities_from_save(player: Node, abilities: Dictionary) -> void:
@@ -21,6 +22,7 @@ static func set_abilities_from_save(player: Node, abilities: Dictionary) -> void
 	player.black_dash_unlocked = abilities.get("black_dash", false)
 	player.wall_grip_unlocked = abilities.get("wall_grip", false)
 	player.backstep_unlocked = abilities.get("backstep", false)
+	player.vertical_dash_unlocked = abilities.get("vertical_dash", false)
 
 static func enter_sleep_state(player: Node) -> void:
 	player.velocity = Vector2.ZERO

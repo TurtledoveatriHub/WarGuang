@@ -85,7 +85,8 @@ static func handle_dash_timers(player: Node, fixed_delta: float) -> void:
 	if player.current_state == player.PlayerState.DASH:
 		player.dash_duration_timer += fixed_delta
 		var current_dash_duration = player.black_dash_duration if player.black_dash_unlocked else player.dash_duration
-		if player.dash_duration_timer >= current_dash_duration:
+		var total_dash_duration = current_dash_duration + maxf(player.dash_steer_duration, 0.0)
+		if player.dash_duration_timer >= total_dash_duration:
 			player.dash_duration_timer = 0
 			if player.was_gliding_before_dash:
 				player.was_gliding_before_dash = false
@@ -159,6 +160,10 @@ static func update_coyote_time(player: Node) -> void:
 # 处理冲刺输入和冲刺进入条件。
 static func try_dash(player: Node, dash_just_pressed: bool) -> bool:
 	if dash_just_pressed and player.can_dash and player.dash_unlocked:
+		# 已在空中冲刺过则立即拒绝，不执行任何副作用（避免破坏滑翔状态）。
+		if not player.is_on_floor() and not player.coyote_time_active and player.has_dashed_in_air:
+			return false
+
 		player.was_gliding_before_dash = (player.current_state == player.PlayerState.GLIDE)
 
 		if player.was_gliding_before_dash:
@@ -166,18 +171,27 @@ static func try_dash(player: Node, dash_just_pressed: bool) -> bool:
 			player.glide_timer = 0.0
 			player.is_double_jump_holding = false
 
+		# 在地面时不会消耗空中冲刺计数；在空中时标记已使用空中冲刺。
 		if not player.is_on_floor() and not player.coyote_time_active:
-			if player.has_dashed_in_air:
-				return false
 			player.has_dashed_in_air = true
 
-		player.dash_locked_direction = 1 if player.is_facing_right else -1
+		# 检测冲刺方向：垂直输入优先于水平（同时按住时优先垂直），地面禁止下冲刺。
+		var v_input := Input.get_axis("up", "down")
+		var h_input := Input.get_axis("left", "right")
+		if player.vertical_dash_unlocked and v_input != 0 and not (player.is_on_floor() and v_input > 0):
+			player.dash_locked_vector = Vector2(0, -1 if v_input < 0 else 1)
+		else:
+			var h_dir: int = 1 if player.is_facing_right else -1
+			if h_input != 0:
+				h_dir = 1 if h_input > 0 else -1
+			player.dash_locked_vector = Vector2(h_dir, 0)
 
 		player.change_state(player.PlayerState.DASH)
 		player.can_dash = false
 		player.dash_duration_timer = 0
 		var current_dash_duration = player.black_dash_duration if player.black_dash_unlocked else player.dash_duration
-		player.dash_duration_timer_node.start(current_dash_duration)
+		var total_dash_duration = current_dash_duration + maxf(player.dash_steer_duration, 0.0)
+		player.dash_duration_timer_node.start(total_dash_duration)
 		player.dash_cooldown_timer_node.start(player.dash_cooldown)
 		return true
 	elif dash_just_pressed and not player.dash_unlocked:
@@ -368,27 +382,47 @@ static func handle_backstep_state(player: Node, fixed_delta: float, move_input: 
 
 # 处理基础冲刺状态的速度锁定。
 static func handle_dash_state(player: Node) -> void:
+	# 冲刺期间按下跳跃不立即打断冲刺，改为缓冲到冲刺结束后执行（由 _on_dash_duration_timeout 处理）。
 	if Input.is_action_just_pressed("jump"):
-		if player.is_on_floor() or player.coyote_time_active:
-			if player.try_jump(true):
-				return
-		elif player.try_double_jump(true):
-			return
-
-	var dash_direction: int = player.dash_locked_direction
-	if dash_direction == 0:
-		dash_direction = 1 if player.is_facing_right else -1
-		player.dash_locked_direction = dash_direction
-	player.velocity.x = dash_direction * player.dash_speed
-	player.velocity.y = 0
-
-	if Input.is_action_just_pressed("jump") or Input.is_action_pressed("jump"):
 		if player.can_double_jump and not player.has_double_jumped:
 			player.jump_buffer_after_dash = true
 			player.jump_buffer_type = 2
 		else:
 			player.jump_buffer_after_dash = true
 			player.jump_buffer_type = 1
+
+	if player.dash_locked_vector == Vector2.ZERO:
+		player.dash_locked_vector = Vector2.RIGHT if player.is_facing_right else Vector2.LEFT
+
+	# 转向阶段：超过基础冲刺时长后，允许玩家在同一轴向上调整方向。
+	var current_dash_duration = player.black_dash_duration if player.black_dash_unlocked else player.dash_duration
+	if player.dash_steer_duration > 0.0 and player.dash_duration_timer >= current_dash_duration:
+		if player.dash_locked_vector.y == 0:
+			# 水平冲刺：转向阶段只允许左右调整
+			var move_input = player.get_resolved_horizontal_input() if player.has_method("get_resolved_horizontal_input") else Input.get_axis("left", "right")
+			if move_input != 0:
+				player.dash_locked_vector = Vector2(1 if move_input > 0 else -1, 0)
+				player.is_facing_right = move_input > 0
+				player.animated_sprite.flip_h = not player.is_facing_right
+		else:
+			# 垂直冲刺：转向阶段按反方向键直接打断冲刺。
+			var v_input := Input.get_axis("up", "down")
+			if v_input != 0:
+				if sign(v_input) == -player.dash_locked_vector.y:
+					# 按住反方向 → 直接退出冲刺状态
+					player.dash_duration_timer = 0
+					player.dash_duration_timer_node.stop()
+					player.change_state(player.PlayerState.DOWN)
+					return
+				# 同方向调整
+				player.dash_locked_vector = Vector2(0, -1 if v_input < 0 else 1)
+
+	var current_dash_speed: float = player.vertical_dash_speed if player.dash_locked_vector.y != 0 else player.dash_speed
+	player.velocity = player.dash_locked_vector * current_dash_speed
+	if player.dash_locked_vector.y == 0:
+		player.velocity.y = 0
+	else:
+		player.velocity.x = 0
 
 	# 处理攀墙状态的受力、减速和跳跃入口。
 static func handle_wallgrip_state(player: Node, fixed_delta: float, move_input: float, jump_just_pressed: bool, _jump_pressed: bool, _jump_just_released: bool, dash_just_pressed: bool) -> void:

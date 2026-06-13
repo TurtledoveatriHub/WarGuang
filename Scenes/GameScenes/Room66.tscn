@@ -1,0 +1,110 @@
+[gd_scene load_steps=13 format=4 uid="uid://jpn8aqyvq2yu"]
+
+[ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_cb4qp"]
+[ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="2_7xt4e"]
+[ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/Room1/雪地瓦片集.tres" id="3_16onl"]
+[ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/Room1/雪地不可攀爬瓦片集.tres" id="4_vi4j0"]
+[ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/Room1/雪地背景瓦片集.tres" id="5_glpwp"]
+[ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/HurtBox.tscn" id="6_8irbu"]
+[ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="7_jhq37"]
+[ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="8_hgiax"]
+[ext_resource type="PackedScene" uid="uid://dvyyx1gsopmfx" path="res://Scenes/Instances/Coins/Coin.tscn" id="9_germs"]
+[ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="10_g28qu"]
+[ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="11_k3alq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
+
+[node name="Room66" type="Node2D" node_paths=PackedStringArray("room_bounds")]
+script = ExtResource("1_cb4qp")
+room_id = "Room66"
+adjacent_rooms = Array[String](["Room63", "Room67", "Room69"])
+room_color = Color(0.6872149, 0.68721503, 0.68721485, 1)
+room_bounds = NodePath("RoomBounds66")
+
+[node name="RoomBounds66" type="Node2D" parent="."]
+scale = Vector2(3, 6)
+script = ExtResource("2_7xt4e")
+debug_color = Color(0, 0.824, 0.588, 0.235)
+metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
+
+[node name="RoomTrigger" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomTrigger"]
+shape = SubResource("RectangleShape2D_qqk48")
+
+[node name="GroundControllers" type="Node2D" parent="."]
+
+[node name="TileMapLayers" type="Node2D" parent="."]
+
+[node name="GroundTileMap" type="TileMapLayer" parent="TileMapLayers"]
+z_index = 20
+tile_map_data = PackedByteArray("AADV/+X/AgALAAIAAADV/+T/AgALAAAAAADU/+X/AgAKAAIAAADU/+T/AgAKAAAAAADT/+X/AgAKAAIAAADT/+T/AgAKAAAAAADS/+X/AgAKAAIAAADS/+T/AgAKAAAAAADR/+X/AgAKAAIAAADR/+T/AgAKAAAAAADQ/+X/AgAKAAIAAADQ/+T/AgAKAAAAAADP/+X/AgAKAAIAAADP/+T/AgAKAAAAAADO/+X/AgAKAAIAAADO/+T/AgAKAAAAAADN/+X/AgAKAAIAAADN/+T/AgAKAAAAAADM/+X/AgAKAAIAAADM/+T/AgAKAAAAAADL/+X/AgAJAAIAAADL/+T/AgAJAAAAAAA1ANv/AgALAAIAAAA1ANr/AgALAAEAAAA1ANn/AgALAAEAAAA1ANj/AgALAAAAAAA0ANv/AgAKAAIAAAA0ANr/AgAKAAEAAAA0ANn/AgAKAAEAAAA0ANj/AgAKAAAAAAAzANv/AgAKAAIAAAAzANr/AgAKAAEAAAAzANn/AgAKAAEAAAAzANj/AgAKAAAAAAAyANv/AgAKAAIAAAAyANr/AgAKAAEAAAAyANn/AgAKAAEAAAAyANj/AgAKAAAAAAAxANv/AgAKAAIAAAAxANr/AgAKAAEAAAAxANn/AgAKAAEAAAAxANj/AgAKAAAAAAAwANv/AgAKAAIAAAAwANr/AgAKAAEAAAAwANn/AgAKAAEAAAAwANj/AgAKAAAAAAAvANv/AgAKAAIAAAAvANr/AgAKAAEAAAAvANn/AgAKAAEAAAAvANj/AgAKAAAAAAAuANv/AgAKAAIAAAAuANr/AgAKAAEAAAAuANn/AgAKAAEAAAAuANj/AgAKAAAAAAAtANv/AgAKAAIAAAAtANr/AgAKAAEAAAAtANn/AgAKAAEAAAAtANj/AgAKAAAAAAAsANv/AgAKAAIAAAAsANr/AgAKAAEAAAAsANn/AgAKAAEAAAAsANj/AgAKAAAAAAArANv/AgAKAAIAAAArANr/AgAKAAEAAAArANn/AgAKAAEAAAArANj/AgAKAAAAAAAqANv/AgAJAAIAAAAqANr/AgAJAAEAAAAqANn/AgAJAAEAAAAqANj/AgAJAAAAAADn/zYAAgALAAIAAADn/zUAAgALAAEAAADn/zQAAgALAAAAAADm/zYAAgAKAAIAAADm/zUAAgAKAAEAAADm/zQAAgAKAAAAAADl/zYAAgAKAAIAAADl/zUAAgAKAAEAAADl/zQAAgAKAAAAAADk/zYAAgAKAAIAAADk/zUAAgAKAAEAAADk/zQAAgAKAAAAAADj/zYAAgAKAAIAAADj/zUAAgAKAAEAAADj/zQAAgAKAAAAAADi/zYAAgAKAAIAAADi/zUAAgAKAAEAAADi/zQAAgAKAAAAAADh/zYAAgAKAAIAAADh/zUAAgAKAAEAAADh/zQAAgAKAAAAAADg/zYAAgAJAAIAAADg/zUAAgAJAAEAAADg/zQAAgAJAAAAAAA=")
+tile_set = ExtResource("3_16onl")
+
+[node name="NoWallTileMap" type="TileMapLayer" parent="TileMapLayers"]
+z_index = 20
+tile_set = ExtResource("4_vi4j0")
+
+[node name="HurtTileMap" type="TileMapLayer" parent="TileMapLayers"]
+tile_map_data = PackedByteArray("AACpAPP/AgALAAIAAACpAPL/AgALAAEAAACpAPH/AgAKAAMAAACpAPD/AgAKAAEAAACpAO//AgAKAAEAAACpAO7/AgAKAAEAAACpAO3/AgAKAAEAAACpAOz/AgAKAAEAAACpAOv/AgAKAAEAAACoAPP/AgAKAAIAAACoAPL/AgAKAAEAAACoAPH/AgAKAAEAAACoAPD/AgAKAAEAAACoAO//AgAKAAEAAACoAO7/AgAKAAEAAACoAO3/AgAKAAEAAACoAOz/AgAKAAEAAACoAOv/AgAKAAEAAACnAPP/AgAKAAMAAACnAPL/AgAKAAEAAACnAPH/AgAKAAEAAACnAPD/AgAKAAEAAACnAO//AgAKAAEAAACnAO7/AgAKAAEAAACnAO3/AgAKAAEAAACnAOz/AgAKAAEAAACnAOv/AgAKAAEAAACmAPP/AgAKAAEAAACmAPL/AgAKAAEAAACmAPH/AgAKAAEAAACmAPD/AgAKAAEAAACmAO//AgAKAAEAAACmAO7/AgAKAAEAAACmAO3/AgAKAAEAAACmAOz/AgAKAAEAAACmAOv/AgAKAAEAAAClAPP/AgAKAAEAAAClAPL/AgAKAAEAAAClAPH/AgAKAAEAAAClAPD/AgAKAAEAAAClAO//AgAKAAEAAAClAO7/AgAKAAEAAAClAO3/AgAKAAEAAAClAOz/AgAKAAEAAAClAOv/AgAKAAEAAACkAPP/AgAKAAEAAACkAPL/AgAKAAEAAACkAPH/AgAKAAEAAACkAPD/AgAKAAEAAACkAO//AgAKAAEAAACkAO7/AgAKAAEAAACkAO3/AgAKAAEAAACkAOz/AgAKAAEAAACkAOv/AgAKAAEAAACjAPP/AgALAAMAAACjAPL/AgAKAAEAAACjAPH/AgAKAAEAAACjAPD/AgAKAAEAAACjAO//AgAKAAEAAACjAO7/AgAKAAEAAACjAO3/AgAKAAEAAACjAOz/AgAKAAEAAACjAOv/AgAKAAEAAACiAPP/AgAKAAIAAACiAPL/AgAKAAEAAACiAPH/AgAKAAEAAACiAPD/AgAKAAEAAACiAO//AgAKAAEAAACiAO7/AgAKAAEAAACiAO3/AgAKAAEAAACiAOz/AgAKAAEAAACiAOv/AgAJAAMAAAChAPP/AgAKAAIAAAChAPL/AgAKAAEAAAChAPH/AgAKAAEAAAChAPD/AgAKAAEAAAChAO//AgAKAAEAAAChAO7/AgAKAAEAAAChAO3/AgAKAAEAAAChAOz/AgAKAAEAAAChAOv/AgAKAAAAAACgAPP/AgAKAAIAAACgAPL/AgAKAAEAAACgAPH/AgAKAAEAAACgAPD/AgAKAAEAAACgAO//AgAKAAEAAACgAO7/AgAKAAEAAACgAO3/AgAKAAEAAACgAOz/AgAKAAEAAACgAOv/AgAKAAAAAACfAPP/AgAKAAIAAACfAPL/AgAKAAEAAACfAPH/AgAKAAEAAACfAPD/AgAKAAEAAACfAO//AgAKAAEAAACfAO7/AgAKAAEAAACfAO3/AgAKAAEAAACfAOz/AgAKAAEAAACfAOv/AgAKAAAAAACeAPP/AgAKAAIAAACeAPL/AgAKAAEAAACeAPH/AgAKAAEAAACeAPD/AgAKAAEAAACeAO//AgAKAAEAAACeAO7/AgAKAAEAAACeAO3/AgAKAAEAAACeAOz/AgAKAAEAAACeAOv/AgAKAAAAAACdAPP/AgAKAAIAAACdAPL/AgAKAAEAAACdAPH/AgAKAAEAAACdAPD/AgAKAAEAAACdAO//AgAKAAEAAACdAO7/AgAKAAEAAACdAO3/AgAKAAEAAACdAOz/AgAKAAEAAACdAOv/AgAKAAAAAACcAPP/AgAKAAIAAACcAPL/AgAKAAEAAACcAPH/AgAKAAEAAACcAPD/AgAKAAEAAACcAO//AgAKAAEAAACcAO7/AgAKAAEAAACcAO3/AgAKAAEAAACcAOz/AgAKAAEAAACcAOv/AgAKAAAAAACbAPP/AgAJAAIAAACbAPL/AgAJAAEAAACbAPH/AgAJAAEAAACbAPD/AgALAAMAAACbAO//AgAKAAEAAACbAO7/AgAKAAEAAACbAO3/AgAKAAEAAACbAOz/AgAKAAEAAACbAOv/AgAKAAAAAACaAPD/AgAJAAIAAACaAO//AgAJAAEAAACaAO7/AgAJAAEAAACaAO3/AgAJAAEAAACaAOz/AgAJAAEAAACaAOv/AgAJAAAAAACqAO7/AgALAAEAAACqAO3/AgAKAAMAAACqAOz/AgAKAAEAAACqAOv/AgAIAAMAAACrAO3/AgALAAIAAACrAOz/AgALAAEAAACrAOv/AgALAAAAAACqAOr/AgALAAAAAACpAOr/AgAKAAAAAACqAPH/AgALAAIAAACqAPD/AgALAAEAAACqAO//AgALAAEAAACnAPT/AgALAAIAAACmAPT/AgAKAAIAAAClAPT/AgAKAAIAAACkAPT/AgAKAAIAAACjAPT/AgAJAAIAAACoAOr/AgAKAAAAAACnAOr/AgAKAAAAAACmAOr/AgAKAAAAAAClAOr/AgAKAAAAAACkAOr/AgAKAAAAAACjAOr/AgAKAAAAAACiAOr/AgAJAAAAAABQAP//AgAAAAIAAABQAP7/AgAAAAEAAABQAP3/AgAAAAEAAABQAPz/AgAAAAEAAABQAPv/AgAAAAEAAABQAPr/AgAAAAEAAABQAPn/AgAAAAEAAABQAPj/AgAAAAEAAABQAPf/AgAAAAEAAABQAPb/AgAAAAEAAABQAPX/AgAAAAEAAABQAPT/AgAAAAEAAABQAPP/AgAAAAEAAABQAPL/AgAAAAEAAABQAPH/AgAAAAEAAABQAPD/AgAAAAAAAABOAP//AgAAAAIAAABOAP7/AgAAAAEAAABOAP3/AgAAAAEAAABOAPz/AgAAAAEAAABOAPv/AgAAAAEAAABOAPr/AgAAAAEAAABOAPn/AgAAAAEAAABOAPj/AgAAAAEAAABOAPf/AgAAAAAAAABTAPz/AgAAAAIAAABTAPv/AgAAAAEAAABTAPr/AgAAAAEAAABTAPn/AgAAAAEAAABTAPj/AgAAAAEAAABTAPf/AgAAAAEAAABTAPb/AgAAAAEAAABTAPX/AgAAAAEAAABTAPT/AgAAAAAAAABYAP//AgAAAAIAAABYAP7/AgAAAAEAAABYAP3/AgAAAAAAAABXAPz/AgAAAAIAAABXAPv/AgAAAAAAAABWAPr/AgAAAAIAAABWAPn/AgAAAAAAAABVAPj/AgAAAAIAAABVAPf/AgAAAAAAAABUAP//AgAAAAIAAABUAP7/AgAAAAEAAABUAP3/AgAAAAAAAABLAPj/AgAAAAIAAABLAPf/AgAAAAAAAAA=")
+
+[node name="BGTileMap" type="TileMapLayer" parent="TileMapLayers"]
+tile_set = ExtResource("5_glpwp")
+
+[node name="HurtBoxs" type="Node2D" parent="."]
+
+[node name="HurtBox" parent="HurtBoxs" instance=ExtResource("6_8irbu")]
+position = Vector2(-242, -128)
+scale = Vector2(1.5, 1.5)
+damage_type = 2
+
+[node name="JumpBoxs" type="Node2D" parent="."]
+
+[node name="JumpBox" parent="JumpBoxs" instance=ExtResource("7_jhq37")]
+position = Vector2(0, 55)
+
+[node name="NPCs" type="Node2D" parent="."]
+
+[node name="Doors" type="Node2D" parent="."]
+
+[node name="Door63-66" parent="Doors" instance=ExtResource("8_hgiax")]
+position = Vector2(-808, -480)
+door_id = "63-66"
+
+[node name="Door66-67" parent="Doors" instance=ExtResource("8_hgiax")]
+position = Vector2(-560, 928)
+scale = Vector2(2, 1)
+door_id = "66-67"
+
+[node name="Door66-69" parent="Doors" instance=ExtResource("8_hgiax")]
+position = Vector2(808, -672)
+door_id = "66-69"
+
+[node name="Coins" type="Node2D" parent="."]
+
+[node name="Coin" parent="Coins" instance=ExtResource("9_germs")]
+position = Vector2(-1190, -120)
+coin_value = 150
+
+[node name="DynamicCheckpoints" type="Node2D" parent="."]
+
+[node name="DynamicCheckpoint" parent="DynamicCheckpoints" instance=ExtResource("10_g28qu")]
+position = Vector2(-728, -480)
+checkpoint_id = 6601
+belongs_to_room = "Room66"
+
+[node name="DynamicCheckpoint2" parent="DynamicCheckpoints" instance=ExtResource("10_g28qu")]
+position = Vector2(-448, 800)
+checkpoint_id = 6602
+belongs_to_room = "Room66"
+
+[node name="DynamicCheckpoint3" parent="DynamicCheckpoints" instance=ExtResource("10_g28qu")]
+position = Vector2(728, -672)
+checkpoint_id = 6603
+belongs_to_room = "Room66"
+
+[node name="ChairSavePoints" type="Node2D" parent="."]
+
+[node name="ChairSavePoint" parent="ChairSavePoints" instance=ExtResource("11_k3alq")]
+position = Vector2(-210, 87)
+save_point_id = "6601"

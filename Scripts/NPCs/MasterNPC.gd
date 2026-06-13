@@ -66,6 +66,7 @@ func _grant_abilities_except_black_dash(player):
 		player.unlock_ability("wall_grip")
 		player.unlock_ability("super_dash")
 		player.unlock_ability("backstep")
+		player.unlock_ability("vertical_dash")
 	
 	# 更新全局数据
 	Global.unlock_ability("dash")
@@ -74,6 +75,7 @@ func _grant_abilities_except_black_dash(player):
 	Global.unlock_ability("wall_grip")
 	Global.unlock_ability("super_dash")
 	Global.unlock_ability("backstep")
+	Global.unlock_ability("vertical_dash")
 	
 	print("DEBUG MasterNPC: 授予除暗影冲刺外的所有能力")
 

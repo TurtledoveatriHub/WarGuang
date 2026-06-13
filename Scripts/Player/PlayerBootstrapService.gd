@@ -14,6 +14,7 @@ static func initialize_on_ready(player: Node) -> void:
 	player.wall_grip_unlocked = Global.unlocked_abilities.get("wall_grip", false)
 	player.super_dash_unlocked = Global.unlocked_abilities.get("super_dash", false)
 	player.backstep_unlocked = Global.unlocked_abilities.get("backstep", false)
+	player.vertical_dash_unlocked = Global.unlocked_abilities.get("vertical_dash", false)
 
 	if player.camera_controller and player.camera_controller.has_method("setup"):
 		player.camera_controller.call_deferred("setup", player)
@@ -141,3 +142,7 @@ static func _connect_ability_unlock_signals(player: Node) -> void:
 	if EventBus.instance.backstep_unlocked.is_connected(player._on_backstep_unlocked):
 		EventBus.instance.backstep_unlocked.disconnect(player._on_backstep_unlocked)
 	EventBus.instance.backstep_unlocked.connect(player._on_backstep_unlocked)
+
+	if EventBus.instance.vertical_dash_unlocked.is_connected(player._on_vertical_dash_unlocked):
+		EventBus.instance.vertical_dash_unlocked.disconnect(player._on_vertical_dash_unlocked)
+	EventBus.instance.vertical_dash_unlocked.connect(player._on_vertical_dash_unlocked)

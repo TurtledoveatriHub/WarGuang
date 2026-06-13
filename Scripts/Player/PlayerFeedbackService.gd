@@ -111,9 +111,12 @@ static func _create_afterimage_new(player: Node, state: int, is_jumpbox: bool = 
 		return
 
 	var move_direction = Vector2.ZERO
-	var player_velocity = player.get_velocity() if player.has_method("get_velocity") else Vector2.ZERO
+	var player_velocity: Vector2 = player.velocity
 	if player_velocity != Vector2.ZERO:
 		move_direction = -player_velocity.normalized()
+	elif player.current_state == player.PlayerState.DASH and player.dash_locked_vector.y != 0:
+		# 垂直冲刺撞墙速度为零时，位移方向仍保持冲刺方向的反方向。
+		move_direction = -player.dash_locked_vector
 	else:
 		move_direction = Vector2(-1 if player.is_facing_right else 1, 0)
 	if not move_direction.is_finite() or move_direction.length_squared() < 0.0001:
@@ -132,6 +135,17 @@ static func _create_afterimage_new(player: Node, state: int, is_jumpbox: bool = 
 		)
 		if afterimage:
 			afterimage.player_ref = player
+			# 垂直冲刺时：旋转 sprite 子节点使其与角色纹理一致，同时补偿 shader 位移方向以抵消旋转带来的空间偏移。
+			if player.current_state == player.PlayerState.DASH and player.dash_locked_vector.y != 0:
+				var target_rot: float = player.animated_sprite.rotation_degrees
+				if afterimage.get("sprite") != null:
+					afterimage.sprite.rotation_degrees = target_rot
+				# 补偿 shader 位移方向：将 move_direction 反向旋转，抵消 sprite 子节点旋转造成的空间偏移。
+				if afterimage.shader_material != null:
+					var rot_rad: float = deg_to_rad(-target_rot)
+					var comp_x: float = move_direction.x * cos(rot_rad) - move_direction.y * sin(rot_rad)
+					var comp_y: float = move_direction.x * sin(rot_rad) + move_direction.y * cos(rot_rad)
+					afterimage.shader_material.set_shader_parameter("move_direction", Vector2(comp_x, comp_y))
 
 static func clear_jumpbox_afterimage_pool(player: Node) -> void:
 	player.has_jumpbox_afterimage = false

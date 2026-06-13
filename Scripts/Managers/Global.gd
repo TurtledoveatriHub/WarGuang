@@ -20,8 +20,9 @@ var unlocked_abilities: Dictionary = {
 	"glide": false,
 	"black_dash": false,
 	"wall_grip": false,
-	"super_dash": false,  # 新增超级冲刺
-	"backstep": false
+	"super_dash": false,
+	"backstep": false,
+	"vertical_dash": false
 }
 
 # 击败的Boss记录
@@ -93,7 +94,8 @@ func initialize_new_game():
 		"black_dash": false,
 		"wall_grip": false,
 		"super_dash": false,
-		"backstep": false
+		"backstep": false,
+		"vertical_dash": false
 	}
 	defeated_bosses = []
 	collected_items = []

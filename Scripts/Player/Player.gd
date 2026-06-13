@@ -94,13 +94,13 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 基础移动速度（像素/秒）
 @export var base_move_speed: float = 120.0
 ## 奔跑移动速度（像素/秒）
-@export var run_move_speed: float = 220.0
+@export var run_move_speed: float = 240.0
 ## 地面加速度 (0-1，越大加速越快)
-@export var ground_acceleration: float = 0.6
+@export var ground_acceleration: float = 0.8
 ## 地面减速度 (0-1，越大减速越快)
-@export var ground_deceleration: float = 0.8
+@export var ground_deceleration: float = 0.6
 ## 空中移动控制力 (0-1，越小控制力越弱)
-@export var air_control: float = 0.5
+@export var air_control: float = 0.26
 ## 空中无输入时 JUMP 状态的基础衰减倍率（越大停得越快）
 @export var air_no_input_deceleration_multiplier_jump: float = 0.8
 ## 空中无输入时 DOWN 状态的基础衰减倍率（越大停得越快）
@@ -109,19 +109,19 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 跳跃设置
 @export_category("跳跃设置")
 ## 跳跃移动速度（像素/秒）
-@export var jump_move_speed: float = 90.0
+@export var jump_move_speed: float = 120.0
 ## 一段跳初始速度
-@export var jump_velocity: float = -90.0
+@export var jump_velocity: float = -120.0
 ## 二段跳初始速度
 @export var double_jump_velocity: float = -60.0
 ## 最大跳跃按住时间（秒）
-@export var max_jump_hold_time: float = 0.3
+@export var max_jump_hold_time: float = 0.24
 ## 跳跃额外速度（长按期间每帧增加）
-@export var jump_hold_boost: float = -30.0
+@export var jump_hold_boost: float = -35.0
 ## 重力
-@export var gravity: float = 1320.0
+@export var gravity: float = 1200.0
 ## 最大下落速度
-@export var max_fall_speed: float = 540.0
+@export var max_fall_speed: float = 480.0
 ## 土狼时间（离开平台后仍可跳跃的时间）
 @export var coyote_time: float = 0.2
 ## 跳跃缓冲时间（提前按跳跃的有效时间）
@@ -138,11 +138,11 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 滑翔目标水平速度
 @export var glide_target_h_speed: float = 180.0
 ## 滑翔水平加速度（按住方向键时每秒逼近目标水平速度的最大变化率）
-@export var glide_horizontal_acceleration: float = 600.0
+@export var glide_horizontal_acceleration: float = 480.0
 ## 滑翔松开方向键时的水平减速
 @export var glide_release_deceleration: float = 90.0
 ## 滑翔最大下落速度乘数
-@export var glide_max_fall_multiplier: float = 0.3
+@export var glide_max_fall_multiplier: float = 0.25
 ## 进入滑翔后的滞空时间（秒）
 @export var glide_hover_time: float = 0.25
 ## 滑翔下落倍率过渡时间（秒）
@@ -186,24 +186,30 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 
 ## 冲刺设置
 @export_category("冲刺设置")
-## 冲刺速度
+## 水平冲刺速度（像素/秒）
 @export var dash_speed: float = 360.0
+## 垂直冲刺速度（像素/秒）
+@export var vertical_dash_speed: float = 300.0
 ## 冲刺持续时间（秒）
-@export var dash_duration: float = 0.2
+@export var dash_duration: float = 0.14
 ## 黑色冲刺持续时间（秒）
-@export var black_dash_duration: float = 0.22
+@export var black_dash_duration: float = 0.16
+## 冲刺转向持续时间（秒）：基础冲刺期结束后，玩家可通过方向键控制冲刺方向的时长
+@export var dash_steer_duration: float = 0.05
 ## 冲刺冷却时间（秒）
 @export var dash_cooldown: float = 0.6
 ## 冲刺后惯性初速度
 @export var dash_inertia_speed: float = 120.0
 ## 冲刺后惯性衰减系数 (0-1，越大衰减越快)
-@export var dash_inertia_decay: float = 0.6
+## 注意：该变量不用于冲刺后的惯性衰减（DASH退出后由常规地面/空中减速处理），
+## 而是用于以下场景：撞墙僵直(handle_wall_bump_stun)、受伤(HURT)、死亡(DIE)状态下的水平速度衰减。
+@export var dash_inertia_decay: float = 0.8
 
 @export_category("后撤步设置")
 ## 后撤步持续时间（秒）
 @export var backstep_duration: float = 0.12
 ## 后撤步移动速度
-@export var backstep_move_speed: float = 260.0
+@export var backstep_move_speed: float = 240.0
 ## 后撤步防反有效窗口（秒）：<=0 时自动使用后撤步持续时间。
 @export var backstep_counter_window: float = 0.1
 ## 后撤步成功防反后仍保持无敌的持续时间（秒）。
@@ -280,7 +286,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 
 @export_category("攀墙设置")
 ## 攀墙下滑速度（像素/秒）
-@export var wall_slide_speed: float = 240.0
+@export var wall_slide_speed: float = 300.0
 ## 攀墙缓慢下滑速度（像素/秒）
 @export var wall_slide_slow_speed: float = 120.0
 ## 按住向墙方向键的静止时间（秒）
@@ -292,13 +298,13 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 离墙后触发墙跳的缓冲窗口（秒）
 @export var wall_jump_escape_buffer_time: float = 0.12  
 ## 墙跳水平初速度（离开墙体的水平速度）
-@export var wall_jump_h_speed: float = 80.0
+@export var wall_jump_h_speed: float = 90.0
 ## 墙跳垂直速度
-@export var wall_jump_v_speed: float = -200.0
+@export var wall_jump_v_speed: float = -180.0
 ## 墙跳后重新附着延迟（秒）
 @export var wall_jump_reattach_delay: float = 0.1
 ## 墙跳最大按住时间（秒）
-@export var wall_jump_max_hold_time: float = 0.3
+@export var wall_jump_max_hold_time: float = 0.24
 ## 墙跳额外垂直速度（长按期间每帧增加）
 @export var wall_jump_hold_boost: float = -40.0
 
@@ -332,9 +338,9 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 墙跳边缘修正的最大尝试次数
 @export var wall_jump_edge_correction_steps: int = 8
 ## 冲刺边缘修正的单步偏移（像素）
-@export var dash_edge_correction_step: float = 0.4
+@export var dash_edge_correction_step: float = 0.6
 ## 冲刺边缘修正的最大尝试次数
-@export var dash_edge_correction_steps: int = 6
+@export var dash_edge_correction_steps: int = 8
 
 #endregion
 
@@ -463,7 +469,7 @@ var can_dash: bool = true                       # 标记当前是否可以冲刺
 var has_dashed_in_air: bool = false             # 标记是否已在空中冲刺过
 var dash_duration_timer: float = 0.0            # 冲刺持续时间计时器
 var dash_cooldown_timer: float = 0.0            # 冲刺冷却计时器
-var dash_locked_direction: int = 1              # 冲刺锁定方向（冲刺期间不允许改向）
+var dash_locked_vector: Vector2 = Vector2.RIGHT  # 冲刺锁定方向向量（水平或垂直）
 
 ## 超级冲刺相关
 var super_dash_charge_timer: float = 0.0        # 超级冲刺充电计时器
@@ -573,6 +579,7 @@ var black_dash_unlocked: bool = false            # 标记强化冲刺能力是�
 var wall_grip_unlocked: bool = false             # 标记攀墙能力是否已解锁
 var super_dash_unlocked: bool = false            # 标记超级冲刺能力是否已解锁
 var backstep_unlocked: bool = false              # 标记后撤步能力是否已解锁
+var vertical_dash_unlocked: bool = false          # 标记垂直冲刺能力是否已解锁
 
 ## 计时器引用相关
 var coyote_timer: Timer                          # 土狼时间计时器，用于检测离开平台后的可跳跃时间
@@ -1160,6 +1167,9 @@ func _on_super_dash_unlocked():
 func _on_backstep_unlocked():
 	backstep_unlocked = true
 
+func _on_vertical_dash_unlocked():
+	vertical_dash_unlocked = true
+
 func enable_counter_slow_compensation(real_duration: float) -> void:
 	if real_duration <= 0.0:
 		counter_slow_compensation_active = false
@@ -1318,6 +1328,8 @@ func unlock_ability(ability_name: String) -> void:
 			super_dash_unlocked = true
 		"backstep":
 			backstep_unlocked = true
+		"vertical_dash":
+			vertical_dash_unlocked = true
 
 func _on_wall_grip_unlocked():
 	wall_grip_unlocked = true
