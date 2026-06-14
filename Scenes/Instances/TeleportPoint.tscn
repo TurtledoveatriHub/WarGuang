@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=4]
+
+[ext_resource type="Script" path="res://Scripts/Instances/TeleportPoint.gd" id="1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_9kf2m"]
+size = Vector2(48, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2gh8d"]
+animations = [{
+"name": "INACTIVE",
+"speed": 5.0,
+"loop": true
+}, {
+"name": "ACTIVATEBLEND",
+"speed": 5.0,
+"loop": false
+}, {
+"name": "ACTIVE",
+"speed": 5.0,
+"loop": true
+}, {
+"name": "INTERACTACTIVE",
+"speed": 5.0,
+"loop": true
+}]
+
+[node name="TeleportPoint" type="Area2D"]
+script = ExtResource("1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_9kf2m")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_2gh8d")
+
+[node name="InteractionPrompt" type="Sprite2D" parent="."]
+visible = false

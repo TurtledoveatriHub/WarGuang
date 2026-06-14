@@ -1,9 +1,5 @@
 extends CanvasLayer
 
-## 地图 UI
-## 层级：98（DarkOverlay=95 之上，GameSetting=100 之下）
-## 不暂停游戏
-
 @onready var background: ColorRect = $Background
 @onready var content_root: Control = $ContentRoot
 @onready var map_container: Node2D = $ContentRoot/MapContainer
@@ -11,12 +7,16 @@ extends CanvasLayer
 @onready var player_icon: Sprite2D = $ContentRoot/MapContainer/PlayerIcon
 @onready var close_btn: TextureButton = $ContentRoot/CloseBtn
 
-## 场景暗化倍率（与 GameSettingScene 一致：值越小越暗，0.3=70%暗）
+## 暗化倍率（与 GameSettingScene 一致：0.3=70%暗）
 @export var darken_multiplier: float = 0.3
+## PlayerIcon 更新间隔（秒）
+@export var player_icon_update_interval: float = 0.2
 
 var is_open: bool = false
-var _original_modulate_color: Color
-var _game_canvas_modulate: CanvasModulate
+var _original_modulate: Color
+var _canvas_modulate: CanvasModulate
+var _tween: Tween = null
+var _icon_timer: float = 0.0
 
 
 func _ready() -> void:
@@ -24,47 +24,55 @@ func _ready() -> void:
 	visible = false
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 	background.color = Color(0, 0, 0, 0)
-	content_root.scale = Vector2.ZERO
+	content_root.modulate = Color(1, 1, 1, 0)
 	close_btn.pressed.connect(_on_close_pressed)
 
 
-## ── 打开 ──
+func _process(delta: float) -> void:
+	if not is_open:
+		return
+	_icon_timer += delta
+	if _icon_timer >= player_icon_update_interval:
+		_icon_timer = 0.0
+		_update_player_position()
+
+
+## ── 打开（淡入内容，不缩放）──
 func open() -> void:
 	if is_open:
 		return
+	_kill_tween()
 	is_open = true
-	visible = true
-	content_root.scale = Vector2.ZERO
 	
 	_adjust_lighting()
-	_update_player_position()
 	
-	## 开启动画：背景渐暗 + 内容弹性放大（模仿 GameSettingScene）
-	var tween := create_tween().set_parallel(true)
-	tween.tween_property(background, "color", Color(0, 0, 0, 0.85), 0.12)
-	tween.tween_property(content_root, "scale", Vector2(1.1, 1.1), 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.chain().tween_property(content_root, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	visible = true
+	content_root.modulate = Color(1, 1, 1, 0)
+	background.color = Color(0, 0, 0, 0)
+	_icon_timer = 999.0
+	
+	_tween = create_tween().set_parallel(true)
+	_tween.tween_property(background, "color", Color(0, 0, 0, 0.85), 0.12)
+	_tween.tween_property(content_root, "modulate", Color(1, 1, 1, 1), 0.15)
 
 
-## ── 关闭 ──
+## ── 关闭（立即隐藏）──
 func close() -> void:
 	if not is_open:
 		return
+	_kill_tween()
 	is_open = false
 	
-	## 立即恢复光照（不依赖 await，确保一定执行）
 	_restore_lighting()
-	
-	## 播放关闭动画（缩小 → 隐藏）
-	var tween := create_tween().set_parallel(true)
-	tween.tween_property(content_root, "scale", Vector2(1.1, 1.1), 0.08).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(background, "color", Color(0, 0, 0, 0), 0.18)
-	tween.chain().tween_property(content_root, "scale", Vector2.ZERO, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	tween.finished.connect(func():
-		visible = false
-		content_root.scale = Vector2.ZERO
-		background.color = Color(0, 0, 0, 0)
-	)
+	background.color = Color(0, 0, 0, 0)
+	content_root.modulate = Color(1, 1, 1, 0)
+	visible = false
+
+
+func _kill_tween() -> void:
+	if _tween and _tween.is_valid():
+		_tween.kill()
+	_tween = null
 
 
 func _on_close_pressed() -> void:
@@ -74,23 +82,22 @@ func _on_close_pressed() -> void:
 ## 暗化场景（与 GameSettingScene 一致）
 func _adjust_lighting() -> void:
 	if RoomManager and RoomManager.global_canvas_modulate:
-		_game_canvas_modulate = RoomManager.global_canvas_modulate
-		_original_modulate_color = _game_canvas_modulate.color
-		_game_canvas_modulate.color = Color(
-			_original_modulate_color.r * darken_multiplier,
-			_original_modulate_color.g * darken_multiplier,
-			_original_modulate_color.b * darken_multiplier,
+		_canvas_modulate = RoomManager.global_canvas_modulate
+		_original_modulate = _canvas_modulate.color
+		_canvas_modulate.color = Color(
+			_original_modulate.r * darken_multiplier,
+			_original_modulate.g * darken_multiplier,
+			_original_modulate.b * darken_multiplier,
 			1.0
 		)
 
 
-## 立即恢复光照（同步执行，不 await）
 func _restore_lighting() -> void:
-	if _game_canvas_modulate and is_instance_valid(_game_canvas_modulate):
-		_game_canvas_modulate.color = _original_modulate_color
+	if _canvas_modulate and is_instance_valid(_canvas_modulate):
+		_canvas_modulate.color = _original_modulate
 
 
-## 更新玩家地图图标位置（概览模式隐藏，具体模式显示）
+## PlayerIcon 定位（每隔 player_icon_update_interval 秒更新一次）
 func _update_player_position() -> void:
 	if not player_icon:
 		return
@@ -102,9 +109,9 @@ func _update_player_position() -> void:
 		player_icon.visible = false
 
 
-## 世界坐标 → 地图坐标（后续由 MapData 映射）
 func _world_to_map_position(world_pos: Vector2) -> Vector2:
-	return world_pos * 0.05  ## 占位系数，后续替换为 MapData 映射
+	## 占位：后续替换为 MapData 的房间→地图坐标映射
+	return world_pos * 0.05
 
 
 func on_room_discovered(_room_id: String) -> void:
