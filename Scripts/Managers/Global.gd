@@ -22,7 +22,8 @@ var unlocked_abilities: Dictionary = {
 	"wall_grip": false,
 	"super_dash": false,
 	"backstep": false,
-	"vertical_dash": false
+	"vertical_dash": false,
+	"map": false
 }
 
 # 击败的Boss记录
@@ -95,11 +96,12 @@ func initialize_new_game():
 		"wall_grip": false,
 		"super_dash": false,
 		"backstep": false,
-		"vertical_dash": false
+		"vertical_dash": false,
+		"map": false
 	}
 	defeated_bosses = []
 	collected_items = []
-	destructible_walls_destroyed = []  # ⭐ 关键！新存档时清空石墙摧毁记录
+	destructible_walls_destroyed = []  
 	maniac_challenge_completed = false
 	maniac_last_challenge_failed = false
 	maniac_stage2_challenge_completed = false
@@ -322,6 +324,10 @@ func _notify_ability_unlocks():
 			EventBus.instance.emit_signal("wall_grip_unlocked")
 		if unlocked_abilities.get("backstep", false):
 			EventBus.instance.emit_signal("backstep_unlocked")
+		if unlocked_abilities.get("vertical_dash", false):
+			EventBus.instance.emit_signal("vertical_dash_unlocked")
+		if unlocked_abilities.get("map", false):
+			EventBus.instance.emit_signal("map_unlocked")
 
 # 解锁能力
 func unlock_ability(ability_name: String):

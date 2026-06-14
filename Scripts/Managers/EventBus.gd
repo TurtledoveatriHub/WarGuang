@@ -4,11 +4,12 @@ extends Node
 signal dash_unlocked()
 signal double_jump_unlocked() 
 signal glide_unlocked()
-signal black_dash_unlocked()  # 新增：强化冲刺解锁信号
-signal wall_grip_unlocked()  # 新增攀墙能力解锁信号
+signal black_dash_unlocked()
+signal wall_grip_unlocked()
 signal super_dash_unlocked()
 signal backstep_unlocked()
 signal vertical_dash_unlocked()
+signal map_unlocked()
 
 # 单例实例
 static var instance: EventBus
@@ -32,3 +33,4 @@ func _use_signals():
 		super_dash_unlocked.emit()
 		backstep_unlocked.emit()
 		vertical_dash_unlocked.emit()
+		map_unlocked.emit()

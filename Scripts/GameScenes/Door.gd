@@ -6,6 +6,9 @@ extends Area2D
 ## 门的唯一 ID，相同 ID 的两个门互相传送
 @export var door_id: String = ""
 
+## 交互模式：启用后玩家触碰门不立即传送，需按下交互键才传送
+@export var use_interaction_mode: bool = false
+
 ## 传送效果设置
 @export_category("传送效果设置")
 ## 渐入时间（秒）
@@ -24,6 +27,8 @@ var can_teleport: bool = true
 var is_player_inside: bool = false
 var is_enabled: bool = true
 
+@onready var interaction_prompt = $InteractionPrompt
+
 func _ready():
 	# 检查 door_id 是否设置
 	if door_id == "":
@@ -37,6 +42,9 @@ func _ready():
 	# 连接信号
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
+	
+	if interaction_prompt:
+		interaction_prompt.visible = false
 
 ## 门被销毁时从 DoorManager 注销
 func _exit_tree():
@@ -44,18 +52,36 @@ func _exit_tree():
 		DoorManager.unregister_door(self)
 
 func _on_body_entered(body):
-	if body.is_in_group("player") and can_teleport and is_enabled:
-		# 关键修复：检查玩家是否处于死亡状态
+	if body.is_in_group("player") and is_enabled:
 		if body.has_method("is_in_death_state") and body.is_in_death_state():
-			return  # 死亡过程中不触发传送
-		
+			return
 		is_player_inside = true
-		await teleport_player(body)
+		if use_interaction_mode:
+			_show_interaction_prompt()
+		elif can_teleport:
+			await teleport_player(body)
 
 func _on_body_exited(body):
 	if body.is_in_group("player"):
 		is_player_inside = false
-		can_teleport = true  # 离开后重新启用传送
+		can_teleport = true
+		_hide_interaction_prompt()
+
+func _input(event):
+	if use_interaction_mode and event.is_action_pressed("interactive") and is_player_inside:
+		var player = get_tree().get_first_node_in_group("player")
+		if player and player.has_method("get_player_state") and player.get_player_state() == player.PlayerState.DASH:
+			return
+		_hide_interaction_prompt()
+		await teleport_player(player)
+
+func _show_interaction_prompt() -> void:
+	if interaction_prompt:
+		interaction_prompt.visible = true
+
+func _hide_interaction_prompt() -> void:
+	if interaction_prompt:
+		interaction_prompt.visible = false
 
 ## 传送玩家
 func teleport_player(player):

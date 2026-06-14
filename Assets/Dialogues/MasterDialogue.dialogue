@@ -1,11 +1,14 @@
 ~ first_meeting
 
-大师：我已经传授了你大部分技巧。
+大师：我已经传授了你大部分技巧，还给了你一张地图。
 do EventBus.emit_signal("dash_unlocked")
 do EventBus.emit_signal("double_jump_unlocked")
 do EventBus.emit_signal("glide_unlocked")
 do EventBus.emit_signal("wall_grip_unlocked")
 do EventBus.emit_signal("super_dash_unlocked")
+do EventBus.emit_signal("backstep_unlocked")
+do EventBus.emit_signal("vertical_dash_unlocked")
+do EventBus.emit_signal("map_unlocked")
 => END
 
 ~ second_meeting

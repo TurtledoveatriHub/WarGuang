@@ -80,7 +80,8 @@ func _get_action_from_hbox(hbox_name: String) -> String:
 		"DownAction": "down",                ## 向下移动
 		"SuperDashAction": "super_dash",     ## 超级冲刺
 		"InteractiveAction": "interactive",  ## 交互
-		"DialogueNextAction": "dialogue_next" ## 对话继续
+		"DialogueNextAction": "dialogue_next", ## 对话继续
+		"MapAction": "map"                    ## 地图
 	}
 	
 	return action_map.get(hbox_name, "")
@@ -136,7 +137,8 @@ func _get_hbox_name_from_action(action: String) -> String:
 		"down": "DownAction",
 		"super_dash": "SuperDashAction",
 		"interactive": "InteractiveAction",
-		"dialogue_next": "DialogueNextAction"
+		"dialogue_next": "DialogueNextAction",
+		"map": "MapAction"
 	}
 	
 	return action_map.get(action, "")

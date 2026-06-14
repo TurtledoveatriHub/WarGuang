@@ -223,6 +223,9 @@ func _input(event):
 		else:
 			await _close_game_setting()
 			get_viewport().set_input_as_handled()
+	## 设置界面打开时阻止 Tab 打开地图
+	if event.is_action_pressed("map") and is_open:
+		get_viewport().set_input_as_handled()
 
 func _exit_tree():
 	if is_open:

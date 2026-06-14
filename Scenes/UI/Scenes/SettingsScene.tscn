@@ -384,6 +384,32 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
+[node name="MapAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/MapAction"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+text = "地图："
+
+[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/MapAction"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+text = "Tab"
+
+[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/MapAction"]
+custom_minimum_size = Vector2(96, 32)
+layout_mode = 2
+texture_normal = ExtResource("18_ppuk0")
+texture_pressed = ExtResource("19_leam6")
+texture_hover = ExtResource("20_ihv7n")
+stretch_mode = 0
+
 [node name="ResetHintLabel2" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage"]
 offset_left = 30.0
 offset_top = 110.0
@@ -426,6 +452,7 @@ theme_override_font_sizes/font_size = 20
 text = "请按下新的按键... (ESC取消)"
 
 [node name="AudioPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
+visible = false
 scale = Vector2(0.75, 0.75)
 
 [node name="VolumeContainer" type="Node2D" parent="SettingsRoot/PagesRoot/AudioPage"]

@@ -117,9 +117,9 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 最大跳跃按住时间（秒）
 @export var max_jump_hold_time: float = 0.24
 ## 跳跃额外速度（长按期间每帧增加）
-@export var jump_hold_boost: float = -35.0
+@export var jump_hold_boost: float = -30.0
 ## 重力
-@export var gravity: float = 1200.0
+@export var gravity: float = 1080.0
 ## 最大下落速度
 @export var max_fall_speed: float = 480.0
 ## 土狼时间（离开平台后仍可跳跃的时间）

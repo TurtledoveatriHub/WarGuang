@@ -35,7 +35,6 @@ const NPC_MASTER = "res://Scenes/NPCs/MasterNPC.tscn"
 # 游戏主场景
 # ============================================
 const GAME_MAIN = "res://Scenes/GameScenes/MainGameScene.tscn"
-const GAME_ROOM1 = "res://Scenes/GameScenes/Room1.tscn"
 
 # ============================================
 # 快捷加载方法（可选，但更方便）
@@ -85,5 +84,4 @@ static func load_master() -> PackedScene:
 static func load_main_game() -> PackedScene:
 	return load(GAME_MAIN)
 
-static func load_room1() -> PackedScene:
-	return load(GAME_ROOM1)
+

@@ -96,6 +96,9 @@ func _ready():
 	# 连接信号
 	game_setting_button.pressed.connect(_open_game_setting_menu)
 	Global.player_max_health_changed.connect(_on_global_max_health_changed)
+	
+	## 监听地图打开/关闭状态
+	MapManager.map_visibility_changed.connect(_on_map_visibility_changed)
 	Global.player_health_changed.connect(_on_global_health_changed)
 	Global.coins_changed.connect(_on_coins_changed)
 	Global.coins_changing.connect(_on_coins_changing)
@@ -493,10 +496,28 @@ func _on_game_setting_closed():
 	if game_setting_button:
 		game_setting_button.visible = true
 
-# PlayerUI.gd - 移除 ESC 防抖
 func _input(event):
-	if event.is_action_pressed("ui_cancel") and game_setting_instance == null:
-		_open_game_setting_menu()
+	## Tab：有地图能力且设置未打开时切换地图（优先处理，避免与 Esc 互斥）
+	if event.is_action_pressed("map"):
+		if game_setting_instance != null:
+			return
+		if Global.unlocked_abilities.get("map", false) and MapManager:
+			MapManager.toggle_map()
+		get_viewport().set_input_as_handled()
+		return
+	## Esc：地图打开时关闭地图，否则打开设置
+	if event.is_action_pressed("ui_cancel"):
+		if MapManager and MapManager.is_map_open:
+			MapManager.close_map()
+			get_viewport().set_input_as_handled()
+			return
+		if game_setting_instance == null:
+			_open_game_setting_menu()
+
+func _on_map_visibility_changed(map_visible: bool) -> void:
+	## 地图打开时禁用 GameSettingButton
+	if game_setting_button:
+		game_setting_button.visible = not map_visible
 
 # 全局数据更新
 func _on_global_max_health_changed(new_max_health: int):
