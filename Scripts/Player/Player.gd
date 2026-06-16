@@ -100,7 +100,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 地面减速度 (0-1，越大减速越快)
 @export var ground_deceleration: float = 0.6
 ## 空中移动控制力 (0-1，越小控制力越弱)
-@export var air_control: float = 0.28
+@export var air_control: float = 0.6
 ## 空中无输入时 JUMP 状态的基础衰减倍率（越大停得越快）
 @export var air_no_input_deceleration_multiplier_jump: float = 0.8
 ## 空中无输入时 DOWN 状态的基础衰减倍率（越大停得越快）
@@ -253,11 +253,11 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 奔跑跳跃设置
 @export_category("奔跑跳跃设置")
 ## 奔跑跳跃水平速度加成
-@export var run_jump_boost_speed: float = 90.0
+@export var run_jump_boost_speed: float = 120.0
 ## 奔跑跳跃加成持续时间（秒）
-@export var run_jump_boost_duration: float = 0.6
+@export var run_jump_boost_duration: float = 0.3
 ## 奔跑跳跃衰减时间（秒）
-@export var run_jump_decay_time: float = 0.3
+@export var run_jump_decay_time: float = 0.6
 
 ## 二段跳旋转设置
 @export_category("二段跳旋转设置")

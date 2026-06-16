@@ -1,9 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://diylsfmb0ckg5"]
+[gd_scene load_steps=10 format=3 uid="uid://diylsfmb0ckg5"]
 
 [ext_resource type="Script" uid="uid://x3hbxtwnrr30" path="res://Scripts/UI/TeleportPanel.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://bv4wcsihjxeaa" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭1.tres" id="2_gxax5"]
+[ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/2.png" id="2_juc85"]
 [ext_resource type="Texture2D" uid="uid://kxm2uujj5ma4" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭3.tres" id="3_5uayw"]
 [ext_resource type="Texture2D" uid="uid://byixw77mgxbb1" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭2.tres" id="4_l5e8y"]
+[ext_resource type="Texture2D" uid="uid://bwow0r831nkda" path="res://Assets/Textures/UIs/SceneUIs/tres/确认1.tres" id="6_q6nrd"]
+[ext_resource type="Texture2D" uid="uid://knvng6xnqnc1" path="res://Assets/Textures/UIs/SceneUIs/tres/确认3.tres" id="7_7prjw"]
+[ext_resource type="Texture2D" uid="uid://di5f8dpskcf3n" path="res://Assets/Textures/UIs/SceneUIs/tres/确认2.tres" id="8_ex6nn"]
+[ext_resource type="Script" uid="uid://dw76ryy8ii6g7" path="res://Scripts/UI/TeleportPanelButton.gd" id="9_l5e8y"]
 
 [node name="TeleportPanel" type="CanvasLayer"]
 script = ExtResource("1")
@@ -15,21 +20,17 @@ anchor_bottom = 1.0
 mouse_filter = 2
 color = Color(0, 0, 0, 0)
 
-[node name="PanelRoot" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-mouse_filter = 2
+[node name="PanelRoot" type="Node2D" parent="."]
+position = Vector2(618, 330)
+
+[node name="Sprite2D" type="Sprite2D" parent="PanelRoot"]
+texture = ExtResource("2_juc85")
 
 [node name="CloseBtn" type="TextureButton" parent="PanelRoot"]
-layout_mode = 0
-offset_left = 259.0
-offset_top = -226.0
-offset_right = 275.0
-offset_bottom = -210.0
+offset_left = 258.0
+offset_top = -175.0
+offset_right = 274.0
+offset_bottom = -159.0
 scale = Vector2(2, 2)
 texture_normal = ExtResource("2_gxax5")
 texture_pressed = ExtResource("3_5uayw")
@@ -37,22 +38,40 @@ texture_hover = ExtResource("4_l5e8y")
 stretch_mode = 0
 
 [node name="Btn1" type="TextureButton" parent="PanelRoot"]
-layout_mode = 0
-offset_left = -360.0
-offset_top = -220.0
-offset_right = 360.0
-offset_bottom = -172.0
-
-[node name="Btn2" type="TextureButton" parent="PanelRoot"]
-layout_mode = 0
-offset_left = -360.0
-offset_top = -160.0
-offset_right = 360.0
-offset_bottom = -112.0
+offset_left = -155.0
+offset_top = -98.0
+offset_right = -123.0
+offset_bottom = -82.0
+scale = Vector2(2, 2)
+texture_normal = ExtResource("6_q6nrd")
+texture_pressed = ExtResource("7_7prjw")
+texture_hover = ExtResource("8_ex6nn")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "Room1-1"
 
 [node name="Btn3" type="TextureButton" parent="PanelRoot"]
-layout_mode = 0
-offset_left = -360.0
-offset_top = -100.0
-offset_right = 360.0
-offset_bottom = -52.0
+offset_left = 57.0
+offset_top = -20.0
+offset_right = 89.0
+offset_bottom = -4.0
+scale = Vector2(2, 2)
+texture_normal = ExtResource("6_q6nrd")
+texture_pressed = ExtResource("7_7prjw")
+texture_hover = ExtResource("8_ex6nn")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "Room2-1"
+
+[node name="Btn4" type="TextureButton" parent="PanelRoot"]
+offset_left = -232.0
+offset_top = -44.0
+offset_right = -200.0
+offset_bottom = -28.0
+scale = Vector2(2, 2)
+texture_normal = ExtResource("6_q6nrd")
+texture_pressed = ExtResource("7_7prjw")
+texture_hover = ExtResource("8_ex6nn")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "Room3-1"

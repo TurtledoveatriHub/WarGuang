@@ -1,6 +1,6 @@
 [gd_resource type="TileSet" load_steps=3 format=3 uid="uid://bpwlvdbkoxsvk"]
 
-[ext_resource type="Texture2D" uid="uid://clt6gbgkhjucg" path="res://Assets/Textures/Tiles/Room1/雪地不可攀爬瓦片集.png" id="1_seumc"]
+[ext_resource type="Texture2D" uid="uid://clt6gbgkhjucg" path="res://Assets/Textures/Tiles/Room1/雪地物块瓦片集.png" id="1_seumc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_seumc"]
 texture = ExtResource("1_seumc")
@@ -22,9 +22,6 @@ texture = ExtResource("1_seumc")
 3:0/size_in_atlas = Vector2i(2, 1)
 3:0/0 = 0
 3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -8, 16, -8, 12, 8, -16, 8)
-3:1/size_in_atlas = Vector2i(2, 1)
-3:1/0 = 0
-3:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -8, 12, -8, 12, 8, -16, 8)
 3:2/size_in_atlas = Vector2i(2, 1)
 3:2/0 = 0
 3:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -8, 12, -8, 12, 8, -16, 8)
@@ -64,6 +61,8 @@ texture = ExtResource("1_seumc")
 9:4/size_in_atlas = Vector2i(2, 1)
 9:4/0 = 0
 9:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(2, -8, 16, -8, 16, 8, -12, 8)
+7:5/size_in_atlas = Vector2i(3, 2)
+7:5/0 = 0
 
 [resource]
 physics_layer_0/collision_layer = 2

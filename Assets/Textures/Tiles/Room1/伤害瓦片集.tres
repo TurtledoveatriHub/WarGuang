@@ -1,26 +1,11 @@
-[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://qtdk7cq6rg5m"]
-
-[ext_resource type="Texture2D" uid="uid://cjendm2aax6fo" path="res://Assets/Textures/Tiles/Room1/伤害与装饰.png" id="1_j5svd"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cau02"]
-texture = ExtResource("1_j5svd")
-0:0/0 = 0
-2:0/0 = 0
-3:0/0 = 0
-4:0/0 = 0
-6:0/0 = 0
-7:0/0 = 0
-9:0/0 = 0
-10:0/0 = 0
-3:1/0 = 0
-4:1/0 = 0
-7:1/0 = 0
-9:1/0 = 0
-0:2/0 = 0
-2:2/0 = 0
-4:2/0 = 0
-5:2/0 = 0
-6:2/0 = 0
+[gd_resource type="TileSet" format=3 uid="uid://qtdk7cq6rg5m"]
 
 [resource]
-sources/0 = SubResource("TileSetAtlasSource_cau02")
+physics_layer_0/collision_layer = 0
+physics_layer_0/collision_mask = 0
+custom_data_layer_0/name = "dmg_type"
+custom_data_layer_0/type = 2
+custom_data_layer_1/name = "is_warp"
+custom_data_layer_1/type = 1
+custom_data_layer_2/name = "knockback"
+custom_data_layer_2/type = 5

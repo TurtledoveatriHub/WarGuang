@@ -1,7 +1,7 @@
 extends CanvasLayer
 
 @onready var background: ColorRect = $Background
-@onready var content_root: Control = $ContentRoot
+@onready var content_root: Node2D = $ContentRoot
 @onready var map_container: Node2D = $ContentRoot/MapContainer
 @onready var map_texture: Sprite2D = $ContentRoot/MapContainer/MapTexture
 @onready var player_icon: Sprite2D = $ContentRoot/MapContainer/PlayerIcon
@@ -15,7 +15,6 @@ extends CanvasLayer
 var is_open: bool = false
 var _original_modulate: Color
 var _canvas_modulate: CanvasModulate
-var _tween: Tween = null
 var _icon_timer: float = 0.0
 
 
@@ -24,8 +23,21 @@ func _ready() -> void:
 	visible = false
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 	background.color = Color(0, 0, 0, 0)
-	content_root.modulate = Color(1, 1, 1, 0)
+	content_root.visible = false
+	
+	## 连接关闭按钮信号
 	close_btn.pressed.connect(_on_close_pressed)
+
+
+func _input(event: InputEvent) -> void:
+	## 保底：TextureButton 是 Control 类型，作为 Node2D(ContentRoot) 子节点时
+	## 鼠标事件路由可能不可靠，在 CanvasLayer 层额外检测关闭按钮点击区域
+	if not is_open or not visible:
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if close_btn.get_global_rect().has_point(get_viewport().get_mouse_position()):
+			_on_close_pressed()
+			get_viewport().set_input_as_handled()
 
 
 func _process(delta: float) -> void:
@@ -37,42 +49,25 @@ func _process(delta: float) -> void:
 		_update_player_position()
 
 
-## ── 打开（淡入内容，不缩放）──
 func open() -> void:
 	if is_open:
 		return
-	_kill_tween()
 	is_open = true
-	
-	_adjust_lighting()
-	
 	visible = true
-	content_root.modulate = Color(1, 1, 1, 0)
-	background.color = Color(0, 0, 0, 0)
+	content_root.visible = true
+	background.color = Color(0, 0, 0, 0.85)
 	_icon_timer = 999.0
-	
-	_tween = create_tween().set_parallel(true)
-	_tween.tween_property(background, "color", Color(0, 0, 0, 0.85), 0.12)
-	_tween.tween_property(content_root, "modulate", Color(1, 1, 1, 1), 0.15)
+	_adjust_lighting()
+	_update_player_position()
 
 
-## ── 关闭（立即隐藏）──
 func close() -> void:
 	if not is_open:
 		return
-	_kill_tween()
 	is_open = false
-	
 	_restore_lighting()
-	background.color = Color(0, 0, 0, 0)
-	content_root.modulate = Color(1, 1, 1, 0)
+	content_root.visible = false
 	visible = false
-
-
-func _kill_tween() -> void:
-	if _tween and _tween.is_valid():
-		_tween.kill()
-	_tween = null
 
 
 func _on_close_pressed() -> void:

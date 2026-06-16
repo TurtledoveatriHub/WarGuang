@@ -4,10 +4,10 @@ class_name TextArea
 
 ## 区域基础大小（可在编辑器直接拖动调整）
 ## 注意：最终大小 = size * scale
-@export var size: Vector2 = Vector2(512, 288) : set = set_size
+@export var size: Vector2 = Vector2(320, 320) : set = set_size
 
 ## 参考颜色（仅编辑器可见）
-@export var debug_color: Color = Color(0.0, 0.784, 0.196, 0.137)
+@export var debug_color: Color = Color.from_rgba8(0, 200, 50, 35)
 
 ## 运行时是否可见（默认 false，只在编辑器显示）
 @export var show_in_game: bool = false

@@ -14,10 +14,7 @@ signal room_discovered(room_id: String)
 var is_map_open: bool = false
 
 ## 已探索的房间列表
-var discovered_rooms: Array[String] = []
-
-## 已激活的传送阵列表
-var activated_teleports: Array[String] = []
+var discovered_rooms: Array = []
 
 ## MapUI 实例引用
 var _map_ui_instance: Node = null
@@ -77,27 +74,20 @@ func discover_room(room_id: String) -> void:
 		_map_ui_instance.on_room_discovered(room_id)
 
 
-## 激活一个传送阵
-func activate_teleport(teleport_id: String) -> void:
-	if teleport_id in activated_teleports:
-		return
-	activated_teleports.append(teleport_id)
-
-
-## 检查传送阵是否已激活
-func is_teleport_activated(teleport_id: String) -> bool:
-	return teleport_id in activated_teleports
-
-
 ## 检查房间是否已探索
 func is_room_discovered(room_id: String) -> bool:
 	return room_id in discovered_rooms
 
 
+## 从存档加载恢复探索数据
+func load_save_data(data: Dictionary) -> void:
+	if data.has("discovered_rooms"):
+		discovered_rooms = data["discovered_rooms"] as Array
+
+
 ## 重置状态（新游戏时调用）
 func reset_state() -> void:
 	discovered_rooms.clear()
-	activated_teleports.clear()
 	is_map_open = false
 	if _map_ui_instance and _map_ui_instance.is_inside_tree():
 		_map_ui_instance.queue_free()

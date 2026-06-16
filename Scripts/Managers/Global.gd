@@ -189,7 +189,9 @@ func get_save_data() -> Dictionary:
 		"maniac_stage2_last_challenge_failed": maniac_stage2_last_challenge_failed,
 		"maniac_stage3_challenge_completed": maniac_stage3_challenge_completed,
 		"maniac_stage3_last_challenge_failed": maniac_stage3_last_challenge_failed,
-		"destructible_walls_destroyed": destructible_walls_destroyed.duplicate(true),  # 深拷贝防止引用污染
+		"destructible_walls_destroyed": destructible_walls_destroyed.duplicate(true),
+		"discovered_rooms": MapManager.discovered_rooms.duplicate() if MapManager else [],
+		"activated_teleports": TeleportManager.activated.duplicate() if TeleportManager else [],
 		"played_cinematic_flags": played_cinematic_flags.duplicate(true),
 		"play_time_seconds": get_total_play_time_seconds(),
 		"timestamp": Time.get_datetime_string_from_system()
@@ -293,6 +295,12 @@ func load_save_data(data: Dictionary):
 		played_cinematic_flags = data["played_cinematic_flags"].duplicate(true)
 	else:
 		played_cinematic_flags = {}
+	
+	## 地图探索 & 传送阵激活 持久化（通过 has_method 安全调用，防止脚本时序问题）
+	if MapManager and MapManager.has_method("load_save_data"):
+		MapManager.load_save_data(data)
+	if TeleportManager and TeleportManager.has_method("load_save_data"):
+		TeleportManager.load_save_data(data)
 	
 	print("Global: 存档数据加载完成")
 

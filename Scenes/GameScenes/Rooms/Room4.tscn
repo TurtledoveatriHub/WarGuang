@@ -1,17 +1,16 @@
-[gd_scene load_steps=15 format=4 uid="uid://bmenoypaw0i4i"]
+[gd_scene load_steps=14 format=4 uid="uid://bmenoypaw0i4i"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_vbuyt"]
 [ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="2_jksrl"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_0pe4i"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/Room1/雪地背景瓦片集.tres" id="6_3111a"]
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/Room1/雪地瓦片集.tres" id="7_ss2g8"]
-[ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/Room1/雪地不可攀爬瓦片集.tres" id="8_ejcyb"]
-[ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/HurtBox.tscn" id="11_q1yj4"]
+[ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/Room1/雪地物块瓦片集.tres" id="8_ejcyb"]
 [ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="12_wumnj"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="15_u54f5"]
 [ext_resource type="PackedScene" uid="uid://dvyyx1gsopmfx" path="res://Scenes/Instances/Coins/Coin.tscn" id="17_g82si"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="18_e3q1g"]
-[ext_resource type="PackedScene" uid="uid://jycjg4kaigun" path="res://Scenes/Instances/HurtBoxs/RotationHurtBox.tscn" id="20_h06fl"]
+[ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/HurtBox.tscn" id="20_h06fl"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="21_se4pv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
@@ -75,10 +74,16 @@ tile_set = ExtResource("6_3111a")
 
 [node name="HurtBoxs" type="Node2D" parent="."]
 
-[node name="HurtBox" parent="HurtBoxs" instance=ExtResource("11_q1yj4")]
-position = Vector2(1108, -31)
+[node name="HurtBox" parent="HurtBoxs" instance=ExtResource("20_h06fl")]
+position = Vector2(-323, 186)
 scale = Vector2(1.5, 1.5)
 damage_type = 2
+
+[node name="HurtBox2" parent="HurtBoxs" instance=ExtResource("20_h06fl")]
+position = Vector2(-1054, -172)
+scale = Vector2(3, 3)
+enable_rotation = true
+rotation_speed = 180.0
 
 [node name="JumpBoxs" type="Node2D" parent="."]
 
@@ -118,13 +123,6 @@ checkpoint_id = 402
 belongs_to_room = "Room4"
 
 [node name="CameraFocusBeacons" type="Node2D" parent="."]
-
-[node name="RotationHurtBoxs" type="Node2D" parent="."]
-
-[node name="RotationHurtBox" parent="RotationHurtBoxs" instance=ExtResource("20_h06fl")]
-position = Vector2(696.0001, -394)
-scale = Vector2(3, 3)
-rotation_speed = 180.0
 
 [node name="ChairSavePoints" type="Node2D" parent="."]
 

@@ -1,15 +1,14 @@
-[gd_scene load_steps=13 format=4 uid="uid://bs1ylk126s0f4"]
+[gd_scene load_steps=12 format=4 uid="uid://bs1ylk126s0f4"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_kcxri"]
 [ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="2_h8urx"]
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/Room1/雪地瓦片集.tres" id="3_sadby"]
-[ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/Room1/雪地不可攀爬瓦片集.tres" id="4_tgmw2"]
+[ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/Room1/雪地物块瓦片集.tres" id="4_tgmw2"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/Room1/雪地背景瓦片集.tres" id="5_7ytod"]
-[ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/HurtBox.tscn" id="6_71flj"]
 [ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="7_m8ei2"]
 [ext_resource type="PackedScene" uid="uid://dvyyx1gsopmfx" path="res://Scenes/Instances/Coins/Coin.tscn" id="8_2jbtv"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="9_b6y5y"]
-[ext_resource type="PackedScene" uid="uid://jycjg4kaigun" path="res://Scenes/Instances/HurtBoxs/RotationHurtBox.tscn" id="10_x5lgx"]
+[ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/HurtBox.tscn" id="10_x5lgx"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="11_nk3mb"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
@@ -23,6 +22,7 @@ room_bounds = NodePath("RoomBounds6")
 [node name="RoomBounds6" type="Node2D" parent="."]
 scale = Vector2(8, 8)
 script = ExtResource("2_h8urx")
+size = Vector2(512, 288)
 debug_color = Color(0, 0.824, 0.588, 0.235)
 metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
 
@@ -53,7 +53,7 @@ tile_set = ExtResource("5_7ytod")
 
 [node name="HurtBoxs" type="Node2D" parent="."]
 
-[node name="HurtBox" parent="HurtBoxs" instance=ExtResource("6_71flj")]
+[node name="HurtBox" parent="HurtBoxs" instance=ExtResource("10_x5lgx")]
 position = Vector2(-934, 288)
 scale = Vector2(1.5, 1.5)
 damage_type = 2
@@ -83,13 +83,6 @@ checkpoint_id = 601
 belongs_to_room = "Room6"
 
 [node name="CameraFocusBeacons" type="Node2D" parent="."]
-
-[node name="RotationHurtBoxs" type="Node2D" parent="."]
-
-[node name="RotationHurtBox" parent="RotationHurtBoxs" instance=ExtResource("10_x5lgx")]
-position = Vector2(696.0001, -394)
-scale = Vector2(3, 3)
-rotation_speed = 180.0
 
 [node name="ChairSavePoints" type="Node2D" parent="."]
 

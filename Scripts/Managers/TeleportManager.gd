@@ -9,15 +9,14 @@ signal teleport_activated(teleport_id: String)
 var _teleports: Dictionary = {}
 
 ## 已激活的传送阵 ID 列表
-var activated: Array[String] = []
+var activated: Array = []
 
 
 ## 注册一个传送阵
-func register(point: Node, teleport_id: String, room_id: String, position: Vector2, display_name: String) -> void:
+func register(point: Node, teleport_id: String, room_id: String, position: Vector2) -> void:
 	_teleports[teleport_id] = {
 		"room_id": room_id,
 		"position": position,
-		"display_name": display_name,
 		"node": point
 	}
 
@@ -49,6 +48,12 @@ func activate(teleport_id: String) -> void:
 
 func is_activated(teleport_id: String) -> bool:
 	return teleport_id in activated
+
+
+## 从存档加载恢复激活数据
+func load_save_data(data: Dictionary) -> void:
+	if data.has("activated_teleports"):
+		activated = data["activated_teleports"] as Array
 
 
 ## 重置（新游戏时调用）

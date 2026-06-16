@@ -9,6 +9,8 @@
 
 [node name="MapUI" type="CanvasLayer"]
 script = ExtResource("1")
+darken_multiplier = null
+player_icon_update_interval = null
 
 [node name="Background" type="ColorRect" parent="."]
 anchors_preset = 15
@@ -17,15 +19,7 @@ anchor_bottom = 1.0
 mouse_filter = 2
 color = Color(0, 0, 0, 0)
 
-[node name="ContentRoot" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-pivot_offset = Vector2(640, 360)
-mouse_filter = 2
+[node name="ContentRoot" type="Node2D" parent="."]
 
 [node name="MapContainer" type="Node2D" parent="ContentRoot"]
 
@@ -38,7 +32,6 @@ position = Vector2(500, 314)
 texture = ExtResource("3_kx77s")
 
 [node name="CloseBtn" type="TextureButton" parent="ContentRoot"]
-layout_mode = 0
 offset_left = 828.0
 offset_top = 152.0
 offset_right = 844.0

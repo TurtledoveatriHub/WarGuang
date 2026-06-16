@@ -190,6 +190,42 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ultrw")
 }],
 "loop": true,
 "name": &"HAVE",
@@ -258,5 +294,5 @@ script = ExtResource("1_ddyvn")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_uasog")
-animation = &"REDUCE"
+animation = &"HAVE"
 centered = false
