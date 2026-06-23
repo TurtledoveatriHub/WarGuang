@@ -2,7 +2,9 @@ extends Node
 
 signal room_loaded(room_id: String, previous_room: String)
 
-const CAMERA_LIMIT_DISABLED: int = 10000000  # 禁用相机限制时使用的极大边界值（与 PhantomCamera2D 默认值一致）
+const CAMERA_LIMIT_DISABLED: int = 10000000
+const _ScenePathsScript = preload("res://Scripts/Managers/ScenePaths.gd")
+const _RoomLayoutDataPath = preload("res://Assets/Configs/RoomLayoutData.tres")
 
 # 在变量声明部分添加
 var global_canvas_modulate: CanvasModulate = null
@@ -12,6 +14,11 @@ var rooms: Dictionary = {}
 var current_room: String = ""
 var player_ref: Node = null
 var suppress_player_enter_until_msec: int = 0
+
+## 按需加载相关
+var _room_container: Node = null      # MainGameScene 下的 RoomContainer 节点
+var _room_node_cache: Dictionary = {} # room_id → Node（从场景树移除但保留引用）
+var _room_packed_cache: Dictionary = {} # room_id → PackedScene（缓存场景文件）
 
 ## 颜色状态管理
 var room_original_colors: Dictionary = {}  # 房间ID -> 原始颜色（检查器中设置的颜色）
@@ -28,6 +35,9 @@ func reset_runtime_state() -> void:
 	room_original_colors.clear()
 	is_low_health_active = false
 	low_health_color = Color.WHITE
+	_room_container = null
+	_room_node_cache.clear()
+	_room_packed_cache.clear()
 
 ## 注册房间
 func register_room(room_id: String, room_node: Node, room_data: Dictionary):
@@ -51,7 +61,7 @@ func register_room(room_id: String, room_node: Node, room_data: Dictionary):
 	rooms[room_id] = {
 		"node": room_node,
 		"bounds": room_bounds,
-		"bgm": room_data.get("bgm", ""),
+		"bgm_stream": room_data.get("bgm_stream", null),
 		"adjacent": room_data.get("adjacent", []),
 		"color": room_color
 	}
@@ -62,8 +72,10 @@ func set_global_canvas_modulate(canvas: CanvasModulate):
 
 func load_room(room_id: String):
 	if not rooms.has(room_id):
-		push_error("房间不存在：" + room_id)
-		return
+		if not _instantiate_room(room_id):
+			push_error("房间不存在且加载失败：" + room_id)
+			return
+	
 	var previous_room: String = current_room
 	_debug_room_camera_trace("load_room_begin", {"target_room": room_id, "from_room": current_room})
 	
@@ -71,7 +83,15 @@ func load_room(room_id: String):
 	notify_vignette_effect_room_change()
 	unload_distant_rooms(room_id)
 	
-	# 关键新增：清理被摧毁的石墙（切换房间时删除实例）
+	# 确保目标房间在场景树中并激活
+	_ensure_room_in_tree(room_id)
+	if rooms.has(room_id) and rooms[room_id].has("node"):
+		rooms[room_id].node.set_room_active(true)
+	for adj in rooms[room_id].adjacent:
+		if rooms.has(adj):
+			_ensure_room_in_tree(adj)
+			rooms[adj].node.set_room_active(true)
+	
 	cleanup_destroyed_walls()
 	
 	current_room = room_id
@@ -89,18 +109,13 @@ func load_room(room_id: String):
 	_debug_room_camera_trace("load_room_end", {"current_room": current_room})
 
 func ensure_room_loaded(room_id: String) -> void:
-	if room_id == "" or not rooms.has(room_id):
+	if room_id == "":
 		return
-	var room_node: Node = rooms[room_id].get("node", null)
-	var need_reload: bool = current_room != room_id
-	if room_node and room_node.has_method("is_visible"):
-		need_reload = need_reload or (not room_node.visible)
-	elif room_node:
-		need_reload = need_reload or (not room_node.is_visible_in_tree())
-	if need_reload:
+	if not rooms.has(room_id):
+		_instantiate_room(room_id)
+	if rooms.has(room_id):
+		_ensure_room_in_tree(room_id)
 		load_room(room_id)
-	else:
-		update_camera_limits()
 
 ## 在切房前向目标房间广播入场锚点，用于背景预对齐。
 func prepare_room_background_for_entry(room_id: String, entry_world_pos: Vector2) -> void:
@@ -166,11 +181,63 @@ func unload_distant_rooms(current_room_id: String):
 	var rooms_to_keep = [current_room_id] + current_room_data.adjacent
 	
 	for room_id in rooms:
-		var room_data = rooms[room_id]
 		if room_id in rooms_to_keep:
-			room_data.node.set_room_active(true)
+			rooms[room_id].node.set_room_active(true)
 		else:
-			room_data.node.set_room_active(false)
+			_unload_room(room_id)
+
+
+## 动态实例化房间（从磁盘加载 .tscn）
+func _instantiate_room(room_id: String) -> bool:
+	var scene_path: String = _ScenePathsScript.get_room_path(room_id)
+	if scene_path.is_empty():
+		return false
+	if not _room_packed_cache.has(room_id):
+		if not ResourceLoader.exists(scene_path):
+			push_error("房间场景文件不存在: ", scene_path)
+			return false
+		_room_packed_cache[room_id] = load(scene_path)
+	if _room_container == null:
+		_room_container = get_node_or_null("/root/MainGameScene/RoomContainer")
+		# 备用路径：通过组或场景查找
+		if _room_container == null:
+			var main = get_tree().current_scene
+			if main:
+				_room_container = main.get_node_or_null("RoomContainer")
+		if _room_container == null:
+			push_error("找不到 RoomContainer 节点，请确保 MainGameScene 中有 RoomContainer 子节点")
+			return false
+	var room_node = _room_packed_cache[room_id].instantiate()
+	room_node.name = room_id
+	room_node.position = _RoomLayoutDataPath.get_room_offset(room_id)
+	_room_node_cache[room_id] = room_node
+	_room_container.add_child(room_node)
+	
+	# 注册房间数据（立即完成，房间已在场景树中）
+	if room_node.has_method("get_room_data"):
+		var room_data = room_node.get_room_data()
+		register_room(room_data.id, room_node, room_data)
+		return true
+	push_error("房间场景没有 get_room_data 方法: ", room_id)
+	return false
+
+
+## 确保房间在场景树中（如果已被卸载则重新加载）
+func _ensure_room_in_tree(room_id: String) -> void:
+	if not rooms.has(room_id):
+		_instantiate_room(room_id)
+
+
+## 卸载单个房间（彻底释放，参考空洞骑士做法）
+func _unload_room(room_id: String) -> void:
+	if not rooms.has(room_id):
+		return
+	var node = rooms[room_id].node
+	if is_instance_valid(node):
+		node.queue_free()
+	rooms.erase(room_id)
+	_room_node_cache.erase(room_id)
+	_room_packed_cache.erase(room_id)
 
 ## 新增：添加相邻房间（双向）
 func add_adjacent_room(room_a: String, room_b: String):
@@ -219,19 +286,22 @@ func get_current_canvas_modulate() -> CanvasModulate:
 			return room_node.get_canvas_modulate()
 	return null
 
-## 切换房间 BGM（使用交叉淡入淡出）
+## 切换房间 BGM（优先使用流式接口，支持同BGM跳过）
 func switch_room_bgm(room_id: String):
 	if not rooms.has(room_id):
 		return
 	
 	var room_data = rooms[room_id]
-	var bgm_name = room_data.bgm
+	var bgm_stream: AudioStream = room_data.get("bgm_stream", null)
 	
-	if bgm_name and bgm_name != "":
+	if bgm_stream:
 		if not AudioManager.is_playing_event_bgm():
-			AudioManager.crossfade_bgm(bgm_name, 1.0)
+			AudioManager.play_bgm_stream(bgm_stream)
 		else:
 			print("事件 BGM 播放中，不切换")
+		return
+	
+	print("RoomManager: 房间 ", room_id, " 未配置 bgm_stream，请在 Inspector 中拖拽 BGM 文件")
 
 ## 更新相机限制框
 func update_camera_limits():

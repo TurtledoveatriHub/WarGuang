@@ -1,67 +1,99 @@
-[gd_scene load_steps=19 format=3 uid="uid://bq5gktnvtvvop"]
+[gd_scene load_steps=20 format=3 uid="uid://bq5gktnvtvvop"]
 
 [ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_5nrrw"]
-[ext_resource type="Texture2D" uid="uid://bkkp4i3lu55fw" path="res://Assets/Textures/FXs/PlayerFXs/test001.png" id="2_2hftq"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_3u2k4"]
-atlas = ExtResource("2_2hftq")
-region = Rect2(128, 256, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gnlay"]
-atlas = ExtResource("2_2hftq")
-region = Rect2(256, 256, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_epy5u"]
-atlas = ExtResource("2_2hftq")
-region = Rect2(384, 256, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_hxepv"]
-atlas = ExtResource("2_2hftq")
-region = Rect2(512, 256, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_jroup"]
-atlas = ExtResource("2_2hftq")
-region = Rect2(640, 256, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2hftq"]
-atlas = ExtResource("2_2hftq")
-region = Rect2(0, 128, 128, 128)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_p3c1j"]
-atlas = ExtResource("2_2hftq")
-region = Rect2(0, 256, 128, 128)
+[ext_resource type="Texture2D" uid="uid://b276xt1mpelj3" path="res://Assets/Textures/NPCs/雪精灵.png" id="2_2hftq"]
+[ext_resource type="AudioStream" uid="uid://c1rbd42778cdi" path="res://Assets/Audios/SFX/Player/jumpbox.wav" id="2_aj0vt"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_aj0vt"]
 atlas = ExtResource("2_2hftq")
-region = Rect2(640, 128, 128, 128)
+region = Rect2(0, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p3c1j"]
+atlas = ExtResource("2_2hftq")
+region = Rect2(192, 0, 48, 48)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qafwr"]
 atlas = ExtResource("2_2hftq")
-region = Rect2(128, 256, 128, 128)
+region = Rect2(144, 0, 48, 48)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_0b6j4"]
 atlas = ExtResource("2_2hftq")
-region = Rect2(128, 128, 128, 128)
+region = Rect2(96, 0, 48, 48)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lhxae"]
 atlas = ExtResource("2_2hftq")
-region = Rect2(256, 128, 128, 128)
+region = Rect2(0, 0, 48, 48)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lor7v"]
 atlas = ExtResource("2_2hftq")
-region = Rect2(384, 128, 128, 128)
+region = Rect2(48, 0, 48, 48)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nxbg4"]
 atlas = ExtResource("2_2hftq")
-region = Rect2(512, 128, 128, 128)
+region = Rect2(48, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3u2k4"]
+atlas = ExtResource("2_2hftq")
+region = Rect2(96, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gnlay"]
+atlas = ExtResource("2_2hftq")
+region = Rect2(144, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_epy5u"]
+atlas = ExtResource("2_2hftq")
+region = Rect2(192, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hxepv"]
+atlas = ExtResource("2_2hftq")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jroup"]
+atlas = ExtResource("2_2hftq")
+region = Rect2(144, 0, 48, 48)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_68qnw"]
 atlas = ExtResource("2_2hftq")
-region = Rect2(640, 128, 128, 128)
+region = Rect2(192, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bsgkt"]
+atlas = ExtResource("2_2hftq")
+region = Rect2(0, 48, 48, 48)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_3abc"]
 animations = [{
 "frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_aj0vt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p3c1j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qafwr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0b6j4")
+}],
+"loop": false,
+"name": &"CLOSE",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lhxae")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lor7v")
+}],
+"loop": true,
+"name": &"OFF",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nxbg4")
+}, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_3u2k4")
 }, {
@@ -70,34 +102,6 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_epy5u")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_hxepv")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_jroup")
-}],
-"loop": false,
-"name": &"CLOSE",
-"speed": 6.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_2hftq")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_p3c1j")
-}],
-"loop": true,
-"name": &"OFF",
-"speed": 6.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_aj0vt")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_qafwr")
 }],
 "loop": true,
 "name": &"ON",
@@ -105,38 +109,35 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_0b6j4")
+"texture": SubResource("AtlasTexture_hxepv")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_lhxae")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_lor7v")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_nxbg4")
+"texture": SubResource("AtlasTexture_jroup")
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_68qnw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bsgkt")
 }],
 "loop": false,
 "name": &"OPEN",
-"speed": 6.0
+"speed": 12.0
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_2hftq"]
-radius = 12.0
+radius = 8.0
 
 [node name="HurtBox" type="Area2D" node_paths=PackedStringArray("collision_shapes")]
 visibility_layer = 16
-scale = Vector2(2, 2)
 collision_layer = 16
 script = ExtResource("1_5nrrw")
+hit_sfx = ExtResource("2_aj0vt")
 collision_shapes = [NodePath("CollisionShape2D")]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_3abc")
-animation = &"CLOSE"
+animation = &"ON"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 16

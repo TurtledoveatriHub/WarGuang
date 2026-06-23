@@ -1,4 +1,6 @@
 # AudioManager.gd
+## 音频管理单例 — 纯基础设施层。
+## 不包含字符串查找路径，所有音频资源由各场景通过 @export 拖拽传入。
 extends Node
 
 ## 音频总线名称
@@ -10,357 +12,338 @@ const VOICE_BUS = "Voice"
 ## 音频配置
 const BGM_FADE_IN_DURATION: float = 1.0  ## BGM淡入持续时间（秒）
 const BGM_FADE_OUT_DURATION: float = 1.0  ## BGM淡出持续时间（秒）
-const BGM_CROSSFADE_DURATION: float = 1.0  ## BGM交叉淡入淡出持续时间（秒）
 const BGM_DUCK_DURATION: float = 1.0  ## 音频闪避持续时间（秒）
 const BGM_DUCK_VOLUME: float = 0.5  ## 音频闪避时的音量（0-1）
 
-# BGM优先级 - 区域BGM设为同级，Boss设为更高
-var bgm_priorities = {
-	"BGM0": 1,    # UI BGM
-	"BGM1": 2,    # 区域BGM
-	"BGM1x": 2,   # 区域BGM
-	"BGM3": 2,    # 区域BGM
-	"boss": 3     # Boss BGM
-}
+## SFX 优先级常量
+const SFX_PRIORITY_LOW: int = 1
+const SFX_PRIORITY_NORMAL: int = 5
+const SFX_PRIORITY_HIGH: int = 8
+const SFX_PRIORITY_CRITICAL: int = 10
 
-# 音频文件路径 - 更新为正确的BGM名称
+## 最大并发 SFX 实例数
+const MAX_SFX_INSTANCES: int = 16
+const MAX_SFX_PER_PRIORITY: Dictionary = {1: 3, 5: 5, 8: 8, 10: 16}
+
+## 旧版兼容：BGM 名称 → 文件路径映射
+## 仅保留用于 SceneManager.return_to_title 等少数场景中临时获取 BGM 流。
 var bgm_paths = {
 	"BGM0": "res://Assets/Audios/BGM/BGM0荒凉无边.mp3",
-	"BGM1": "res://Assets/Audios/BGM/BGM1炽天使战斗曲.mp3",
-	"BGM1x": "res://Assets/Audios/BGM/BGM1x宁静八音盒.mp3",
-	"BGM3": "res://Assets/Audios/BGM/BGM3恐惧追逐.mp3",
-	"boss": ""  # 后续添加
 }
 
-# 分类音效路径
-var sfx_ui_paths = {
-	"button_click": "res://Assets/Audios/SFX/UI/鼠标点击音效.mp3"
-}
+# ----- BGM 系统（新版流式） -----
 
-var sfx_instances_paths = {
-	"save_game": "res://Assets/Audios/SFX/Instances/存档点交互音效.mp3"
-}
+## 场景切换淡入淡出时长分组
+## UI→游戏（存档进游戏、返回标题等）
+const UI_TO_GAME_FADE_DURATION: float = 1.5
+## 房间之间切换
+const ROOM_FADE_DURATION: float = 1.0
+## 默认淡入淡出
+const DEFAULT_FADE_DURATION: float = 1.0
 
-var sfx_player_paths = {
-	# 玩家相关音效 - 后续添加
-}
+## 事件播放期间是否抑制 BGM
+var _event_bgm_suppress: bool = false
+## 事件期间缓存的待播 BGM 流
+var _pending_event_bgm: AudioStream = null
 
-var sfx_environment_paths = {
-	# 环境音效 - 后续添加
-}
-
-# 当前播放的BGM
-var current_bgm: String = ""
-var current_bgm_priority: int = 0
-var bgm_players: Dictionary = {}
-var bgm_tweens: Dictionary = {}
-var audio_duck_tween: Tween
-## 房间BGM管理
-var room_bgm_map: Dictionary = {}  # 房间ID -> BGM名称
-var current_room_bgm: String = ""
+## 单 BGM 播放器
+var _bgm_player: AudioStreamPlayer = null
+## 当前正在播放的 BGM 流（用于同流跳过检测）
+var _current_bgm_stream: AudioStream = null
+## BGM 淡入淡出 Tween
+var _bgm_fade_tween: Tween = null
+## 事件 BGM 播放标记（Boss 战等）
 var is_event_bgm_playing: bool = false
+## 事件 BGM 前保存的 BGM 流（用于条件恢复）
+var _saved_bgm_stream: AudioStream = null
+## BGM 流缓存（按名称索引，兼容旧接口）
+var _bgm_stream_cache: Dictionary = {}
+
+# ----- SFX 系统 -----
+
+## 循环音效播放器映射（key → AudioStreamPlayer）
+var _looped_players: Dictionary = {}
+## 活跃的一次性 SFX 实例列表（含优先级排队+对象池）
+var _sfx_instances: Array = []
+## SFX 对象池
+var _sfx_pool: Array[AudioStreamPlayer] = []
+const _SFX_POOL_SIZE: int = 12
+
+## 全局统一点击音效（所有 UI 场景共用，替换时只需改此处默认值）
+var button_click_sfx: AudioStream
+## 音频闪避 Tween
+var audio_duck_tween: Tween
 
 func _ready():
-	print("AudioManager: 初始化")
+	print("AudioManager: 初始化完成（SFX对象池+优先级排队+事件BGM恢复）")
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	
-	# 预创建BGM播放器
-	for bgm_name in bgm_paths:
-		if bgm_paths[bgm_name] and ResourceLoader.exists(bgm_paths[bgm_name]):  # 检查文件是否存在
-			var player = AudioStreamPlayer.new()
-			player.bus = BGM_BUS
-			player.name = "BGM_" + bgm_name
-			player.process_mode = Node.PROCESS_MODE_ALWAYS
-			add_child(player)
-			bgm_players[bgm_name] = player
-		else:
-			print("AudioManager: 警告 - BGM文件不存在: ", bgm_name, " 路径: ", bgm_paths.get(bgm_name, ""))
+	# 预创建 SFX 对象池
+	for i in range(_SFX_POOL_SIZE):
+		var p = AudioStreamPlayer.new()
+		p.process_mode = Node.PROCESS_MODE_ALWAYS
+		p.name = &"SFXPool_%d" % i
+		add_child(p)
+		_sfx_pool.append(p)
+	# 如果未拖拽统一点击音效，从默认路径加载
+	if not button_click_sfx and ResourceLoader.exists("res://Assets/Audios/SFX/UI/鼠标点击音效.wav"):
+		button_click_sfx = load("res://Assets/Audios/SFX/UI/鼠标点击音效.wav")
 
-# 播放BGM（带优先级检查）
-func play_bgm(bgm_name: String, fade_duration: float = BGM_FADE_IN_DURATION):
-	if not bgm_paths.has(bgm_name) or not bgm_paths[bgm_name]:
-		print("AudioManager: 错误 - 未找到BGM: ", bgm_name)
-		return
-	
-	# 检查文件是否存在
-	if not ResourceLoader.exists(bgm_paths[bgm_name]):
-		print("AudioManager: 错误 - BGM文件不存在: ", bgm_paths[bgm_name])
-		return
-	
-	var priority = bgm_priorities.get(bgm_name, 0)
-	
-	# 检查优先级
-	if priority < current_bgm_priority and current_bgm != "":
-		print("AudioManager: 忽略低优先级BGM: ", bgm_name)
-		return
-	
-	# 如果已经在播放相同的BGM，不做任何事
-	if current_bgm == bgm_name:
-		return
-	
-	# 淡出当前BGM
-	if current_bgm != "":
-		await fade_out_bgm(current_bgm, fade_duration)
-	
-	var player = bgm_players[bgm_name]
-	if player.stream == null:
-		var stream = load(bgm_paths[bgm_name])
-		if stream:
-			player.stream = stream
-			player.finished.connect(_on_bgm_finished.bind(bgm_name))
-	
-	# 淡入新BGM
-	await fade_in_bgm(bgm_name, fade_duration)
-	current_bgm = bgm_name
-	current_bgm_priority = priority
+# ============================================================
+# 🎵 BGM 流式接口（场景通过拖拽传入 AudioStream）
+# ============================================================
 
-# 统一的音效播放方法
-func play_sfx(sfx_name: String, category: String = "ui"):
-	var path_dict
-	match category:
-		"ui": path_dict = sfx_ui_paths
-		"instances": path_dict = sfx_instances_paths
-		"player": path_dict = sfx_player_paths
-		"environment": path_dict = sfx_environment_paths
-		_: 
-			print("AudioManager: 错误 - 未知音效类别: ", category)
-			return
-	
-	if path_dict.has(sfx_name):
-		# 检查文件是否存在
-		if not ResourceLoader.exists(path_dict[sfx_name]):
-			print("AudioManager: 错误 - 音效文件不存在: ", path_dict[sfx_name])
-			return
-			
-		var stream = load(path_dict[sfx_name])
-		if stream:
-			var sfx_player = AudioStreamPlayer.new()
-			sfx_player.process_mode = Node.PROCESS_MODE_ALWAYS
-			add_child(sfx_player)
-			sfx_player.stream = stream
-			sfx_player.bus = SFX_BUS
-			sfx_player.play()
-			sfx_player.finished.connect(sfx_player.queue_free)
-			
-			# 可选：为重要音效启用音频闪避
-			if category == "instances":
-				duck_bgm_for_sfx(1.5, 0.7)
-	else:
-		print("AudioManager: 错误 - 未找到音效: ", sfx_name, " 在类别: ", category)
+## 获取或创建单 BGM 播放器
+func _get_bgm_player() -> AudioStreamPlayer:
+	if not _bgm_player or not is_instance_valid(_bgm_player):
+		_bgm_player = AudioStreamPlayer.new()
+		_bgm_player.bus = BGM_BUS
+		_bgm_player.process_mode = Node.PROCESS_MODE_ALWAYS
+		add_child(_bgm_player)
+	# 每次调用时显式刷新总线，确保没有被静音
+	_bgm_player.bus = BGM_BUS
+	return _bgm_player
 
-## 注册房间BGM
-func register_room_bgm(room_id: String, bgm_name: String):
-	room_bgm_map[room_id] = bgm_name
+## 通过 AudioStream 播放 BGM（新版主要接口）
+## 同一流正在播放时自动跳过，不同流时淡出旧→淡入新
+func play_bgm_stream(stream: AudioStream, fade_duration: float = BGM_FADE_IN_DURATION) -> void:
+	if not stream:
+		return
+	# 事件播放期间抑制 BGM
+	if _event_bgm_suppress:
+		_pending_event_bgm = stream
+		return
+	var player = _get_bgm_player()
+	# 同一流正在播放 → 跳过
+	if stream == _current_bgm_stream and player.playing:
+		return
+	# 直接播放，不依赖 tween
+	player.stop()
+	player.stream = stream
+	player.volume_db = 0.0
+	player.play()
+	_current_bgm_stream = stream
+	# 非阻塞后台淡入
+	_fade_in_bgm_player_bg(fade_duration)
 
-## 播放房间BGM
-func play_room_bgm(room_id: String):
-	if not room_bgm_map.has(room_id):
-		print("AudioManager: 错误 - 房间未注册BGM:", room_id)
+## 后台淡入（不阻塞）
+func _fade_in_bgm_player_bg(duration: float) -> void:
+	var player = _get_bgm_player()
+	if not player.playing:
 		return
-	
-	var bgm_name = room_bgm_map[room_id]
-	if bgm_name == "":
-		print("AudioManager: 房间", room_id, "没有设置BGM")
-		return
-	
-	# 如果正在播放事件BGM，不切换
-	if is_event_bgm_playing:
-		print("AudioManager: 事件BGM播放中，不切换房间BGM")
-		return
-	
-	# 检查优先级
-	var priority = bgm_priorities.get(bgm_name, 0)
-	if priority < current_bgm_priority and current_bgm != "":
-		return
-	
-	# 播放BGM
-	await play_bgm(bgm_name)
-	current_room_bgm = bgm_name
+	if _bgm_fade_tween and _bgm_fade_tween.is_valid():
+		_bgm_fade_tween.kill()
+	# 从当前音量 tween 到 0dB（如果已经在 0dB 就不做任何事）
+	_bgm_fade_tween = create_tween()
+	_bgm_fade_tween.tween_property(player, "volume_db", 0.0, duration).from_current()
 
-## 播放事件BGM（Boss战等，高优先级）
+## 音频闪避 — 重要音效时临时降低 BGM 音量
+func duck_bgm_for_sfx(duck_duration: float = BGM_DUCK_DURATION, duck_volume: float = BGM_DUCK_VOLUME):
+	var player = _get_bgm_player()
+	if not _current_bgm_stream or not player.playing:
+		return
+	var original_volume = player.volume_db
+	if audio_duck_tween and audio_duck_tween.is_valid():
+		audio_duck_tween.kill()
+	audio_duck_tween = create_tween()
+	audio_duck_tween.tween_property(player, "volume_db", linear_to_db(duck_volume), 0.2)
+	audio_duck_tween.tween_interval(duck_duration)
+	audio_duck_tween.tween_property(player, "volume_db", original_volume, 0.5)
+
+## 播放事件 BGM — 保存当前 BGM，切换事件 BGM
 func play_event_bgm(bgm_name: String):
 	is_event_bgm_playing = true
-	await force_play_bgm(bgm_name)
-	print("AudioManager: 播放事件BGM -", bgm_name)
+	if _current_bgm_stream:
+		_saved_bgm_stream = _current_bgm_stream
+	var stream = _load_bgm_compat(bgm_name)
+	if stream:
+		play_bgm_stream(stream)
 
-## 停止事件BGM，恢复房间BGM
+## 播放事件 BGM（流式版，推荐）
+func play_event_bgm_stream(stream: AudioStream):
+	if not stream:
+		return
+	is_event_bgm_playing = true
+	if _current_bgm_stream:
+		_saved_bgm_stream = _current_bgm_stream
+	play_bgm_stream(stream)
+
+## 停止事件 BGM — 条件恢复之前的 BGM
 func stop_event_bgm():
 	is_event_bgm_playing = false
-	if RoomManager.current_room != "":
-		await play_room_bgm(RoomManager.current_room)
-	print("AudioManager: 停止事件BGM，恢复房间BGM")
+	if _saved_bgm_stream:
+		var saved = _saved_bgm_stream
+		_saved_bgm_stream = null
+		play_bgm_stream(saved)
+	else:
+		print("AudioManager: 没有可恢复的 BGM")
 
-## 检查是否正在播放事件BGM
 func is_playing_event_bgm() -> bool:
 	return is_event_bgm_playing
 
-## 强制播放BGM（无视优先级，用于事件BGM）
-func force_play_bgm(bgm_name: String, fade_duration: float = BGM_FADE_IN_DURATION):
-	if not bgm_paths.has(bgm_name) or not bgm_paths[bgm_name]:
-		print("AudioManager: 错误 - 未找到BGM:", bgm_name)
-		return
-	
-	# 检查文件是否存在
-	if not ResourceLoader.exists(bgm_paths[bgm_name]):
-		print("AudioManager: 错误 - BGM文件不存在:", bgm_paths[bgm_name])
-		return
-	
-	if current_bgm == bgm_name:
-		return
-	
-	# 淡出当前BGM
-	if current_bgm != "":
-		await fade_out_bgm(current_bgm, fade_duration)
-	
-	var player = bgm_players[bgm_name]
-	if player.stream == null:
-		var stream = load(bgm_paths[bgm_name])
-		if stream:
-			player.stream = stream
-			player.finished.connect(_on_bgm_finished.bind(bgm_name))
-	
-	# 淡入新BGM
-	await fade_in_bgm(bgm_name, fade_duration)
-	current_bgm = bgm_name
-	current_bgm_priority = bgm_priorities.get(bgm_name, 0)
+# ----- 事件 BGM 抑制（用于入场动画/过场动画期间） -----
 
-# 淡入BGM
-func fade_in_bgm(bgm_name: String, duration: float = BGM_FADE_IN_DURATION):
-	var player = bgm_players[bgm_name]
-	player.volume_db = -80.0
-	player.play()
-	
-	if bgm_tweens.has(bgm_name):
-		bgm_tweens[bgm_name].kill()
-	
+## 设置事件抑制状态。true=抑制BGM播放，false=恢复并播放缓存的BGM
+func set_event_bgm_suppress(suppress: bool) -> void:
+	_event_bgm_suppress = suppress
+	if not suppress and _pending_event_bgm:
+		var saved = _pending_event_bgm
+		_pending_event_bgm = null
+		play_bgm_stream(saved, ROOM_FADE_DURATION)
+
+## 死亡时 BGM 淡出（联动死亡流程，非阻塞）
+func fade_out_bgm_on_death(fade_duration: float = 1.2) -> void:
+	var player = _get_bgm_player()
+	if not player.playing:
+		return
 	var tween = create_tween()
-	tween.tween_property(player, "volume_db", 0.0, duration)
-	bgm_tweens[bgm_name] = tween
-	await tween.finished
+	tween.tween_property(player, "volume_db", -80.0, fade_duration)
+	tween.tween_callback(stop_bgm_stream)
 
-# 淡出BGM
-func fade_out_bgm(bgm_name: String, duration: float = BGM_FADE_OUT_DURATION):
-	if bgm_players.has(bgm_name):
-		var player = bgm_players[bgm_name]
-		
-		if bgm_tweens.has(bgm_name):
-			bgm_tweens[bgm_name].kill()
-		
-		var tween = create_tween()
-		tween.tween_property(player, "volume_db", -80.0, duration)
-		tween.tween_callback(player.stop)
-		bgm_tweens[bgm_name] = tween
-		await tween.finished
+## 旧版兼容：通过名称加载 BGM 流（仅限 BGM0）
+func _load_bgm_compat(bgm_name: String) -> AudioStream:
+	if _bgm_stream_cache.has(bgm_name):
+		return _bgm_stream_cache[bgm_name]
+	if not bgm_paths.has(bgm_name) or not bgm_paths[bgm_name]:
+		return null
+	if not ResourceLoader.exists(bgm_paths[bgm_name]):
+		return null
+	_bgm_stream_cache[bgm_name] = load(bgm_paths[bgm_name])
+	return _bgm_stream_cache[bgm_name]
 
-## 交叉淡入淡出切换BGM（使用现有的淡入淡出函数）
-func crossfade_bgm(new_bgm_name: String, fade_duration: float = BGM_CROSSFADE_DURATION):
-	if not bgm_paths.has(new_bgm_name) or not bgm_paths[new_bgm_name]:
-		print("AudioManager: 错误 - 未找到BGM: ", new_bgm_name)
+# ============================================================
+# 🎵 BGM 旧版兼容接口（逐步淘汰）
+# ============================================================
+
+## 停止 BGM 流播放（立即停止，无淡出）
+func stop_bgm_stream() -> void:
+	var player = _get_bgm_player()
+	if player.playing:
+		player.stop()
+	_current_bgm_stream = null
+
+## 通过名称播放 BGM（内部委托给 play_bgm_stream）
+func play_bgm(bgm_name: String, fade_duration: float = BGM_FADE_IN_DURATION):
+	var stream = _load_bgm_compat(bgm_name)
+	if not stream:
 		return
-	
-	# 检查文件是否存在
-	if not ResourceLoader.exists(bgm_paths[new_bgm_name]):
-		print("AudioManager: 错误 - BGM文件不存在: ", bgm_paths[new_bgm_name])
+	play_bgm_stream(stream, fade_duration)
+
+## 停止 BGM（立即停止）
+func stop_bgm(_fade_duration: float = BGM_FADE_OUT_DURATION):
+	stop_bgm_stream()
+
+# ============================================================
+# 🎵 SFX 流式接口（含优先级排队）
+# ============================================================
+
+## 播放一次性音效（默认优先级 NORMAL）
+func play_stream_sfx(stream: AudioStream, bus: String = SFX_BUS) -> void:
+	play_stream_sfx_prioritized(stream, SFX_PRIORITY_NORMAL, bus)
+
+## 全局统一点击音效（所有UI场景共用此方法）
+func play_button_click_sfx() -> void:
+	play_stream_sfx(button_click_sfx)
+
+## 播放一次性音效（带优先级 + 对象池）
+func play_stream_sfx_prioritized(stream: AudioStream, priority: int = SFX_PRIORITY_NORMAL, bus: String = SFX_BUS) -> void:
+	if not stream:
 		return
-	
-	var priority = bgm_priorities.get(new_bgm_name, 0)
-	
-	# 检查优先级
-	if priority < current_bgm_priority and current_bgm != "":
-		return
-	
-	# 如果已经在播放相同的BGM，不做任何事
-	if current_bgm == new_bgm_name:
-		return
-	
-	# 使用现有的fade_out_bgm函数淡出当前BGM
-	if current_bgm != "":
-		await fade_out_bgm(current_bgm, fade_duration)
-	
-	var player = bgm_players[new_bgm_name]
-	if player.stream == null:
-		var stream = load(bgm_paths[new_bgm_name])
-		if stream:
-			player.stream = stream
-			player.finished.connect(_on_bgm_finished.bind(new_bgm_name))
-	
-	# 使用现有的fade_in_bgm函数淡入新BGM
-	await fade_in_bgm(new_bgm_name, fade_duration)
-	current_bgm = new_bgm_name
-	current_bgm_priority = priority
-
-func _on_bgm_finished(bgm_name: String):
-	# 循环播放
-	if current_bgm == bgm_name:
-		bgm_players[bgm_name].play()
-
-# 停止BGM
-func stop_bgm(fade_duration: float = BGM_FADE_OUT_DURATION):
-	if current_bgm != "":
-		await fade_out_bgm(current_bgm, fade_duration)
-		current_bgm = ""
-		current_bgm_priority = 0
-
-# 音频闪避 - 播放重要音效时临时降低BGM音量
-func duck_bgm_for_sfx(duck_duration: float = BGM_DUCK_DURATION, duck_volume: float = BGM_DUCK_VOLUME):
-	if current_bgm != "":
-		var player = bgm_players[current_bgm]
-		var original_volume = player.volume_db
-		
-		# 停止之前的闪避tween
-		if audio_duck_tween and audio_duck_tween.is_valid():
-			audio_duck_tween.kill()
-		
-		# 临时降低BGM音量
-		audio_duck_tween = create_tween()
-		audio_duck_tween.tween_property(player, "volume_db", linear_to_db(duck_volume), 0.2)
-		audio_duck_tween.tween_interval(duck_duration)
-		audio_duck_tween.tween_property(player, "volume_db", original_volume, 0.5)
-
-# 播放UI音效
-func play_ui_sfx(sfx_name: String):
-	play_sfx(sfx_name, "ui")
-
-# 播放实例音效
-func play_instance_sfx(sfx_name: String):
-	play_sfx(sfx_name, "instances")
-
-# 播放空间音效（使用AudioStreamPlayer2D）
-func play_spatial_sfx(sfx_name: String, position: Vector2, category: String = "player"):
-	var path_dict
-	match category:
-		"player": path_dict = sfx_player_paths
-		"environment": path_dict = sfx_environment_paths
-		"instances": path_dict = sfx_instances_paths
-		_: 
-			print("AudioManager: 错误 - 未知音效类别: ", category)
+	# 清理已释放的池条目
+	_sfx_instances = _sfx_instances.filter(func(e): return e.pool_idx >= 0 and e.pool_idx < _sfx_pool.size() and is_instance_valid(_sfx_pool[e.pool_idx]))
+	# 找空闲池成员
+	var free_idx: int = -1
+	for ei in range(_sfx_instances.size()):
+		var pi = _sfx_instances[ei].pool_idx
+		if pi >= 0 and pi < _sfx_pool.size():
+			if not _sfx_pool[pi].playing:
+				free_idx = ei
+				break
+	if free_idx < 0:
+		# 无空闲 → 用优先级驱逐
+		var max_for_priority = MAX_SFX_PER_PRIORITY.get(priority, MAX_SFX_INSTANCES)
+		if _sfx_instances.size() >= _SFX_POOL_SIZE or _count_at_or_below(priority) >= max_for_priority:
+			_evict_lowest(priority)
+		if _sfx_instances.size() >= _SFX_POOL_SIZE:
 			return
-	
-	if path_dict.has(sfx_name):
-		# 检查文件是否存在
-		if not ResourceLoader.exists(path_dict[sfx_name]):
-			print("AudioManager: 错误 - 音效文件不存在: ", path_dict[sfx_name])
-			return
-			
-		var stream = load(path_dict[sfx_name])
-		if stream:
-			var sfx_player = AudioStreamPlayer2D.new()
-			sfx_player.process_mode = Node.PROCESS_MODE_ALWAYS
-			sfx_player.stream = stream
-			sfx_player.bus = SFX_BUS
-			sfx_player.global_position = position
-			
-			# 添加到当前场景
-			var current_scene = get_tree().current_scene
-			if current_scene:
-				current_scene.add_child(sfx_player)
-				sfx_player.play()
-				sfx_player.finished.connect(sfx_player.queue_free)
-				print("AudioManager: 播放空间音效 - ", sfx_name, " 位置: ", position)
-	else:
-		print("AudioManager: 错误 - 未找到音效: ", sfx_name, " 在类别: ", category)
+		# 如果驱逐后有池成员空闲了，用它；否则用第一个空闲池成员
+		for pi in range(_sfx_pool.size()):
+			if not _sfx_pool[pi].playing:
+				free_idx = _sfx_instances.size()  # 新条目
+				_sfx_instances.append({"pool_idx": pi, "priority": priority})
+				break
+	if free_idx < 0 and _sfx_instances.size() < _SFX_POOL_SIZE:
+		# 还有未用过的池成员
+		free_idx = _sfx_instances.size()
+		_sfx_instances.append({"pool_idx": free_idx, "priority": priority})
+	if free_idx < 0:
+		return
+	var pool_i: int = _sfx_instances[free_idx if free_idx < _sfx_instances.size() else 0].pool_idx if free_idx >= 0 else -1
+	if pool_i < 0:
+		return
+	var player: AudioStreamPlayer = _sfx_pool[pool_i]
+	player.stop()
+	player.stream = stream.duplicate() if stream is AudioStream else stream
+	player.bus = bus
+	player.play()
 
-# 音量控制方法（0-100范围）
+func _count_at_or_below(threshold: int) -> int:
+	var count: int = 0
+	for entry in _sfx_instances:
+		var pi = entry.pool_idx
+		if pi >= 0 and pi < _sfx_pool.size() and is_instance_valid(_sfx_pool[pi]) and _sfx_pool[pi].playing and entry.priority <= threshold:
+			count += 1
+	return count
+
+func _evict_lowest(new_priority: int) -> void:
+	var lowest_ei: int = -1
+	var lowest_prio: int = 999
+	for ei in range(_sfx_instances.size()):
+		var entry = _sfx_instances[ei]
+		var pi = entry.pool_idx
+		if pi >= 0 and pi < _sfx_pool.size() and is_instance_valid(_sfx_pool[pi]):
+			if _sfx_pool[pi].playing and entry.priority < lowest_prio and entry.priority < new_priority:
+				lowest_prio = entry.priority
+				lowest_ei = ei
+	if lowest_ei >= 0:
+		var victim_pi = _sfx_instances[lowest_ei].pool_idx
+		if victim_pi >= 0 and victim_pi < _sfx_pool.size() and is_instance_valid(_sfx_pool[victim_pi]):
+			_sfx_pool[victim_pi].stop()
+		_sfx_instances.remove_at(lowest_ei)
+
+## 启动循环音效
+func play_stream_looped(key: String, stream: AudioStream, bus: String = SFX_BUS) -> void:
+	if not stream or _looped_players.has(key):
+		return
+	var instance = stream.duplicate() if stream is AudioStream else stream
+	var sfx_player = AudioStreamPlayer.new()
+	sfx_player.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(sfx_player)
+	sfx_player.stream = instance
+	sfx_player.bus = bus
+	sfx_player.finished.connect(_on_looped_sfx_finished.bind(key))
+	sfx_player.play()
+	_looped_players[key] = sfx_player
+
+## 停止循环音效
+func stop_stream_looped(key: String) -> void:
+	if not _looped_players.has(key):
+		return
+	var player: AudioStreamPlayer = _looped_players[key]
+	if is_instance_valid(player):
+		player.stop()
+		player.queue_free()
+	_looped_players.erase(key)
+
+func _on_looped_sfx_finished(key: String) -> void:
+	if _looped_players.has(key):
+		var player: AudioStreamPlayer = _looped_players[key]
+		if is_instance_valid(player):
+			player.play()
+
+# ============================================================
+# 🔊 音量控制
+# ============================================================
+
 func get_bus_volume_percent(bus_name: String) -> float:
 	var bus_index = AudioServer.get_bus_index(bus_name)
 	if bus_index != -1:
@@ -370,8 +353,7 @@ func get_bus_volume_percent(bus_name: String) -> float:
 func set_bus_volume_percent(bus_name: String, value: float):
 	var bus_index = AudioServer.get_bus_index(bus_name)
 	if bus_index != -1:
-		var linear_value = value / 100.0
-		AudioServer.set_bus_volume_db(bus_index, linear_to_db(linear_value))
+		AudioServer.set_bus_volume_db(bus_index, linear_to_db(value / 100.0))
 
 func set_master_volume(value: float):
 	set_bus_volume_percent("Master", value * 100.0)

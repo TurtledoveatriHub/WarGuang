@@ -29,7 +29,7 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 ## 旋转设置
 @export_category("旋转设置")
 ## 精灵视觉效果：NONE=无, ROTATE=旋转, FLIP=往返水平翻转（碰撞体不翻）
-@export var sprite_effect: SpriteEffect = SpriteEffect.NONE
+@export var sprite_effect: SpriteEffect = SpriteEffect.FLIP
 ## 旋转速度（度/秒），仅 ROTATE 模式有效
 @export var rotation_speed: float = 90.0
 ## 旋转方向：true=顺时针，false=逆时针
@@ -204,6 +204,9 @@ func _process(delta):
 	# 移动
 	if movement_mode != MovementMode.STATIC:
 		handle_movement(fixed_delta)
+		# 等待帧时 handle_movement 不会调用 _update_position，显式补调确保位置同步
+		if is_waiting and movement_mode != MovementMode.STATIC:
+			_update_position()
 	
 	# 伤害检测（仅在 _damage_allowed 时执行）
 	if _damage_allowed:
@@ -246,6 +249,11 @@ func _on_body_exited(body):
 func handle_movement(delta: float) -> void:
 	if path_length <= 0.0 or move_speed <= 0.0:
 		return
+	
+	# NaN 保护
+	if not is_finite(_progress): _progress = 0.0
+	if not is_finite(current_speed): current_speed = 0.0
+	if not is_finite(wait_timer): wait_timer = 0.0
 	
 	# 端点等待
 	if is_waiting:

@@ -38,24 +38,21 @@ func return_to_title_from_game_setting(already_black: bool = false) -> bool:
 		Global.stop_play_time_session()
 
 	if already_black:
-		if AudioManager:
-			AudioManager.fade_out_bgm("main_game", 1.0)
+		AudioManager.stop_bgm_stream()
 		await _do_scene_transition(
 			ScenePaths.UI_TITLE,
 			0.0,
 			FadeManager.ui_switch_black_hold_duration,
 			FadeManager.ui_switch_fade_in_duration,
-			"BGM0"
+			""  # BGM 由 TitleScene._ready() 通过 @export title_bgm_stream 播放
 		)
 	else:
-		# 渐出游戏 BGM
-		await AudioManager.fade_out_bgm("main_game", 1.0)
 		await _do_scene_transition(
 			ScenePaths.UI_TITLE,
 			FadeManager.ui_switch_fade_out_duration,
 			FadeManager.ui_switch_black_hold_duration,
 			FadeManager.ui_switch_fade_in_duration,
-			"BGM0"
+			""  # BGM 由 TitleScene._ready() 通过 @export title_bgm_stream 播放
 		)
 	get_tree().paused = false
 	
@@ -107,7 +104,10 @@ func start_game_from_save(slot_index: int):
 		FadeManager.force_black()
 	else:
 		await FadeManager.fade_out(0.0)
-	await AudioManager.play_bgm("BGM1", FadeManager.ui_save_to_game_fade_out_duration)
+	# 新存档入场动画期间抑制 BGM，并停止当前标题 BGM
+	if is_new_save_opening:
+		AudioManager.stop_bgm_stream()
+		AudioManager.set_event_bgm_suppress(true)
 	get_tree().change_scene_to_file(ScenePaths.GAME_MAIN)
 	if FadeManager and FadeManager.has_method("force_black"):
 		FadeManager.force_black()
@@ -171,11 +171,8 @@ func start_game_from_save(slot_index: int):
 
 	_end_scene_switch()
 
-func _resolve_target_bgm(scene_path: String) -> String:
-	if scene_path == ScenePaths.UI_TITLE or scene_path == ScenePaths.UI_SAVE_SELECT or scene_path == ScenePaths.UI_SETTINGS:
-		return "BGM0"
-	if scene_path == ScenePaths.GAME_MAIN:
-		return "BGM1"
+func _resolve_target_bgm(_scene_path: String) -> String:
+	# BGM 由各场景自行通过 @export 拖拽管理，切场时不主动播放 BGM
 	return ""
 
 func _do_scene_transition(scene_path: String, fade_out_duration: float, black_hold_duration: float, fade_in_duration: float, target_bgm: String) -> void:

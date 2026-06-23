@@ -69,6 +69,7 @@ func _ready():
 	
 	# 未被摧毁，连接 WallDetector 的信号并开始检测
 	wall_detector.body_entered.connect(_on_detector_body_entered)
+	print("DestructibleWall: 检测器已连接, layer=", wall_detector.collision_layer, " mask=", wall_detector.collision_mask, " monitoring=", wall_detector.monitoring)
 	
 	# 关键：确保未被摧毁时播放 IDLE 动画
 	if animated_sprite and animated_sprite.sprite_frames:
@@ -77,9 +78,44 @@ func _ready():
 
 ## 检测器检测到玩家进入
 func _on_detector_body_entered(body):
+	print("DestructibleWall body_entered fired, body=", body.name, " group(player)=", body.is_in_group("player"))
 	# 只处理玩家
 	if not body.is_in_group("player"):
+		print("  → return: not in player group")
 		return
+	
+	if is_destroyed:
+		print("  → return: is_destroyed=", is_destroyed)
+		return
+	
+	if not is_player_on_correct_side(body):
+		print("  → return: wrong side (facing=", facing_direction, ")")
+		return
+	
+	if not body.is_on_floor():
+		print("  → return: not on floor")
+		return
+	
+	if not body.is_running:
+		print("  → return: not running")
+		return
+
+	var player_velocity = Vector2.ZERO
+	if body.has_method("get_velocity"):
+		player_velocity = body.get_velocity()
+	
+	var speed = abs(player_velocity.x)
+	print("  speed=", speed, " threshold=[", velocity_threshold_min, ",", velocity_threshold_max, "]")
+	if speed < velocity_threshold_min or speed > velocity_threshold_max:
+		print("  → return: speed out of range")
+		return
+	
+	if not is_player_touching_wall(body):
+		print("  → return: not touching wall (dist=", body.global_position.distance_to(wall_body.global_position), ")")
+		return
+	
+	print("  ✅ ALL PASSED, triggering impact!")
+	_handle_impact(body)
 	
 	# 已被摧毁，忽略
 	if is_destroyed:
@@ -93,21 +129,12 @@ func _on_detector_body_entered(body):
 	if not body.is_on_floor() or not body.is_running:
 		return
 
-	var player_velocity = Vector2.ZERO
-	if body.has_method("get_velocity"):
-		player_velocity = body.get_velocity()
-	
-	var speed = abs(player_velocity.x)
-	if speed < velocity_threshold_min or speed > velocity_threshold_max:
-		return  # 速度不符合
-	
-	# 3. 检查玩家是否真的撞到墙（距离检测）
-	if not is_player_touching_wall(body):
-		return  # 只是经过检测器，没有真正撞墙
-	
 	# 所有条件满足，触发撞击
-	print("DEBUG DestructibleWall: 检测到撞击，玩家速度=", player_velocity.x)
+	print("  ✅ ALL PASSED, triggering impact!")
 	_handle_impact(body)
+	
+	# 速度阈值检查已在上面完成
+	# 距离检查已在上面完成
 
 ## 检查玩家是否在正确的一侧
 func is_player_on_correct_side(body) -> bool:
@@ -120,7 +147,7 @@ func is_player_on_correct_side(body) -> bool:
 func is_player_touching_wall(body) -> bool:
 	# 简单方法：检测玩家与墙的距离
 	var distance = body.global_position.distance_to(wall_body.global_position)
-	return distance < 50  # 距离小于 50 像素算撞墙
+	return distance < 80  # 距离小于 80 像素算撞墙（碰撞体缩放后的实际大小）
 
 ## 处理撞击
 func _handle_impact(body):

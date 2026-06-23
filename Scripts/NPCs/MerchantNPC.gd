@@ -5,6 +5,19 @@ class_name MerchantNPC
 ## MerchantNPC - 商人 NPC 专用类
 ## ============================================
 
+## 互动音效配置
+@export_category("Merchant Sounds")
+## 普通心情交互音效（情绪 IDLE 时播放）
+@export var mood_normal_sfx: AudioStream
+## 高兴心情交互音效（情绪 HAPPY 时播放）
+@export var mood_happy_sfx: AudioStream
+## 生气心情交互音效（情绪 ANGRY 时播放）
+@export var mood_angry_sfx: AudioStream
+## 放弃购买或钱不够时播放
+@export var no_purchase_sfx: AudioStream
+## 购买成功时播放
+@export var purchase_success_sfx: AudioStream
+
 ## 动画状态配置
 @export_category("Animation States")
 ## 待机动画
@@ -45,6 +58,15 @@ func _ready():
 ## 开始交互（覆盖基类）
 func _start_interaction():
 	player_has_purchased = false
+	
+	# 根据情绪播放对应音效
+	match current_mood:
+		Moods.HAPPY:
+			AudioManager.play_stream_sfx(mood_happy_sfx)
+		Moods.ANGRY:
+			AudioManager.play_stream_sfx(mood_angry_sfx)
+		Moods.IDLE:
+			AudioManager.play_stream_sfx(mood_normal_sfx)
 	
 	# 根据情绪决定初始对话
 	match current_mood:
@@ -139,12 +161,14 @@ func update_mood(new_mood: Moods):
 
 ## 处理购买成功
 func on_purchase_success(item_id: String):
+	AudioManager.play_stream_sfx(purchase_success_sfx)
 	bought_items.append(item_id)
 	player_has_purchased = true
 	consecutive_no_purchase_count = 0
 
 ## 处理玩家离开（未购买）
 func on_player_leave_without_purchase():
+	AudioManager.play_stream_sfx(no_purchase_sfx)
 	consecutive_no_purchase_count += 1
 
 ## 覆盖对话结束处理

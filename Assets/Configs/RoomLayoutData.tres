@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="RoomLayoutData" load_steps=2 format=3 uid="uid://dj37wucndv7u0"]
+
+[ext_resource type="Script" uid="uid://tumaf2kj85wi" path="res://Scripts/Resources/RoomLayoutData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+room_positions = {
+"Room1": Vector2(0, 0),
+"Room2": Vector2(3344, -640),
+"Room3": Vector2(-4304, 960),
+"Room39": Vector2(9667, -288),
+"Room4": Vector2(6736, -624),
+"Room61": Vector2(14720, 0),
+"Room62": Vector2(20544, -1152),
+"Room63": Vector2(22784, -1856),
+"Room64": Vector2(22784, 1600),
+"Room65": Vector2(23456, 4032),
+"Room66": Vector2(24256, -1536),
+"Room67": Vector2(24512, 864),
+"Room68": Vector2(25440, 3776),
+"Room69": Vector2(26240, -3456),
+"RoomDream10": Vector2(3392, 1088),
+"SnowMountain1": Vector2(60000, 0),
+"SnowMountain2": Vector2(63520, -320),
+"SnowMountain3": Vector2(66720, 960)
+}

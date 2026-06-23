@@ -1,10 +1,11 @@
-[gd_scene load_steps=16 format=3 uid="uid://cwp2nnedkebnl"]
+[gd_scene load_steps=17 format=3 uid="uid://cwp2nnedkebnl"]
 
 [ext_resource type="Script" uid="uid://c8ybqtmdpgils" path="res://Scripts/UI/Scenes/SaveSelectScene.gd" id="1_6ahw5"]
 [ext_resource type="Script" uid="uid://c6yjpi17utwg8" path="res://Scripts/UI/Scenes/UITransitionAnimator.gd" id="1_transition_animator"]
 [ext_resource type="Texture2D" uid="uid://dmxv540ejjtkg" path="res://Assets/Textures/UIs/SaveSlotBlue.tres" id="2_1iexe"]
 [ext_resource type="PackedScene" uid="uid://b81s4uybrdtsf" path="res://Scenes/UI/Scenes/DeleteConfirmDialog.tscn" id="2_axbvp"]
 [ext_resource type="Texture2D" uid="uid://c1v56vyheog76" path="res://Assets/Textures/UIs/SaveSlotRed.tres" id="3_283jm"]
+[ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/a.wav" id="3_c6mq1"]
 [ext_resource type="Texture2D" uid="uid://fwgvvrpd0hkd" path="res://Assets/Textures/UIs/PlayerUIs/1.png" id="6_xxd4s"]
 [ext_resource type="Texture2D" uid="uid://xygjp77wxevl" path="res://Assets/Textures/UIs/SceneUIs/tres/回退1.tres" id="7_nc2wn"]
 [ext_resource type="Texture2D" uid="uid://40v6kkfpqldt" path="res://Assets/Textures/UIs/SceneUIs/tres/回退3.tres" id="8_xxd4s"]
@@ -25,6 +26,7 @@ fill_from = Vector2(1, 1)
 [node name="SaveSelectScene" type="CanvasLayer"]
 script = ExtResource("1_6ahw5")
 delete_confirm_scene = ExtResource("2_axbvp")
+button_click_sfx = ExtResource("3_c6mq1")
 room_filled_texture_map = {
 "Room1": ExtResource("3_283jm"),
 "Room2": ExtResource("2_1iexe"),

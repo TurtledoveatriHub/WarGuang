@@ -2,7 +2,6 @@
 extends CanvasLayer
 
 ## 设置场景主脚本
-
 ## 节点引用
 @onready var audio_button = $SettingsRoot/AudioButton          # 音量按钮
 @onready var controls_button = $SettingsRoot/ControlsButton    # 按键映射按钮
@@ -18,7 +17,6 @@ extends CanvasLayer
 @onready var master_volume_slider = $SettingsRoot/PagesRoot/AudioPage/VolumeContainer/MasterVolumeLabel/MasterVolumeSlider
 @onready var bgm_volume_slider = $SettingsRoot/PagesRoot/AudioPage/VolumeContainer/BGMVolumeLabel/BGMVolumeSlider
 @onready var sfx_volume_slider = $SettingsRoot/PagesRoot/AudioPage/VolumeContainer/SFXVolumeLabel/SFXVolumeSlider
-@onready var voice_volume_slider = $SettingsRoot/PagesRoot/AudioPage/VolumeContainer/VoiceVolumeLabel/VoiceVolumeSlider
 
 ## 场景来源信息
 var opened_from: String = ""
@@ -60,13 +58,13 @@ func _ready():
 	# 连接音量滑块信号
 	if master_volume_slider:
 		master_volume_slider.value_changed.connect(_on_master_volume_changed)
+		master_volume_slider.drag_started.connect(_on_volume_slider_drag_started)
 	if bgm_volume_slider:
 		bgm_volume_slider.value_changed.connect(_on_bgm_volume_changed)
+		bgm_volume_slider.drag_started.connect(_on_volume_slider_drag_started)
 	if sfx_volume_slider:
 		sfx_volume_slider.value_changed.connect(_on_sfx_volume_changed)
-	if voice_volume_slider:
-		voice_volume_slider.value_changed.connect(_on_voice_volume_changed)
-	
+		sfx_volume_slider.drag_started.connect(_on_volume_slider_drag_started)
 	_cache_page_base_states()
 	_set_only_page_visible("audio")
 	_current_page_name = "audio"
@@ -78,6 +76,14 @@ func _ready():
 	# 设置焦点
 	if audio_button is Control:
 		audio_button.grab_focus()
+	
+	# 同步滑块值与实际总线音量
+	if master_volume_slider:
+		master_volume_slider.value = AudioManager.get_bus_volume_percent("Master")
+	if bgm_volume_slider:
+		bgm_volume_slider.value = AudioManager.get_bus_volume_percent("BGM")
+	if sfx_volume_slider:
+		sfx_volume_slider.value = AudioManager.get_bus_volume_percent("SFX")
 
 	_set_scene_input_locked(true)
 	if ui_transition_animator:
@@ -248,7 +254,7 @@ func _apply_effect_level(level: int) -> void:
 func _on_audio_button_pressed():
 	if _scene_input_locked or _page_switch_in_progress:
 		return
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	
 	# 静默取消控制页面中的映射
 	if controls_page and controls_page.has_method("cancel_current_mapping"):
@@ -260,7 +266,7 @@ func _on_audio_button_pressed():
 func _on_controls_button_pressed():
 	if _scene_input_locked or _page_switch_in_progress:
 		return
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	
 	# 静默取消任何映射
 	if controls_page and controls_page.has_method("cancel_current_mapping"):
@@ -271,7 +277,7 @@ func _on_controls_button_pressed():
 func _on_graphics_button_pressed():
 	if _scene_input_locked or _page_switch_in_progress:
 		return
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	if controls_page and controls_page.has_method("cancel_current_mapping"):
 		controls_page.cancel_current_mapping()
 	await _switch_to_page("graphics")
@@ -280,7 +286,7 @@ func _on_graphics_button_pressed():
 func _on_close_button_pressed():
 	if _scene_input_locked:
 		return
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	_close_settings()
 
 ## 处理输入
@@ -334,8 +340,9 @@ func _on_bgm_volume_changed(value: float):
 func _on_sfx_volume_changed(value: float):
 	AudioManager.set_bus_volume_percent("SFX", value)
 
-func _on_voice_volume_changed(value: float):
-	AudioManager.set_bus_volume_percent("Voice", value)
+## 音量滑块拖拽开始时播放点击音效
+func _on_volume_slider_drag_started():
+	AudioManager.play_button_click_sfx()
 
 func _exit_tree():
 	LightingManager.stop_all_light_effects()

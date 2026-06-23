@@ -114,7 +114,6 @@ func _on_teleport_button_pressed(target_id: String) -> void:
 	player.velocity = Vector2.ZERO
 	RoomManager.update_camera_limits()
 	
-	await get_tree().process_frame
 	await get_tree().physics_frame
 	RoomManager.update_camera_limits()
 	

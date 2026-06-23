@@ -15,14 +15,14 @@ func _ready():
 		message_label.text = "是否删除存档？"
 
 func _on_confirm_pressed():
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	
 	if confirm_callback:
 		confirm_callback.call()
 	queue_free()
 
 func _on_cancel_pressed():
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	queue_free()
 
 # 添加ESC键处理函数

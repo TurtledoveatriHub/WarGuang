@@ -452,10 +452,11 @@ theme_override_font_sizes/font_size = 20
 text = "请按下新的按键... (ESC取消)"
 
 [node name="AudioPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
-visible = false
 scale = Vector2(0.75, 0.75)
 
 [node name="VolumeContainer" type="Node2D" parent="SettingsRoot/PagesRoot/AudioPage"]
+visible = false
+position = Vector2(0, 42)
 
 [node name="MasterVolumeLabel" type="Label" parent="SettingsRoot/PagesRoot/AudioPage/VolumeContainer"]
 offset_left = 75.0
@@ -485,13 +486,13 @@ ticks_on_borders = true
 
 [node name="BGMVolumeLabel" type="Label" parent="SettingsRoot/PagesRoot/AudioPage/VolumeContainer"]
 offset_left = 75.0
-offset_top = 250.0
+offset_top = 290.0
 offset_right = 187.0
-offset_bottom = 272.0
+offset_bottom = 312.0
 scale = Vector2(2, 2)
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
-text = "BGM音量："
+text = "背景音量："
 
 [node name="BGMVolumeSlider" type="HSlider" parent="SettingsRoot/PagesRoot/AudioPage/VolumeContainer/BGMVolumeLabel"]
 layout_mode = 0
@@ -511,9 +512,9 @@ ticks_on_borders = true
 
 [node name="SFXVolumeLabel" type="Label" parent="SettingsRoot/PagesRoot/AudioPage/VolumeContainer"]
 offset_left = 75.0
-offset_top = 400.0
+offset_top = 450.0
 offset_right = 185.0
-offset_bottom = 422.0
+offset_bottom = 472.0
 scale = Vector2(2, 2)
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
@@ -535,34 +536,7 @@ value = 60.0
 rounded = true
 ticks_on_borders = true
 
-[node name="VoiceVolumeLabel" type="Label" parent="SettingsRoot/PagesRoot/AudioPage/VolumeContainer"]
-offset_left = 75.0
-offset_top = 550.0
-offset_right = 185.0
-offset_bottom = 572.0
-scale = Vector2(2, 2)
-theme = ExtResource("5_wi6u5")
-theme_override_font_sizes/font_size = 20
-text = "角色音量："
-
-[node name="VoiceVolumeSlider" type="HSlider" parent="SettingsRoot/PagesRoot/AudioPage/VolumeContainer/VoiceVolumeLabel"]
-layout_mode = 0
-offset_left = 120.0
-offset_top = -3.0
-offset_right = 270.0
-offset_bottom = 15.0
-scale = Vector2(2, 2)
-theme_override_icons/grabber = ExtResource("24_houfj")
-theme_override_icons/grabber_highlight = ExtResource("25_ppuk0")
-theme_override_styles/slider = SubResource("StyleBoxLine_tpcns")
-theme_override_styles/grabber_area = SubResource("StyleBoxLine_inflj")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBoxLine_3bdlu")
-value = 60.0
-rounded = true
-ticks_on_borders = true
-
 [node name="GraphicsPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
-visible = false
 
 [node name="EffectLevelContainer" type="VBoxContainer" parent="SettingsRoot/PagesRoot/GraphicsPage"]
 offset_left = 88.0

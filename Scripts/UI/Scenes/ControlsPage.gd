@@ -2,7 +2,6 @@
 extends Node2D
 
 ## 控制设置页面脚本
-
 ## 节点引用
 @onready var action_list = $ActionList                     ## 动作列表容器
 @onready var controls_hint = $ControlsHint                 ## 控制页面提示标签
@@ -88,7 +87,7 @@ func _get_action_from_hbox(hbox_name: String) -> String:
 
 ## 动作重新映射按钮按下（支持切换）
 func _on_action_remap_button_pressed(action: String):
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	
 	## 关键修复：如果已经在等待输入，直接切换动作
 	if InputMapManager.is_remapping():
@@ -253,7 +252,7 @@ func _process(delta):
 
 ## 重置按钮按下
 func _on_reset_button_pressed():
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	
 	## 如果正在等待映射输入，先取消
 	if InputMapManager.is_remapping():

@@ -20,6 +20,8 @@ static func initialize_on_ready(player: Node) -> void:
 		player.camera_controller.call_deferred("setup", player)
 	if player.fx_controller and player.fx_controller.has_method("setup"):
 		player.fx_controller.call_deferred("setup", player)
+	if player.audio_controller and player.audio_controller.has_method("setup"):
+		player.audio_controller.call_deferred("setup", player)
 
 	player.find_vignette_effect()
 	initialize_timers(player)

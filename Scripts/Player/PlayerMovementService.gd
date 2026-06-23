@@ -510,6 +510,7 @@ static func handle_walljump_state(player: Node, fixed_delta: float, move_input: 
 	# 处理撞墙后的反弹和相机反馈。
 static func handle_wall_bump(player: Node) -> void:
 	CameraShakeManager.shake("x_strong", player.phantom_camera)
+	player.trigger_feedback_event(&"wall_bump", {})
 	player.velocity.x = player.wall_bump_rebound_x * (-1 if player.is_facing_right else 1)
 	player.velocity.y = player.wall_bump_rebound_y
 	player.hurt_timer = maxf(player.run_wall_bump_control_lock_time, 0.0)

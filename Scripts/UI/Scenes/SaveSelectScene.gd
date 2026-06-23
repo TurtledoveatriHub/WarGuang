@@ -3,6 +3,7 @@ extends CanvasLayer  # 修复：改为 CanvasLayer
 ## 删除确认对话框场景（在 Inspector 中拖拽 DeleteConfirmDialog.tscn）
 @export var delete_confirm_scene: PackedScene
 
+
 class SaveData:
 	var exists: bool = false
 	var player_max_health: int = 3
@@ -188,7 +189,7 @@ func _update_slot_display():
 func _on_save_slot_pressed(slot_index: int):
 	if _scene_input_locked:
 		return
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	
 	if is_dialog_open:
 		return
@@ -282,6 +283,7 @@ func _input(event):
 
 ## 处理删除按钮按下
 func _on_delete_button_pressed(slot_index: int):
+	AudioManager.play_button_click_sfx()
 	if not delete_confirm_scene:
 		push_error("SaveSelectScene: delete_confirm_scene 未配置！请在 Inspector 中拖拽 DeleteConfirmDialog.tscn")
 		return
@@ -329,7 +331,7 @@ func _on_confirm_delete(slot_index: int):
 func _on_back_button_pressed():
 	if _scene_input_locked:
 		return
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	
 	if is_dialog_open:
 		return

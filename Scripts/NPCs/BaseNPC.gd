@@ -8,6 +8,7 @@ class_name BaseNPC
 ## - 基础交互逻辑
 ## - 对话气球显示
 ## - 交互提示管理
+## - 通用音效系统
 ## ============================================
 
 ## NPC 唯一标识符（在 Inspector 中设置）
@@ -21,6 +22,9 @@ class_name BaseNPC
 
 ## 是否只能交互一次
 @export var interact_once: bool = false
+
+## 通用交互音效数组（每次交互随机播放一个，拖拽 .wav 文件）
+@export var npc_interact_sounds: Array[AudioStream]
 
 # 节点引用
 @onready var animated_sprite = $AnimatedSprite2D if has_node("AnimatedSprite2D") else null
@@ -108,6 +112,11 @@ func _start_interaction():
 	# 设置对话内容
 	if balloon.has_method("set_dialogue"):
 		balloon.set_dialogue(dialogue_resource, self)
+	
+	# 播放随机交互音效
+	if not npc_interact_sounds.is_empty():
+		var idx: int = randi() % npc_interact_sounds.size()
+		AudioManager.play_stream_sfx(npc_interact_sounds[idx])
 	
 	# 隐藏交互提示
 	if interaction_prompt:

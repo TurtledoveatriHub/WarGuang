@@ -1,8 +1,9 @@
-[gd_scene load_steps=22 format=3 uid="uid://cnx8rqa13bm26"]
+[gd_scene load_steps=23 format=3 uid="uid://cnx8rqa13bm26"]
 
 [ext_resource type="Script" uid="uid://2jv58grmryqa" path="res://Scripts/UI/Scenes/TitleScene.gd" id="1_25ulu"]
 [ext_resource type="PackedScene" uid="uid://8vv4frjt0qmt" path="res://Scenes/UI/Scenes/SettingsScene.tscn" id="2_fkiff"]
 [ext_resource type="Script" uid="uid://c6yjpi17utwg8" path="res://Scripts/UI/Scenes/UITransitionAnimator.gd" id="2_transition_animator"]
+[ext_resource type="AudioStream" uid="uid://cs31nir8y35de" path="res://Assets/Audios/BGM/探险.ogg" id="3_1p8n3"]
 [ext_resource type="Texture2D" uid="uid://fwgvvrpd0hkd" path="res://Assets/Textures/UIs/PlayerUIs/1.png" id="5_iwgkb"]
 [ext_resource type="Texture2D" uid="uid://1xy7xygxqlmf" path="res://Assets/Textures/UIs/SceneUIs/title沃光标题01.tres" id="6_iwgkb"]
 [ext_resource type="Texture2D" uid="uid://norhspdvctlf" path="res://Assets/Textures/UIs/SceneUIs/title开始游戏01.tres" id="7_kvyf1"]
@@ -48,6 +49,7 @@ fill_to = Vector2(0, 1)
 [node name="TitleScene" type="CanvasLayer"]
 script = ExtResource("1_25ulu")
 settings_scene_resource = ExtResource("2_fkiff")
+title_bgm_stream = ExtResource("3_1p8n3")
 
 [node name="UITransitionAnimator" type="Node" parent="."]
 script = ExtResource("2_transition_animator")

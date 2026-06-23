@@ -50,13 +50,7 @@ func _ready():
 	var tree := get_tree()
 	if tree == null:
 		return
-	await tree.process_frame
-	if not is_inside_tree() or get_tree() == null:
-		return
-	await get_tree().process_frame
-	if not is_inside_tree() or get_tree() == null:
-		return
-	
+	# 立即加载房间（不等待渲染帧，借助 FadeManager.force_black 保持黑屏）
 	RoomManager.auto_calculate_room_connections()
 	
 	# 如果是从存档加载，设置玩家位置和状态
@@ -68,9 +62,6 @@ func _ready():
 	else:
 		if get_tree() == null:
 			return
-		await get_tree().process_frame
-		if not is_inside_tree() or get_tree() == null:
-			return
 		RoomManager.load_room("Room1")
 	
 	# 连接玩家死亡信号
@@ -81,6 +72,12 @@ func _ready():
 		player_ui.player_died.connect(_on_player_died)
 
 	_boot_visual_ready = true
+	# 等待一帧渲染 + 一帧物理让 PhantomCamera 内部跟随逻辑稳定
+	await get_tree().process_frame
+	await get_tree().physics_frame
+	# 在淡入前最后一次对齐相机到玩家位置，防止 PhantomCamera 跟随偏移
+	if is_instance_valid(player) and player.has_method("sync_camera_to_player_center"):
+		player.sync_camera_to_player_center(true)
 	boot_visual_ready.emit()
 
 func _play_new_game_opening_sequence() -> void:
@@ -137,13 +134,10 @@ func wait_until_boot_visual_ready() -> void:
 	await boot_visual_ready
 
 func initialize_room_system():
-	# 自动注册所有房间
-	for room_node in room_container.get_children():
-		if room_node.has_method("get_room_data"):
-			var room_data = room_node.get_room_data()
-			
-			# 关键修改：不传递颜色数据，RoomManager会从CanvasModulate节点获取
-			RoomManager.register_room(room_data.id, room_node, room_data)
+	# 按需加载模式：RoomContainer 启动时为空
+	# 首次房间加载由 _load_from_save 或玩家进入触发
+	# RoomManager._instantiate_room() 会在需要时加载房间
+	pass
 
 ## 从存档加载
 func _load_from_save():

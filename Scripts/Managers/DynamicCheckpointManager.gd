@@ -1,7 +1,7 @@
 extends Node
 # 自动加载的单例
 
-var current_checkpoint_id: int = -1
+var current_checkpoint_id: String = ""
 var current_checkpoint_room: String = ""
 var checkpoints: Dictionary = {}  # checkpoint_id -> position
 var checkpoint_rooms: Dictionary = {}  # checkpoint_id -> room_id
@@ -11,7 +11,7 @@ func _ready():
 	await get_tree().process_frame
 
 ## 注册检查点
-func register_checkpoint(checkpoint_id: int, position: Vector2, room_id: String):
+func register_checkpoint(checkpoint_id: String, position: Vector2, room_id: String):
 	# 检查 ID 是否重复
 	if checkpoints.has(checkpoint_id):
 		var old_room: String = checkpoint_rooms.get(checkpoint_id, "未知")
@@ -32,7 +32,7 @@ func register_checkpoint(checkpoint_id: int, position: Vector2, room_id: String)
 	checkpoint_rooms[checkpoint_id] = room_id
 
 ## 设置当前检查点（移除优先级参数）
-func set_current_checkpoint(id: int, current_room: String):
+func set_current_checkpoint(id: String, current_room: String):
 	# 检查检查点是否属于当前房间
 	var checkpoint_room = checkpoint_rooms.get(id, "")
 	
@@ -49,7 +49,7 @@ func set_current_checkpoint(id: int, current_room: String):
 
 ## 获取当前检查点位置（检查房间归属）
 func get_current_checkpoint_position(check_room: String = "") -> Vector2:
-	if current_checkpoint_id == -1:
+	if current_checkpoint_id == "":
 		print("无动态检查点，返回默认位置")
 		return Vector2.ZERO
 	
@@ -72,7 +72,7 @@ func on_room_changed(_new_room_id: String):
 ## 玩家死亡时清除所有动态检查点记录
 func clear_all_checkpoints_on_death():
 	# 重置当前激活的检查点
-	current_checkpoint_id = -1
+	current_checkpoint_id = ""
 	current_checkpoint_room = ""
 	if Global and Global.has_method("clear_dynamic_checkpoints"):
 		Global.clear_dynamic_checkpoints()

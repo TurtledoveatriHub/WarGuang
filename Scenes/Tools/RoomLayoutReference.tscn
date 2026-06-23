@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvb8xasnspjbn"]
+
+[ext_resource type="Script" uid="uid://dx7mu2xywsyrg" path="res://Scripts/Tools/RoomLayoutViewer.gd" id="1_6bb6t"]
+
+[node name="RoomLayoutReference" type="Node2D"]
+script = ExtResource("1_6bb6t")

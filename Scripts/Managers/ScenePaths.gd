@@ -84,4 +84,37 @@ static func load_master() -> PackedScene:
 static func load_main_game() -> PackedScene:
 	return load(GAME_MAIN)
 
+# ============================================
+# 房间场景路径（按需加载用）
+# ============================================
+const ROOMS_DIR = "res://Scenes/GameScenes/Rooms/"
+const ROOM_PATHS = {
+	"Room1": ROOMS_DIR + "Room1.tscn",
+	"Room2": ROOMS_DIR + "Room2.tscn",
+	"Room3": ROOMS_DIR + "Room3.tscn",
+	"Room4": ROOMS_DIR + "Room4.tscn",
+	"Room5": ROOMS_DIR + "Room5.tscn",
+	"Room6": ROOMS_DIR + "Room6.tscn",
+	"RoomDream10": ROOMS_DIR + "RoomDream10.tscn",
+	"Room39": ROOMS_DIR + "Room39.tscn",
+	"Room61": ROOMS_DIR + "Room61.tscn",
+	"Room62": ROOMS_DIR + "Room62.tscn",
+	"Room63": ROOMS_DIR + "Room63.tscn",
+	"Room64": ROOMS_DIR + "Room64.tscn",
+	"Room65": ROOMS_DIR + "Room65.tscn",
+	"Room66": ROOMS_DIR + "Room66.tscn",
+	"Room67": ROOMS_DIR + "Room67.tscn",
+	"Room68": ROOMS_DIR + "Room68.tscn",
+	"Room69": ROOMS_DIR + "Room69.tscn",
+	"SnowMountain1": ROOMS_DIR + "SnowMountain/SnowMountain1.tscn",
+	"SnowMountain2": ROOMS_DIR + "SnowMountain/SnowMountain2.tscn",
+	"SnowMountain3": ROOMS_DIR + "SnowMountain/SnowMountain3.tscn",
+	"SnowMountain4": ROOMS_DIR + "SnowMountain/SnowMountain4.tscn",
+}
 
+## 获取房间场景文件路径
+static func get_room_path(room_id: String) -> String:
+	if ROOM_PATHS.has(room_id):
+		return ROOM_PATHS[room_id]
+	push_error("ScenePaths: 未知的房间ID: ", room_id)
+	return ""

@@ -1,7 +1,8 @@
-[gd_scene load_steps=13 format=3 uid="uid://ti5ndmbw2337"]
+[gd_scene load_steps=14 format=3 uid="uid://ti5ndmbw2337"]
 
 [ext_resource type="Script" uid="uid://0r1sd45ghf8l" path="res://Scripts/UI/Scenes/GameSettingScene.gd" id="1_vf3dq"]
 [ext_resource type="PackedScene" uid="uid://8vv4frjt0qmt" path="res://Scenes/UI/Scenes/SettingsScene.tscn" id="2_aemly"]
+[ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/a.wav" id="3_hmv1b"]
 [ext_resource type="Texture2D" uid="uid://bnf2wds016uy8" path="res://Assets/Textures/UIs/SceneUIs/tres/场景UI集.png" id="3_urdrt"]
 [ext_resource type="Texture2D" uid="uid://xygjp77wxevl" path="res://Assets/Textures/UIs/SceneUIs/tres/回退1.tres" id="4_urdrt"]
 [ext_resource type="Texture2D" uid="uid://40v6kkfpqldt" path="res://Assets/Textures/UIs/SceneUIs/tres/回退3.tres" id="5_hmv1b"]
@@ -16,6 +17,7 @@
 [node name="GameSettingScene" type="CanvasLayer"]
 script = ExtResource("1_vf3dq")
 settings_scene_resource = ExtResource("2_aemly")
+button_click_sfx = ExtResource("3_hmv1b")
 
 [node name="Background" type="Sprite2D" parent="."]
 visible = false

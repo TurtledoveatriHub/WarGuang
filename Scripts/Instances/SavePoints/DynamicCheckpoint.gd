@@ -1,14 +1,14 @@
-# DynamicCheckpoint.gd - 简化版本（移除优先级）
+# DynamicCheckpoint.gd
 extends Area2D
-## 检查点唯一 ID
-@export var checkpoint_id: int = 0  
+## 检查点唯一 ID（字符串，房间内唯一即可）
+@export var checkpoint_id: String = ""  
 ## 所属房间 ID（必须填写）
 @export var belongs_to_room: String = ""  
 
 func _ready():
 	# 检查必填字段
-	if checkpoint_id == 0:
-		print("错误：检查点必须设置 checkpoint_id（不能为 0）")
+	if checkpoint_id == "":
+		print("错误：检查点必须设置 checkpoint_id")
 	
 	if belongs_to_room == "":
 		# 尝试自动获取所属房间
@@ -18,7 +18,7 @@ func _ready():
 	
 	connect("body_entered", _on_body_entered)
 	
-	# 注册到 DynamicCheckpointManager（移除优先级参数）
+	# 注册到 DynamicCheckpointManager
 	DynamicCheckpointManager.register_checkpoint(checkpoint_id, global_position, belongs_to_room)
 
 ## 确定检查点所属房间
@@ -50,5 +50,5 @@ func _on_body_entered(body):
 				  "，当前房间为", current_room, "，忽略激活")
 			return
 		
-		# 通知 DynamicCheckpointManager 激活检查点（移除优先级参数）
+		# 通知 DynamicCheckpointManager 激活检查点
 		DynamicCheckpointManager.set_current_checkpoint(checkpoint_id, current_room)

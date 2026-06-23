@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://4jbxxqn058o2" path="res://Assets/Textures/anim16×16_01-Sheet.png" id="2_dvqej"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5g173"]
-size = Vector2(9, 9)
+size = Vector2(8, 8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_sx4gy"]
 atlas = ExtResource("2_dvqej")
@@ -182,9 +182,10 @@ script = ExtResource("1_ol2j8")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 8
-position = Vector2(-0.5, 0.5)
 shape = SubResource("RectangleShape2D_5g173")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_t0krv")
-animation = &"START"
+animation = &"YES"
+frame = 1
+frame_progress = 0.66504484

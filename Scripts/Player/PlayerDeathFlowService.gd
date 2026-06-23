@@ -31,7 +31,7 @@ static func start_death_process(player: Node) -> void:
 	if not player.is_in_death_process:
 		return
 
-	AudioManager.stop_bgm(1.0)
+	AudioManager.fade_out_bgm_on_death(player.die_animation_time)
 	await player.get_tree().create_timer(player.die_animation_time).timeout
 
 	if player.is_low_health_effect_active:

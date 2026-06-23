@@ -2,6 +2,9 @@ extends CanvasLayer  # 修复：改为 CanvasLayer
 
 ## 设置界面场景（在 Inspector 中拖拽 SettingsScene.tscn）
 @export var settings_scene_resource: PackedScene
+## 标题画面 BGM（在 Inspector 中拖拽 .ogg 或 .mp3 文件）
+@export var title_bgm_stream: AudioStream
+
 
 @onready var start_button = $UI/StartButton
 @onready var settings_button = $UI/SettingsButton
@@ -77,8 +80,9 @@ func _ready():
 		if FadeManager and FadeManager.has_method("get_black_alpha") and FadeManager.get_black_alpha() <= 0.01:
 			call_deferred("_on_scene_transition_enter_begin")
 	
-	## 播放 UI BGM
-	AudioManager.play_bgm("BGM0")
+	## 播放 UI BGM（在 Inspector 中拖拽 title_bgm_stream）
+	if title_bgm_stream:
+		AudioManager.play_bgm_stream(title_bgm_stream)
 	
 	await get_tree().create_timer(0.1).timeout
 	await _play_external_material_enter()
@@ -112,7 +116,7 @@ func _ready():
 func _on_start_button_pressed():
 	if _scene_input_locked:
 		return
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	_reset_title_click_state()
 	
 	_set_scene_input_locked(true)
@@ -126,6 +130,7 @@ func _on_start_button_pressed():
 func _on_settings_button_pressed():
 	if _scene_input_locked:
 		return
+	AudioManager.play_button_click_sfx()
 	_reset_title_click_state()
 	start_button.disabled = true
 	settings_button.disabled = true  # 修复：改为 settings_button
@@ -180,7 +185,7 @@ func _on_quit_button_pressed():
 		return
 	_reset_title_click_state()
 	_set_scene_input_locked(true)
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	if ui_transition_animator:
 		await ui_transition_animator.play_exit_transition()
 	await _play_external_material_exit()

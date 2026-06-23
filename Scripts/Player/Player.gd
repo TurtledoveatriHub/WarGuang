@@ -81,6 +81,8 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 @onready var camera_controller = $PlayerCameraController
 ## 统一管理跑步、冲刺、受伤、落地等一次性与周期性特效。
 @onready var fx_controller = $PlayerFXController
+## 管理玩家所有动作音效的播放与停止。
+@onready var audio_controller = $PlayerAudioController
 @onready var canvas_modulate = get_tree().get_first_node_in_group("canvas_modulate")
 
 ##外部变量
@@ -136,15 +138,15 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 进入滑翔的初始水平速度
 @export var glide_init_h_speed: float = 0.0
 ## 滑翔目标水平速度
-@export var glide_target_h_speed: float = 180.0
+@export var glide_target_h_speed: float = 120.0
 ## 滑翔水平加速度（按住方向键时每秒逼近目标水平速度的最大变化率）
 @export var glide_horizontal_acceleration: float = 480.0
 ## 滑翔松开方向键时的水平减速
-@export var glide_release_deceleration: float = 90.0
+@export var glide_release_deceleration: float = 120.0
 ## 滑翔最大下落速度乘数
-@export var glide_max_fall_multiplier: float = 0.25
+@export var glide_max_fall_multiplier: float = 0.3
 ## 进入滑翔后的滞空时间（秒）
-@export var glide_hover_time: float = 0.25
+@export var glide_hover_time: float = 0.2
 ## 滑翔下落倍率过渡时间（秒）
 @export var glide_fall_accel_time: float = 1.2
 
@@ -153,9 +155,9 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 受伤击退速度
 @export var hurt_knockback_speed: float = 120.0
 ## 受伤僵直时间（秒）
-@export var hurt_stun_time: float = 0.6
+@export var hurt_stun_time: float = 0.4
 ## 受伤无敌时间（秒）
-@export var hurt_invincible_time: float = 1.2
+@export var hurt_invincible_time: float = 0.6
 ## 进入游戏开始时的禁用时间（秒）
 @export var warp_control_lock_time: float = 1.0
 ## 传送伤害飞行峰值速度（像素/秒）
@@ -182,7 +184,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 传送渐黑渐显持续时间（秒）
 @export var fade_transition_time: float = 1.2
 ## 死亡慢动作时间（秒）
-@export var slowly_die_time: float = 1
+@export var slowly_die_time: float = 0.8
 
 ## 冲刺设置
 @export_category("冲刺设置")
@@ -276,9 +278,9 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## JumpBox 重新触发锁定时间（毫秒）
 @export var jumpbox_retrigger_lock_ms: int = 120
 ## JumpBox 单次触发的最大上抛力（像素/秒）
-@export var jumpbox_max_vertical_force: float = 600.0
+@export var jumpbox_max_vertical_force: float = 480.0
 ## JumpBox 水平速度上限（像素/秒）
-@export var jumpbox_max_horizontal_speed: float = 480.0
+@export var jumpbox_max_horizontal_speed: float = 420.0
 
 @export_category("调试")
 ## 记录受伤后相机跳位相关状态

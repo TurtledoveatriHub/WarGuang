@@ -1,10 +1,14 @@
-[gd_scene load_steps=38 format=3 uid="uid://b5u66wh2js8e"]
+[gd_scene load_steps=42 format=3 uid="uid://b5u66wh2js8e"]
 
 [ext_resource type="Script" uid="uid://igv5cxvnqu52" path="res://Scripts/NPCs/MerchantNPC.gd" id="1_5oicq"]
+[ext_resource type="AudioStream" uid="uid://bmquje8dd6chq" path="res://Assets/Audios/SFX/Player/blackdash.wav" id="2_e57xd"]
 [ext_resource type="Resource" uid="uid://c4girsu3fahn" path="res://Assets/Dialogues/MerchantDialogue.dialogue" id="2_ppi4a"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="3_ac534"]
 [ext_resource type="Texture2D" uid="uid://bx0ye7xrni3ix" path="res://Assets/Textures/NPCs/店员.png" id="3_dsyu1"]
+[ext_resource type="AudioStream" uid="uid://debkka622reug" path="res://Assets/Audios/SFX/Player/hurt.wav" id="3_ohcmg"]
+[ext_resource type="AudioStream" uid="uid://r0cd2hghqoae" path="res://Assets/Audios/SFX/Player/dash.wav" id="4_dxusm"]
 [ext_resource type="Texture2D" uid="uid://dohto6nf1nd73" path="res://Assets/Textures/UIs/new tiles 16×16-1.png" id="4_o1pgj"]
+[ext_resource type="AudioStream" uid="uid://c1rbd42778cdi" path="res://Assets/Audios/SFX/Player/jumpbox.wav" id="5_j5py5"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tlho6"]
 atlas = ExtResource("3_dsyu1")
@@ -252,6 +256,12 @@ size = Vector2(22, 25)
 
 [node name="MerchantNPC" type="Area2D"]
 script = ExtResource("1_5oicq")
+mood_normal_sfx = ExtResource("2_e57xd")
+mood_happy_sfx = ExtResource("3_ohcmg")
+mood_angry_sfx = ExtResource("4_dxusm")
+click_item_sfx = ExtResource("5_j5py5")
+no_purchase_sfx = ExtResource("5_j5py5")
+purchase_success_sfx = ExtResource("5_j5py5")
 dialogue_resource = ExtResource("2_ppi4a")
 balloon_scene = ExtResource("3_ac534")
 

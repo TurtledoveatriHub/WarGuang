@@ -1,4 +1,6 @@
 extends Area2D
+## 金币收集音效（拖拽 .wav 文件）
+@export var coin_collect_sfx: AudioStream
 
 @onready var animated_sprite = $AnimatedSprite2D
 @onready var collision_shape = $CollisionShape2D
@@ -22,7 +24,7 @@ func _on_body_entered(body):
 		Global.add_coins(coin_value)
 		
 		# 播放收集音效
-		AudioManager.play_sfx("coin_collect")
+		AudioManager.play_stream_sfx(coin_collect_sfx)
 		
 		# 等待动画播放完毕
 		await animated_sprite.animation_finished

@@ -207,6 +207,8 @@ func _start_drop_flow() -> void:
 	if _shutting_down or not is_inside_tree() or get_tree() == null:
 		_abort_drop_flow()
 		return
+	# 事件播放期间抑制 BGM，reveal 阶段结束后恢复
+	AudioManager.set_event_bgm_suppress(true)
 	if not is_instance_valid(_player):
 		await reveal_overlay_to_gameplay(float(_active_payload.get("reveal_duration", get_default_fade_duration())))
 		if FadeManager and FadeManager.has_method("force_fade_in"):
@@ -684,6 +686,8 @@ func _run_reveal_phase(reveal_duration: float) -> void:
 			FadeManager.force_fade_in()
 	# 始终使用本地覆盖层揭黑，确保 reveal_duration 可见且可控。
 	await reveal_overlay_to_gameplay(reveal_duration)
+	# Reveal 完成后恢复 BGM 播放
+	AudioManager.set_event_bgm_suppress(false)
 	var global_alpha_after: float = FadeManager.get_black_alpha() if FadeManager and FadeManager.has_method("get_black_alpha") else -1.0
 	if debug_reveal_flow:
 		print("BootCinematicDirector: reveal finished, elapsed_ms=", Time.get_ticks_msec() - reveal_start_ms, ", global_alpha_after=", global_alpha_after)
@@ -713,6 +717,8 @@ func play_blocking_intro_event(player_ref: Player, payload: Dictionary = {}) -> 
 		return
 	if not is_instance_valid(player_ref):
 		return
+	# 事件播放期间抑制 BGM，reveal 阶段结束后恢复
+	AudioManager.set_event_bgm_suppress(true)
 	_player = player_ref
 	_black_hold_released = false
 	_active_payload = payload.get("payload", payload) if typeof(payload.get("payload", payload)) == TYPE_DICTIONARY else {}

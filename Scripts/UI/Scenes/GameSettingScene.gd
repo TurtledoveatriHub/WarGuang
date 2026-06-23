@@ -2,7 +2,6 @@ extends CanvasLayer
 
 ## 设置界面场景（在 Inspector 中拖拽 SettingsScene.tscn）
 @export var settings_scene_resource: PackedScene
-
 @onready var continue_button = $ContinueButton
 @onready var settings_button = $SettingsButton
 @onready var main_menu_button = $MainMenuButton
@@ -185,7 +184,7 @@ func _on_settings_closed(settings_scene: Node = null):
 		game_canvas_modulate.color = target_color
 
 func _on_main_menu_button_pressed():
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	
 	if not is_open or _is_closing:
 		return

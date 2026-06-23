@@ -5,6 +5,8 @@ extends Area2D
 @export_category("门设置")
 ## 门的唯一 ID，相同 ID 的两个门互相传送
 @export var door_id: String = ""
+## 目标房间 ID（传送前自动加载此房间，不填则尝试加载当前房间的相邻房间）
+@export var target_room_id: String = ""
 
 ## 交互模式：启用后玩家触碰门不立即传送，需按下交互键才传送
 @export var use_interaction_mode: bool = false
@@ -59,7 +61,17 @@ func _on_body_entered(body):
 		if use_interaction_mode:
 			_show_interaction_prompt()
 		elif can_teleport:
-			await teleport_player(body)
+			can_teleport = false
+			# 立即锁控/清惯性（同步操作，安全）
+			if body.has_method("lock_control"):
+				body.lock_control(999.0, "door_transfer")
+			body.velocity = Vector2.ZERO
+			if body.has_method("interrupt_hurt_visual_only"):
+				body.interrupt_hurt_visual_only()
+			elif body.has_method("interrupt_hurt_visual_effect"):
+				body.interrupt_hurt_visual_effect()
+			# 延迟到 idle 阶段启动传送，避免在 physics callback 中修改场景树
+			call_deferred("_deferred_start_teleport", body)
 
 func _on_body_exited(body):
 	if body.is_in_group("player"):
@@ -73,7 +85,8 @@ func _input(event):
 		if player and player.has_method("get_player_state") and player.get_player_state() == player.PlayerState.DASH:
 			return
 		_hide_interaction_prompt()
-		await teleport_player(player)
+		# 交互模式从 _input 调用（非 physics callback），直接走传送
+		await _teleport_player(player)
 
 func _show_interaction_prompt() -> void:
 	if interaction_prompt:
@@ -83,18 +96,32 @@ func _hide_interaction_prompt() -> void:
 	if interaction_prompt:
 		interaction_prompt.visible = false
 
-## 传送玩家
-func teleport_player(player):
-	# 进入 Door 即锁输入并清理惯性，直到自动走位结束。
+## 延迟启动传送（idle 阶段执行，此时不在 physics callback 中）
+func _deferred_start_teleport(body: Node) -> void:
+	if not is_instance_valid(body) or not is_instance_valid(self):
+		return
+	# 先黑屏，再加载房间（避免闪现目标房间一帧）
+	await FadeManager.fade_out(fade_in_duration)
+	await _teleport_player(body)
+
+## 黑屏阶段执行传送（此时屏幕已全黑，操作场景树安全）
+func _teleport_player(player: Node) -> void:
+	# 锁控与中断受伤视觉（_on_body_entered 中已做，此处为 _input 路径做保护）
 	if player.has_method("lock_control"):
 		player.lock_control(999.0, "door_transfer")
 	player.velocity = Vector2.ZERO
-
-	# 中断受伤视觉效果
 	if player.has_method("interrupt_hurt_visual_only"):
 		player.interrupt_hurt_visual_only()
 	elif player.has_method("interrupt_hurt_visual_effect"):
 		player.interrupt_hurt_visual_effect()
+	
+	# 传送前确保目标房间已加载（按需加载模式必需）	
+	if target_room_id != "" and RoomManager and RoomManager.has_method("ensure_room_loaded"):
+		RoomManager.ensure_room_loaded(target_room_id)
+	elif RoomManager and RoomManager.rooms.has(RoomManager.current_room):
+		# 没填 target_room_id 时，尝试加载当前房间的所有相邻房间
+		for adj in RoomManager.rooms[RoomManager.current_room].adjacent:
+			RoomManager.ensure_room_loaded(adj)
 	
 	var other_door = DoorManager.find_other_door(self)
 	
@@ -105,14 +132,11 @@ func teleport_player(player):
 	can_teleport = false
 	other_door.can_teleport = false
 	
-	# 1. 渐入（渐黑）
-	await FadeManager.fade_out(fade_in_duration)
-	
-	# 2. 黑屏期间切换房间和传送玩家
-	var target_room_id = other_door.get_room_id()
+	# 黑屏期间切换房间和传送玩家
+	var door_target_room = other_door.get_room_id()
 	var target_position = other_door.global_position
 	var defer_autowalk_for_room_cinematic: bool = false
-	if target_room_id == "RoomDream10" and Global and Global.has_method("has_cinematic_flag"):
+	if door_target_room == "RoomDream10" and Global and Global.has_method("has_cinematic_flag"):
 		defer_autowalk_for_room_cinematic = not Global.has_cinematic_flag("room_dream10_first_enter")
 	if defer_autowalk_for_room_cinematic and FadeManager and FadeManager.has_method("hold_black"):
 		FadeManager.hold_black("room_dream10_first_enter")
@@ -122,9 +146,9 @@ func teleport_player(player):
 		RoomManager.suppress_player_room_enter(0.45)
 	# 切房前先向目标房间广播入场锚点，用于背景预对齐。
 	if RoomManager and RoomManager.has_method("prepare_room_background_for_entry"):
-		RoomManager.prepare_room_background_for_entry(target_room_id, target_position)
+		RoomManager.prepare_room_background_for_entry(door_target_room, target_position)
 	
-	RoomManager.load_room(target_room_id)
+	RoomManager.load_room(door_target_room)
 	
 	player.global_position = target_position
 	player.velocity = Vector2.ZERO
@@ -147,7 +171,7 @@ func teleport_player(player):
 	# 传送到目标房间后稍作停顿，再开始自动走位；期间保持连续锁控。
 	await get_tree().create_timer(0.1).timeout
 	if not defer_autowalk_for_room_cinematic and player.has_method("start_door_autowalk_to_dynamic_checkpoint"):
-		var autowalk_started: bool = player.start_door_autowalk_to_dynamic_checkpoint(target_room_id, target_position, player.is_facing_right)
+		var autowalk_started: bool = player.start_door_autowalk_to_dynamic_checkpoint(door_target_room, target_position, player.is_facing_right)
 		if not autowalk_started and player.has_method("lock_control"):
 			# 目标房间可能暂无动态检查点，避免无限锁输入。
 			player.lock_control(0.18, "door_transfer_fallback")

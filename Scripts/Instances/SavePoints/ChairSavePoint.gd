@@ -1,4 +1,6 @@
 extends Area2D
+## 存档交互音效（拖拽 .wav 文件）
+@export var save_interact_sfx: AudioStream
 
 @onready var interaction_prompt = $InteractionPrompt
 
@@ -51,7 +53,7 @@ func _interact_with_chair():
 	Global.last_save_room = current_room_id
 	
 	# 播放存档音效
-	AudioManager.play_instance_sfx("save_game")
+	AudioManager.play_stream_sfx(save_interact_sfx)
 	
 	# 让玩家进入睡眠状态并锁定控制
 	var player = get_tree().get_first_node_in_group("player")

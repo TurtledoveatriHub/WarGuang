@@ -8,6 +8,7 @@ class_name PlayerUI
 ## 血量单位场景（在 Inspector 中拖拽 HealthUnit.tscn）
 @export var health_unit_scene: PackedScene
 
+
 ## 游戏设置场景（在 Inspector 中拖拽 GameSettingScene.tscn）
 @export var game_setting_scene: PackedScene
 
@@ -463,7 +464,7 @@ func show_save_label():
 
 # 游戏设置相关函数
 func _on_game_setting_button_pressed():
-	AudioManager.play_sfx("button_click")
+	AudioManager.play_button_click_sfx()
 	
 	_open_game_setting_menu()
 

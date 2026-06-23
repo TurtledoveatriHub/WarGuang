@@ -4,8 +4,8 @@ extends Node2D
 @export_category("房间设置")
 @export var room_id: String = "Room1"
 
-## 房间 BGM
-@export var room_bgm: String = ""
+## 房间 BGM 流（在 Inspector 中拖拽 .ogg 文件）
+@export var room_bgm_stream: AudioStream
 
 ## 相邻房间 ID 列表
 @export var adjacent_rooms: Array[String] = []
@@ -55,15 +55,10 @@ func setup_room_trigger():
 		room_trigger.body_entered.connect(_on_player_entered)
 
 func set_room_active(active: bool):
-	set_process(active)
-	set_physics_process(active)
-	
-	for child in get_children():
-		if child != room_trigger:
-			child.set_process(active)
-			child.set_physics_process(active)
-			if child.has_method("set_active"):
-				child.set_active(active)
+	if active:
+		process_mode = PROCESS_MODE_INHERIT
+	else:
+		process_mode = PROCESS_MODE_DISABLED
 	
 	visible = active
 
@@ -89,7 +84,7 @@ func get_room_data() -> Dictionary:
 		"id": room_id,
 		"bounds_size": room_bounds.get_actual_size() if room_bounds else Vector2.ZERO,
 		"bounds_position": room_bounds.global_position if room_bounds else Vector2.ZERO,
-		"bgm": room_bgm,
+		"bgm_stream": room_bgm_stream,
 		"adjacent": adjacent_rooms,
 		"color": room_color
 	}

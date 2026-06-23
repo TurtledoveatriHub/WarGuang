@@ -7,7 +7,7 @@ extends TileMapLayer
 ## 默认击退力
 @export var default_knockback: Vector2 = Vector2(300, 400)
 ## 伤害冷却间隔（秒）
-@export var damage_cooldown_time: float = 0.3
+@export var damage_cooldown_time: float = 0.2
 
 ## 自定义数据层名称（需与 TileSet 编辑器中完全一致）
 @export var data_damage_type: String = "dmg_type"
@@ -25,38 +25,28 @@ func _ready():
 		push_warning("HurtboxMap: 未设置 TileSet")
 		return
 	
-	var tile_size: Vector2 = tile_set.tile_size
 	_hurt_area = Area2D.new()
 	_hurt_area.name = "HurtArea"
 	_hurt_area.collision_layer = 16   # 层5 HurtBox(2^4=16)
 	_hurt_area.collision_mask = 1     # 监听层1 Player(2^0=1)
 	
 	var count: int = 0
+	
+	# 收集所有有 TileData 的格子
+	var hurt_cells: Array[Vector2i] = []
 	for cell in get_used_cells():
-		var data: TileData = get_cell_tile_data(cell)
-		if data == null:
-			continue
-		
-		var has_custom: bool = false
-		var pc: int = data.get_collision_polygons_count(0)
-		if pc > 0:
-			for pi in range(pc):
-				var pts: PackedVector2Array = data.get_collision_polygon_points(0, pi)
-				if pts.size() < 3: continue
-				var poly := CollisionPolygon2D.new()
-				poly.polygon = pts
-				poly.position = map_to_local(cell)
-				_hurt_area.add_child(poly)
-				has_custom = true
-				count += 1
-		
-		if not has_custom:
-			var shape := CollisionShape2D.new()
-			shape.shape = RectangleShape2D.new()
-			(shape.shape as RectangleShape2D).size = tile_size
-			shape.position = map_to_local(cell)
-			_hurt_area.add_child(shape)
-			count += 1
+		if get_cell_tile_data(cell) != null:
+			hurt_cells.append(cell)
+	
+	if hurt_cells.is_empty():
+		push_warning("HurtboxMap: 未找到任何有 TileData 的格子")
+		return
+	
+	# 每个伤害格子创建一个独立矩形碰撞体（不合并）
+	var tile_size: Vector2 = tile_set.tile_size
+	for cell in hurt_cells:
+		_add_cell_shape(cell, tile_size)
+		count += 1
 	
 	if count == 0:
 		push_warning("HurtboxMap: 未找到任何有 TileData 的格子")
@@ -67,7 +57,16 @@ func _ready():
 	_hurt_area.body_exited.connect(_on_body_exited)
 	
 	if not Engine.is_editor_hint():
-		print("HurtboxMap: 生成了 ", count, " 个碰撞体")
+		print("HurtboxMap: 生成了 ", count, " 个碰撞体（每格独立）")
+
+
+## 单个格子的矩形碰撞体，中心对齐格子中心
+func _add_cell_shape(cell: Vector2i, tile_size: Vector2) -> void:
+	var shape := CollisionShape2D.new()
+	shape.shape = RectangleShape2D.new()
+	(shape.shape as RectangleShape2D).size = tile_size
+	shape.position = map_to_local(cell)
+	_hurt_area.add_child(shape)
 
 
 func _on_body_entered(body: Node) -> void:
