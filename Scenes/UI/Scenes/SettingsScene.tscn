@@ -1,8 +1,8 @@
-[gd_scene load_steps=31 format=3 uid="uid://8vv4frjt0qmt"]
+[gd_scene load_steps=32 format=3 uid="uid://8vv4frjt0qmt"]
 
 [ext_resource type="Script" uid="uid://b8qfrtedcjp8w" path="res://Scripts/UI/Scenes/SettingsScene.gd" id="1_kwsuw"]
 [ext_resource type="Script" uid="uid://c6yjpi17utwg8" path="res://Scripts/UI/Scenes/UITransitionAnimator.gd" id="2_transition_animator"]
-[ext_resource type="Texture2D" uid="uid://fwgvvrpd0hkd" path="res://Assets/Textures/UIs/PlayerUIs/1.png" id="3_bvn5r"]
+[ext_resource type="Texture2D" uid="uid://ctb5t1s4mmfof" path="res://Assets/Textures/Backgrounds/雪地基础背景.png" id="3_bvn5r"]
 [ext_resource type="Texture2D" uid="uid://bv4wcsihjxeaa" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭1.tres" id="4_vx36v"]
 [ext_resource type="Texture2D" uid="uid://kxm2uujj5ma4" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭3.tres" id="5_bvn5r"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="5_wi6u5"]
@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://clsfxo3yvpw85" path="res://Assets/Textures/UIs/SceneUIs/tres/音量设置1.tres" id="8_rwgsd"]
 [ext_resource type="Texture2D" uid="uid://1s1p4qb2ylw1" path="res://Assets/Textures/UIs/SceneUIs/tres/音量设置3.tres" id="9_vx36v"]
 [ext_resource type="Texture2D" uid="uid://drw5t7db5y62a" path="res://Assets/Textures/UIs/SceneUIs/tres/音量设置2.tres" id="10_bvn5r"]
-[ext_resource type="Script" uid="uid://78cuppapjngy" path="res://Scripts/UI/Scenes/ControlsPage.gd" id="10_oi1yp"]
+[ext_resource type="Script" uid="uid://b5ruuqcdndtr1" path="res://Scripts/UI/Scenes/PCControlsPage.gd" id="10_oi1yp"]
 [ext_resource type="Texture2D" uid="uid://ctxsxvklddrjj" path="res://Assets/Textures/UIs/SceneUIs/tres/按键设置1.tres" id="11_pn2j1"]
 [ext_resource type="Texture2D" uid="uid://bfmrxf2530tkm" path="res://Assets/Textures/UIs/SceneUIs/tres/按键设置3.tres" id="12_hlh84"]
 [ext_resource type="Texture2D" uid="uid://dq50bsyyfm8iu" path="res://Assets/Textures/UIs/SceneUIs/tres/按键设置2.tres" id="13_houfj"]
@@ -25,11 +25,14 @@
 [ext_resource type="Texture2D" uid="uid://duklbrpm0cx67" path="res://Assets/Textures/UIs/SceneUIs/tres/回退2.tres" id="23_houfj"]
 [ext_resource type="Texture2D" uid="uid://bxip4ialo0qsl" path="res://Assets/Textures/UIs/SceneUIs/tres/音量滑块1.tres" id="24_houfj"]
 [ext_resource type="Texture2D" uid="uid://dolaxw8vcjj6y" path="res://Assets/Textures/UIs/SceneUIs/tres/音量滑块2.tres" id="25_ppuk0"]
+[ext_resource type="Script" uid="uid://buwtlyhwawd2q" path="res://Scripts/UI/Scenes/MobieControlsPage.gd" id="mobie_controls_script"]
 
-[sub_resource type="Gradient" id="Gradient_bvn5r"]
+[sub_resource type="Gradient" id="Gradient_pn2j1"]
+offsets = PackedFloat32Array(0, 0.32663316, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.09296482, 0.09296482, 0.09296482, 1, 1, 1, 1, 1)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_pn2j1"]
-gradient = SubResource("Gradient_bvn5r")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hlh84"]
+gradient = SubResource("Gradient_pn2j1")
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_tpcns"]
 color = Color(0.19607843, 0.15686275, 0.11764706, 1)
@@ -54,16 +57,16 @@ extra_target_paths = Array[NodePath]([NodePath("../BackButton"), NodePath("../Se
 color = Color(0.646029, 0.64602906, 0.6460289, 1)
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
-position = Vector2(675.5, 368.5)
-scale = Vector2(22.578125, 15.390624)
-color = Color(0.3529412, 0.3529412, 0.50980395, 0.78431374)
+position = Vector2(640, 359.99997)
+scale = Vector2(20, 11.25)
+color = Color(0.5729883, 0.5729883, 0.5729883, 1)
 range_layer_min = 1
 range_layer_max = 100
-texture = SubResource("GradientTexture2D_pn2j1")
+texture = SubResource("GradientTexture2D_hlh84")
 
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(640, 360)
-scale = Vector2(2.5, 2.5)
+scale = Vector2(8.000001, 4.5)
 texture = ExtResource("3_bvn5r")
 region_rect = Rect2(256, 0, 256, 144)
 
@@ -139,10 +142,12 @@ offset_right = 640.0
 offset_bottom = 642.0
 pivot_offset = Vector2(300, 300)
 
-[node name="ControlsPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
+[node name="PCControlsPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
+visible = false
+position = Vector2(-14, -27)
 script = ExtResource("10_oi1yp")
 
-[node name="ActionList" type="VBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage"]
+[node name="ActionList" type="VBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage"]
 offset_left = 30.0
 offset_top = 150.0
 offset_right = 530.0
@@ -150,25 +155,25 @@ offset_bottom = 534.0
 pivot_offset = Vector2(230, 181)
 theme_override_constants/separation = 12
 
-[node name="LeftAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#LeftAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(500, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/LeftAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_LeftAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#LeftAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "向左："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/LeftAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_LeftAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#LeftAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "A "
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/LeftAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_LeftAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#LeftAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -176,25 +181,25 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="RightAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#RightAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/RightAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_RightAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#RightAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "向右："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/RightAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_RightAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#RightAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "D "
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/RightAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_RightAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#RightAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -202,25 +207,25 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="UpAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#UpAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/UpAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_UpAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#UpAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "向上："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/UpAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_UpAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#UpAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "W  "
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/UpAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_UpAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#UpAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -228,25 +233,25 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="DownAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#DownAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/DownAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_DownAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#DownAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "向下："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/DownAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_DownAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#DownAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "S  "
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/DownAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_DownAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#DownAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -254,25 +259,25 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="JumpAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#JumpAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/JumpAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_JumpAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#JumpAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "跳跃："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/JumpAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_JumpAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#JumpAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "K  "
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/JumpAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_JumpAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#JumpAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -280,25 +285,25 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="DashAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#DashAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/DashAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_DashAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#DashAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "冲刺："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/DashAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_DashAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#DashAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "L  "
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/DashAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_DashAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#DashAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -306,25 +311,25 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="InteractiveAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#InteractiveAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/InteractiveAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_InteractiveAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#InteractiveAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "交互："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/InteractiveAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_InteractiveAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#InteractiveAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "U  "
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/InteractiveAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_InteractiveAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#InteractiveAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -332,25 +337,25 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="DialogueNextAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#DialogueNextAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/DialogueNextAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_DialogueNextAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#DialogueNextAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "交互继续："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/DialogueNextAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_DialogueNextAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#DialogueNextAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "Space"
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/DialogueNextAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_DialogueNextAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#DialogueNextAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -358,25 +363,25 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="SuperDashAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#SuperDashAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/SuperDashAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_SuperDashAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#SuperDashAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "超级冲刺："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/SuperDashAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_SuperDashAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#SuperDashAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "O "
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/SuperDashAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_SuperDashAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#SuperDashAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -384,25 +389,25 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="MapAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList#MapAction" type="HBoxContainer" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/MapAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_MapAction#NameLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#MapAction"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "地图："
 
-[node name="KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/MapAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_MapAction#KeyLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#MapAction"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
 theme_override_font_sizes/font_size = 20
 text = "Tab"
 
-[node name="RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage/ActionList/MapAction"]
+[node name="SettingsRoot_PagesRoot_ControlsPage_ActionList_MapAction#RemapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage/ActionList/SettingsRoot_PagesRoot_ControlsPage_ActionList#MapAction"]
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 texture_normal = ExtResource("18_ppuk0")
@@ -410,52 +415,168 @@ texture_pressed = ExtResource("19_leam6")
 texture_hover = ExtResource("20_ihv7n")
 stretch_mode = 0
 
-[node name="ResetHintLabel2" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage"]
-offset_left = 30.0
-offset_top = 110.0
-offset_right = 140.0
-offset_bottom = 132.0
+[node name="SettingsRoot_PagesRoot_ControlsPage#ResetHintLabel2" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage"]
+offset_left = 886.0
+offset_top = 485.0
+offset_right = 996.0
+offset_bottom = 507.0
 theme = ExtResource("5_wi6u5")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 20
 text = "映射重置："
 
-[node name="ResetButton" type="TextureButton" parent="SettingsRoot/PagesRoot/ControlsPage"]
-offset_left = 149.0
-offset_top = 91.0
-offset_right = 165.0
-offset_bottom = 107.0
+[node name="SettingsRoot_PagesRoot_ControlsPage#ResetButton" type="TextureButton" parent="SettingsRoot/PagesRoot/PCControlsPage"]
+offset_left = 1031.0
+offset_top = 461.0
+offset_right = 1047.0
+offset_bottom = 477.0
 scale = Vector2(3, 3)
 texture_normal = ExtResource("21_pn2j1")
 texture_pressed = ExtResource("22_hlh84")
 texture_hover = ExtResource("23_houfj")
 stretch_mode = 3
 
-[node name="ResetHintLabel" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage"]
-offset_left = 220.0
-offset_top = 110.0
-offset_right = 484.0
-offset_bottom = 132.0
+[node name="SettingsRoot_PagesRoot_ControlsPage#ResetHintLabel" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage"]
+offset_left = 888.0
+offset_top = 537.0
+offset_right = 1152.0
+offset_bottom = 559.0
 theme = ExtResource("5_wi6u5")
 theme_override_colors/font_color = Color(1, 1, 1, 0.60784316)
 theme_override_font_sizes/font_size = 20
 text = "再按一次以重置按键映射。"
 
-[node name="ControlsHint" type="Label" parent="SettingsRoot/PagesRoot/ControlsPage"]
-offset_left = 548.0
-offset_top = 510.0
-offset_right = 839.0
-offset_bottom = 532.0
+[node name="SettingsRoot_PagesRoot_ControlsPage#ControlsHint" type="Label" parent="SettingsRoot/PagesRoot/PCControlsPage"]
+offset_left = 826.0
+offset_top = 141.0
+offset_right = 1117.0
+offset_bottom = 163.0
 theme = ExtResource("5_wi6u5")
 theme_override_colors/font_color = Color(1, 1, 1, 0.60784316)
 theme_override_font_sizes/font_size = 20
 text = "请按下新的按键... (ESC取消)"
 
+[node name="MobieControlsPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
+position = Vector2(-14, -27)
+script = ExtResource("mobie_controls_script")
+
+[node name="LayoutSettings" type="VBoxContainer" parent="SettingsRoot/PagesRoot/MobieControlsPage"]
+offset_left = 40.0
+offset_top = 90.0
+offset_right = 540.0
+offset_bottom = 520.0
+theme_override_constants/separation = 12
+
+[node name="LayoutModeRow" type="HBoxContainer" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings"]
+layout_mode = 2
+
+[node name="LayoutModeLabel" type="Label" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/LayoutModeRow"]
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+text = "移动方式："
+
+[node name="LayoutModeOption" type="OptionButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/LayoutModeRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="CenterRow" type="HBoxContainer" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings"]
+layout_mode = 2
+
+[node name="CenterLabel" type="Label" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/CenterRow"]
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+text = "中心："
+
+[node name="DpadCenterX" type="SpinBox" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/CenterRow"]
+layout_mode = 2
+max_value = 1280.0
+value = 100.0
+
+[node name="DpadCenterY" type="SpinBox" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/CenterRow"]
+layout_mode = 2
+max_value = 720.0
+value = 560.0
+
+[node name="SpacingRow" type="HBoxContainer" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings"]
+layout_mode = 2
+
+[node name="SpacingLabel" type="Label" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/SpacingRow"]
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+text = "间距："
+
+[node name="DpadSpacing" type="SpinBox" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/SpacingRow"]
+layout_mode = 2
+min_value = 10.0
+max_value = 200.0
+value = 70.0
+
+[node name="ButtonSizeRow" type="HBoxContainer" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings"]
+layout_mode = 2
+
+[node name="ButtonSizeLabel" type="Label" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/ButtonSizeRow"]
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+text = "按钮大小："
+
+[node name="DpadButtonSize" type="SpinBox" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/ButtonSizeRow"]
+layout_mode = 2
+min_value = 20.0
+max_value = 200.0
+value = 55.0
+
+[node name="ActionSizeRow" type="HBoxContainer" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings"]
+layout_mode = 2
+
+[node name="ActionSizeLabel" type="Label" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/ActionSizeRow"]
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+text = "动作按钮："
+
+[node name="JumpSize" type="SpinBox" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/ActionSizeRow"]
+layout_mode = 2
+min_value = 20.0
+max_value = 200.0
+value = 90.0
+
+[node name="ActionSize" type="SpinBox" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/ActionSizeRow"]
+layout_mode = 2
+min_value = 20.0
+max_value = 200.0
+value = 60.0
+
+[node name="AlphaRow" type="HBoxContainer" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings"]
+layout_mode = 2
+
+[node name="AlphaLabel" type="Label" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/AlphaRow"]
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+text = "透明度："
+
+[node name="ButtonAlpha" type="SpinBox" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/AlphaRow"]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 0.25
+
+[node name="PressedAlpha" type="SpinBox" parent="SettingsRoot/PagesRoot/MobieControlsPage/LayoutSettings/AlphaRow"]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 0.5
+
 [node name="AudioPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
+visible = false
+position = Vector2(146, 38)
 scale = Vector2(0.75, 0.75)
 
 [node name="VolumeContainer" type="Node2D" parent="SettingsRoot/PagesRoot/AudioPage"]
-visible = false
 position = Vector2(0, 42)
 
 [node name="MasterVolumeLabel" type="Label" parent="SettingsRoot/PagesRoot/AudioPage/VolumeContainer"]
@@ -537,12 +658,13 @@ rounded = true
 ticks_on_borders = true
 
 [node name="GraphicsPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
+visible = false
 
 [node name="EffectLevelContainer" type="VBoxContainer" parent="SettingsRoot/PagesRoot/GraphicsPage"]
-offset_left = 88.0
-offset_top = 60.0
-offset_right = 472.0
-offset_bottom = 210.0
+offset_left = 377.0
+offset_top = 206.0
+offset_right = 761.0
+offset_bottom = 356.0
 theme_override_constants/separation = 16
 
 [node name="EffectLevelLabel" type="Label" parent="SettingsRoot/PagesRoot/GraphicsPage/EffectLevelContainer"]

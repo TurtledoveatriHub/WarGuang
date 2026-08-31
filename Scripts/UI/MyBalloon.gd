@@ -169,10 +169,17 @@ func _unhandled_input(event):
 	if not dialogue_line:
 		return
 	
-	# 只在等待输入时处理空格键（没有响应选项时）
-	if event.is_action_pressed(next_action) and is_waiting_for_input and dialogue_line.responses.size() == 0:
-		next(dialogue_line.next_id)
-		get_viewport().set_input_as_handled()
+	# 只在等待输入时处理空格键/交互键/屏幕触摸（没有响应选项时）
+	if is_waiting_for_input and dialogue_line.responses.size() == 0:
+		if event.is_action_pressed(next_action):
+			next(dialogue_line.next_id)
+			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed("interactive"):
+			next(dialogue_line.next_id)
+			get_viewport().set_input_as_handled()
+		elif event is InputEventScreenTouch and event.pressed:
+			next(dialogue_line.next_id)
+			get_viewport().set_input_as_handled()
 	
 	# 处理选项选择 - 允许在选项显示时使用 A/D 键和空格键
 	if dialogue_line.responses.size() > 0 and responses_menu and responses_menu.visible:
@@ -183,6 +190,10 @@ func _unhandled_input(event):
 		elif event.is_action_pressed("right") or event.is_action_pressed("ui_right"):
 			_navigate_options(1)
 			get_viewport().set_input_as_handled()
+
+	# 移动端：直接点击响应按钮即可进行选择，不再强制依赖交互键
+	if dialogue_line.responses.size() > 0 and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		get_viewport().set_input_as_handled()
 
 func _on_response_selected(response: DialogueResponse):
 	next(response.next_id)

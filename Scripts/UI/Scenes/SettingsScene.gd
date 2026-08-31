@@ -7,7 +7,8 @@ extends CanvasLayer
 @onready var controls_button = $SettingsRoot/ControlsButton    # 按键映射按钮
 @onready var graphics_button = $SettingsRoot/GraphicsButton    # 画面按钮
 @onready var audio_page = $SettingsRoot/PagesRoot/AudioPage              # 音频页面
-@onready var controls_page = $SettingsRoot/PagesRoot/ControlsPage        # 控制页面
+@onready var pc_controls_page = $SettingsRoot/PagesRoot/PCControlsPage    # PC控制页面
+@onready var mobie_controls_page = get_node_or_null("SettingsRoot/PagesRoot/MobieControlsPage") # 移动端控制页面
 @onready var graphics_page = get_node_or_null("SettingsRoot/PagesRoot/GraphicsPage") # 画面页面
 @onready var effect_level_option: OptionButton = get_node_or_null("SettingsRoot/PagesRoot/GraphicsPage/EffectLevelContainer/EffectLevelOption")
 @onready var close_button = $BackButton                        # 关闭按钮
@@ -147,8 +148,10 @@ func _resolve_page(page_name: String) -> CanvasItem:
 	match page_name:
 		"audio":
 			return audio_page
-		"controls":
-			return controls_page
+		"controls", "pc_controls":
+			return pc_controls_page
+		"mobile_controls", "mobie_controls":
+			return mobie_controls_page
 		"graphics":
 			return graphics_page
 		_:
@@ -205,14 +208,16 @@ func _play_page_exit(page: CanvasItem) -> void:
 func _name_by_page(page: CanvasItem) -> String:
 	if page == audio_page:
 		return "audio"
-	if page == controls_page:
-		return "controls"
+	if page == pc_controls_page:
+		return "pc_controls"
+	if page == mobie_controls_page:
+		return "mobie_controls"
 	if page == graphics_page:
 		return "graphics"
 	return ""
 
 func _set_only_page_visible(active_page: String) -> void:
-	for page_name in ["audio", "controls", "graphics"]:
+	for page_name in ["audio", "pc_controls", "mobie_controls", "graphics"]:
 		var page: CanvasItem = _resolve_page(page_name)
 		if page == null:
 			continue
@@ -225,7 +230,7 @@ func _set_category_buttons_enabled(enabled: bool) -> void:
 
 func _set_category_button_state(active_page: String) -> void:
 	audio_button.disabled = active_page == "audio"
-	controls_button.disabled = active_page == "controls"
+	controls_button.disabled = active_page == "controls" or active_page == "pc_controls" or active_page == "mobie_controls"
 	graphics_button.disabled = active_page == "graphics"
 
 func _populate_effect_level_options() -> void:
@@ -257,8 +262,10 @@ func _on_audio_button_pressed():
 	AudioManager.play_button_click_sfx()
 	
 	# 静默取消控制页面中的映射
-	if controls_page and controls_page.has_method("cancel_current_mapping"):
-		controls_page.cancel_current_mapping()
+	if pc_controls_page and pc_controls_page.has_method("cancel_current_mapping"):
+		pc_controls_page.cancel_current_mapping()
+	if mobie_controls_page and mobie_controls_page.has_method("cancel_current_mapping"):
+		mobie_controls_page.cancel_current_mapping()
 	
 	await _switch_to_page("audio")
 
@@ -269,17 +276,21 @@ func _on_controls_button_pressed():
 	AudioManager.play_button_click_sfx()
 	
 	# 静默取消任何映射
-	if controls_page and controls_page.has_method("cancel_current_mapping"):
-		controls_page.cancel_current_mapping()
+	if pc_controls_page and pc_controls_page.has_method("cancel_current_mapping"):
+		pc_controls_page.cancel_current_mapping()
+	if mobie_controls_page and mobie_controls_page.has_method("cancel_current_mapping"):
+		mobie_controls_page.cancel_current_mapping()
 	
-	await _switch_to_page("controls")
+	await _switch_to_page("pc_controls")
 
 func _on_graphics_button_pressed():
 	if _scene_input_locked or _page_switch_in_progress:
 		return
 	AudioManager.play_button_click_sfx()
-	if controls_page and controls_page.has_method("cancel_current_mapping"):
-		controls_page.cancel_current_mapping()
+	if pc_controls_page and pc_controls_page.has_method("cancel_current_mapping"):
+		pc_controls_page.cancel_current_mapping()
+	if mobie_controls_page and mobie_controls_page.has_method("cancel_current_mapping"):
+		mobie_controls_page.cancel_current_mapping()
 	await _switch_to_page("graphics")
 
 ## 关闭按钮按下
