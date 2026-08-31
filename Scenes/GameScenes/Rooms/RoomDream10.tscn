@@ -46,6 +46,7 @@ tile_set = ExtResource("2_hn54l")
 [node name="Door1-10" parent="Doors" instance=ExtResource("4_auxex")]
 position = Vector2(-1192, -32)
 door_id = "1-10"
+target_room_id = "Room1"
 
 [node name="HurtBoxs" type="Node2D" parent="."]
 
@@ -62,12 +63,10 @@ position = Vector2(1576, 0)
 
 [node name="DynamicCheckpoint" parent="DynamicCheckpoints" instance=ExtResource("5_6vpoh")]
 position = Vector2(-2688, -32)
-checkpoint_id = 1001
 belongs_to_room = "RoomDream10"
 
 [node name="DynamicCheckpoint2" parent="DynamicCheckpoints" instance=ExtResource("5_6vpoh")]
 position = Vector2(-464, -81)
-checkpoint_id = 1002
 belongs_to_room = "RoomDream10"
 
 [node name="WaterSurface" parent="." instance=ExtResource("6_83itb")]

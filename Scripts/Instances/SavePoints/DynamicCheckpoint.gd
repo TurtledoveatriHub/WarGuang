@@ -6,7 +6,6 @@ extends Area2D
 @export var belongs_to_room: String = ""  
 
 func _ready():
-	# 检查必填字段
 	if checkpoint_id == "":
 		print("错误：检查点必须设置 checkpoint_id")
 	
@@ -20,7 +19,7 @@ func _ready():
 	
 	# 注册到 DynamicCheckpointManager
 	DynamicCheckpointManager.register_checkpoint(checkpoint_id, global_position, belongs_to_room)
-
+	
 ## 确定检查点所属房间
 func determine_belongs_to_room():
 	if belongs_to_room != "":
@@ -41,14 +40,8 @@ func determine_belongs_to_room():
 
 func _on_body_entered(body):
 	if body.is_in_group("player"):
-		# 获取当前房间 ID
 		var current_room = RoomManager.current_room
-		
-		# 检查检查点是否属于当前房间
 		if belongs_to_room != "" and belongs_to_room != current_room:
-			print("检查点", checkpoint_id, "属于房间", belongs_to_room, 
-				  "，当前房间为", current_room, "，忽略激活")
+			print("[DC] 忽略: 不属于当前房间")
 			return
-		
-		# 通知 DynamicCheckpointManager 激活检查点
 		DynamicCheckpointManager.set_current_checkpoint(checkpoint_id, current_room)

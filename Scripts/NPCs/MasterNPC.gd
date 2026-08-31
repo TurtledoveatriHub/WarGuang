@@ -7,7 +7,7 @@ class_name MasterNPC
 @export var talk_animation: String = "TALK"
 
 func _ready():
-	npc_id = "master_01"
+	npc_id = "MasterNPC"
 	super._ready()
 	_play_default_idle()
 

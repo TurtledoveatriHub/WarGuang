@@ -41,6 +41,10 @@ static func start_death_process(player: Node) -> void:
 	var respawn_position: Vector2 = Global.get_save_point_position()
 	player.global_position = respawn_position
 	player.reset_player_for_respawn()
+	# ★ 角色死亡重生：强制刷新所有 EnemyBase 敌人（无论死活、位置）
+	for node in player.get_tree().get_nodes_in_group("enemy_base"):
+		if node.has_method("force_refresh"):
+			node.force_refresh()
 	# 黑屏期内先同步复活点房间与相机限制，再完成居中归位。
 	await PlayerRoomTransitionService.sync_room_and_camera_for_respawn(player, "", true)
 	# 额外等待一帧并再次居中，防止限制异步刷新覆盖首帧对齐。

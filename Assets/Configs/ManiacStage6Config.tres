@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ChallengeConfig" load_steps=2 format=3 uid="uid://dwo5albmahk4i"]
+
+[ext_resource type="Script" uid="uid://cjrjaqyt0i28c" path="res://Scripts/Resources/ChallengeConfig.gd" id="1_fvcyy"]
+
+[resource]
+script = ExtResource("1_fvcyy")
+challenge_name = "第六阶段"
+target_count = 20
+challenge_container_path = NodePath("../Challenge6")

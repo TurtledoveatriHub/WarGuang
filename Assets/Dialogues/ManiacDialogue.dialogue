@@ -13,6 +13,10 @@ if Global.maniac_stage2_last_challenge_failed and not Global.maniac_stage2_chall
 if Global.maniac_stage3_last_challenge_failed and not Global.maniac_stage3_challenge_completed
     => stage3_failed_dialogue
 
+# 如果第四次挑战失败了，给重试机会
+if Global.maniac_stage4_last_challenge_failed and not Global.maniac_stage4_challenge_completed
+    => stage4_failed_dialogue
+
 # ==================== 检查是否第一次交互 ====================
 if TaskManager.get_npc_dialogue_count("maniac_01") == 0
     => first_interaction
@@ -50,7 +54,12 @@ do npc.launch_challenge()
 # ==================== 后续交互 ====================
 ~ subsequent_interaction
 
-# 检查是否已经完成第二阶段
+# 检查是否已经完成第四阶段
+if Global.maniac_stage4_challenge_completed
+    => post_stage4_challenge
+
+
+# 检查是否已经完成第三阶段
 if Global.maniac_stage3_challenge_completed
     => post_stage3_challenge
 
@@ -123,5 +132,20 @@ do npc.launch_stage3_challenge()
 ~ post_stage3_challenge
 
 "疯子":第三级也过了...你比我预想得更强。
-"疯子":后续挑战等我准备好再说。
+"疯子":第四级呢？
+do npc.launch_stage4_challenge()
+=> END
+
+# ==================== 特殊分支：第四阶段挑战失败后重试 ====================
+~ stage4_failed_dialogue
+
+"疯子":在我预料。
+do npc.launch_stage3_challenge()
+=> END
+
+# ==================== 特殊分支：已完成第四阶段 ====================
+~ post_stage4_challenge
+
+"疯子":第四级也...
+"疯子":等着瞧...
 => END

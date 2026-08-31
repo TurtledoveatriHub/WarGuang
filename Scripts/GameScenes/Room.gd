@@ -36,11 +36,18 @@ func _correct_container_children_world_positions():
 	for container_name in container_names:
 		var container = get_node_or_null(container_name)
 		if container and container.position != Vector2.ZERO:
+			# 先保存所有子节点的世界坐标，再置零容器，最后统一恢复
+			# 避免边读边改 bug：处理第一个子节点时置零容器，后续子节点丢失偏移量
+			var saved: Array[Vector2] = []
 			for child in container.get_children():
 				if child is Node2D:
-					var world_pos = child.global_position
-					container.position = Vector2.ZERO
-					child.global_position = world_pos
+					saved.append(child.global_position)
+			container.position = Vector2.ZERO
+			var idx := 0
+			for child in container.get_children():
+				if child is Node2D:
+					child.global_position = saved[idx]
+					idx += 1
 
 func setup_room_trigger():
 	if room_trigger and room_trigger is Area2D and room_bounds:

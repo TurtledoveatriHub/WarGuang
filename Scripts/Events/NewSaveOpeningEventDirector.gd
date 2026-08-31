@@ -41,12 +41,12 @@ var intro_visual_enabled: bool = true
 
 @export_category("Gameplay Drop")
 ## 掉落演出开始镜头缩放值。
-@export var gameplay_camera_start_zoom: float = 4.0
+@export var gameplay_camera_start_zoom: float = 6.0
 ## 掉落演出目标镜头缩放值。
-@export var gameplay_camera_target_zoom: float = 2.0
+@export var gameplay_camera_target_zoom: float = 3.0
 #后续改为曲线放大
 ## 掉落镜头缩放过渡时长（秒）。
-@export var gameplay_camera_zoom_duration: float = 4.0
+@export var gameplay_camera_zoom_duration: float = 2.0
 ## 掉落速度（像素/秒）。
 @export var gameplay_drop_speed: float = 360.0
 ## 落地停留时长（秒）。

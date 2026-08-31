@@ -44,6 +44,8 @@ static func sync_room_and_camera_for_respawn(player: Node, preferred_room_id: St
 				player.camera_controller.begin_blackout_camera_transition()
 			if RoomManager.has_method("ensure_room_loaded"):
 				RoomManager.ensure_room_loaded(target_room_id)
+				if RoomManager.has_method("load_room") and RoomManager.current_room != target_room_id:
+					RoomManager.load_room(target_room_id)
 			elif RoomManager.current_room != target_room_id:
 				RoomManager.load_room(target_room_id)
 			elif RoomManager.has_method("update_camera_limits"):

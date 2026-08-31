@@ -70,7 +70,7 @@ func register_room(room_id: String, room_node: Node, room_data: Dictionary):
 func set_global_canvas_modulate(canvas: CanvasModulate):
 	global_canvas_modulate = canvas
 
-func load_room(room_id: String):
+func load_room(room_id: String, skip_unload: bool = false):
 	if not rooms.has(room_id):
 		if not _instantiate_room(room_id):
 			push_error("房间不存在且加载失败：" + room_id)
@@ -81,7 +81,8 @@ func load_room(room_id: String):
 	
 	notify_dynamic_checkpoint_manager_room_change(room_id)
 	notify_vignette_effect_room_change()
-	unload_distant_rooms(room_id)
+	if not skip_unload:
+		unload_distant_rooms(room_id)
 	
 	# 确保目标房间在场景树中并激活
 	_ensure_room_in_tree(room_id)
@@ -108,14 +109,18 @@ func load_room(room_id: String):
 	room_loaded.emit(room_id, previous_room)
 	_debug_room_camera_trace("load_room_end", {"current_room": current_room})
 
-func ensure_room_loaded(room_id: String) -> void:
+func ensure_room_loaded(room_id: String) -> bool:
+	## 确保房间已在场景树中（仅实例化+注册，不激活房间）
+	## load_room 需要调用方单独执行
 	if room_id == "":
-		return
+		return false
 	if not rooms.has(room_id):
-		_instantiate_room(room_id)
+		if not _instantiate_room(room_id):
+			return false
 	if rooms.has(room_id):
 		_ensure_room_in_tree(room_id)
-		load_room(room_id)
+		return true
+	return false
 
 ## 在切房前向目标房间广播入场锚点，用于背景预对齐。
 func prepare_room_background_for_entry(room_id: String, entry_world_pos: Vector2) -> void:

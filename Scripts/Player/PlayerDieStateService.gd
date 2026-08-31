@@ -13,10 +13,12 @@ static func handle_die_state(player: Node, fixed_delta: float) -> void:
 	player.velocity.y = min(player.velocity.y, player.effective_max_fall_speed)
 
 	if abs(player.velocity.x) > 0.0:
+		# ★ 使用 ground_deceleration / air_deceleration
+		var die_decel: float = player.ground_deceleration if player.is_on_floor() else player.air_deceleration
 		player.velocity.x = move_toward(
 			player.velocity.x,
 			0.0,
-			player.dash_inertia_decay * player.base_move_speed * fixed_delta * player.effective_acceleration_multiplier
+			die_decel * player.base_move_speed * fixed_delta * player.effective_acceleration_multiplier
 		)
 
 	player.die_timer -= fixed_delta

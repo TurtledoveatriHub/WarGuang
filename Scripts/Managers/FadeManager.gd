@@ -4,25 +4,25 @@ extends CanvasLayer
 
 @export_category("UI 场景切换参数（普通）")
 ## 普通 UI 切场：淡出时长（秒）
-@export var ui_switch_fade_out_duration: float = 0.2
+@export var ui_switch_fade_out_duration: float = 0.4
 ## 普通 UI 切场：全黑保持时长（秒）
-@export var ui_switch_black_hold_duration: float = 0.3
+@export var ui_switch_black_hold_duration: float = 0.4
 ## 普通 UI 切场：淡入时长（秒）
-@export var ui_switch_fade_in_duration: float = 0.2
+@export var ui_switch_fade_in_duration: float = 0.4
 
 @export_category("UI 场景切换参数（SaveSelect 进入游戏）")
 ## SaveSelect -> Game：淡出时长（秒）
-@export var ui_save_to_game_fade_out_duration: float = 0.6
+## 注意：实际使用 FadeManager.force_black() 瞬间全黑（因切场时场景正在加载，fade_out 会被截断）
+@export var ui_save_to_game_fade_out_duration: float = 0.4
 ## SaveSelect -> Game：全黑保持时长（秒）
-@export var ui_save_to_game_black_hold_duration: float = 0.6
+@export var ui_save_to_game_black_hold_duration: float = 2.4
 ## SaveSelect -> Game：淡入时长（秒）
-@export var ui_save_to_game_fade_in_duration: float = 0.6
+@export var ui_save_to_game_fade_in_duration: float = 0.8
 
-@export_category("UI 页面内过渡（非切场）")
-## UI 页面内部的常规淡入淡出时长（秒）
-@export var ui_overlay_fade_duration: float = 0.4
-## UI 页面内部的快速淡入淡出时长（秒）
-@export var ui_overlay_fast_fade_duration: float = 0.2
+## ── 注意 ──
+## 所有 UI 页面内过渡（Title→Settings 等非切场覆盖层）统一使用上方
+## "UI 场景切换参数（普通）"组的 fade_out/black_hold/fade_in 值。
+## 不再单独设 "UI 页面内过渡（非切场）"参数组，所有 UI 过渡参数集中管理。
 
 signal fade_out_completed
 signal fade_in_completed
@@ -111,3 +111,8 @@ func release_black_hold(tag: String) -> void:
 
 func has_black_hold() -> bool:
 	return not _black_hold_tags.is_empty()
+
+## 清空所有黑幕锁（保留当前黑屏状态）。
+## 用于场景切换等场景，确保 fade_in 不会被残留黑幕锁跳过。
+func clear_black_holds() -> void:
+	_black_hold_tags.clear()

@@ -19,6 +19,9 @@ static func try_jump(player: Node, jump_just_pressed: bool) -> bool:
 				player.run_jump_timer = player.run_jump_boost_duration
 				player.run_jump_original_direction = 1 if player.is_facing_right else -1
 
+			# ★ 先设标志再 change_state（FXController 在 change_state 的信号中运行）
+			player.jump1start_played = false
+			player.should_jump1start = true
 			player.change_state(player.PlayerState.JUMP)
 			player.jump_buffer_timer.stop()
 			return true
@@ -102,7 +105,15 @@ static func handle_landing(player: Node) -> void:
 		if player.down_state_entry_time >= player.land_shake_min_down_time:
 			CameraShakeManager.shake("y_strong", player.phantom_camera)
 			player.lock_control(maxf(player.land_shake_control_lock_time, 0.0), "land_shake")
+			# 落地抖动时水平速度清零，改善手感
+			player.velocity.x = 0.0
 			land_shake_triggered = true
+		# ★ DOWN 态着陆：标记DOWNEND待播并停留DOWN态，不切地面态
+		player._landing_downend_active = true
+		PlayerRuntimeFlowServiceScript.clear_airborne_run_keep_tracking(player)
+		return  # 跳过下方 IDLE/RUN/MOVE 切换
+
+	# 非 DOWN 态（JUMP/GLIDE 等落地）→ 直接切换地面态
 	var move_input_ground = player.get_resolved_horizontal_input() if player.has_method("get_resolved_horizontal_input") else Input.get_axis("left", "right")
 	if move_input_ground == 0:
 		player.change_state(player.PlayerState.IDLE)
@@ -121,6 +132,26 @@ static func handle_landing(player: Node) -> void:
 				player.change_state(player.PlayerState.MOVE)
 
 	# 落地后清空本次空中奔跑保持跟踪。
+	PlayerRuntimeFlowServiceScript.clear_airborne_run_keep_tracking(player)
+
+## DOWNEND 播放完毕后（或锁定解除后），执行地面态切换（IDLE / RUN / MOVE）。
+## 提取自 handle_landing 的后半段，供 _on_sprite_anim_finished 调用。
+static func apply_ground_transition(player: Node) -> void:
+	var move_input_ground = player.get_resolved_horizontal_input() if player.has_method("get_resolved_horizontal_input") else Input.get_axis("left", "right")
+	if move_input_ground == 0:
+		player.change_state(player.PlayerState.IDLE)
+	else:
+		# 奔跑保持条件：来自奔跑离地跟踪、全程条件有效、落地输入方向与跟踪方向一致。
+		if player.airborne_run_keep_active and player.airborne_run_keep_valid and sign(move_input_ground) == player.airborne_run_keep_direction:
+			player.change_state(player.PlayerState.RUN)
+			player.is_run_ready = true
+			player.run_direction = player.airborne_run_keep_direction
+			player.is_running = true
+		else:
+			if player.is_running:
+				player.change_state(player.PlayerState.RUN)
+			else:
+				player.change_state(player.PlayerState.MOVE)
 	PlayerRuntimeFlowServiceScript.clear_airborne_run_keep_tracking(player)
 
 static func start_normal_jump_from_wall(player: Node) -> void:

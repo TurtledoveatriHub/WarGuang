@@ -67,7 +67,7 @@ func _ready():
 	
 	$BackButton.pressed.connect(_on_back_button_pressed)
 	if not ui_transition_animator:
-		FadeManager.fade_in(FadeManager.ui_overlay_fast_fade_duration)
+		FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
 		_set_scene_input_locked(false)
 	else:
 		if FadeManager and FadeManager.has_method("get_black_alpha") and FadeManager.get_black_alpha() <= 0.01:

@@ -1,17 +1,31 @@
-[gd_scene load_steps=15 format=4 uid="uid://dbiq0bp6upwiq"]
+[gd_scene load_steps=29 format=4 uid="uid://dbiq0bp6upwiq"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_exdrf"]
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/Room1/雪地瓦片集.tres" id="2_rumk0"]
-[ext_resource type="Texture2D" uid="uid://fwgvvrpd0hkd" path="res://Assets/Textures/UIs/PlayerUIs/1.png" id="3_3br1t"]
+[ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/2.png" id="3_msc7c"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="4_h7qsl"]
 [ext_resource type="PackedScene" uid="uid://bjlvqrcplff4s" path="res://Scenes/NPCs/ManiacNPC.tscn" id="6_2hr80"]
-[ext_resource type="Script" uid="uid://cmr8exyv7c35t" path="res://Scripts/Components/ChallengeController.gd" id="7_rumk0"]
-[ext_resource type="Script" uid="uid://ddauges2o6tyf" path="res://Scripts/Instances/ChallengeJumpBoxs/ChallengeMovePath.gd" id="8_3br1t"]
+[ext_resource type="AudioStream" uid="uid://debkka622reug" path="res://Assets/Audios/SFX/Player/hurt.wav" id="6_hfmo6"]
+[ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="7_0lk7t"]
+[ext_resource type="Script" uid="uid://cmr8exyv7c35t" path="res://Scripts/Tools/ChallengeController.gd" id="7_rumk0"]
+[ext_resource type="AudioStream" uid="uid://r0cd2hghqoae" path="res://Assets/Audios/SFX/Player/dash.wav" id="7_yg5kj"]
 [ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/HurtBox.tscn" id="9_3br1t"]
 [ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="9_r4pg8"]
+[ext_resource type="Script" uid="uid://cjrjaqyt0i28c" path="res://Scripts/Resources/ChallengeConfig.gd" id="9_uqayk"]
+[ext_resource type="Resource" uid="uid://bxd34rllgoej0" path="res://Assets/Configs/ManiacStage1Config.tres" id="9_yg5kj"]
 [ext_resource type="PackedScene" uid="uid://dkf8hj58symgr" path="res://Scenes/Instances/HealthUpgradeItem.tscn" id="10_rumk0"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="11_3br1t"]
+[ext_resource type="Resource" uid="uid://dy6aoo3vv8biq" path="res://Assets/Configs/ManiacStage2Config.tres" id="11_5q8ia"]
 [ext_resource type="PackedScene" uid="uid://cbxsbnigsn8l2" path="res://Scenes/Instances/TeleportPoint.tscn" id="12_0lk7t"]
+[ext_resource type="Resource" uid="uid://du82tvnhv0588" path="res://Assets/Configs/ManiacStage3Config.tres" id="12_msc7c"]
+[ext_resource type="PackedScene" uid="uid://cx4dhxum88xak" path="res://Scenes/UI/ChallengeCounter.tscn" id="13_5q8ia"]
+[ext_resource type="Resource" uid="uid://cemm2ey8ml5dd" path="res://Assets/Configs/ManiacStage4Config.tres" id="13_msc7c"]
+[ext_resource type="Resource" uid="uid://c14j7lbkiqemc" path="res://Assets/Configs/ManiacStage5Config.tres" id="14_jv2kv"]
+[ext_resource type="Resource" uid="uid://dwo5albmahk4i" path="res://Assets/Configs/ManiacStage6Config.tres" id="15_x75tx"]
+[ext_resource type="Resource" uid="uid://t2kdib2p7x7h" path="res://Assets/Configs/ManiacStage7Config.tres" id="16_sjujx"]
+[ext_resource type="Resource" uid="uid://cucj7mgbxqktm" path="res://Assets/Configs/ManiacStage8Config.tres" id="17_ik3qt"]
+[ext_resource type="Resource" uid="uid://bh7w5pgya0yey" path="res://Assets/Configs/ManiacStage9Config.tres" id="18_nqexr"]
+[ext_resource type="Resource" uid="uid://chk61w0jychoa" path="res://Assets/Configs/ManiacStage10Config.tres" id="19_m8o1n"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a4x7p"]
 
@@ -37,8 +51,11 @@ metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
 shape = SubResource("RectangleShape2D_a4x7p")
 
 [node name="Background" type="Sprite2D" parent="."]
-texture = ExtResource("3_3br1t")
-region_rect = Rect2(256, 144, 256, 144)
+position = Vector2(0, -208)
+scale = Vector2(6, 6)
+texture = ExtResource("3_msc7c")
+region_enabled = true
+region_rect = Rect2(0, 0, 160, 160)
 
 [node name="TileMapLayers" type="Node2D" parent="."]
 
@@ -49,131 +66,386 @@ tile_set = ExtResource("2_rumk0")
 
 [node name="NPCs" type="Node2D" parent="."]
 
-[node name="ManiacNPC" parent="NPCs" node_paths=PackedStringArray("patrol_area", "challenge_area") instance=ExtResource("6_2hr80")]
-position = Vector2(331, 164)
-patrol_area = NodePath("../../NPC_Areas/Maniac_Patrol/PatrolArea")
-challenge_area = NodePath("../../NPC_Areas/Maniac_Challenge/ChallengeArea")
-challenge_area_size = Vector2(400, 400)
+[node name="ManiacNPC" parent="NPCs" instance=ExtResource("6_2hr80")]
+position = Vector2(133, 160)
 move_speed = 80.0
+challenge_controller_path = NodePath("../../Challenges/ChallengeController")
+npc_interact_sounds = Array[AudioStream]([ExtResource("6_hfmo6"), ExtResource("7_yg5kj")])
 
-[node name="ChallengeController" type="Node" parent="NPCs/ManiacNPC"]
+[node name="Challenges" type="Node2D" parent="."]
+
+[node name="ChallengeController" type="Node" parent="Challenges"]
 script = ExtResource("7_rumk0")
+stage_configs = Array[ExtResource("9_uqayk")]([ExtResource("9_yg5kj"), ExtResource("11_5q8ia"), ExtResource("12_msc7c"), ExtResource("13_msc7c"), ExtResource("14_jv2kv"), ExtResource("15_x75tx"), ExtResource("16_sjujx"), ExtResource("17_ik3qt"), ExtResource("18_nqexr"), ExtResource("19_m8o1n")])
+challenge_area_path = NodePath("../ChallengeArea")
+start_position_path = NodePath("../StartPositionPath")
+challenge_ui_scene = ExtResource("13_5q8ia")
 
-[node name="SpawnPoints1" type="Node2D" parent="NPCs/ManiacNPC"]
-
-[node name="SpawnPoint1" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints1"]
-position = Vector2(-211, -68)
-
-[node name="SpawnPoint2" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints1"]
-position = Vector2(-147, -68)
-
-[node name="SpawnPoint3" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints1"]
-position = Vector2(-83, -68)
-
-[node name="SpawnPoints2" type="Node2D" parent="NPCs/ManiacNPC"]
-
-[node name="SpawnPoint1" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints2"]
-position = Vector2(-147, -52)
-
-[node name="MovePath" type="Node2D" parent="NPCs/ManiacNPC/SpawnPoints2/SpawnPoint1"]
-script = ExtResource("8_3br1t")
-target_point_1_offset = Vector2(-100, 0)
-target_point_2_offset = Vector2(100, 0)
-path_color = Color(0, 1, 0, 0.5)
-
-[node name="SpawnPoint2" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints2"]
-position = Vector2(-147, -100)
-
-[node name="MovePath" type="Node2D" parent="NPCs/ManiacNPC/SpawnPoints2/SpawnPoint2"]
-script = ExtResource("8_3br1t")
-target_point_1_offset = Vector2(-100, 0)
-target_point_2_offset = Vector2(100, 0)
-path_color = Color(0, 1, 0, 0.5)
-
-[node name="SpawnPoint3" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints2"]
-position = Vector2(-147, -133)
-
-[node name="MovePath" type="Node2D" parent="NPCs/ManiacNPC/SpawnPoints2/SpawnPoint3"]
-script = ExtResource("8_3br1t")
-target_point_1_offset = Vector2(-100, 0)
-target_point_2_offset = Vector2(100, 0)
-path_color = Color(0, 1, 0, 0.5)
-
-[node name="SpawnPoint4" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints2"]
-position = Vector2(-147, -170)
-
-[node name="MovePath" type="Node2D" parent="NPCs/ManiacNPC/SpawnPoints2/SpawnPoint4"]
-script = ExtResource("8_3br1t")
-target_point_1_offset = Vector2(-100, 0)
-target_point_2_offset = Vector2(100, 0)
-path_color = Color(0, 1, 0, 0.5)
-
-[node name="SpawnPoints3" type="Node2D" parent="NPCs/ManiacNPC"]
-
-[node name="SpawnPoint1" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints3"]
-position = Vector2(-29, -51)
-
-[node name="MovePath" type="Node2D" parent="NPCs/ManiacNPC/SpawnPoints3/SpawnPoint1"]
-script = ExtResource("8_3br1t")
-target_point_1_offset = Vector2(-100, 0)
-target_point_2_offset = Vector2(100, 0)
-path_color = Color(0, 1, 0, 0.5)
-
-[node name="SpawnPoint2" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints3"]
-position = Vector2(-226, -99)
-
-[node name="MovePath" type="Node2D" parent="NPCs/ManiacNPC/SpawnPoints3/SpawnPoint2"]
-script = ExtResource("8_3br1t")
-target_point_1_offset = Vector2(-100, 0)
-target_point_2_offset = Vector2(100, 0)
-path_color = Color(0, 1, 0, 0.5)
-
-[node name="SpawnPoint3" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints3"]
-position = Vector2(-84, -187)
-
-[node name="MovePath" type="Node2D" parent="NPCs/ManiacNPC/SpawnPoints3/SpawnPoint3"]
-script = ExtResource("8_3br1t")
-target_point_1_offset = Vector2(-100, 0)
-target_point_2_offset = Vector2(100, 0)
-path_color = Color(0, 1, 0, 0.5)
-
-[node name="SpawnPoint4" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints3"]
-position = Vector2(-83, -233)
-
-[node name="MovePath" type="Node2D" parent="NPCs/ManiacNPC/SpawnPoints3/SpawnPoint4"]
-script = ExtResource("8_3br1t")
-target_point_1_offset = Vector2(-100, 0)
-target_point_2_offset = Vector2(100, 0)
-path_color = Color(0, 1, 0, 0.5)
-
-[node name="SpawnPoint5" type="Marker2D" parent="NPCs/ManiacNPC/SpawnPoints3"]
-position = Vector2(-84, -274)
-
-[node name="MovePath" type="Node2D" parent="NPCs/ManiacNPC/SpawnPoints3/SpawnPoint5"]
-script = ExtResource("8_3br1t")
-target_point_1_offset = Vector2(-100, 0)
-target_point_2_offset = Vector2(100, 0)
-path_color = Color(0, 1, 0, 0.5)
-
-[node name="NPC_Areas" type="Node2D" parent="."]
-position = Vector2(256, 164)
-
-[node name="Maniac_Patrol" type="Node2D" parent="NPC_Areas"]
-
-[node name="PatrolArea" type="Node2D" parent="NPC_Areas/Maniac_Patrol"]
-scale = Vector2(1.25, 0.25)
-script = ExtResource("9_r4pg8")
-debug_color = Color(0, 0.8235294, 0.5882353, 0.13725491)
-metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
-
-[node name="Maniac_Challenge" type="Node2D" parent="NPC_Areas"]
-
-[node name="ChallengeArea" type="Node2D" parent="NPC_Areas/Maniac_Challenge"]
-position = Vector2(-192, -372.00003)
-scale = Vector2(2, 3)
+[node name="ChallengeArea" type="Node2D" parent="Challenges"]
+position = Vector2(0, -208.00003)
+scale = Vector2(3, 3)
 script = ExtResource("9_r4pg8")
 debug_color = Color(0, 0.824, 0.588, 0.235)
 metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
+
+[node name="StartPositionPath" type="Marker2D" parent="Challenges"]
+position = Vector2(0, 160)
+
+[node name="Challenge1" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge1" instance=ExtResource("7_0lk7t")]
+position = Vector2(-191, 63)
+is_challenge_jumpbox = true
+
+[node name="JumpBox2" parent="Challenges/Challenge1" instance=ExtResource("7_0lk7t")]
+position = Vector2(-64, 63)
+movement_mode = 1
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+
+[node name="JumpBox3" parent="Challenges/Challenge1" instance=ExtResource("7_0lk7t")]
+position = Vector2(191, 63)
+is_challenge_jumpbox = true
+
+[node name="Challenge2" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge2" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, 104)
+movement_mode = 1
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+
+[node name="JumpBox2" parent="Challenges/Challenge2" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, 16)
+movement_mode = 1
+move_speed = 60.0
+end_offset = Vector2(-128, 0)
+is_challenge_jumpbox = true
+
+[node name="JumpBox3" parent="Challenges/Challenge2" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, -46)
+movement_mode = 1
+move_speed = 60.0
+end_offset = Vector2(0, -128)
+is_challenge_jumpbox = true
+
+[node name="Challenge3" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge3" instance=ExtResource("7_0lk7t")]
+position = Vector2(-126, 63)
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+respawn_time = 4.0
+
+[node name="JumpBox2" parent="Challenges/Challenge3" instance=ExtResource("7_0lk7t")]
+position = Vector2(129, 63)
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(-128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 4.0
+
+[node name="JumpBox3" parent="Challenges/Challenge3" instance=ExtResource("7_0lk7t")]
+position = Vector2(-126, -127)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 4.0
+
+[node name="JumpBox4" parent="Challenges/Challenge3" instance=ExtResource("7_0lk7t")]
+position = Vector2(129, -127)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(-128, 0)
+is_challenge_jumpbox = true
+respawn_time = 4.0
+
+[node name="Challenge4" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge4" instance=ExtResource("7_0lk7t")]
+position = Vector2(-126, 63)
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox2" parent="Challenges/Challenge4" instance=ExtResource("7_0lk7t")]
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(-128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox3" parent="Challenges/Challenge4" instance=ExtResource("7_0lk7t")]
+position = Vector2(129, -62)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox4" parent="Challenges/Challenge4" instance=ExtResource("7_0lk7t")]
+position = Vector2(256, -127)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(-128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox5" parent="Challenges/Challenge4" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, -62)
+is_challenge_jumpbox = true
+respawn_time = 6.0
+
+[node name="Challenge5" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge5" instance=ExtResource("7_0lk7t")]
+position = Vector2(-126, 63)
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox2" parent="Challenges/Challenge5" instance=ExtResource("7_0lk7t")]
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(-128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox3" parent="Challenges/Challenge5" instance=ExtResource("7_0lk7t")]
+position = Vector2(129, -62)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox4" parent="Challenges/Challenge5" instance=ExtResource("7_0lk7t")]
+position = Vector2(256, -127)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(-128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox5" parent="Challenges/Challenge5" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, -62)
+is_challenge_jumpbox = true
+respawn_time = 6.0
+
+[node name="Challenge6" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge6" instance=ExtResource("7_0lk7t")]
+position = Vector2(-126, 63)
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox2" parent="Challenges/Challenge6" instance=ExtResource("7_0lk7t")]
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(-128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox3" parent="Challenges/Challenge6" instance=ExtResource("7_0lk7t")]
+position = Vector2(129, -62)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox4" parent="Challenges/Challenge6" instance=ExtResource("7_0lk7t")]
+position = Vector2(256, -127)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(-128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox5" parent="Challenges/Challenge6" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, -62)
+is_challenge_jumpbox = true
+respawn_time = 6.0
+
+[node name="Challenge7" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge7" instance=ExtResource("7_0lk7t")]
+position = Vector2(-126, 63)
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox2" parent="Challenges/Challenge7" instance=ExtResource("7_0lk7t")]
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(-128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox3" parent="Challenges/Challenge7" instance=ExtResource("7_0lk7t")]
+position = Vector2(129, -62)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox4" parent="Challenges/Challenge7" instance=ExtResource("7_0lk7t")]
+position = Vector2(256, -127)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(-128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox5" parent="Challenges/Challenge7" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, -62)
+is_challenge_jumpbox = true
+respawn_time = 6.0
+
+[node name="Challenge8" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge8" instance=ExtResource("7_0lk7t")]
+position = Vector2(-126, 63)
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox2" parent="Challenges/Challenge8" instance=ExtResource("7_0lk7t")]
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(-128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox3" parent="Challenges/Challenge8" instance=ExtResource("7_0lk7t")]
+position = Vector2(129, -62)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox4" parent="Challenges/Challenge8" instance=ExtResource("7_0lk7t")]
+position = Vector2(256, -127)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(-128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox5" parent="Challenges/Challenge8" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, -62)
+is_challenge_jumpbox = true
+respawn_time = 6.0
+
+[node name="Challenge9" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge9" instance=ExtResource("7_0lk7t")]
+position = Vector2(-126, 63)
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox2" parent="Challenges/Challenge9" instance=ExtResource("7_0lk7t")]
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(-128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox3" parent="Challenges/Challenge9" instance=ExtResource("7_0lk7t")]
+position = Vector2(129, -62)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox4" parent="Challenges/Challenge9" instance=ExtResource("7_0lk7t")]
+position = Vector2(256, -127)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(-128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox5" parent="Challenges/Challenge9" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, -62)
+is_challenge_jumpbox = true
+respawn_time = 6.0
+
+[node name="Challenge10" type="Node2D" parent="Challenges"]
+
+[node name="JumpBox" parent="Challenges/Challenge10" instance=ExtResource("7_0lk7t")]
+position = Vector2(-126, 63)
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox2" parent="Challenges/Challenge10" instance=ExtResource("7_0lk7t")]
+movement_mode = 2
+move_speed = 60.0
+end_offset = Vector2(-128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox3" parent="Challenges/Challenge10" instance=ExtResource("7_0lk7t")]
+position = Vector2(129, -62)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(128, 0)
+circular_clockwise = false
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox4" parent="Challenges/Challenge10" instance=ExtResource("7_0lk7t")]
+position = Vector2(256, -127)
+movement_mode = 2
+move_speed = 90.0
+end_offset = Vector2(-128, 0)
+is_challenge_jumpbox = true
+respawn_time = 5.0
+
+[node name="JumpBox5" parent="Challenges/Challenge10" instance=ExtResource("7_0lk7t")]
+position = Vector2(0, -62)
+is_challenge_jumpbox = true
+respawn_time = 6.0
 
 [node name="Doors" type="Node2D" parent="."]
 
@@ -194,7 +466,7 @@ scale = Vector2(1.5, 1.5)
 damage_type = 2
 
 [node name="HurtBox2" parent="HurtBoxs" instance=ExtResource("9_3br1t")]
-position = Vector2(-18, -98)
+position = Vector2(487, -87)
 scale = Vector2(4, 4)
 damage_type = 3
 
@@ -217,14 +489,14 @@ item_id = "2"
 [node name="DynamicCheckpoints" type="Node2D" parent="."]
 position = Vector2(1576, 0)
 
-[node name="DynamicCheckpoint" parent="DynamicCheckpoints" instance=ExtResource("11_3br1t")]
+[node name="1" parent="DynamicCheckpoints" instance=ExtResource("11_3br1t")]
 position = Vector2(-2496, -32)
-checkpoint_id = 201
+checkpoint_id = "1"
 belongs_to_room = "Room2"
 
-[node name="DynamicCheckpoint2" parent="DynamicCheckpoints" instance=ExtResource("11_3br1t")]
+[node name="2" parent="DynamicCheckpoints" instance=ExtResource("11_3br1t")]
 position = Vector2(-665, -32)
-checkpoint_id = 202
+checkpoint_id = "2"
 belongs_to_room = "Room2"
 
 [node name="Camera2DText" type="Area2D" parent="."]

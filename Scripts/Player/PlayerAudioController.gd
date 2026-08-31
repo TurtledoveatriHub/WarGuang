@@ -70,10 +70,12 @@ var _surface_cache_frame: int = -1
 ## 奔跑跳跃音效 — 奔跑状态下起跳时播放（比普通起跳更厚重）
 @export var run_jump_sfx: AudioStream
 
-## JumpBox 完美触发音效 — 完美触发时播放
-@export var jumpbox_perfect_sfx: AudioStream
-## JumpBox 普通触发音效 — 普通触发时播放
-@export var jumpbox_normal_sfx: AudioStream
+## 受伤时 BGM 闪避设置
+@export_category("受伤 BGM 闪避")
+## 受伤时 BGM 音量降低的时长（秒）
+@export var hurt_bgm_duck_duration: float = 1.5
+## 受伤时 BGM 降低到的音量（0~1, 0=静音, 1=原音量）
+@export var hurt_bgm_duck_volume: float = 0.3
 
 ## ============================================================
 ## ⚙️ 参数配置
@@ -122,7 +124,6 @@ func setup(player_ref: Player) -> void:
 	if player.has_method("register_feedback_hook"):
 		player.register_feedback_hook(&"state_changed", Callable(self, "_on_state_changed"))
 		player.register_feedback_hook(&"landed", Callable(self, "_on_landed"))
-		player.register_feedback_hook(&"jumpbox_bounce_started", Callable(self, "_on_jumpbox_bounce"))
 		player.register_feedback_hook(&"backstep_counter", Callable(self, "_on_backstep_counter"))
 		player.register_feedback_hook(&"wall_bump", Callable(self, "_on_wall_bump"))
 		player.register_feedback_hook(&"damage_taken", Callable(self, "_on_damage_taken"))
@@ -308,16 +309,6 @@ func _on_landed(payload: Dictionary) -> void:
 	else:
 		_play_one_shot(landing_sfx)
 
-## JumpBox 触发事件 — 根据触发等级区分完美/普通
-func _on_jumpbox_bounce(payload: Dictionary) -> void:
-	if not is_instance_valid(player):
-		return
-	var grade = payload.get("grade", "normal")
-	if grade == "perfect":
-		_play_one_shot(jumpbox_perfect_sfx)
-	else:
-		_play_one_shot(jumpbox_normal_sfx)
-
 ## 后撤步防反成功事件
 func _on_backstep_counter(_payload: Dictionary) -> void:
 	if not is_instance_valid(player):
@@ -330,9 +321,11 @@ func _on_wall_bump(_payload: Dictionary) -> void:
 		return
 	_play_one_shot(wall_bump_sfx)
 
-## 受伤事件（预留：额外受击反馈）
+## 受伤事件 — 触发 BGM 闪避（空洞骑士式效果）
 func _on_damage_taken(_payload: Dictionary) -> void:
-	pass
+	if not is_instance_valid(player):
+		return
+	AudioManager.duck_bgm_for_sfx(hurt_bgm_duck_duration, hurt_bgm_duck_volume)
 
 ## ============================================================
 ## 🔊 音效播放工具

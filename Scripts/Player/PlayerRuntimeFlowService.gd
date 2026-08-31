@@ -120,9 +120,13 @@ static func finalize_post_physics(player: Node, fixed_delta: float, move_input: 
 			"state": player.current_state
 		})
 
-	if previous_was_on_floor and not player.was_on_floor and player.velocity.y >= 0 and not player.is_jumping:
+	if previous_was_on_floor and not player.was_on_floor and not player.is_jumping:
 		player.coyote_time_active = true
 		player.coyote_timer.start(player.coyote_time)
+		# 离开平台时解锁一次空中跳跃能力，解决走离移动平台后无法跳跃的问题
+		# 移除 velocity.y>=0 限制：向上移动的平台会导致 player 有负 velocity.y，使条件不满足
+		# 移除 has_double_jumped=false：避免覆盖 JUMP2 飞行中的旋转效果
+		player.can_double_jump = true
 
 	# 奔跑离地连续性跟踪：仅在“奔跑离地”时启动；空中每帧验证“同向按住 + 同向非零速度”。
 	if previous_was_on_floor and not player.was_on_floor:

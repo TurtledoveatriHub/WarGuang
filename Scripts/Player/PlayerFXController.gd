@@ -117,7 +117,9 @@ func _on_state_changed(payload: Dictionary) -> void:
 		player.PlayerState.JUMP:
 			if player.has_double_jumped:
 				return
-			_spawn_fx("JumpAnchor", _get_fx_world_position("JumpAnchor"), player.animated_sprite.flip_h)
+			# ★ 使用 should_jump1start 标志（状态变更前即由 try_jump 设置）
+			if player.should_jump1start:
+				_spawn_fx("JumpAnchor", _get_fx_world_position("JumpAnchor"), player.animated_sprite.flip_h)
 		player.PlayerState.WALLJUMP:
 			var wall_jump_flip_h: bool = player.animated_sprite.flip_h
 			if player.wall_jump_fx_flip_h_locked:

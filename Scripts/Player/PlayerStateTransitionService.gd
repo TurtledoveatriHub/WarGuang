@@ -35,6 +35,9 @@ static func apply_exit_state(player: Node, from_state: int) -> void:
 		player.PlayerState.WALLJUMP:
 			player.can_reattach_to_wall = true
 
+		player.PlayerState.DOWN:
+			player._landing_downend_active = false
+
 		player.PlayerState.LOOKUP, player.PlayerState.LOOKDOWN:
 			player.reset_camera_position()
 

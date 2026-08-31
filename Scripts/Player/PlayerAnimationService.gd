@@ -25,17 +25,34 @@ static func update_animation(player: Node) -> void:
 				if player.is_jumpbox_triggered or player.is_double_jump_holding:
 					target_animation_val = "JUMP2"
 				else:
-					target_animation_val = "JUMP1"
+					target_animation_val = "JUMP1LOOP"
+			elif player.should_jump1start:
+				target_animation_val = "JUMP1START"
+				player.should_jump1start = false
+			elif player.jump1start_played:
+				target_animation_val = "JUMP1LOOP"
+				player.jump1start_played = false
+			elif player.current_animation == "JUMP1LOOP":
+				target_animation_val = "JUMP1LOOP"
+			elif player.current_animation == "JUMP1START":
+				target_animation_val = "JUMP1START"
 			else:
-				target_animation_val = "JUMP1"
+				target_animation_val = "JUMP1LOOP"
 		player.PlayerState.DOWN:
 			if player.has_double_jumped:
 				if player.is_jumpbox_triggered or player.is_double_jump_holding:
 					target_animation_val = "JUMP2"
 				else:
-					target_animation_val = "DOWN"
+					target_animation_val = "DOWNLOOP"
+			elif player._landing_downend_active:
+				# 着陆后先播放一遍 DOWNEND
+				target_animation_val = "DOWNEND"
+			elif player.current_animation == "DOWNEND":
+				# DOWNEND 播放中/已播完最后一帧，保持不动
+				target_animation_val = "DOWNEND"
 			else:
-				target_animation_val = "DOWN"
+				# 正常下落循环
+				target_animation_val = "DOWNLOOP"
 		player.PlayerState.DASH:
 			if player.black_dash_unlocked:
 				target_animation_val = "BLACKDASH"

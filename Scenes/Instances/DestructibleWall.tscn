@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=3 uid="uid://ch51hg2xln7gy"]
 
 [ext_resource type="Script" uid="uid://bnwr7hcg7b7je" path="res://Scripts/Instances/DestructibleWall.gd" id="1_wall"]
-[ext_resource type="Texture2D" uid="uid://84vpi6k4oljc" path="res://Assets/Textures/Tools/石墙.png" id="2_lt2x3"]
+[ext_resource type="Texture2D" uid="uid://84vpi6k4oljc" path="res://Assets/Textures/Instances/石墙.png" id="2_lt2x3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
 size = Vector2(10, 30)

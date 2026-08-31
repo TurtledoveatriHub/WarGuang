@@ -1,7 +1,9 @@
 # Scripts/Instances/Platforms/Platform.gd
-## 平台系统（严格参考 HurtBox 移动模式实现）
-## 继承 AnimatableBody2D，移动时自动携带玩家
-## 
+## 平台系统（纯位置跟随模式——蔚蓝风格）
+## 继承 Node2D，通过移动 StaticBody2D 子节点实现碰撞跟随。
+## Player 通过读取 get_platform_velocity() 手动叠加速度，而非依赖物理自动携带。
+## 修复：Player 在平台上受伤时不会与平台物理冲突导致"消失"。
+##
 ## 动画状态机：
 ##   ON（静止）←→ ONMOVE（移动）
 ##   ON →（player 站上且 brittle）→ CLOSE（非循环，播完→OFF）
@@ -9,7 +11,8 @@
 ##
 ## 碰撞体规则：ON / ONMOVE / CLOSE →启用，OFF / OPEN →禁用
 ## 移动规则：OFF / CLOSE / OPEN →不移动
-extends AnimatableBody2D
+extends Node2D
+class_name Platform
 
 enum MovementMode { STATIC, LINEAR, CIRCULAR }
 enum PlatformAnim { ON, ONMOVE, OFF, CLOSE, OPEN }
@@ -45,12 +48,17 @@ enum SpriteEffect { NONE, FLIP }
 @export_category("玩家交互")
 ## player 站在平台上后停止移动
 @export var stop_when_player_stands: bool = false
-## 是否可破碎
-@export var brittle: bool = false
-## 破碎后恢复等待时间（秒）
-@export var recover_time: float = 3.0
 ## 玩家在平台上的水平速度乘数
 @export var horizontal_speed_multiplier: float = 1.0
+
+## ── 破碎 ──
+@export_category("破碎设置")
+## 是否可破碎
+@export var brittle: bool = false
+## 破碎倒计时（秒），player站上后等待此时间再播 CLOSE 动画
+@export var break_countdown: float = 0.2
+## 破碎后恢复等待时间（秒）
+@export var recover_time: float = 3.0
 
 # ── 移动状态（HurtBox 同款）──
 var _start_pos: Vector2
@@ -64,6 +72,8 @@ var _current_speed: float = 0.0
 var _circle_center: Vector2
 var _circle_radius: float = 0.0
 var _prev_position: Vector2  # 用于圆周差值移动和速度计算
+var _prev_progress: float = -1.0  # 移动冻结诊断
+var _stuck_frames: int = 0
 var _anim_state: PlatformAnim = PlatformAnim.ON
 var _player_on: bool = false
 #var _last_position: Vector2
@@ -71,14 +81,20 @@ var _platform_velocity: Vector2 = Vector2.ZERO
 
 # ── 破碎状态 ──
 var _brittle_active: bool = false
+var _break_countdown_timer: float = 0.0
 var _recover_timer: float = 0.0
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
-@onready var collision_shape: CollisionShape2D = $CollisionShape2D
-@onready var _detect_area: Area2D = $Area2D
+@onready var _collision_body: StaticBody2D = $Body
+@onready var collision_shape: CollisionShape2D = $Body/CollisionShape2D
+@onready var _detect_area: Area2D = $Body/Area2D
+
+# 保存在 Inspector 中设置的 collision_layer（含 Wall 等自定义层），不被 _set_collision_deferred 覆盖
+var _base_collision_layer: int = 2
 
 
 func _ready():
+	_base_collision_layer = _collision_body.collision_layer
 	_start_pos = global_position
 	_end_pos = _start_pos + end_offset
 	_path_length = end_offset.length()
@@ -103,23 +119,50 @@ func _ready():
 func _physics_process(delta: float) -> void:
 	var fd := minf(delta, 1.0 / 30.0)
 	
-	# 每帧计算速度
 	_platform_velocity = (global_position - _prev_position) / maxf(fd, 0.001)
 	_prev_position = global_position
+	
+	# ── 移动冻结诊断（设备用，不修改逻辑）──
+	if movement_mode != MovementMode.STATIC and not _is_waiting and not _brittle_active:
+		if _prev_progress == _progress:
+			_stuck_frames += 1
+			if _stuck_frames == 120:
+				var room_node: Node = null
+				if get_parent() and get_parent().get_parent():
+					room_node = get_parent().get_parent()
+				var room_name: String = str(room_node.name) if room_node else "?"
+				print("[Platform] 疑似冻结: node=", name, " room=", room_name,
+					" mode=", movement_mode, " progress=", _progress, " speed=", _current_speed,
+					" waiting=", _is_waiting, " is_finite=", is_finite(_progress))
+		else:
+			_stuck_frames = 0
+		_prev_progress = _progress
 	
 	# NaN 保护
 	if not is_finite(_progress): _progress = 0.0
 	if not is_finite(_current_speed): _current_speed = 0.0
 	if not is_finite(_wait_timer): _wait_timer = 0.0
 	
-	# 破碎流程
+	# 破碎流程（含倒计时）
 	if _brittle_active:
-		match _anim_state:
-			PlatformAnim.OFF:
-				_recover_timer -= fd
-				if _recover_timer <= 0.0:
-					_play_anim(PlatformAnim.OPEN)
+		if _break_countdown_timer > 0.0:
+			_break_countdown_timer -= fd
+			if _break_countdown_timer <= 0.0:
+				_set_collision_deferred(true)
+				_play_anim(PlatformAnim.CLOSE)
+		else:
+			match _anim_state:
+				PlatformAnim.OFF:
+					_recover_timer -= fd
+					if _recover_timer <= 0.0:
+						_play_anim(PlatformAnim.OPEN)
 		return
+	
+	# 破碎持续检测——player 从侧面进入或平台移动后 player 到达顶部时才触发破碎
+	if brittle and not _brittle_active and _player_on and _anim_state != PlatformAnim.OFF:
+		var body := get_tree().get_first_node_in_group("player")
+		if body and body.global_position.y < global_position.y - 4.0:
+			_on_player_stood()
 	
 	if stop_when_player_stands and _player_on and movement_mode != MovementMode.STATIC:
 		_play_anim(PlatformAnim.ON)
@@ -167,6 +210,19 @@ func handle_movement(delta: float) -> void:
 	else:
 		_current_speed = move_speed
 	
+	# ★ 根因修复：减速到 0 且接近终点时强制到达，避免 epsilon 精度差导致永久冻结
+	if _current_speed <= 0.0 and dist_left < half_decel * 0.5:
+		if _moving_to_end:
+			_progress = 1.0
+			global_position = _end_pos
+		else:
+			_progress = 0.0
+			global_position = _start_pos
+		_is_waiting = true
+		_wait_timer = wait_time
+		_play_anim(PlatformAnim.ON)
+		return
+	
 	# 推进进度
 	var step: float = (_current_speed * delta) / _path_length
 	_progress += step if _moving_to_end else -step
@@ -203,20 +259,16 @@ func _update_position() -> void:
 		MovementMode.LINEAR:
 			global_position = _start_pos.lerp(_end_pos, _progress)
 		MovementMode.CIRCULAR:
-			var dir: float = 1.0 if circular_clockwise else -1.0
-			var target: Vector2
+			# ★ 修复：使用 end_offset 方向向量计算圆弧，支持任意方向 end_offset
+			var end_dir: Vector2 = end_offset.normalized()
+			var perp: Vector2 = Vector2(-end_dir.y, end_dir.x)
+			var dir_sign: float = 1.0 if circular_clockwise else -1.0
+			var angle: float
 			if _moving_to_end:
-				target = _circle_center + Vector2(
-					_circle_radius * cos(dir * PI * (1.0 - _progress)),
-					_circle_radius * sin(dir * PI * (1.0 - _progress)))
+				angle = dir_sign * PI * (1.0 - _progress)
 			else:
-				target = _circle_center + Vector2(
-					_circle_radius * cos(-dir * PI * (1.0 - _progress)),
-					_circle_radius * sin(-dir * PI * (1.0 - _progress)))
-			# 圆周用差值移动，减少 AnimatableBody2D 抖动
-			var diff: Vector2 = target - global_position
-			if diff.length_squared() > 0.01:
-				global_position += diff
+				angle = -dir_sign * PI * (1.0 - _progress)
+			global_position = _circle_center + _circle_radius * (end_dir * cos(angle) + perp * sin(angle))
 
 
 ## ── 精灵翻转（HurtBox 同款 FLIP 逻辑）──
@@ -235,6 +287,12 @@ func _on_player_stood() -> void:
 	if not brittle or _brittle_active or _anim_state == PlatformAnim.OFF:
 		return
 	_brittle_active = true
+	_break_countdown_timer = break_countdown
+
+## 倒计时结束后启动 CLOSE（由 _physics_process 调用）
+func _on_player_stood_impl() -> void:
+	if _anim_state != PlatformAnim.ON and _anim_state != PlatformAnim.ONMOVE:
+		return
 	_set_collision_deferred(true)
 	_play_anim(PlatformAnim.CLOSE)
 	# CLOSE 播完后自动切 OFF（监听 animation_finished）
@@ -248,6 +306,7 @@ func _on_anim_finished() -> void:
 		_anim_state = PlatformAnim.OFF
 		_set_collision_deferred(false)
 		_recover_timer = recover_time
+		_play_anim(PlatformAnim.OFF)  # 播完 CLOSE 立即切 OFF 动画，不卡最后一帧
 	elif current == "OPEN":
 		_brittle_active = false
 		_anim_state = PlatformAnim.ON
@@ -255,11 +314,11 @@ func _on_anim_finished() -> void:
 		_play_anim(PlatformAnim.ON)
 
 
-## ── 碰撞体控制 ──
+## ── 碰撞体控制（在子 StaticBody2D 上操作）──
 func _set_collision_deferred(enabled: bool) -> void:
 	if collision_shape:
 		collision_shape.set_deferred("disabled", not enabled)
-	set_deferred("collision_layer", 2 if enabled else 0)
+	_collision_body.set_deferred("collision_layer", _base_collision_layer if enabled else 0)
 
 
 ## ── 动画播放 ──

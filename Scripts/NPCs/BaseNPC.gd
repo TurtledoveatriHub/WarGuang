@@ -1,95 +1,57 @@
 extends Area2D
 class_name BaseNPC
 
-## ============================================
-## BaseNPC - 所有 NPC 的基础类
-## ============================================
-## 功能:
-## - 基础交互逻辑
-## - 对话气球显示
-## - 交互提示管理
-## - 通用音效系统
-## ============================================
+## NPC 唯一标识符
+var npc_id: String = ""
 
-## NPC 唯一标识符（在 Inspector 中设置）
-@export var npc_id: String = ""
-
-## 对话资源（在 Inspector 中指定）
 @export var dialogue_resource: DialogueResource
-
-## 气球对话场景（在 Inspector 中拖拽 MyBalloon.tscn）
 @export var balloon_scene: PackedScene
-
-## 是否只能交互一次
 @export var interact_once: bool = false
-
-## 通用交互音效数组（每次交互随机播放一个，拖拽 .wav 文件）
 @export var npc_interact_sounds: Array[AudioStream]
 
-# 节点引用
 @onready var animated_sprite = $AnimatedSprite2D if has_node("AnimatedSprite2D") else null
 @onready var interaction_prompt = $InteractionPrompt if has_node("InteractionPrompt") else null
 
-# 内部变量 (var): 使用 # 注释，写在变量右边
-var player_in_range: bool = false  # 玩家是否在范围内
-var has_interacted: bool = false  # 是否已经交互过
-var is_talking: bool = false  # 是否正在对话
+var player_in_range: bool = false
+var has_interacted: bool = false
+var is_talking: bool = false
 
 func _ready():
-	# 修复：删除 super._ready()，因为 Area2D 没有 _ready() 方法
-	# 使用 get_node_or_null 访问 DialogueSystem
-	var dialogue_system = get_node_or_null("/root/DialogueSystem")
-	if dialogue_system:
-		if dialogue_system.has_signal("dialogue_started"):
-			dialogue_system.dialogue_started.connect(_on_dialogue_started)
-		if dialogue_system.has_signal("dialogue_ended"):
-			dialogue_system.dialogue_ended.connect(_on_dialogue_ended)
-	
-	# 修复：连接 Area2D 的 body_entered/body_exited 信号
-	if has_node("CollisionShape2D") or has_node("Area2D"):
-		if not body_entered.is_connected(_on_body_entered):
-			body_entered.connect(_on_body_entered)
-		if not body_exited.is_connected(_on_body_exited):
-			body_exited.connect(_on_body_exited)
-	
-	# 初始隐藏提示
+	var ds = get_node_or_null("/root/DialogueSystem")
+	if ds:
+		if ds.has_signal("dialogue_started"):
+			ds.dialogue_started.connect(_on_dialogue_started)
+		if ds.has_signal("dialogue_ended"):
+			ds.dialogue_ended.connect(_on_dialogue_ended)
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
+	if not body_exited.is_connected(_on_body_exited):
+		body_exited.connect(_on_body_exited)
 	if interaction_prompt:
 		interaction_prompt.visible = false
-	
 	_play_default_idle()
 
 func _process(_delta):
 	if player_in_range:
 		if Input.is_action_just_pressed("interactive"):
-			print("DEBUG BaseNPC._process: 检测到交互输入，npc_id=", npc_id)
-			# 修复：调用 try_interact() 而不是直接调用 player.start_dialogue()
 			try_interact()
 
 ## 尝试与 NPC 交互（子类必须实现）
 func try_interact():
-	print("DEBUG BaseNPC.try_interact: 被调用，npc_id=", npc_id)
-	print("  player_in_range=", player_in_range)
-	
 	if not player_in_range:
-		print("DEBUG BaseNPC: 玩家不在范围，返回")
 		return
 	
-	# 修复：检查 DialogueSystem
 	var dialogue_system = get_node_or_null("/root/DialogueSystem")
 	var in_dialogue = false
 	if dialogue_system:
 		in_dialogue = dialogue_system.is_dialogue_active
 	
-	print("DEBUG BaseNPC: in_dialogue=", in_dialogue)
 	if in_dialogue:
-		print("DEBUG BaseNPC: 对话进行中，返回")
 		return
 	
 	if interact_once and has_interacted:
-		print("DEBUG BaseNPC: 已交互过，返回")
 		return
 	
-	print("DEBUG BaseNPC: 调用 _start_interaction()")
 	_start_interaction()
 
 ## 开始交互
@@ -112,11 +74,6 @@ func _start_interaction():
 	# 设置对话内容
 	if balloon.has_method("set_dialogue"):
 		balloon.set_dialogue(dialogue_resource, self)
-	
-	# 播放随机交互音效
-	if not npc_interact_sounds.is_empty():
-		var idx: int = randi() % npc_interact_sounds.size()
-		AudioManager.play_stream_sfx(npc_interact_sounds[idx])
 	
 	# 隐藏交互提示
 	if interaction_prompt:

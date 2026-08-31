@@ -7,6 +7,15 @@ signal menu_closed
 
 var source_teleport_id: String = ""
 
+## ── 黑屏效果参数 ──
+@export_category("黑屏效果")
+## 淡出时长（秒，画面渐黑）
+@export var fade_out_duration: float = 0.4
+## 黑屏保持时长（秒，全黑期间执行传送逻辑）
+@export var black_hold_duration: float = 0.6
+## 淡入时长（秒，渐亮恢复画面）
+@export var fade_in_duration: float = 0.4
+
 @onready var background: ColorRect = $Background
 @onready var panel_root: Node2D = $PanelRoot
 @onready var close_btn: TextureButton = $PanelRoot/CloseBtn
@@ -86,21 +95,21 @@ func _on_teleport_button_pressed(target_id: String) -> void:
 	## 注意：打开 TeleportPanel 时 get_tree().paused = true
 	## FadeManager 设置了 PROCESS_MODE_ALWAYS，其 tween 在暂停态下仍可推进
 	
-	## 步骤1：黑屏（FadeManager 在游戏暂停时仍能正常工作）
-	await FadeManager.fade_out(0.1)
+	## 步骤1：淡出 → 黑屏
+	await FadeManager.fade_out(fade_out_duration)
 	
-	## 步骤2：黑屏中关闭面板（不暴露在黑屏外）
+	## 步骤2：黑屏中关闭面板 + 执行传送（不暴露在黑屏外）
 	_restore_lighting()
 	get_tree().paused = false
 	_set_game_setting_btn_visible(true)
 	menu_closed.emit()
-	visible = false  ## 隐藏但不 free，避免 await 后脚本失效
+	visible = false
 	
-	## 步骤3：传送
+	## 步骤3：黑屏期间传送（参考 Door 的流程：黑屏持续期间操作场景树安全）
 	var data: Dictionary = TeleportManager.get_data(target_id)
 	var player := get_tree().get_first_node_in_group("player")
 	if data.is_empty() or not player:
-		await FadeManager.fade_in(0.4)
+		await FadeManager.fade_in(fade_in_duration)
 		queue_free()
 		return
 	
@@ -109,8 +118,22 @@ func _on_teleport_button_pressed(target_id: String) -> void:
 	player.velocity = Vector2.ZERO
 	
 	var target_room: String = data.get("room_id", "")
+	
+	if RoomManager and RoomManager.has_method("suppress_player_room_enter"):
+		RoomManager.suppress_player_room_enter(0.45)
+	
+	var tp_pos_raw = data.get("position", Vector2.ZERO)
+	var tp_pos: Vector2 = Vector2.ZERO
+	if typeof(tp_pos_raw) == TYPE_VECTOR2:
+		tp_pos = tp_pos_raw
+	elif typeof(tp_pos_raw) == TYPE_ARRAY and tp_pos_raw.size() == 2:
+		tp_pos = Vector2(tp_pos_raw[0], tp_pos_raw[1])
+	
+	if RoomManager and RoomManager.has_method("prepare_room_background_for_entry"):
+		RoomManager.prepare_room_background_for_entry(target_room, tp_pos)
+	
 	RoomManager.load_room(target_room)
-	player.global_position = data.get("position", Vector2.ZERO)
+	player.global_position = tp_pos
 	player.velocity = Vector2.ZERO
 	RoomManager.update_camera_limits()
 	
@@ -125,10 +148,12 @@ func _on_teleport_button_pressed(target_id: String) -> void:
 	if player.has_method("lock_control"):
 		player.lock_control(0.0, "teleport_end")
 	
-	await get_tree().physics_frame
-	await FadeManager.fade_in(0.4)
+	## 步骤4：黑屏保持
+	if black_hold_duration > 0.0:
+		await get_tree().create_timer(black_hold_duration).timeout
 	
-	## 步骤4：全部流程完成后才释放面板
+	## 步骤5：淡入
+	await FadeManager.fade_in(fade_in_duration)
 	queue_free()
 
 

@@ -17,14 +17,17 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 @export var damage_type: DamageType = DamageType.NORMAL
 ## 是否为传送伤害（独立于普通/阴影，会触发传送受击流程）
 @export var is_warp_damage: bool = false
-## 水平击退力
-@export var horizontal_knockback_force: float = 300.0
-## 垂直击退力
-@export var vertical_knockback_force: float = 400.0
+## ★ 对 player 的击退力（Vector2统一参数）
+@export var player_knockback: Vector2 = Vector2(50, 100)
+## ★ 对 Layer8 敌人的击退力（Vector2统一参数）
+@export var enemy_knockback: Vector2 = Vector2(100, 100)
 ## 伤害冷却时间（秒）
 @export var damage_cooldown_time: float = 0.1
 ## 持续伤害间隔（秒，0=每次冷却后立即触发）
 @export var continuous_damage_interval: float = 0.5
+
+## 对 Layer8 敌人的伤害值（不区分伤害类型）
+@export var enemy_damage: int = 1
 
 ## 旋转设置
 @export_category("旋转设置")
@@ -161,10 +164,9 @@ func _ready():
 			if child is CollisionShape2D:
 				collision_shapes.append(child)
 	
-	# 设置物理层：自身在 HurtBox 层(5)，仅监听 Player 层(1)
-	# 避免和地面/墙壁等 StaticBody 产生物理推挤
-	collision_layer = 16  # 2^4 = 层5 HurtBox
-	collision_mask = 1    # 2^0 = 层1 Player
+	# 设置物理层：自身在 HurtBox 层(5)，监听 Player 层(1) + Enemy 层(8)
+	collision_layer = 16   # 2^4 = 层5 HurtBox
+	collision_mask = 129   # 2^0 + 2^7 = 层1 Player + 层8 Enemy
 	
 	# 初始动画
 	animated_sprite.play("ON")
@@ -233,6 +235,18 @@ func _on_body_entered(body):
 			elif _damage_allowed:
 				if not damage_timers.has(body):
 					damage_timers[body] = continuous_damage_interval
+	# 对物理层 Layer8（bit 7 = 128）的敌人造成伤害（加入持续检测）
+	elif body is CharacterBody2D and (body.collision_layer & 128) != 0:
+		if not body in bodies_in_area:
+			bodies_in_area.append(body)
+		var enemy_base = body.get_node_or_null("EnemyBase")
+		if enemy_base and enemy_base.has_method("take_damage"):
+			if _damage_allowed:
+				# 计算敌人击退方向（与玩家击退同逻辑）
+				var enemy_kb: Vector2 = Vector2(sign(body.global_position.x - global_position.x) * enemy_knockback.x, -enemy_knockback.y)
+				enemy_base.take_damage(enemy_damage, enemy_kb)
+				if not damage_cooldown.has(body):
+					damage_cooldown[body] = damage_cooldown_time
 
 func _on_body_exited(body):
 	if body in bodies_in_area:
@@ -291,6 +305,18 @@ func handle_movement(delta: float) -> void:
 	else:
 		current_speed = move_speed
 	
+	# ★ 根因修复：减速到 0 且接近终点时强制到达
+	if current_speed <= 0.0 and dist_left < half_decel * 0.5:
+		if _moving_to_end:
+			_progress = 1.0
+			global_position = end_pos
+		else:
+			_progress = 0.0
+			global_position = start_pos
+		is_waiting = true
+		wait_timer = wait_time
+		return
+	
 	# 推进进度
 	var step: float = (current_speed * delta) / path_length
 	if not is_finite(step):
@@ -334,11 +360,16 @@ func _update_position() -> void:
 			var osc: float = sin(t * TAU * wave_period + phase) * sign_mult
 			global_position = linear_pos + perp_dir * wave_amplitude * osc
 		MovementMode.CIRCULAR:
+			# ★ 修复：使用 end_offset 方向向量计算圆弧，支持任意方向 end_offset
+			var end_dir: Vector2 = end_offset.normalized()
+			var perp: Vector2 = Vector2(-end_dir.y, end_dir.x)
 			var dir_sign: float = 1.0 if circular_clockwise else -1.0
+			var angle: float
 			if _moving_to_end:
-				global_position = circle_center + Vector2(circle_radius * cos(dir_sign * PI * (1.0 - _progress)), circle_radius * sin(dir_sign * PI * (1.0 - _progress)))
+				angle = dir_sign * PI * (1.0 - _progress)
 			else:
-				global_position = circle_center + Vector2(circle_radius * cos(-dir_sign * PI * (1.0 - _progress)), circle_radius * sin(-dir_sign * PI * (1.0 - _progress)))
+				angle = -dir_sign * PI * (1.0 - _progress)
+			global_position = circle_center + circle_radius * (end_dir * cos(angle) + perp * sin(angle))
 
 # ── 伤害处理 ──────────────────────────────────────
 
@@ -361,6 +392,19 @@ func handle_damage(delta: float, scaled_delta: float) -> void:
 				if not damage_cooldown.has(body) or damage_cooldown[body] <= 0:
 					apply_damage(body)
 					damage_cooldown[body] = 0.1
+		# Layer8 敌人持续伤害（与玩家同逻辑但使用 enemy_damage）
+		elif body is CharacterBody2D and (body.collision_layer & 128) != 0:
+			if not damage_timers.has(body):
+				damage_timers[body] = 0.0
+			damage_timers[body] += delta
+			if damage_timers[body] >= continuous_damage_interval:
+				damage_timers[body] = 0.0
+				if not damage_cooldown.has(body) or damage_cooldown[body] <= 0:
+					var enemy_base = body.get_node_or_null("EnemyBase")
+					if enemy_base and enemy_base.has_method("take_damage"):
+						var enemy_kb: Vector2 = Vector2(sign(body.global_position.x - global_position.x) * enemy_knockback.x, -enemy_knockback.y)
+						enemy_base.take_damage(enemy_damage, enemy_kb)
+						damage_cooldown[body] = 0.1
 	for body in damage_cooldown.keys():
 		if is_instance_valid(body):
 			damage_cooldown[body] -= scaled_delta
@@ -380,8 +424,8 @@ func apply_damage(body) -> bool:
 	var direction: Vector2 = (body.global_position - global_position).normalized()
 	var angle: float = abs(atan2(direction.y, direction.x) - PI / 2.0)
 	var total_force: float = sqrt(
-		horizontal_knockback_force * horizontal_knockback_force \
-		+ vertical_knockback_force * vertical_knockback_force
+		player_knockback.x * player_knockback.x \
+		+ player_knockback.y * player_knockback.y
 	)
 	var y_ratio: float = cos(angle)
 	var x_ratio: float = sin(angle)

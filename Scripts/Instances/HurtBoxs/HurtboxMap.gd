@@ -4,10 +4,15 @@ extends TileMapLayer
 @export var default_damage_type: int = 0
 ## 默认是否传送伤害
 @export var default_is_warp: bool = false
-## 默认击退力
-@export var default_knockback: Vector2 = Vector2(300, 400)
+## ★ 对 player 的击退力（Vector2统一参数）
+@export var player_knockback: Vector2 = Vector2(50, 100)
+## ★ 对 Layer8 敌人的击退力（Vector2统一参数）
+@export var enemy_knockback: Vector2 = Vector2(1000, 100)
 ## 伤害冷却间隔（秒）
 @export var damage_cooldown_time: float = 0.2
+
+## 对 Layer8 敌人的伤害值（不区分伤害类型）
+@export var enemy_damage: int = 1
 
 ## 自定义数据层名称（需与 TileSet 编辑器中完全一致）
 @export var data_damage_type: String = "dmg_type"
@@ -17,6 +22,8 @@ extends TileMapLayer
 var _hurt_area: Area2D
 ## 当前在区域内的玩家列表（用于连续检测）
 var _players_in_area: Array = []
+## 当前在区域内的 Layer8 敌人列表
+var _enemies_in_area: Array = []
 var _damage_cooldown: Dictionary = {}
 
 
@@ -28,7 +35,7 @@ func _ready():
 	_hurt_area = Area2D.new()
 	_hurt_area.name = "HurtArea"
 	_hurt_area.collision_layer = 16   # 层5 HurtBox(2^4=16)
-	_hurt_area.collision_mask = 1     # 监听层1 Player(2^0=1)
+	_hurt_area.collision_mask = 129   # 监听层1 Player(2^0=1) + 层8 Enemy(2^7=128)
 	
 	var count: int = 0
 	
@@ -72,12 +79,28 @@ func _add_cell_shape(cell: Vector2i, tile_size: Vector2) -> void:
 func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("player") and not body in _players_in_area:
 		_players_in_area.append(body)
+	elif body is CharacterBody2D and (body.collision_layer & 128) != 0:
+		if not body in _enemies_in_area:
+			_enemies_in_area.append(body)
+			# 敌人不区分伤害类型，进入即直接扣 enemy_damage 血
+			var enemy_base = body.get_node_or_null("EnemyBase")
+			if enemy_base and enemy_base.has_method("take_damage"):
+				## ★ 以具体格子位置计算击退方向
+				var cell: Vector2i = local_to_map(to_local(body.global_position))
+				var cell_world: Vector2 = to_global(map_to_local(cell))
+				var knockback: Vector2 = Vector2(
+					sign(body.global_position.x - cell_world.x) * enemy_knockback.x,
+					-enemy_knockback.y)
+				enemy_base.take_damage(enemy_damage, knockback)
 
 
 func _on_body_exited(body: Node) -> void:
 	var idx: int = _players_in_area.find(body)
 	if idx >= 0:
 		_players_in_area.remove_at(idx)
+	var eidx: int = _enemies_in_area.find(body)
+	if eidx >= 0:
+		_enemies_in_area.remove_at(eidx)
 	if _damage_cooldown.has(body):
 		_damage_cooldown.erase(body)
 
@@ -107,7 +130,30 @@ func _process(delta: float) -> void:
 			continue
 		
 		_try_apply_damage(body)
-
+	
+	# Layer8 敌人持续伤害（与玩家同间隔逻辑，但伤害值固定为 enemy_damage）
+	for i in range(_enemies_in_area.size() - 1, -1, -1):
+		var body = _enemies_in_area[i]
+		if not is_instance_valid(body):
+			_enemies_in_area.remove_at(i)
+			continue
+		# ★ 修复：冷却中需要递减（与玩家逻辑一致）
+		if _damage_cooldown.has(body) and _damage_cooldown[body] > 0.0:
+			_damage_cooldown[body] -= delta
+			if _damage_cooldown[body] <= 0.0:
+				_damage_cooldown.erase(body)
+			continue
+		var enemy_base = body.get_node_or_null("EnemyBase")
+		if enemy_base and enemy_base.has_method("take_damage"):
+			if not enemy_base.is_dead():
+				## ★ 以具体格子位置计算击退方向
+				var cell: Vector2i = local_to_map(to_local(body.global_position))
+				var cell_world: Vector2 = to_global(map_to_local(cell))
+				var knockback: Vector2 = Vector2(
+					sign(body.global_position.x - cell_world.x) * enemy_knockback.x,
+					-enemy_knockback.y)
+				enemy_base.take_damage(enemy_damage, knockback)
+				_damage_cooldown[body] = damage_cooldown_time
 
 ## 查找玩家所在格子的 TileData 并施加伤害
 func _try_apply_damage(body: Node) -> void:
@@ -135,7 +181,7 @@ func _try_apply_damage(body: Node) -> void:
 	
 	var dmg_type: int = default_damage_type
 	var is_warp: bool = default_is_warp
-	var kb: Vector2 = default_knockback
+	var kb: Vector2 = player_knockback
 	
 	var ct: Variant = data.get_custom_data(data_damage_type)
 	if ct != null: dmg_type = ct

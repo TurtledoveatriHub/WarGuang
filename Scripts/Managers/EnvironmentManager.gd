@@ -34,15 +34,12 @@ func set_environment_multipliers(horizontal: float, vertical: float, gravity: fl
 		"acceleration": acceleration
 	}
 	
-	print("EnvironmentManager: 环境乘数更新 - 水平:", horizontal, ", 垂直:", vertical, ", 重力:", gravity)
-	
 	# 通知所有玩家
 	_notify_players()
 
 ## 清除环境效果（恢复默认值）
 func clear_environment():
 	set_environment_multipliers(1.0, 1.0, 1.0, 1.0, 1.0)
-	print("EnvironmentManager: 环境效果已清除")
 
 ## 通知玩家更新乘数
 func _notify_players():

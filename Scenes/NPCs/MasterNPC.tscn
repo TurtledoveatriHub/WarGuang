@@ -83,9 +83,10 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g62kn"]
-size = Vector2(22, 25)
+size = Vector2(36, 24)
 
 [node name="MasterNPC" type="Area2D"]
+collision_layer = 64
 script = ExtResource("1_5awuc")
 dialogue_resource = ExtResource("2_h7ebo")
 balloon_scene = ExtResource("3_06twq")
@@ -96,7 +97,7 @@ animation = &"TALK"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 33
-position = Vector2(0, -0.5)
+position = Vector2(6, 2)
 shape = SubResource("RectangleShape2D_g62kn")
 
 [node name="InteractionPrompt" type="Sprite2D" parent="."]

@@ -98,6 +98,8 @@ static func handle_dash_timers(player: Node, fixed_delta: float) -> void:
 				else:
 					player.change_state(player.PlayerState.MOVE)
 			else:
+				if player.jump_buffer_timer and player.jump_buffer_timer.is_stopped() == false:
+					player.jump_buffer_timer.stop()
 				if player.velocity.y < 0:
 					player.change_state(player.PlayerState.JUMP)
 				else:
@@ -189,6 +191,8 @@ static func try_dash(player: Node, dash_just_pressed: bool) -> bool:
 		player.change_state(player.PlayerState.DASH)
 		player.can_dash = false
 		player.dash_duration_timer = 0
+		## ★ 清除来自 BACKSTEP 等状态的残留跳跃缓冲，防止上冲刺结束后自动跳跃
+		player.jump_buffer_after_dash = false
 		var current_dash_duration = player.black_dash_duration if player.black_dash_unlocked else player.dash_duration
 		var total_dash_duration = current_dash_duration + maxf(player.dash_steer_duration, 0.0)
 		player.dash_duration_timer_node.start(total_dash_duration)
@@ -520,13 +524,17 @@ static func handle_wall_bump(player: Node) -> void:
 # 处理撞墙僵直期间的重力与恢复。
 static func handle_wall_bump_stun(player: Node, fixed_delta: float) -> void:
 	player.apply_gravity(fixed_delta)
-	player.velocity.x = move_toward(player.velocity.x, 0, player.dash_inertia_decay * player.base_move_speed * fixed_delta)
+	var bump_decel: float = player.ground_deceleration if player.is_on_floor() else player.air_deceleration
+	player.velocity.x = move_toward(player.velocity.x, 0, bump_decel * player.base_move_speed * fixed_delta)
 	player.hurt_timer -= fixed_delta
 
 	if player.hurt_timer <= 0:
 		player.is_wall_bump_stun = false
 		if player.is_control_locked:
 			player.unlock_control()
+		# 撞墙僵直结束后重置二段跳状态，允许空中跳跃
+		player.has_double_jumped = false
+		player.can_double_jump = true
 		if player.is_on_floor():
 			player.change_state(player.PlayerState.IDLE)
 		else:

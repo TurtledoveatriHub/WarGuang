@@ -122,6 +122,10 @@ func start_game_from_save(slot_index: int):
 	if remain_black > 0.0:
 		await get_tree().create_timer(remain_black).timeout
 	if not is_new_save_opening:
+		# 清除所有残留黑幕锁，确保淡入正常执行
+		# （FadeManager 是 autoload，hold_black 标签可能从之前游戏会话残留）
+		if FadeManager and FadeManager.has_method("clear_black_holds"):
+			FadeManager.clear_black_holds()
 		await FadeManager.fade_in(FadeManager.ui_save_to_game_fade_in_duration)
 	if Global:
 		Global.start_play_time_session()

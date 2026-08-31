@@ -1,8 +1,7 @@
-[gd_scene load_steps=20 format=3 uid="uid://bq5gktnvtvvop"]
+[gd_scene load_steps=19 format=3 uid="uid://bq5gktnvtvvop"]
 
 [ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_5nrrw"]
 [ext_resource type="Texture2D" uid="uid://b276xt1mpelj3" path="res://Assets/Textures/NPCs/雪精灵.png" id="2_2hftq"]
-[ext_resource type="AudioStream" uid="uid://c1rbd42778cdi" path="res://Assets/Audios/SFX/Player/jumpbox.wav" id="2_aj0vt"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_aj0vt"]
 atlas = ExtResource("2_2hftq")
@@ -131,8 +130,8 @@ radius = 8.0
 [node name="HurtBox" type="Area2D" node_paths=PackedStringArray("collision_shapes")]
 visibility_layer = 16
 collision_layer = 16
+collision_mask = 129
 script = ExtResource("1_5nrrw")
-hit_sfx = ExtResource("2_aj0vt")
 collision_shapes = [NodePath("CollisionShape2D")]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

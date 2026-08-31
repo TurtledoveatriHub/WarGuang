@@ -15,10 +15,12 @@ static func handle_hurt_state(player: Node, fixed_delta: float) -> void:
 	player.velocity.y += player.gravity * player.effective_gravity_multiplier * fixed_delta
 	player.velocity.y = min(player.velocity.y, player.effective_max_fall_speed)
 
+	# ★ 使用 ground_deceleration / air_deceleration（由当前是否在地面决定）
+	var hurt_decel: float = player.ground_deceleration if player.is_on_floor() else player.air_deceleration
 	player.velocity.x = move_toward(
 		player.velocity.x,
 		0.0,
-		player.dash_inertia_decay * player.base_move_speed * fixed_delta * player.effective_acceleration_multiplier
+		hurt_decel * player.base_move_speed * fixed_delta * player.effective_acceleration_multiplier
 	)
 
 	if player.current_animation != "HURT":

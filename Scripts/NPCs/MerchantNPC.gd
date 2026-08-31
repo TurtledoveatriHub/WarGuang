@@ -50,7 +50,7 @@ var inventory: Array[Dictionary] = [
 ]
 
 func _ready():
-	npc_id = "merchant_01"
+	npc_id = "MerchantNPC"
 	super._ready()
 	update_mood(Moods.IDLE)
 	print("DEBUG: 商人 NPC 初始化完成 -", npc_id)

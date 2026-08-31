@@ -1,11 +1,10 @@
-[gd_scene load_steps=93 format=3 uid="uid://dwj2ydwabq3n0"]
+[gd_scene load_steps=91 format=3 uid="uid://dwj2ydwabq3n0"]
 
 [ext_resource type="Script" uid="uid://b641fcmvm5n4c" path="res://Scripts/Player/Player.gd" id="1_kyqiw"]
 [ext_resource type="PackedScene" uid="uid://dq4jgo8v4l7kq" path="res://Scenes/Instances/Afterimage.tscn" id="2_t26db"]
-[ext_resource type="Texture2D" uid="uid://dtkgdvtvivq4r" path="res://Assets/Lights/2d_lights.webp" id="3_fk5o5"]
 [ext_resource type="Script" uid="uid://bhexx6mj1xv3q" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_2d.gd" id="3_ude3g"]
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="4_jmcll"]
-[ext_resource type="Script" uid="uid://bw1fmebkjwy7o" path="res://Scripts/Components/AfterimageTrail.gd" id="5_afterimagetrail"]
+[ext_resource type="Script" uid="uid://bw1fmebkjwy7o" path="res://Scripts/Tools/AfterimageTrail.gd" id="5_afterimagetrail"]
 [ext_resource type="Script" uid="uid://c6igct05krujq" path="res://Scripts/Player/PlayerCameraController.gd" id="6_camera_controller"]
 [ext_resource type="Script" uid="uid://kd5yity3l62p" path="res://Scripts/Player/PlayerFXController.gd" id="7_fx_controller"]
 [ext_resource type="Texture2D" uid="uid://d3gavddfgdl2a" path="res://Assets/Textures/Warmas/wmn.png" id="8_0kmp4"]
@@ -23,11 +22,19 @@
 [ext_resource type="AudioStream" uid="uid://ci48705axq611" path="res://Assets/Audios/SFX/Player/superdashcharge.wav" id="13_8cj01"]
 [ext_resource type="AudioStream" uid="uid://cxebgkwhsno3f" path="res://Assets/Audios/SFX/Player/superdashstart.wav" id="13_yb677"]
 [ext_resource type="AudioStream" uid="uid://crlf5wctjacdg" path="res://Assets/Audios/SFX/Player/backste.wav" id="14_8cj01"]
-[ext_resource type="AudioStream" uid="uid://c1rbd42778cdi" path="res://Assets/Audios/SFX/Player/jumpbox.wav" id="14_yb677"]
+
+[sub_resource type="Gradient" id="Gradient_8cj01"]
+offsets = PackedFloat32Array(0, 0.7035176)
+colors = PackedColorArray(1, 1, 0.9607843, 0.92156863, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_i2g7t"]
+gradient = SubResource("Gradient_8cj01")
+fill = 1
+fill_from = Vector2(0.50641024, 0.4679487)
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_jmcll"]
 closed = false
-polygon = PackedVector2Array(-8, -11, -8, 11, 8, 11, 8, -11, -8, -11)
+polygon = PackedVector2Array(-8, -8, -8, 11, 7, 11, 7, -8, -8, -8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_0u84n"]
 atlas = ExtResource("8_0kmp4")
@@ -65,9 +72,9 @@ region = Rect2(0, 160, 32, 32)
 atlas = ExtResource("8_0kmp4")
 region = Rect2(32, 160, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_i2g7t"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_to4uw"]
 atlas = ExtResource("8_0kmp4")
-region = Rect2(64, 64, 32, 32)
+region = Rect2(128, 32, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_io2mu"]
 atlas = ExtResource("8_0kmp4")
@@ -121,21 +128,13 @@ region = Rect2(32, 192, 32, 32)
 atlas = ExtResource("8_0kmp4")
 region = Rect2(0, 192, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_to4uw"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_fcbn2"]
 atlas = ExtResource("8_0kmp4")
-region = Rect2(128, 32, 32, 32)
+region = Rect2(224, 32, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_p7cr0"]
 atlas = ExtResource("8_0kmp4")
 region = Rect2(160, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_vrod0"]
-atlas = ExtResource("8_0kmp4")
-region = Rect2(192, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fcbn2"]
-atlas = ExtResource("8_0kmp4")
-region = Rect2(224, 32, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hjq2i"]
 atlas = ExtResource("8_0kmp4")
@@ -336,13 +335,21 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_i2g7t")
+"texture": SubResource("AtlasTexture_to4uw")
 }, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_to4uw")
+}],
+"loop": false,
+"name": &"DOWNEND",
+"speed": 18.0
+}, {
+"frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_io2mu")
 }],
-"loop": false,
-"name": &"DOWN",
+"loop": true,
+"name": &"DOWNLOOP",
 "speed": 12.0
 }, {
 "frames": [{
@@ -403,20 +410,22 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_fcbn2")
+}],
+"loop": true,
+"name": &"JUMP1LOOP",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_to4uw")
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_p7cr0")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_vrod0")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fcbn2")
 }],
 "loop": false,
-"name": &"JUMP1",
-"speed": 12.0
+"name": &"JUMP1START",
+"speed": 18.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -614,7 +623,7 @@ script = ExtResource("4_jmcll")
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 10
-collision_mask = 63
+collision_mask = 111
 script = ExtResource("1_kyqiw")
 afterimage_scene = ExtResource("2_t26db")
 metadata/_edit_horizontal_guides_ = [-11.0]
@@ -663,18 +672,16 @@ super_dash_start_sfx = ExtResource("13_yb677")
 backstep_sfx = ExtResource("14_8cj01")
 backstep_counter_sfx = ExtResource("13_1e6p3")
 run_jump_sfx = ExtResource("10_0u84n")
-jumpbox_perfect_sfx = ExtResource("14_yb677")
-jumpbox_normal_sfx = ExtResource("14_yb677")
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
-position = Vector2(-3, 16)
+position = Vector2(-1, 6)
 color = Color(0.84313726, 0.84313726, 0.6666667, 0.74509805)
 energy = 0.3
 range_layer_max = 5
 range_item_cull_mask = 11
 shadow_enabled = true
 shadow_item_cull_mask = 15
-texture = ExtResource("3_fk5o5")
+texture = SubResource("GradientTexture2D_i2g7t")
 offset = Vector2(0, -6)
 texture_scale = 0.4
 
@@ -685,12 +692,7 @@ occluder_light_mask = 0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_jbabp")
-animation = &"IDLE"
-
-[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="."]
-visible = false
-sprite_frames = SubResource("SpriteFrames_jbabp")
-animation = &"WALLJUMP"
+animation = &"INTERACTIVE"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(1, 4)
@@ -701,7 +703,7 @@ top_level = true
 script = ExtResource("3_ude3g")
 follow_mode = 5
 follow_target = NodePath("..")
-zoom = Vector2(2, 2)
+zoom = Vector2(3, 3)
 tween_resource = SubResource("Resource_ude3g")
 follow_damping = true
 dead_zone_width = 0.1
@@ -723,11 +725,9 @@ metadata/_custom_type_script = "uid://bhexx6mj1xv3q"
 [node name="WallRays" type="Node2D" parent="."]
 
 [node name="LeftWallRay" type="RayCast2D" parent="WallRays"]
-position = Vector2(0, 7.5)
-target_position = Vector2(-8, 0.5)
+target_position = Vector2(-8, 0)
 collision_mask = 4
 
 [node name="RightWallRay" type="RayCast2D" parent="WallRays"]
-position = Vector2(0, 7.5)
-target_position = Vector2(8, 0.5)
+target_position = Vector2(8, 0)
 collision_mask = 4

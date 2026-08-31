@@ -35,7 +35,9 @@ var collected_items: Array = []
 # 可破坏石墙摧毁记录（当前存档）- 从存档数据中读取/保存
 var destructible_walls_destroyed: Array = []
 
-# 疯子挑战状态记录
+## 疯子挑战状态记录
+
+# 第一阶段挑战状态记录
 var maniac_challenge_completed: bool = false
 var maniac_last_challenge_failed: bool = false
 
@@ -46,6 +48,34 @@ var maniac_stage2_last_challenge_failed: bool = false
 # 第三阶段挑战状态记录
 var maniac_stage3_challenge_completed: bool = false
 var maniac_stage3_last_challenge_failed: bool = false
+
+# 第四阶段挑战状态记录
+var maniac_stage4_challenge_completed: bool = false
+var maniac_stage4_last_challenge_failed: bool = false
+
+# 第五阶段挑战状态记录
+var maniac_stage5_challenge_completed: bool = false
+var maniac_stage5_last_challenge_failed: bool = false
+
+# 第六阶段挑战状态记录
+var maniac_stage6_challenge_completed: bool = false
+var maniac_stage6_last_challenge_failed: bool = false
+
+# 第七阶段挑战状态记录
+var maniac_stage7_challenge_completed: bool = false
+var maniac_stage7_last_challenge_failed: bool = false
+
+# 第八阶段挑战状态记录
+var maniac_stage8_challenge_completed: bool = false
+var maniac_stage8_last_challenge_failed: bool = false
+
+# 第九阶段挑战状态记录
+var maniac_stage9_challenge_completed: bool = false
+var maniac_stage9_last_challenge_failed: bool = false
+
+# 第十阶段挑战状态记录
+var maniac_stage10_challenge_completed: bool = false
+var maniac_stage10_last_challenge_failed: bool = false
 
 # 存档点数据
 var save_point_position: Vector2 = Vector2.ZERO  # 静态存档点位置
@@ -102,29 +132,42 @@ func initialize_new_game():
 	defeated_bosses = []
 	collected_items = []
 	destructible_walls_destroyed = []  
+	
 	maniac_challenge_completed = false
 	maniac_last_challenge_failed = false
 	maniac_stage2_challenge_completed = false
 	maniac_stage2_last_challenge_failed = false
 	maniac_stage3_challenge_completed = false
 	maniac_stage3_last_challenge_failed = false
+	maniac_stage4_challenge_completed = false
+	maniac_stage4_last_challenge_failed = false
+	maniac_stage5_challenge_completed = false
+	maniac_stage5_last_challenge_failed = false
+	maniac_stage6_challenge_completed = false
+	maniac_stage6_last_challenge_failed = false
+	maniac_stage7_challenge_completed = false
+	maniac_stage7_last_challenge_failed = false
+	maniac_stage8_challenge_completed = false
+	maniac_stage8_last_challenge_failed = false
+	maniac_stage9_challenge_completed = false
+	maniac_stage9_last_challenge_failed = false
+	maniac_stage10_challenge_completed = false
+	maniac_stage10_last_challenge_failed = false
+	
 	last_save_point = {"position": Vector2(0, 0), "scene_path": "", "save_point_id": ""}
 	save_point_position = Vector2.ZERO
 	last_checkpoint_position = Vector2.ZERO
 	last_checkpoint_type = "static"
 	
-	# ⭐ 关键修复：重置 TaskManager 的 NPC 对话记录
 	var task_manager = get_node_or_null("/root/TaskManager")
 	if task_manager:
 		task_manager.npc_interactions.clear()
 		task_manager.tasks_completed.clear()
 		task_manager.special_dialogues_shown.clear()
 
-
 func request_boot_cinematic(sequence_id: StringName, payload: Dictionary = {}) -> void:
 	pending_boot_cinematic_id = sequence_id
 	pending_boot_cinematic_payload = payload.duplicate(true)
-
 
 func peek_boot_cinematic_request() -> Dictionary:
 	if pending_boot_cinematic_id == &"":
@@ -133,7 +176,6 @@ func peek_boot_cinematic_request() -> Dictionary:
 		"id": pending_boot_cinematic_id,
 		"payload": pending_boot_cinematic_payload.duplicate(true)
 	}
-
 
 func consume_boot_cinematic_request() -> Dictionary:
 	if pending_boot_cinematic_id == &"":
@@ -146,11 +188,9 @@ func consume_boot_cinematic_request() -> Dictionary:
 	pending_boot_cinematic_payload = {}
 	return request
 
-
 func clear_boot_cinematic_request() -> void:
 	pending_boot_cinematic_id = &""
 	pending_boot_cinematic_payload = {}
-
 
 # 保存游戏数据
 func get_save_data() -> Dictionary:
@@ -182,6 +222,7 @@ func get_save_data() -> Dictionary:
 		"npc_interactions": task_manager.npc_interactions.duplicate(true) if task_manager else {},
 		"tasks_completed": task_manager.tasks_completed.duplicate(true) if task_manager else {},
 		"special_dialogues_shown": task_manager.special_dialogues_shown.duplicate(true) if task_manager else {},
+		
 		# 修复：添加疯子挑战状态
 		"maniac_challenge_completed": maniac_challenge_completed,
 		"maniac_last_challenge_failed": maniac_last_challenge_failed,
@@ -189,9 +230,25 @@ func get_save_data() -> Dictionary:
 		"maniac_stage2_last_challenge_failed": maniac_stage2_last_challenge_failed,
 		"maniac_stage3_challenge_completed": maniac_stage3_challenge_completed,
 		"maniac_stage3_last_challenge_failed": maniac_stage3_last_challenge_failed,
+		"maniac_stage4_challenge_completed": maniac_stage4_challenge_completed,
+		"maniac_stage4_last_challenge_failed": maniac_stage4_last_challenge_failed,
+		"maniac_stage5_challenge_completed": maniac_stage5_challenge_completed,
+		"maniac_stage5_last_challenge_failed": maniac_stage5_last_challenge_failed,
+		"maniac_stage6_challenge_completed": maniac_stage6_challenge_completed,
+		"maniac_stage6_last_challenge_failed": maniac_stage6_last_challenge_failed,
+		"maniac_stage7_challenge_completed": maniac_stage7_challenge_completed,
+		"maniac_stage7_last_challenge_failed": maniac_stage7_last_challenge_failed,
+		"maniac_stage8_challenge_completed": maniac_stage8_challenge_completed,
+		"maniac_stage8_last_challenge_failed": maniac_stage8_last_challenge_failed,
+		"maniac_stage9_challenge_completed": maniac_stage9_challenge_completed,
+		"maniac_stage9_last_challenge_failed": maniac_stage9_last_challenge_failed,
+		"maniac_stage10_challenge_completed": maniac_stage10_challenge_completed,
+		"maniac_stage10_last_challenge_failed": maniac_stage10_last_challenge_failed,
+		
 		"destructible_walls_destroyed": destructible_walls_destroyed.duplicate(true),
 		"discovered_rooms": MapManager.discovered_rooms.duplicate() if MapManager else [],
 		"activated_teleports": TeleportManager.activated.duplicate() if TeleportManager else [],
+		"tp_coords": TeleportManager.get_save_coords() if TeleportManager and TeleportManager.has_method("get_save_coords") else {},
 		"played_cinematic_flags": played_cinematic_flags.duplicate(true),
 		"play_time_seconds": get_total_play_time_seconds(),
 		"timestamp": Time.get_datetime_string_from_system()
@@ -284,6 +341,48 @@ func load_save_data(data: Dictionary):
 
 	if data.has("maniac_stage3_last_challenge_failed"):
 		maniac_stage3_last_challenge_failed = data["maniac_stage3_last_challenge_failed"]
+
+	if data.has("maniac_stage4_challenge_completed"):
+		maniac_stage4_challenge_completed = data["maniac_stage4_challenge_completed"]
+
+	if data.has("maniac_stage4_last_challenge_failed"):
+		maniac_stage4_last_challenge_failed = data["maniac_stage4_last_challenge_failed"]
+	
+	if data.has("maniac_stage5_challenge_completed"):
+		maniac_stage2_challenge_completed = data["maniac_stage5_challenge_completed"]
+	
+	if data.has("maniac_stage5_last_challenge_failed"):
+		maniac_stage2_last_challenge_failed = data["maniac_stage5_last_challenge_failed"]
+
+	if data.has("maniac_stage6_challenge_completed"):
+		maniac_stage3_challenge_completed = data["maniac_stage6_challenge_completed"]
+
+	if data.has("maniac_stage6_last_challenge_failed"):
+		maniac_stage3_last_challenge_failed = data["maniac_stage6_last_challenge_failed"]
+
+	if data.has("maniac_stage7_challenge_completed"):
+		maniac_stage4_challenge_completed = data["maniac_stage7_challenge_completed"]
+
+	if data.has("maniac_stage7_last_challenge_failed"):
+		maniac_stage4_last_challenge_failed = data["maniac_stage7_last_challenge_failed"]
+	
+	if data.has("maniac_stage8_challenge_completed"):
+		maniac_stage2_challenge_completed = data["maniac_stage8_challenge_completed"]
+	
+	if data.has("maniac_stage8_last_challenge_failed"):
+		maniac_stage2_last_challenge_failed = data["maniac_stage8_last_challenge_failed"]
+
+	if data.has("maniac_stage9_challenge_completed"):
+		maniac_stage3_challenge_completed = data["maniac_stage9_challenge_completed"]
+
+	if data.has("maniac_stage9_last_challenge_failed"):
+		maniac_stage3_last_challenge_failed = data["maniac_stage9_last_challenge_failed"]
+
+	if data.has("maniac_stage10_challenge_completed"):
+		maniac_stage4_challenge_completed = data["maniac_stage10_challenge_completed"]
+
+	if data.has("maniac_stage10_last_challenge_failed"):
+		maniac_stage4_last_challenge_failed = data["maniac_stage10_last_challenge_failed"]
 	
 	# 加载可破坏石墙摧毁记录（每个存档独立）
 	if data.has("destructible_walls_destroyed"):

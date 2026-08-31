@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://b03jaomk2cnqd"]
+[gd_scene load_steps=14 format=3 uid="uid://b03jaomk2cnqd"]
 
 [ext_resource type="Script" uid="uid://bgd4cnk4b8qrx" path="res://Scripts/GameScenes/MainGameScene.gd" id="1_dcv5v"]
 [ext_resource type="PackedScene" uid="uid://dwj2ydwabq3n0" path="res://Scenes/Player/Player.tscn" id="1_wdg0h"]
@@ -10,6 +10,7 @@
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="11_om4ip"]
 [ext_resource type="Script" uid="uid://dij1xd6xmfvis" path="res://Scripts/Events/RoomCinematicEventDirector.gd" id="11_room_cinematic"]
 [ext_resource type="Texture2D" uid="uid://dvi0fwdkqjh2u" path="res://Assets/Textures/Backgrounds/1.png" id="12_dcv5v"]
+[ext_resource type="PackedScene" uid="uid://ce7h23h2l5a6n" path="res://Scenes/UI/MobileControls.tscn" id="13_mobile_ctrl"]
 [ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="18_iaaki"]
 
 [sub_resource type="Environment" id="Environment_jbabp"]
@@ -54,6 +55,8 @@ position = Vector2(0, -704)
 health_unit_spacing = 70.0
 
 [node name="VignetteEffect" parent="." instance=ExtResource("8_jbabp")]
+
+[node name="MobileControls" parent="." instance=ExtResource("13_mobile_ctrl")]
 
 [node name="BootCinematicDirector" type="CanvasLayer" parent="."]
 process_mode = 3

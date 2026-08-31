@@ -64,26 +64,24 @@ tile_map_data = PackedByteArray("AACt/xIAAgALAAEAAACt/xMAAgALAAEAAACt/xQAAgALAAE
 tile_set = ExtResource("5_6jb2b")
 
 [node name="HurtBoxs" type="Node2D" parent="."]
-position = Vector2(0, -64)
 
 [node name="HurtBox" parent="HurtBoxs" instance=ExtResource("10_dfccu")]
-position = Vector2(160, -80)
+position = Vector2(160, -120)
 sprite_effect = 0
 movement_mode = 3
 move_speed = 60.0
 end_offset = Vector2(0, 48)
 wait_time = 0.0
 acceleration_time = 0.0
-enable_debug = true
 
 [node name="HurtBox2" parent="HurtBoxs" instance=ExtResource("10_dfccu")]
-position = Vector2(-800, 152)
+position = Vector2(-800, 88)
 movement_mode = 1
 move_speed = 60.0
 end_offset = Vector2(120, 0)
 
 [node name="HurtBox3" parent="HurtBoxs" instance=ExtResource("10_dfccu")]
-position = Vector2(824, 8)
+position = Vector2(688, -96)
 movement_mode = 1
 move_speed = 60.0
 end_offset = Vector2(120, 0)
@@ -105,32 +103,31 @@ position = Vector2(160, -104)
 coin_value = 20
 
 [node name="Doors" type="Node2D" parent="."]
-position = Vector2(0, -64)
 
 [node name="1sm1" parent="Doors" instance=ExtResource("12_yffrf")]
-position = Vector2(-1320, 608)
+position = Vector2(-1320, 544)
 door_id = "1sm1"
 target_room_id = "Room1"
 
 [node name="sm1sm2" parent="Doors" instance=ExtResource("12_yffrf")]
-position = Vector2(1320, 0)
+position = Vector2(1320, -64)
 door_id = "sm1sm2"
 target_room_id = "SnowMountain2"
 
 [node name="DynamicCheckpoints" type="Node2D" parent="."]
-position = Vector2(0, -64)
+position = Vector2(0, 64)
 
 [node name="1" parent="DynamicCheckpoints" instance=ExtResource("14_gbokx")]
-position = Vector2(-1240, 608)
+position = Vector2(-1240, 480)
 checkpoint_id = "1"
 belongs_to_room = "SnowMountain1"
 
 [node name="2" parent="DynamicCheckpoints" instance=ExtResource("14_gbokx")]
-position = Vector2(1240, 0)
+position = Vector2(1240, -128)
 checkpoint_id = "2"
 belongs_to_room = "SnowMountain1"
 
 [node name="3" parent="DynamicCheckpoints" instance=ExtResource("14_gbokx")]
-position = Vector2(160, 0)
+position = Vector2(160, -128)
 checkpoint_id = "3"
 belongs_to_room = "SnowMountain1"

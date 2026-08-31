@@ -37,7 +37,8 @@ static func take_damage_with_type(player: Node, damage_source_position: Vector2,
 	player.PlayerDamageFlowServiceScript.normalize_special_state_before_damage(player)
 
 	player.hurt_direction = player.PlayerDamageFlowServiceScript.compute_hurt_direction(player, damage_source_position, knockback_force)
-	player.velocity = player.hurt_direction * player.hurt_knockback_speed
+	## ★ 直接使用传入的击退向量作为受伤速度（不再用 hurt_knockback_speed 覆盖）
+	player.velocity = knockback_force
 
 	var new_health: int = int(player.PlayerDamageFlowServiceScript.apply_damage_and_emit(
 		player,

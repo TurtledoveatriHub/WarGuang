@@ -98,6 +98,13 @@ static func handle_jump_state(player: Node, fixed_delta: float, move_input: floa
 
 static func handle_down_state(player: Node, fixed_delta: float, move_input: float, jump_just_pressed: bool, jump_pressed: bool, jump_just_released: bool, dash_just_pressed: bool) -> void:
 	if player.is_on_floor():
+		if player._landing_downend_active:
+			# ★ DOWNEND 正在播放/保持中：不重复调用 handle_landing
+			# 若摇震锁定已解除（DOWNEND 播完或超时）则切地面态
+			if not player.is_control_locked:
+				player._landing_downend_active = false
+				PlayerAirAbilityServiceScript.apply_ground_transition(player)
+			return
 		player.handle_landing()
 		return
 

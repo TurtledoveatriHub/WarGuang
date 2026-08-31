@@ -14,15 +14,22 @@ extends Area2D
 ## 传送效果设置
 @export_category("传送效果设置")
 ## 渐入时间（秒）
-@export var fade_in_duration: float = 0.1
+@export var fade_in_duration: float = 0.4
 ## 黑屏时间（秒）
-@export var black_screen_duration: float = 0.5
+@export var black_screen_duration: float = 0.4
 ## 淡出时间（秒）
 @export var fade_out_duration: float = 0.4
 ## Door 非瞬移追镜时长（秒）
 @export var door_camera_catchup_duration: float = 0.20
 ## Door 传送后临时放开相机限制时长（秒）
 @export var door_camera_limit_unlock_duration: float = 0.32
+
+## 房间入场事件配置
+@export_category("房间入场事件")
+## 设置此字段后，目标房间为该 ID 时延迟淡入并 hold_black，用于入场动画
+@export var cinematic_room_id: String = ""
+## 入场动画的 cinematic flag 名称（用于 Global.has_cinematic_flag 检查首次进入）
+@export var cinematic_hold_tag: String = ""
 
 # 内部变量
 var can_teleport: bool = true
@@ -32,7 +39,6 @@ var is_enabled: bool = true
 @onready var interaction_prompt = $InteractionPrompt
 
 func _ready():
-	# 检查 door_id 是否设置
 	if door_id == "":
 		print("错误：门节点没有设置 door_id，路径：", get_path())
 		is_enabled = false
@@ -47,6 +53,24 @@ func _ready():
 	
 	if interaction_prompt:
 		interaction_prompt.visible = false
+	
+	# 延迟检测已在区域内的 player
+	call_deferred("_check_overlapping_player")
+
+
+func _check_overlapping_player() -> void:
+	if not is_enabled or not is_instance_valid(self):
+		return
+	# 延迟足够时间等当前淡入完成
+	await get_tree().create_timer(1.0).timeout
+	if not is_instance_valid(self) or not is_enabled:
+		return
+	for b in get_overlapping_bodies():
+		if b.is_in_group("player") and can_teleport:
+			print("[Door] 已在区域内(延迟1s后检测): id=", door_id)
+			_on_body_entered(b)
+			break
+
 
 ## 门被销毁时从 DoorManager 注销
 func _exit_tree():
@@ -58,11 +82,11 @@ func _on_body_entered(body):
 		if body.has_method("is_in_death_state") and body.is_in_death_state():
 			return
 		is_player_inside = true
+		print("[Door] body_entered: id=", door_id, " target=", target_room_id, " can_tp=", can_teleport)
 		if use_interaction_mode:
 			_show_interaction_prompt()
 		elif can_teleport:
 			can_teleport = false
-			# 立即锁控/清惯性（同步操作，安全）
 			if body.has_method("lock_control"):
 				body.lock_control(999.0, "door_transfer")
 			body.velocity = Vector2.ZERO
@@ -70,7 +94,6 @@ func _on_body_entered(body):
 				body.interrupt_hurt_visual_only()
 			elif body.has_method("interrupt_hurt_visual_effect"):
 				body.interrupt_hurt_visual_effect()
-			# 延迟到 idle 阶段启动传送，避免在 physics callback 中修改场景树
 			call_deferred("_deferred_start_teleport", body)
 
 func _on_body_exited(body):
@@ -85,7 +108,16 @@ func _input(event):
 		if player and player.has_method("get_player_state") and player.get_player_state() == player.PlayerState.DASH:
 			return
 		_hide_interaction_prompt()
-		# 交互模式从 _input 调用（非 physics callback），直接走传送
+		# 交互模式同样走标准的黑屏→传送流程
+		if player.has_method("lock_control"):
+			player.lock_control(999.0, "door_transfer")
+		player.velocity = Vector2.ZERO
+		if player.has_method("interrupt_hurt_visual_only"):
+			player.interrupt_hurt_visual_only()
+		elif player.has_method("interrupt_hurt_visual_effect"):
+			player.interrupt_hurt_visual_effect()
+		# 和 body_entered 一样：先黑屏再传送
+		await FadeManager.fade_out(fade_in_duration)
 		await _teleport_player(player)
 
 func _show_interaction_prompt() -> void:
@@ -115,31 +147,42 @@ func _teleport_player(player: Node) -> void:
 	elif player.has_method("interrupt_hurt_visual_effect"):
 		player.interrupt_hurt_visual_effect()
 	
-	# 传送前确保目标房间已加载（按需加载模式必需）	
+	# 传送前确保目标房间已加载（按需加载模式必需）
+	var loaded_room: bool = false
 	if target_room_id != "" and RoomManager and RoomManager.has_method("ensure_room_loaded"):
-		RoomManager.ensure_room_loaded(target_room_id)
+		loaded_room = RoomManager.ensure_room_loaded(target_room_id)
 	elif RoomManager and RoomManager.rooms.has(RoomManager.current_room):
-		# 没填 target_room_id 时，尝试加载当前房间的所有相邻房间
 		for adj in RoomManager.rooms[RoomManager.current_room].adjacent:
-			RoomManager.ensure_room_loaded(adj)
+			if RoomManager.has_method("ensure_room_loaded"):
+				RoomManager.ensure_room_loaded(adj)
+				RoomManager.load_room(adj)
+	
+	if not loaded_room and target_room_id != "":
+		push_error("Door: 目标房间加载失败 room_id=", target_room_id)
 	
 	var other_door = DoorManager.find_other_door(self)
 	
 	if not other_door:
 		push_error("严重错误：找不到相同 ID 的另一个门，ID='" + door_id + "'，路径：" + str(get_path()))
+		# 恢复 can_teleport 让玩家可以再次尝试
+		can_teleport = true
+		if player.has_method("lock_control"):
+			player.lock_control(0.0, "door_transfer_fail")
 		return
 	
 	can_teleport = false
 	other_door.can_teleport = false
+	print("[Door] 找到配对门: id=", door_id, " 目标房间=", other_door.get_room_id())
 	
 	# 黑屏期间切换房间和传送玩家
 	var door_target_room = other_door.get_room_id()
 	var target_position = other_door.global_position
 	var defer_autowalk_for_room_cinematic: bool = false
-	if door_target_room == "RoomDream10" and Global and Global.has_method("has_cinematic_flag"):
-		defer_autowalk_for_room_cinematic = not Global.has_cinematic_flag("room_dream10_first_enter")
+	if cinematic_room_id != "" and cinematic_hold_tag != "" and door_target_room == cinematic_room_id:
+		if Global and Global.has_method("has_cinematic_flag"):
+			defer_autowalk_for_room_cinematic = not Global.has_cinematic_flag(cinematic_hold_tag)
 	if defer_autowalk_for_room_cinematic and FadeManager and FadeManager.has_method("hold_black"):
-		FadeManager.hold_black("room_dream10_first_enter")
+		FadeManager.hold_black(cinematic_hold_tag)
 
 	# 传送窗口内临时抑制 RoomTrigger 切房回调，防止角点门附近二次切房竞态
 	if RoomManager and RoomManager.has_method("suppress_player_room_enter"):
@@ -148,13 +191,12 @@ func _teleport_player(player: Node) -> void:
 	if RoomManager and RoomManager.has_method("prepare_room_background_for_entry"):
 		RoomManager.prepare_room_background_for_entry(door_target_room, target_position)
 	
-	RoomManager.load_room(door_target_room)
+	RoomManager.load_room(door_target_room, true)
+	print("[Door] room_loaded: ", door_target_room, " t=", Time.get_ticks_msec())
 	
 	player.global_position = target_position
 	player.velocity = Vector2.ZERO
-	# 玩家已落到目标门后再次刷新房间相机限制，避免边界门首帧限制滞后
 	RoomManager.update_camera_limits()
-	# 等场景树与物理一帧，使房间显隐、相机限制与变换就绪后再同步相机（仍处在全黑中）
 	await get_tree().process_frame
 	await get_tree().physics_frame
 	RoomManager.update_camera_limits()
@@ -168,7 +210,6 @@ func _teleport_player(player: Node) -> void:
 				door_camera_catchup_duration,
 				door_camera_limit_unlock_duration
 			)
-	# 传送到目标房间后稍作停顿，再开始自动走位；期间保持连续锁控。
 	await get_tree().create_timer(0.1).timeout
 	if not defer_autowalk_for_room_cinematic and player.has_method("start_door_autowalk_to_dynamic_checkpoint"):
 		var autowalk_started: bool = player.start_door_autowalk_to_dynamic_checkpoint(door_target_room, target_position, player.is_facing_right)
@@ -176,10 +217,7 @@ func _teleport_player(player: Node) -> void:
 			# 目标房间可能暂无动态检查点，避免无限锁输入。
 			player.lock_control(0.18, "door_transfer_fallback")
 	
-	# 同步后额外等待一帧，让 PhantomCameraHost 更新 Camera2D
 	await get_tree().physics_frame
-	
-	# 3. 黑屏等待（相机已在上一段完成切换，此处仅保持全黑时长）
 	await get_tree().create_timer(black_screen_duration).timeout
 	
 	# 4. 淡出（恢复）

@@ -72,7 +72,7 @@ func _ready():
 	
 	_set_scene_input_locked(true)
 	if not ui_transition_animator:
-		FadeManager.fade_in(FadeManager.ui_overlay_fade_duration)
+		FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
 		_set_scene_input_locked(false)
 	else:
 		_sync_animator_title_target()
@@ -140,7 +140,7 @@ func _on_settings_button_pressed():
 	if ui_transition_animator:
 		await ui_transition_animator.play_exit_transition()
 	await _play_external_material_exit()
-	await FadeManager.fade_out(FadeManager.ui_overlay_fade_duration)
+	await FadeManager.fade_out(FadeManager.ui_switch_fade_out_duration)
 	
 	if not settings_scene_resource:
 		push_error("TitleScene: settings_scene_resource 未配置！请在 Inspector 中拖拽 SettingsScene.tscn")
@@ -153,13 +153,13 @@ func _on_settings_button_pressed():
 	if settings_scene.has_method("_on_scene_transition_enter_begin"):
 		settings_scene.call_deferred("_on_scene_transition_enter_begin")
 	
-	await FadeManager.fade_in(FadeManager.ui_overlay_fade_duration)
+	await FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
 
 ## 处理Settings返回标题
 func _on_settings_closed(settings_scene: Node = null):
 	_settings_overlay_open = false
 	_reset_title_click_state()
-	await FadeManager.fade_out(FadeManager.ui_overlay_fade_duration)
+	await FadeManager.fade_out(FadeManager.ui_switch_fade_out_duration)
 	if settings_scene and is_instance_valid(settings_scene):
 		settings_scene.queue_free()
 	start_button.disabled = false
@@ -169,7 +169,7 @@ func _on_settings_closed(settings_scene: Node = null):
 		_on_scene_transition_enter_begin()
 	
 	## 关键修复：等待淡入完成后重新设置呼吸效果
-	await FadeManager.fade_in(FadeManager.ui_overlay_fade_duration)
+	await FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
 	await _play_external_material_enter()
 	
 	## 新增：重新设置灯光呼吸效果

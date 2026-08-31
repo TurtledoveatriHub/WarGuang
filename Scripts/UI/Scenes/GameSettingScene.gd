@@ -80,7 +80,7 @@ func _close_menu():
 	if continue_button is Control:
 		continue_button.grab_focus()
 	
-	FadeManager.fade_in(FadeManager.ui_overlay_fade_duration)
+	FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
 	
 	if game_canvas_modulate and is_instance_valid(game_canvas_modulate):
 		var target_color = Color(
@@ -172,7 +172,7 @@ func _on_settings_closed(settings_scene: Node = null):
 	if continue_button is Control:
 		continue_button.grab_focus()
 	
-	FadeManager.fade_in(FadeManager.ui_overlay_fade_duration)
+	FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
 	
 	if game_canvas_modulate and is_instance_valid(game_canvas_modulate):
 		var target_color = Color(

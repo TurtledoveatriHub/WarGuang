@@ -55,6 +55,11 @@ func _interact_with_chair():
 	# 播放存档音效
 	AudioManager.play_stream_sfx(save_interact_sfx)
 	
+	# ★ 仅复活死亡的 EnemyBase 敌人（冷却立即结束）
+	for node in get_tree().get_nodes_in_group("enemy_base"):
+		if node.has_method("revive_by_save"):
+			node.revive_by_save()
+	
 	# 让玩家进入睡眠状态并锁定控制
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
