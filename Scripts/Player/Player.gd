@@ -104,7 +104,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 空中减速度 (0-1，越大减速越快)
 @export var air_deceleration: float = 0.4
 ## 空中移动控制力 (0-1，越小控制力越弱)
-@export var air_control: float = 0.6
+@export var air_control: float = 0.4
 ## 空中无输入时 JUMP 状态的基础衰减倍率（越大停得越快）
 @export var air_no_input_deceleration_multiplier_jump: float = 0.2
 ## 空中无输入时 DOWN 状态的基础衰减倍率（越大停得越快）

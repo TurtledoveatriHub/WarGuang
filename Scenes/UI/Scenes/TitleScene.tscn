@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://8vv4frjt0qmt" path="res://Scenes/UI/Scenes/SettingsScene.tscn" id="2_fkiff"]
 [ext_resource type="Script" uid="uid://c6yjpi17utwg8" path="res://Scripts/UI/Scenes/UITransitionAnimator.gd" id="2_transition_animator"]
 [ext_resource type="AudioStream" uid="uid://cs31nir8y35de" path="res://Assets/Audios/BGM/探险.ogg" id="3_1p8n3"]
-[ext_resource type="Texture2D" uid="uid://fwgvvrpd0hkd" path="res://Assets/Textures/UIs/PlayerUIs/1.png" id="5_iwgkb"]
+[ext_resource type="Texture2D" uid="uid://duyvj1thx76c8" path="res://Assets/Textures/Tiles/Room3/马里奥背景.png" id="5_syapl"]
 [ext_resource type="Texture2D" uid="uid://1xy7xygxqlmf" path="res://Assets/Textures/UIs/SceneUIs/title沃光标题01.tres" id="6_iwgkb"]
 [ext_resource type="Texture2D" uid="uid://norhspdvctlf" path="res://Assets/Textures/UIs/SceneUIs/title开始游戏01.tres" id="7_kvyf1"]
 [ext_resource type="Texture2D" uid="uid://dosd0gvafei6y" path="res://Assets/Textures/UIs/SceneUIs/title沃光标题02.tres" id="7_syapl"]
@@ -36,15 +36,14 @@ _data = {
 &"material_loop": SubResource("Animation_material_loop")
 }
 
-[sub_resource type="Gradient" id="Gradient_iwgkb"]
-offsets = PackedFloat32Array(0, 0.875)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+[sub_resource type="Gradient" id="Gradient_fw62u"]
+offsets = PackedFloat32Array(0.13819095, 0.6758794, 1)
+colors = PackedColorArray(0.3911856, 0.39118528, 0.39118534, 1, 0.10526919, 0.105269104, 0.105269134, 1, 0, 0, 0, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_syapl"]
-gradient = SubResource("Gradient_iwgkb")
+gradient = SubResource("Gradient_fw62u")
 fill = 1
-fill_from = Vector2(0.8717949, 0)
-fill_to = Vector2(0, 1)
+fill_from = Vector2(0.4764957, 0.2948718)
 
 [node name="TitleScene" type="CanvasLayer"]
 script = ExtResource("1_25ulu")
@@ -61,21 +60,20 @@ libraries = {
 }
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0.5330367, 0.5330367, 0.5330366, 1)
+color = Color(0.5971763, 0.5971761, 0.5971761, 1)
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
-position = Vector2(640.00006, 360)
-scale = Vector2(5, 5)
-color = Color(0.74348193, 0.74348193, 0.74348193, 1)
-energy = 0.4
+position = Vector2(640, 359.99997)
+scale = Vector2(20, 11.25)
+color = Color(0.67687863, 0.6768787, 0.6768785, 1)
+range_layer_min = 1
 range_layer_max = 100
 texture = SubResource("GradientTexture2D_syapl")
-texture_scale = 4.0
 
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(640.00006, 360.00003)
 scale = Vector2(2.5, 2.5)
-texture = ExtResource("5_iwgkb")
+texture = ExtResource("5_syapl")
 
 [node name="Title" type="Sprite2D" parent="."]
 position = Vector2(646.00006, 187)

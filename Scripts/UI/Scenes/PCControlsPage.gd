@@ -2,28 +2,53 @@ extends Node2D
 class_name PCControlsPage
 
 ## PC 端按键设置页
-@onready var action_list = $ActionList
-@onready var controls_hint = $ControlsHint
-@onready var reset_button = $ResetButton
-@onready var reset_hint_label = $ResetHintLabel
+var action_list: VBoxContainer = null
+var controls_hint: Label = null
+var reset_button: TextureButton = null
+var reset_hint_label: Label = null
 
 var action_buttons = {}
 
 var reset_state: int = 0
 var reset_timer: float = 0.0
+## 重置提示显示持续时间，单位：秒。
 @export var reset_hint_show_time: float = 1.5
+## 重置提示淡出时间，单位：秒。
 @export var reset_hint_fade_time: float = 0.5
+## 重置操作超时时间，单位：秒。
 @export var reset_timeout: float = 2.0
 
+## 等待按键提示显示时间，单位：秒。
 @export var hint_wait_time: float = 0.5
+## 提示淡出时间，单位：秒。
 @export var hint_fade_time: float = 0.5
 var current_hint_type: String = ""
 var hint_timer: Timer = null
 var hint_tween: Tween = null
 
 func _ready():
-	controls_hint.visible = false
-	reset_hint_label.visible = false
+	action_list = get_node_or_null("ActionList")
+	if action_list == null:
+		action_list = _find_node_by_suffix(self, "ActionList") as VBoxContainer
+
+	var controls_hint_node = _find_node_by_suffix(self, "ControlsHint")
+	var reset_hint_node = _find_node_by_suffix(self, "ResetHintLabel")
+	var reset_button_node = _find_node_by_suffix(self, "ResetButton")
+	if controls_hint_node is Label:
+		controls_hint = controls_hint_node
+	if reset_hint_node is Label:
+		reset_hint_label = reset_hint_node
+	if reset_button_node is TextureButton:
+		reset_button = reset_button_node
+
+	if controls_hint:
+		controls_hint.visible = false
+	if reset_hint_label:
+		reset_hint_label.visible = false
+
+	if action_list == null:
+		push_warning("PCControlsPage: ActionList not found, controls page cannot initialize.")
+		return
 
 	hint_timer = Timer.new()
 	hint_timer.name = "HintTimer"
@@ -32,7 +57,8 @@ func _ready():
 	add_child(hint_timer)
 
 	_setup_action_buttons()
-	reset_button.pressed.connect(_on_reset_button_pressed)
+	if reset_button:
+		reset_button.pressed.connect(_on_reset_button_pressed)
 	_update_all_action_displays()
 
 func _setup_action_buttons():
@@ -40,7 +66,7 @@ func _setup_action_buttons():
 		if child is HBoxContainer:
 			var remap_button = _find_remap_button(child)
 			if remap_button:
-				var action_name = _get_action_from_hbox(child.name)
+				var action_name: String = _get_action_from_hbox(child.name)
 				if action_name != "":
 					action_buttons[action_name] = remap_button
 					remap_button.pressed.connect(_on_action_remap_button_pressed.bind(action_name))
@@ -49,6 +75,17 @@ func _find_remap_button(hbox: HBoxContainer) -> TextureButton:
 	for child in hbox.get_children():
 		if child is TextureButton and child.name.contains("Remap"):
 			return child
+	return null
+
+func _find_node_by_suffix(node: Node, suffix: String) -> Node:
+	if node == null:
+		return null
+	if node.name.contains(suffix):
+		return node
+	for child in node.get_children():
+		var found = _find_node_by_suffix(child, suffix)
+		if found != null:
+			return found
 	return null
 
 func _get_action_from_hbox(hbox_name: String) -> String:
@@ -64,7 +101,10 @@ func _get_action_from_hbox(hbox_name: String) -> String:
 		"DialogueNextAction": "dialogue_next",
 		"MapAction": "map"
 	}
-	return action_map.get(hbox_name, "")
+	for action_suffix in action_map.keys():
+		if hbox_name.ends_with(action_suffix):
+			return action_map[action_suffix]
+	return ""
 
 func _on_action_remap_button_pressed(action: String):
 	AudioManager.play_button_click_sfx()
@@ -82,11 +122,11 @@ func _update_all_action_displays():
 		_update_action_display(action)
 
 func _update_action_display(action: String):
-	var hbox_name = _get_hbox_name_from_action(action)
-	if hbox_name == "":
+	var hbox_suffix: String = _get_hbox_name_from_action(action)
+	if hbox_suffix == "":
 		return
-	var hbox = action_list.get_node_or_null(hbox_name)
-	if not hbox:
+	var hbox: Node = _find_node_by_suffix(action_list, hbox_suffix)
+	if hbox == null:
 		return
 	if hbox.get_child_count() >= 2:
 		var key_label = hbox.get_child(1)

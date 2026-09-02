@@ -192,21 +192,29 @@ func _detect_surface_type() -> int:
 	if not collider:
 		return -1
 
-	# 检测 TileMapLayer / TileMap
+	# 检测 TileMapLayer / TileMap，并优雅处理未配置 surface_type 自定义数据层的情况。
 	if collider is TileMapLayer:
 		var local_pos: Vector2 = collider.to_local(result.get("position", Vector2.ZERO))
 		var cell: Vector2i = collider.local_to_map(local_pos)
 		var tile_data = collider.get_cell_tile_data(cell)
 		if tile_data:
-			_cached_surface_type = tile_data.get_custom_data("surface_type") as int
-			return _cached_surface_type
+			var layer_id: int = tile_data.get_custom_data_layer_by_name("surface_type")
+			if layer_id >= 0:
+				var value = tile_data.get_custom_data("surface_type")
+				if typeof(value) == TYPE_INT:
+					_cached_surface_type = int(value)
+					return _cached_surface_type
 	elif collider is TileMap:
 		var local_pos: Vector2 = collider.to_local(result.get("position", Vector2.ZERO))
 		var cell: Vector2i = collider.local_to_map(local_pos)
 		var tile_data = collider.get_cell_tile_data(cell)
 		if tile_data:
-			_cached_surface_type = tile_data.get_custom_data("surface_type") as int
-			return _cached_surface_type
+			var layer_id: int = tile_data.get_custom_data_layer_by_name("surface_type")
+			if layer_id >= 0:
+				var value = tile_data.get_custom_data("surface_type")
+				if typeof(value) == TYPE_INT:
+					_cached_surface_type = int(value)
+					return _cached_surface_type
 	return -1
 
 ## 超级冲刺飞行音效管理

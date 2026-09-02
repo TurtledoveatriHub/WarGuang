@@ -17,6 +17,12 @@ var health: int = 5
 @export var invincible_time: float = 0.8
 ## 启用来自 HurtBox 的击退效果
 @export var enable_hurtbox_knockback: bool = true
+## 受伤击退缩放系数（0~1，越小越轻柔，更接近 Hollow Knight 的短冲量手感）
+@export var hurt_knockback_scale: float = 0.55
+## 受伤时允许的最大水平速度
+@export var max_hurt_velocity_x: float = 160.0
+## 受伤时允许的最大垂直速度
+@export var max_hurt_velocity_y: float = 220.0
 
 ## ── 接触玩家伤害 ──
 @export_category("接触玩家伤害")
@@ -88,9 +94,14 @@ func take_damage(damage: int, kb_force: Vector2 = Vector2.ZERO) -> void:
 	health -= damage
 	_invincible_timer = invincible_time
 	_parent.modulate.a = 0.5
-	# 受伤击退（替换当前速度，HURT 状态不再清零 velocity.x）
+	## 受伤击退：改为“冲量叠加 + 限幅”，避免直接覆盖速度导致被打飞感过强。
 	if enable_hurtbox_knockback and kb_force != Vector2.ZERO:
-		_parent.velocity = kb_force
+		var impulse: Vector2 = kb_force * hurt_knockback_scale
+		var clamped_impulse: Vector2 = Vector2(
+			clamp(impulse.x, -max_hurt_velocity_x, max_hurt_velocity_x),
+			clamp(impulse.y, -max_hurt_velocity_y, max_hurt_velocity_y)
+		)
+		_parent.velocity += clamped_impulse
 	damage_taken.emit(damage, health)
 	if health <= 0:
 		_die()

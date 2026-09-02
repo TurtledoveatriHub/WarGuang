@@ -1,10 +1,11 @@
-[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://dxhvxoxaobqjj"]
+[gd_resource type="TileSet" load_steps=7 format=3 uid="uid://dxhvxoxaobqjj"]
 
-[ext_resource type="Texture2D" uid="uid://6c0i1f45ykms" path="res://Assets/Textures/Tiles/Room3/788d0675a585104e05c50d96297e767f.png" id="1_2most"]
 [ext_resource type="Texture2D" uid="uid://q11dt17ws408" path="res://Assets/Textures/Tiles/Room3/地面瓦片集.png" id="1_40xij"]
+[ext_resource type="Texture2D" uid="uid://6c0i1f45ykms" path="res://Assets/Textures/Tiles/Room3/地面.png" id="1_mktdq"]
+[ext_resource type="Texture2D" uid="uid://drgj6542y7rac" path="res://Assets/Textures/Tiles/Room3/水管.png" id="2_teacy"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mktdq"]
-texture = ExtResource("1_2most")
+texture = ExtResource("1_mktdq")
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 2:0/0 = 0
@@ -17,6 +18,24 @@ texture = ExtResource("1_2most")
 2:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 4:2/0 = 0
 4:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0ybm5"]
+texture = ExtResource("2_teacy")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-6, -6, 8, -6, 8, 8, -6, 8)
+1:0/0 = 0
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(6, -6, -8, -6, -8, 8, 6, 8)
+0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -8, 8, -8, 8, 8, -4, 8)
+1:1/0 = 0
+2:1/0 = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, -8, -8, -8, -8, 8, 4, 8)
+0:2/0 = 0
+0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -8, 8, -8, 8, 8, -4, 8)
+1:2/0 = 0
+2:2/0 = 0
+2:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, -8, -8, -8, -8, 8, 4, 8)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hwvxb"]
 texture = ExtResource("1_40xij")
@@ -404,3 +423,4 @@ terrain_set_0/terrain_0/name = "3x3"
 terrain_set_0/terrain_0/color = Color(0.49925888, 0.35298988, 0.17260501, 1)
 sources/2 = SubResource("TileSetAtlasSource_hwvxb")
 sources/0 = SubResource("TileSetAtlasSource_mktdq")
+sources/1 = SubResource("TileSetAtlasSource_0ybm5")

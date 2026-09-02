@@ -15,27 +15,27 @@ layer = 50
 script = ExtResource("1_8trha")
 
 [node name="Background" type="Sprite2D" parent="."]
-position = Vector2(572, 314)
+position = Vector2(597, 313)
 scale = Vector2(3, 3)
 texture = ExtResource("2_rl7e0")
 region_enabled = true
 region_rect = Rect2(9, 169, 158, 110)
 
 [node name="Message" type="Label" parent="Background"]
-offset_left = -39.666664
-offset_top = -27.666668
-offset_right = 37.333336
-offset_bottom = -16.666668
+offset_left = -40.333332
+offset_top = -14.000001
+offset_right = 36.666668
+offset_bottom = -3.000001
 theme = ExtResource("2_s464x")
 theme_override_colors/font_color = Color(0.5, 0.050000012, 0.050000012, 1)
 theme_override_font_sizes/font_size = 10
 text = "是否删除存档？"
 
 [node name="ButtonContainer" type="HBoxContainer" parent="Background"]
-offset_left = -51.66667
-offset_top = 1.6666613
-offset_right = 42.33333
-offset_bottom = 17.66666
+offset_left = -49.66667
+offset_top = 24.666674
+offset_right = 44.33333
+offset_bottom = 40.66667
 theme_override_constants/separation = 30
 
 [node name="ConfirmButton" type="TextureButton" parent="Background/ButtonContainer"]

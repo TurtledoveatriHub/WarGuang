@@ -43,6 +43,7 @@ var _base_visual_scales: Dictionary = {}
 var _base_visual_positions: Dictionary = {}
 var _base_visual_modulates: Dictionary = {}
 var _is_closing: bool = false
+var _is_game_lighting_dimmed: bool = false
 
 
 func _ready():
@@ -59,8 +60,10 @@ func _ready():
 	if Global:
 		Global.pause_play_time_session()
 	
-	# 关键修复：显示黑色遮罩层
-	DarkOverlay.show_overlay()
+	# 关键修复：显示黑色遮罩层，并强制重置旧状态，避免重复打开 SettingsScene 时造成遮罩叠加。
+	if DarkOverlay and is_instance_valid(DarkOverlay):
+		DarkOverlay.reset_overlay()
+		DarkOverlay.show_overlay()
 	# 关键修复：如果对话框存在，暂时隐藏它
 	var balloon = get_node_or_null("/root/MyBalloon")
 	if balloon:
@@ -93,28 +96,30 @@ func _close_menu():
 		game_canvas_modulate.color = target_color
 
 func _adjust_game_lighting():
+	if _is_game_lighting_dimmed:
+		return
 	if RoomManager and RoomManager.global_canvas_modulate:
 		game_canvas_modulate = RoomManager.global_canvas_modulate
-		
 		original_modulate_color = game_canvas_modulate.color
-		
 		var target_color = Color(
 			original_modulate_color.r * darken_multiplier,
 			original_modulate_color.g * darken_multiplier,
 			original_modulate_color.b * darken_multiplier,
 			1.0
 		)
-		
 		game_canvas_modulate.color = target_color
+		_is_game_lighting_dimmed = true
 	else:
 		print("GameSettingScene: 错误: 无法获取CanvasModulate")
 
 func _restore_game_lighting():
+	if not _is_game_lighting_dimmed:
+		return
 	if game_canvas_modulate and is_instance_valid(game_canvas_modulate):
 		var tween = create_tween()
 		tween.tween_property(game_canvas_modulate, "color", original_modulate_color, transition_duration)
-		
 		await tween.finished
+		_is_game_lighting_dimmed = false
 	else:
 		print("GameSettingScene: 无法恢复光照")
 
@@ -126,7 +131,13 @@ func _close_game_setting():
 	is_open = false
 	_set_menu_buttons_enabled(false)
 	await _play_close_animation()
-	DarkOverlay.hide_overlay()
+	if DarkOverlay and is_instance_valid(DarkOverlay):
+		DarkOverlay.reset_overlay()
+		DarkOverlay.hide_overlay()
+	# 关键修正：必须先等待亮度恢复完成，再销毁场景。
+	# 之前未 await，queue_free() 会杀掉绑定在本节点上的补间，
+	# 导致 CanvasModulate 永远停在暗色，出现“只消失一层”的残留。
+	await _restore_game_lighting()
 	get_tree().paused = false
 	if Global:
 		Global.resume_play_time_session()
@@ -137,6 +148,13 @@ func _on_continue_button_pressed():
 	if not continue_button or continue_button.disabled:
 		return
 	await _close_game_setting()
+
+func _set_mobile_hud_visibility(show_state: bool) -> void:
+	for hud in get_tree().get_nodes_in_group("mobile_touch_hud"):
+		if hud.has_method("set_hud_visible"):
+			hud.set_hud_visible(show_state)
+		elif hud.has_method("_set_visible_state"):
+			hud._set_visible_state(show_state)
 
 func _on_settings_button_pressed():
 	if not is_open or settings_instance:
@@ -153,10 +171,12 @@ func _on_settings_button_pressed():
 	
 	settings_instance = settings_scene_resource.instantiate()
 	settings_instance.setup("GameSettingScene", self)
-	
 	settings_instance.layer = layer + 1
-	
 	get_tree().root.add_child(settings_instance)
+	# 关键修正：SettingsScene 打开时不得叠加任何暗化层。
+	# 场景后方已经由 DarkOverlay 提供唯一一层暗化（单一开关状态），
+	# 若再调暗全局 CanvasModulate，就会形成“多层暗化”，
+	# 且返回 GameSettingScene 后还会残留一层无法消除。
 	if settings_instance.has_method("_on_scene_transition_enter_begin"):
 		settings_instance._on_scene_transition_enter_begin()
 
@@ -172,16 +192,10 @@ func _on_settings_closed(settings_scene: Node = null):
 	if continue_button is Control:
 		continue_button.grab_focus()
 	
+	# 关键修正：SettingsScene 关闭时，不得再干预 GameSettingScene 的全局暗化状态。
+	# 真实的亮度恢复必须发生在 GameSettingScene 自己退出时，
+	# 否则会在返回主菜单时反复重复执行 “打开 GameSettingScene” 逻辑。 
 	FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
-	
-	if game_canvas_modulate and is_instance_valid(game_canvas_modulate):
-		var target_color = Color(
-			original_modulate_color.r * darken_multiplier,
-			original_modulate_color.g * darken_multiplier,
-			original_modulate_color.b * darken_multiplier,
-			1.0
-		)
-		game_canvas_modulate.color = target_color
 
 func _on_main_menu_button_pressed():
 	AudioManager.play_button_click_sfx()
@@ -192,14 +206,12 @@ func _on_main_menu_button_pressed():
 	_is_closing = true
 	is_open = false
 	
-	# 确保关闭任何打开的对话框
 	var balloon = get_node_or_null("/root/MyBalloon")
 	if balloon:
 		balloon.visible = false
 		if balloon.has_method("end_dialogue"):
 			balloon.end_dialogue()
 	
-	# 确保 DialogueManager 插件的弹窗被关闭
 	if DialogueManager and DialogueManager.has_method("hide_balloon"):
 		DialogueManager.hide_balloon()
 	
@@ -208,7 +220,10 @@ func _on_main_menu_button_pressed():
 
 	_set_menu_buttons_enabled(false)
 	await _play_close_animation()
-	DarkOverlay.hide_overlay()
+	if DarkOverlay and is_instance_valid(DarkOverlay):
+		DarkOverlay.hide_overlay()
+	# 关键修正：等待亮度恢复完成后再切换场景，避免补间随场景销毁而中断。
+	await _restore_game_lighting()
 	var switched: bool = await SceneManager.return_to_title_from_game_setting(false)
 	if not switched:
 		_is_closing = false
@@ -230,7 +245,16 @@ func _exit_tree():
 	if is_open:
 		is_open = false
 		get_tree().paused = false
-		_restore_game_lighting()
+		# 节点即将销毁，补间无法完成，必须立即恢复亮度。
+		_restore_game_lighting_immediate()
+
+## 立即恢复全局亮度（无补间）——用于节点即将被销毁的情况。
+func _restore_game_lighting_immediate() -> void:
+	if not _is_game_lighting_dimmed:
+		return
+	if game_canvas_modulate and is_instance_valid(game_canvas_modulate):
+		game_canvas_modulate.color = original_modulate_color
+		_is_game_lighting_dimmed = false
 
 func _open_settings_menu():
 	if not settings_scene_resource:

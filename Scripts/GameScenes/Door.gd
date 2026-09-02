@@ -24,13 +24,6 @@ extends Area2D
 ## Door 传送后临时放开相机限制时长（秒）
 @export var door_camera_limit_unlock_duration: float = 0.32
 
-## 房间入场事件配置
-@export_category("房间入场事件")
-## 设置此字段后，目标房间为该 ID 时延迟淡入并 hold_black，用于入场动画
-@export var cinematic_room_id: String = ""
-## 入场动画的 cinematic flag 名称（用于 Global.has_cinematic_flag 检查首次进入）
-@export var cinematic_hold_tag: String = ""
-
 # 内部变量
 var can_teleport: bool = true
 var is_player_inside: bool = false
@@ -177,12 +170,6 @@ func _teleport_player(player: Node) -> void:
 	# 黑屏期间切换房间和传送玩家
 	var door_target_room = other_door.get_room_id()
 	var target_position = other_door.global_position
-	var defer_autowalk_for_room_cinematic: bool = false
-	if cinematic_room_id != "" and cinematic_hold_tag != "" and door_target_room == cinematic_room_id:
-		if Global and Global.has_method("has_cinematic_flag"):
-			defer_autowalk_for_room_cinematic = not Global.has_cinematic_flag(cinematic_hold_tag)
-	if defer_autowalk_for_room_cinematic and FadeManager and FadeManager.has_method("hold_black"):
-		FadeManager.hold_black(cinematic_hold_tag)
 
 	# 传送窗口内临时抑制 RoomTrigger 切房回调，防止角点门附近二次切房竞态
 	if RoomManager and RoomManager.has_method("suppress_player_room_enter"):
@@ -200,10 +187,7 @@ func _teleport_player(player: Node) -> void:
 	await get_tree().process_frame
 	await get_tree().physics_frame
 	RoomManager.update_camera_limits()
-	if defer_autowalk_for_room_cinematic:
-		if player.has_method("sync_camera_to_player_center"):
-			player.sync_camera_to_player_center(true)
-	elif player.has_method("sync_camera_after_room_teleport"):
+	if player.has_method("sync_camera_after_room_teleport"):
 		player.sync_camera_after_room_teleport()
 		if player.has_method("start_door_camera_catchup_after_teleport"):
 			player.start_door_camera_catchup_after_teleport(
@@ -211,7 +195,7 @@ func _teleport_player(player: Node) -> void:
 				door_camera_limit_unlock_duration
 			)
 	await get_tree().create_timer(0.1).timeout
-	if not defer_autowalk_for_room_cinematic and player.has_method("start_door_autowalk_to_dynamic_checkpoint"):
+	if player.has_method("start_door_autowalk_to_dynamic_checkpoint"):
 		var autowalk_started: bool = player.start_door_autowalk_to_dynamic_checkpoint(door_target_room, target_position, player.is_facing_right)
 		if not autowalk_started and player.has_method("lock_control"):
 			# 目标房间可能暂无动态检查点，避免无限锁输入。
@@ -221,11 +205,7 @@ func _teleport_player(player: Node) -> void:
 	await get_tree().create_timer(black_screen_duration).timeout
 	
 	# 4. 淡出（恢复）
-	if defer_autowalk_for_room_cinematic:
-		if FadeManager and FadeManager.has_method("force_black"):
-			FadeManager.force_black()
-	else:
-		await FadeManager.fade_in(fade_out_duration)
+	await FadeManager.fade_in(fade_out_duration)
 	
 	other_door.is_player_inside = true
 

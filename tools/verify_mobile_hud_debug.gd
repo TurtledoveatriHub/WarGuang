@@ -1,0 +1,20 @@
+extends SceneTree
+
+func _initialize() -> void:
+	var scene: Node = load("res://Scenes/GameScenes/MainGameScene.tscn").instantiate()
+	root.add_child(scene)
+	var hud: CanvasLayer = scene.get_node("MobileTouchHUD")
+	var joystick_base: TextureButton = hud.get_node("Root/MoveJoystick")
+	var joystick_thumb: TextureButton = hud.get_node("Root/MoveJoystickThumb")
+	print("BASE POS=", joystick_base.position)
+	print("THUMB POS=", joystick_thumb.position)
+	hud._on_move_joystick_pressed(joystick_base)
+	print("dragging after press=", hud._is_dragging_joystick)
+	hud._update_joystick_from_pointer(joystick_base.position + joystick_base.size * 0.5 + Vector2(40.0, 0.0))
+	print("MOVE_STATE=", hud._move_state)
+	print("RIGHT=", Input.is_action_pressed("right"))
+	print("LEFT=", Input.is_action_pressed("left"))
+	print("UP=", Input.is_action_pressed("up"))
+	print("DOWN=", Input.is_action_pressed("down"))
+	print("THUMB NEW POS=", joystick_thumb.position)
+	quit()

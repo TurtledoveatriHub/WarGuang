@@ -1,6 +1,7 @@
-[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://bfhbue5xras0w"]
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://bfhbue5xras0w"]
 
 [ext_resource type="Texture2D" uid="uid://3bot2glo7481" path="res://Assets/Textures/Tiles/Room1/雪地背景瓦片集.png" id="1_g4ncm"]
+[ext_resource type="Texture2D" uid="uid://c3pn8vudmd70r" path="res://Assets/Textures/Tiles/Room3/马里奥城堡背景瓦片集.png" id="2_7r3wt"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7r3wt"]
 texture = ExtResource("1_g4ncm")
@@ -197,8 +198,22 @@ texture = ExtResource("1_g4ncm")
 10:4/0/terrain = 0
 10:4/0/probability = 0.5
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hl1g0"]
+texture = ExtResource("2_7r3wt")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+
 [resource]
 terrain_set_0/mode = 2
 terrain_set_0/terrain_0/name = "Terrain 0"
 terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
 sources/0 = SubResource("TileSetAtlasSource_7r3wt")
+sources/1 = SubResource("TileSetAtlasSource_hl1g0")

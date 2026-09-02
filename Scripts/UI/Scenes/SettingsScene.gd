@@ -29,10 +29,17 @@ var _current_page_name: String = "audio"
 var _page_switch_in_progress: bool = false
 
 @export_category("Settings 页面内切换动画")
+## 强制在 PC 端以移动端控制页面进行调试测试。
+@export var force_mobile_controls_for_testing: bool = true
+## 设置页面入场动画时长，单位：秒。
 @export var page_enter_duration: float = 0.22
+## 设置页面退场动画时长，单位：秒。
 @export var page_exit_duration: float = 0.18
+## 入场动画峰值缩放倍率。
 @export var page_peak_scale_multiplier: float = 1.12
+## 退场动画最小缩放倍率。
 @export var page_exit_min_scale_multiplier: float = 0.02
+## 页面动画起始位移量，单位：像素。
 @export var page_drift_distance: float = 18.0
 
 enum UiEffectLevel {
@@ -45,37 +52,47 @@ var ui_effect_level: int = UiEffectLevel.MEDIUM
 var _page_base_positions: Dictionary = {}
 var _page_base_scales: Dictionary = {}
 var _page_base_modulates: Dictionary = {}
+var _settings_canvas_original_color: Color = Color(1.0, 1.0, 1.0, 1.0)
+var _settings_canvas_modulate: CanvasModulate = null
+
+func _connect_unique_signal(signal_ref: Signal, callable_ref: Callable) -> void:
+	if signal_ref and not signal_ref.is_connected(callable_ref):
+		signal_ref.connect(callable_ref)
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 100
+	_settings_canvas_modulate = get_node_or_null("CanvasModulate") as CanvasModulate
+	if _settings_canvas_modulate and is_instance_valid(_settings_canvas_modulate):
+		_settings_canvas_original_color = _settings_canvas_modulate.color
+	_connect_mobile_controls_signals()
 	
 	# 连接按钮信号
-	audio_button.pressed.connect(_on_audio_button_pressed)
-	controls_button.pressed.connect(_on_controls_button_pressed)
-	graphics_button.pressed.connect(_on_graphics_button_pressed)
-	close_button.pressed.connect(_on_close_button_pressed)
+	_connect_unique_signal(audio_button.pressed, _on_audio_button_pressed)
+	_connect_unique_signal(controls_button.pressed, _on_controls_button_pressed)
+	_connect_unique_signal(graphics_button.pressed, _on_graphics_button_pressed)
+	_connect_unique_signal(close_button.pressed, _on_close_button_pressed)
 	
 	# 连接音量滑块信号
 	if master_volume_slider:
-		master_volume_slider.value_changed.connect(_on_master_volume_changed)
-		master_volume_slider.drag_started.connect(_on_volume_slider_drag_started)
+		_connect_unique_signal(master_volume_slider.value_changed, _on_master_volume_changed)
+		_connect_unique_signal(master_volume_slider.drag_started, _on_volume_slider_drag_started)
 	if bgm_volume_slider:
-		bgm_volume_slider.value_changed.connect(_on_bgm_volume_changed)
-		bgm_volume_slider.drag_started.connect(_on_volume_slider_drag_started)
+		_connect_unique_signal(bgm_volume_slider.value_changed, _on_bgm_volume_changed)
+		_connect_unique_signal(bgm_volume_slider.drag_started, _on_volume_slider_drag_started)
 	if sfx_volume_slider:
-		sfx_volume_slider.value_changed.connect(_on_sfx_volume_changed)
-		sfx_volume_slider.drag_started.connect(_on_volume_slider_drag_started)
+		_connect_unique_signal(sfx_volume_slider.value_changed, _on_sfx_volume_changed)
+		_connect_unique_signal(sfx_volume_slider.drag_started, _on_volume_slider_drag_started)
 	_cache_page_base_states()
 	_set_only_page_visible("audio")
 	_current_page_name = "audio"
 	_set_category_button_state(_current_page_name)
 	_populate_effect_level_options()
 	if effect_level_option:
-		effect_level_option.item_selected.connect(_on_effect_level_selected)
+		_connect_unique_signal(effect_level_option.item_selected, _on_effect_level_selected)
 	
 	# 设置焦点
-	if audio_button is Control:
+	if audio_button is Control and is_inside_tree():
 		audio_button.grab_focus()
 	
 	# 同步滑块值与实际总线音量
@@ -144,11 +161,19 @@ func _switch_to_page(page_name: String, animated: bool = true) -> void:
 	_set_category_button_state(page_name)
 	_page_switch_in_progress = false
 
+func _is_mobile_platform() -> bool:
+	return force_mobile_controls_for_testing or OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("ios")
+
+func _get_controls_page_name() -> String:
+	return "mobie_controls" if _is_mobile_platform() else "pc_controls"
+
 func _resolve_page(page_name: String) -> CanvasItem:
 	match page_name:
 		"audio":
 			return audio_page
-		"controls", "pc_controls":
+		"controls":
+			return _resolve_page(_get_controls_page_name())
+		"pc_controls":
 			return pc_controls_page
 		"mobile_controls", "mobie_controls":
 			return mobie_controls_page
@@ -158,7 +183,7 @@ func _resolve_page(page_name: String) -> CanvasItem:
 			return null
 
 func _cache_page_base_states() -> void:
-	for page_name in ["audio", "controls", "graphics"]:
+	for page_name in ["audio", "pc_controls", "mobie_controls", "graphics"]:
 		var page: CanvasItem = _resolve_page(page_name)
 		if page:
 			_page_base_positions[page_name] = page.position
@@ -230,7 +255,7 @@ func _set_category_buttons_enabled(enabled: bool) -> void:
 
 func _set_category_button_state(active_page: String) -> void:
 	audio_button.disabled = active_page == "audio"
-	controls_button.disabled = active_page == "controls" or active_page == "pc_controls" or active_page == "mobie_controls"
+	controls_button.disabled = active_page == "controls" or active_page == "pc_controls" or active_page == "mobie_controls" or active_page == "mobile_controls"
 	graphics_button.disabled = active_page == "graphics"
 
 func _populate_effect_level_options() -> void:
@@ -281,7 +306,8 @@ func _on_controls_button_pressed():
 	if mobie_controls_page and mobie_controls_page.has_method("cancel_current_mapping"):
 		mobie_controls_page.cancel_current_mapping()
 	
-	await _switch_to_page("pc_controls")
+	var target_page_name := _get_controls_page_name()
+	await _switch_to_page(target_page_name)
 
 func _on_graphics_button_pressed():
 	if _scene_input_locked or _page_switch_in_progress:
@@ -303,7 +329,8 @@ func _on_close_button_pressed():
 ## 处理输入
 func _input(event):
 	if _scene_input_locked:
-		if event is InputEventKey or event is InputEventMouseButton or event is InputEventJoypadButton:
+		# 锁定状态时，不吞掉鼠标点击；允许编辑界面中的按钮继续接收点击事件。
+		if event is InputEventKey or event is InputEventJoypadButton:
 			get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("ui_cancel") and esc_enabled:
@@ -316,6 +343,15 @@ func _input(event):
 		_close_settings()
 
 ## 关闭设置场景
+func _connect_mobile_controls_signals() -> void:
+	if mobie_controls_page and is_instance_valid(mobie_controls_page):
+		if mobie_controls_page.has_signal("layout_saved_and_closed"):
+			mobie_controls_page.layout_saved_and_closed.connect(_on_mobile_controls_page_saved)
+
+func _on_mobile_controls_page_saved() -> void:
+	# 取消布局编辑时的场景暗化逻辑：只恢复交互锁定，不再操作全局亮度。
+	_set_scene_input_locked(false)
+
 func _close_settings():
 	set_process_input(false)
 	set_process_unhandled_input(false)
@@ -327,6 +363,9 @@ func _close_settings():
 	if InputMapManager:
 		InputMapManager.cancel_remap()
 
+	# 关键修正：SettingsScene 关闭时，不得再操作父层 DarkOverlay。
+	# 父场景的暗化状态由 GameSettingScene 自己控制，返回父场景后
+	# 只需要恢复按键交互，而不要重新触发 “打开 GameSettingScene” 的暗化逻辑。
 	_set_scene_input_locked(true)
 	if ui_transition_animator:
 		await ui_transition_animator.play_exit_transition()

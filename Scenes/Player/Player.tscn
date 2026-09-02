@@ -692,10 +692,10 @@ occluder_light_mask = 0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_jbabp")
-animation = &"INTERACTIVE"
+animation = &"IDLE"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(1, 4)
+position = Vector2(0, 4)
 shape = SubResource("RectangleShape2D_io2mu")
 
 [node name="PhantomCamera2D" type="Node2D" parent="." node_paths=PackedStringArray("follow_target")]
@@ -703,7 +703,7 @@ top_level = true
 script = ExtResource("3_ude3g")
 follow_mode = 5
 follow_target = NodePath("..")
-zoom = Vector2(3, 3)
+zoom = Vector2(2, 2)
 tween_resource = SubResource("Resource_ude3g")
 follow_damping = true
 dead_zone_width = 0.1

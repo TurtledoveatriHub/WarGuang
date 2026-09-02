@@ -160,7 +160,7 @@ tips/show_jitter_tips=false
 
 [physics]
 
-common/max_physics_ticks_per_second=120
+common/max_physics_ticks_per_second=60
 
 [rendering]
 

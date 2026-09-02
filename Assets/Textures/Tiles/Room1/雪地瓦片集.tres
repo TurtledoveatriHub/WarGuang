@@ -1,6 +1,25 @@
-[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://cgw26w3s2aaur"]
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://cgw26w3s2aaur"]
 
 [ext_resource type="Texture2D" uid="uid://xpny3tna0xww" path="res://Assets/Textures/Tiles/Room1/雪地瓦片集.png" id="1_85jmt"]
+[ext_resource type="Texture2D" uid="uid://drgj6542y7rac" path="res://Assets/Textures/Tiles/Room3/水管.png" id="1_sqhbw"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8mhk5"]
+texture = ExtResource("1_sqhbw")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(8, -8, -6, -8, -6, 8, 8, 8)
+1:0/0 = 0
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 6, -8, 6, 8, -8, 8)
+0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -8, 8, -8, 8, 8, -4, 8)
+1:1/0 = 0
+2:1/0 = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, -8, -8, -8, -8, 8, 4, 8)
+0:2/0 = 0
+0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -8, 8, -8, 8, 8, -4, 8)
+1:2/0 = 0
+2:2/0 = 0
+2:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, -8, -8, -8, -8, 8, 4, 8)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hwvxb"]
 texture = ExtResource("1_85jmt")
@@ -468,3 +487,4 @@ terrain_set_0/terrain_0/color = Color(0.49925888, 0.35298988, 0.17260501, 1)
 custom_data_layer_0/name = "surface_type"
 custom_data_layer_0/type = 2
 sources/2 = SubResource("TileSetAtlasSource_hwvxb")
+sources/0 = SubResource("TileSetAtlasSource_8mhk5")

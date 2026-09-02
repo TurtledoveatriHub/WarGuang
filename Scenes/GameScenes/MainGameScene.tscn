@@ -1,16 +1,29 @@
-[gd_scene load_steps=14 format=3 uid="uid://b03jaomk2cnqd"]
+[gd_scene load_steps=26 format=3 uid="uid://b03jaomk2cnqd"]
 
 [ext_resource type="Script" uid="uid://bgd4cnk4b8qrx" path="res://Scripts/GameScenes/MainGameScene.gd" id="1_dcv5v"]
 [ext_resource type="PackedScene" uid="uid://dwj2ydwabq3n0" path="res://Scenes/Player/Player.tscn" id="1_wdg0h"]
 [ext_resource type="PackedScene" uid="uid://kkrfw8yl08js" path="res://Scenes/Player/PlayerUI/PlayerUI.tscn" id="2_4xi3m"]
+[ext_resource type="Texture2D" uid="uid://d25qqy4l3uw55" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆.tres" id="6_545fw"]
+[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆.tres" id="7_2ehfc"]
 [ext_resource type="PackedScene" uid="uid://bq2thpcuuy615" path="res://Scenes/GameScenes/VignetteEffect.tscn" id="8_jbabp"]
+[ext_resource type="Texture2D" uid="uid://bn2av7db8mp0" path="res://Assets/Textures/UIs/MobieControlsUI/跳跃1.tres" id="8_oc6dx"]
 [ext_resource type="Script" uid="uid://dvqwec3j18pnf" path="res://Scripts/Events/BootCinematicDirector.gd" id="9_boot_cinematic"]
+[ext_resource type="Texture2D" uid="uid://biex1ykpn1qgq" path="res://Assets/Textures/UIs/MobieControlsUI/跳跃2.tres" id="9_y20sn"]
+[ext_resource type="Texture2D" uid="uid://cilxl6s3ql74f" path="res://Assets/Textures/UIs/MobieControlsUI/冲刺1.tres" id="10_7uw37"]
 [ext_resource type="Script" uid="uid://ujho0n07mac4" path="res://Scripts/Events/NewSaveOpeningEventDirector.gd" id="10_new_save_opening"]
+[ext_resource type="Texture2D" uid="uid://cmqn3lq3grd75" path="res://Assets/Textures/UIs/MobieControlsUI/冲刺2.tres" id="11_21net"]
 [ext_resource type="Texture2D" uid="uid://dnua3kkv0wkqj" path="res://Assets/Textures/Backgrounds/4.png" id="11_70mj8"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="11_om4ip"]
 [ext_resource type="Script" uid="uid://dij1xd6xmfvis" path="res://Scripts/Events/RoomCinematicEventDirector.gd" id="11_room_cinematic"]
 [ext_resource type="Texture2D" uid="uid://dvi0fwdkqjh2u" path="res://Assets/Textures/Backgrounds/1.png" id="12_dcv5v"]
+[ext_resource type="Texture2D" uid="uid://bw8x5folvwdp1" path="res://Assets/Textures/UIs/MobieControlsUI/交互1.tres" id="12_exifc"]
+[ext_resource type="Texture2D" uid="uid://br0syxlpkp878" path="res://Assets/Textures/UIs/MobieControlsUI/交互2.tres" id="13_j582q"]
+[ext_resource type="Texture2D" uid="uid://dpose46mf52q0" path="res://Assets/Textures/UIs/MobieControlsUI/超级冲刺1.tres" id="14_uc6ms"]
+[ext_resource type="Texture2D" uid="uid://dh3o6v2fippdq" path="res://Assets/Textures/UIs/MobieControlsUI/超级冲刺2.tres" id="15_skrsa"]
+[ext_resource type="Texture2D" uid="uid://dim2f13dvnmib" path="res://Assets/Textures/UIs/MobieControlsUI/地图1.tres" id="16_bjlxe"]
+[ext_resource type="Texture2D" uid="uid://bxbloyj8ao1wb" path="res://Assets/Textures/UIs/MobieControlsUI/地图2.tres" id="17_r5aow"]
 [ext_resource type="Script" uid="uid://bd046eokvcnu2" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="18_iaaki"]
+[ext_resource type="Script" uid="uid://c6sfk0f5l322c" path="res://Scripts/GameScenes/MobileTouchHUD.gd" id="mobile_touch_hud_script"]
 
 [sub_resource type="Environment" id="Environment_jbabp"]
 background_mode = 3
@@ -52,6 +65,105 @@ position = Vector2(0, -704)
 
 [node name="PlayerUI" parent="." instance=ExtResource("2_4xi3m")]
 health_unit_spacing = 70.0
+
+[node name="MobileTouchHUD" type="CanvasLayer" parent="."]
+layer = 100
+script = ExtResource("mobile_touch_hud_script")
+
+[node name="Root" type="Control" parent="MobileTouchHUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="MoveJoystick" type="TextureButton" parent="MobileTouchHUD/Root"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 480.0
+offset_right = 104.0
+offset_bottom = 544.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("6_545fw")
+stretch_mode = 3
+
+[node name="MoveJoystickThumb" type="TextureButton" parent="MobileTouchHUD/Root"]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 512.0
+offset_right = 104.0
+offset_bottom = 544.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("7_2ehfc")
+stretch_mode = 3
+
+[node name="JumpButton" type="TextureButton" parent="MobileTouchHUD/Root"]
+layout_mode = 0
+offset_left = 975.0
+offset_top = 544.0
+offset_right = 1007.0
+offset_bottom = 576.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("8_oc6dx")
+texture_hover = ExtResource("9_y20sn")
+stretch_mode = 3
+
+[node name="DashButton" type="TextureButton" parent="MobileTouchHUD/Root"]
+layout_mode = 0
+offset_left = 1113.0
+offset_top = 539.0
+offset_right = 1145.0
+offset_bottom = 571.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("10_7uw37")
+texture_hover = ExtResource("11_21net")
+stretch_mode = 3
+
+[node name="InteractButton" type="TextureButton" parent="MobileTouchHUD/Root"]
+layout_mode = 0
+offset_left = 1118.0
+offset_top = 417.0
+offset_right = 1150.0
+offset_bottom = 449.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("12_exifc")
+texture_hover = ExtResource("13_j582q")
+stretch_mode = 3
+
+[node name="SuperDashButton" type="TextureButton" parent="MobileTouchHUD/Root"]
+layout_mode = 0
+offset_left = 1119.0
+offset_top = 292.0
+offset_right = 1151.0
+offset_bottom = 324.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("14_uc6ms")
+texture_hover = ExtResource("15_skrsa")
+stretch_mode = 3
+
+[node name="MapButton" type="TextureButton" parent="MobileTouchHUD/Root"]
+layout_mode = 0
+offset_left = 1097.0
+offset_top = 165.0
+offset_right = 1145.0
+offset_bottom = 197.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("16_bjlxe")
+texture_hover = ExtResource("17_r5aow")
+stretch_mode = 3
 
 [node name="VignetteEffect" parent="." instance=ExtResource("8_jbabp")]
 

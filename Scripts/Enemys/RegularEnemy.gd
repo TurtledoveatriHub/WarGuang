@@ -15,6 +15,10 @@ class_name RegularEnemy
 @export var jump_velocity: float = -480.0
 ## 重力加速度（像素/秒²）
 @export var gravity: float = 900.0
+## 地面摩擦强度，用于受伤和落地状态的速度衰减
+@export var ground_drag: float = 220.0
+## 受伤状态下的水平拖拽强度，避免瞬时被抛飞感过强
+@export var hurt_drag: float = 190.0
 
 ## ── 节点路径 ──
 @export_category("节点路径")
@@ -72,8 +76,10 @@ enum State { PATROL, CHASE, HURT, DIE, RESPAWN, IDLE }
 
 ## 当前状态
 var _state: int = State.PATROL
-## 当前方向（1=右，-1=左），同时控制 scale.x 和 velocity.x 符号
+## 当前逻辑方向（1=右，-1=左），不再直接用作每帧 sprite 强制翻转的唯一来源。
 var _dir: int = 1
+## 当前渲染朝向，独立管理 sprite flip，避免速度与折算方向互相覆盖。
+var _facing_dir: int = 1
 var _sprite: AnimatedSprite2D = null
 var _base: Node = null
 var _player: Node = null
@@ -103,6 +109,7 @@ var _in_hurt: bool = false
 func _ready():
 	_spawn_pos = global_position
 	_sprite = $AnimatedSprite2D
+	_facing_dir = _dir
 	
 	if enemy_base_path: _base = get_node(enemy_base_path)
 	if _base:
@@ -134,8 +141,8 @@ func _ready():
 	if hurtbox_detector_path:
 		var h = get_node(hurtbox_detector_path) as Area2D
 		if h:
-			h.area_entered.connect(func(_a): _in_hurt = true)
-			h.area_exited.connect(func(_a): _in_hurt = false)
+			h.area_entered.connect(_on_hurtbox_area_entered)
+			h.area_exited.connect(_on_hurtbox_area_exited)
 	
 	if _sprite and _sprite.sprite_frames:
 		_sprite.animation_finished.connect(_on_anim_end)
@@ -152,22 +159,31 @@ func _physics_process(d):
 	
 	# 方向安全钳位（防止 _dir 意外为 0 或其它非法值）
 	_dir = 1 if _dir >= 0 else -1
-	
-	# 在非HURT状态时，如果刚落地则清除击退残留
-	if _state != State.HURT and is_on_floor():
-		velocity.x = 0
+	_sync_flip()
 	
 	match _state:
 		State.IDLE, State.RESPAWN:
-			velocity.x = 0; _apply_gravity(d); _apply_vel_flip(); move_and_slide(); return
+			velocity.x = move_toward(velocity.x, 0.0, ground_drag * d)
+			_apply_gravity(d)
+			_apply_vel_flip()
+			move_and_slide()
+			return
 		State.HURT:
-			# HURT 状态：保留 EnemyBase.take_damage 设置的击退 velocity，不覆盖
-			_apply_gravity(d); _apply_vel_flip(); move_and_slide()
+			# HURT 状态：保留击退冲量，但做有限缓减，避免瞬间被抛飞。
+			_apply_gravity(d)
+			if is_on_floor():
+				velocity.x = move_toward(velocity.x, 0.0, hurt_drag * d)
+			_apply_vel_flip()
+			move_and_slide()
 			_hurt_timer -= d
 			if _hurt_timer <= 0: _change(State.PATROL)
 			return
 		State.DIE:
-			velocity.x = 0; _apply_gravity(d); _apply_vel_flip(); move_and_slide(); return
+			velocity.x = move_toward(velocity.x, 0.0, ground_drag * d)
+			_apply_gravity(d)
+			_apply_vel_flip()
+			move_and_slide()
+			return
 	
 	_apply_gravity(d)
 	
@@ -277,32 +293,25 @@ func _chase(_d):
 # 工具函数
 # ════════════════════════════════════════
 
-## 纹理方向强制跟随 velocity.x（所有状态统一调用）
-## 不依赖 _dir，velocity.x>0→右，<0→左，=0→保持不变
+## 纹理方向统一跟随逻辑朝向，不再被 velocity.x 的瞬时波动打断。
+## 这样可以避免每帧都左右翻转鬼畜，保证 Sprite 与 AI 朝向始终一致。
 func _apply_vel_flip() -> void:
-	if velocity.x > 0.1:
-		scale.x = 1
-	elif velocity.x < -0.1:
-		scale.x = -1
-	# velocity.x 接近 0：保持当前朝向
+	if _state in [State.DIE, State.RESPAWN]:
+		return
+	_facing_dir = _dir
+	if _sprite and is_instance_valid(_sprite):
+		_sprite.scale.x = 2.0 if _facing_dir > 0 else -2.0
+	# 根节点 scale 不能在这里改，否则会把 RayCast 与 CollisionShape 也一起翻转，导致逻辑错乱。
 
-## 翻转根节点（仅同步射线，由 _apply_vel_flip 接管纹理方向）
+## 同步射线方向：只让 RayCast 的目标方向随 _dir 变化，不碰根节点 scale。
 func _sync_flip() -> void:
-	if _obs_ray:
-		_obs_ray.target_position = Vector2(50 * int(sign(scale.x)), 0)
-	if _cliff_ray:
-		_cliff_ray.target_position = Vector2(50 * int(sign(scale.x)), 25)
 	var target: int = _dir
-	if velocity.x > 1.0:
-		target = 1
-	elif velocity.x < -1.0:
-		target = -1
-	if scale.x != target:
-		scale.x = target
-		if _obs_ray:
-			_obs_ray.target_position = Vector2(50 * target, 0)
-		if _cliff_ray:
-			_cliff_ray.target_position = Vector2(50 * target, 25)
+	if _obs_ray:
+		_obs_ray.target_position = Vector2(50 * target, 0)
+	if _cliff_ray:
+		_cliff_ray.target_position = Vector2(50 * target, 25)
+	if _sprite and is_instance_valid(_sprite):
+		_sprite.scale.x = 2.0 if target > 0 else -2.0
 
 ## 重力与下落动画
 func _apply_gravity(d):
@@ -315,8 +324,10 @@ func _apply_gravity(d):
 ## 跳跃：同时设置水平和垂直速度，保持移动方向
 func _do_jump(h_speed: float):
 	if is_on_floor() and not _in_air_jumped:
+		## 跳跃时保留当前前进方向，但不再直接把速度硬覆盖为极值，避免原地跳问题。
 		velocity.y = jump_velocity
-		velocity.x = _dir * h_speed  ## 跳跃时保持水平速度
+		var horizontal_base: float = max(abs(velocity.x), abs(_dir * h_speed))
+		velocity.x = _dir * min(horizontal_base, max(abs(_dir * h_speed), 10.0)) * 0.85
 		_in_air_jumped = true
 		_anim_lock_jump = true       ## 锁定动画防止被 Move/Run/Down 覆盖
 		_play("Jump")
@@ -367,13 +378,49 @@ func _on_player_leave(b):
 		if _state == State.CHASE:
 			_change(State.PATROL)
 
+func _on_hurtbox_area_entered(area: Area2D) -> void:
+	if area == null:
+		_in_hurt = true
+		return
+	_in_hurt = true
+	var enemy_base = get_node_or_null("EnemyBase")
+	if enemy_base == null or not enemy_base.has_method("take_damage"):
+		return
+	var damage_value: int = 1
+	if area.has_method("get"):
+		var area_damage: Variant = area.get("enemy_damage")
+		if typeof(area_damage) == TYPE_INT:
+			damage_value = int(area_damage)
+	var direction: Vector2 = (global_position - area.global_position).normalized()
+	if direction == Vector2.ZERO:
+		direction = Vector2.UP
+	var knockback: Vector2 = Vector2(
+		(direction.x * 100.0),
+		(direction.y * 100.0)
+	)
+	if area.has_method("get"):
+		var area_knockback: Variant = area.get("enemy_knockback")
+		if typeof(area_knockback) == TYPE_VECTOR2:
+			knockback = Vector2(
+				direction.x * abs(Vector2(area_knockback).x),
+				direction.y * abs(Vector2(area_knockback).y)
+			)
+	enemy_base.take_damage(damage_value, knockback)
+
+func _on_hurtbox_area_exited(_area: Area2D) -> void:
+	_in_hurt = false
+
 ## 受伤（由 EnemyBase.damage_taken 信号触发）
-func _on_hurt(_d, _h):
-	if _state in [State.DIE, State.RESPAWN]: return
+func _on_hurt(_d, current_health):
+	if _state in [State.DIE, State.RESPAWN]:
+		return
+	if current_health <= 0:
+		_change(State.DIE)
+		_play("Die")
+		return
 	_change(State.HURT)
 	_hurt_timer = hurt_duration
-	# ★ 击退保留：velocity 已由 EnemyBase.take_damage 设置，HURT 状态不覆盖
-	# HURT 状态利用 _sync_flip() 确保纹理方向与 velocity 方向一致
+	# ★ 击退保留：velocity 已由 EnemyBase.take_damage 设置，HURT 状态只做拖拽衰减，不再让 sprite 反复 flip
 
 ## 死亡（由 EnemyBase.enemy_died 信号触发）
 ## 死亡时禁用KillZone（避免死亡动画期间仍有伤害判定）

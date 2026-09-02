@@ -17,26 +17,19 @@ func _ready():
 func create_breathing_effect():
 	stop_all_light_effects()
 	
-	## 等待一帧确保所有操作完成
 	await get_tree().process_frame
 	
 	var lights = get_tree().get_nodes_in_group(point_light_group)
 	for light in lights:
 		if light is PointLight2D and is_instance_valid(light):
-			## 保存原始能量值
 			if not original_light_energies.has(light.get_instance_id()):
 				original_light_energies[light.get_instance_id()] = light.energy
-			## 创建呼吸效果
 			var tween = create_tween()
-			tween.set_loops()  # 关键：设置循环
-			
-			## 关键修复：使用不同的过渡和缓动类型使呼吸更自然
+			tween.set_loops()
 			tween.set_trans(Tween.TRANS_SINE)
 			tween.set_ease(Tween.EASE_IN_OUT)
-			
-			tween.tween_property(light, "energy", 1.3, 1.5)
-			tween.tween_property(light, "energy", 0.8, 1.5)
-			
+			tween.tween_property(light, "energy", 1.08, 1.8)
+			tween.tween_property(light, "energy", 0.92, 2.2)
 			active_tweens[light.get_instance_id()] = tween
 
 ## 停止所有灯光效果

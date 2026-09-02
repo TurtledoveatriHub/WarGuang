@@ -242,8 +242,14 @@ func _on_body_entered(body):
 		var enemy_base = body.get_node_or_null("EnemyBase")
 		if enemy_base and enemy_base.has_method("take_damage"):
 			if _damage_allowed:
-				# 计算敌人击退方向（与玩家击退同逻辑）
-				var enemy_kb: Vector2 = Vector2(sign(body.global_position.x - global_position.x) * enemy_knockback.x, -enemy_knockback.y)
+				# 计算敌人击退方向：用“目标 - 伤害源”计算，确保顶上/侧面/正下方都按“被推离”处理。
+				var enemy_dir: Vector2 = (body.global_position - global_position).normalized()
+				if enemy_dir == Vector2.ZERO:
+					enemy_dir = Vector2.UP
+				var enemy_kb: Vector2 = Vector2(
+					enemy_dir.x * abs(enemy_knockback.x),
+					enemy_dir.y * abs(enemy_knockback.y)
+				)
 				enemy_base.take_damage(enemy_damage, enemy_kb)
 				if not damage_cooldown.has(body):
 					damage_cooldown[body] = damage_cooldown_time
@@ -402,7 +408,13 @@ func handle_damage(delta: float, scaled_delta: float) -> void:
 				if not damage_cooldown.has(body) or damage_cooldown[body] <= 0:
 					var enemy_base = body.get_node_or_null("EnemyBase")
 					if enemy_base and enemy_base.has_method("take_damage"):
-						var enemy_kb: Vector2 = Vector2(sign(body.global_position.x - global_position.x) * enemy_knockback.x, -enemy_knockback.y)
+						var enemy_dir: Vector2 = (body.global_position - global_position).normalized()
+						if enemy_dir == Vector2.ZERO:
+							enemy_dir = Vector2.UP
+						var enemy_kb: Vector2 = Vector2(
+							enemy_dir.x * abs(enemy_knockback.x),
+							enemy_dir.y * abs(enemy_knockback.y)
+						)
 						enemy_base.take_damage(enemy_damage, enemy_kb)
 						damage_cooldown[body] = 0.1
 	for body in damage_cooldown.keys():
@@ -421,17 +433,14 @@ func apply_damage(body) -> bool:
 	and body.has_method("is_black_dash_unlocked") \
 	and body.is_black_dash_unlocked():
 		return false
+	## 统一按“目标 - 伤害源”的方向来计算击退：
+	## 例如玩家在伤害块上方时，方向应为向上，而不是朝向伤害源的错误向下方向。
 	var direction: Vector2 = (body.global_position - global_position).normalized()
-	var angle: float = abs(atan2(direction.y, direction.x) - PI / 2.0)
-	var total_force: float = sqrt(
-		player_knockback.x * player_knockback.x \
-		+ player_knockback.y * player_knockback.y
-	)
-	var y_ratio: float = cos(angle)
-	var x_ratio: float = sin(angle)
+	if direction == Vector2.ZERO:
+		direction = Vector2.UP
 	var knockback_force: Vector2 = Vector2(
-		-sign(direction.x) * abs(total_force * x_ratio),
-		-abs(total_force * y_ratio)
+		direction.x * abs(player_knockback.x),
+		direction.y * abs(player_knockback.y)
 	)
 	if body.has_method("take_damage"):
 		if not damage_cooldown.has(body) or damage_cooldown[body] <= 0:

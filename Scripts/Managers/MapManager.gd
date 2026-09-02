@@ -24,8 +24,9 @@ func _ready() -> void:
 	## 预加载 MapUI 场景
 	var map_ui_scene := preload("res://Scenes/UI/MapUI.tscn")
 	_map_ui_instance = map_ui_scene.instantiate()
-	## 先不添加到场景树，等第一次打开时再添加
-	_map_ui_instance.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	## 先不添加到场景树，等第一次打开时再添加。
+	## 关键修正：地图在未暂停的游戏内打开，必须用 ALWAYS（WHEN_PAUSED 会使其 tween 永不推进）。
+	_map_ui_instance.process_mode = Node.PROCESS_MODE_ALWAYS
 
 
 ## 切换地图开/关
@@ -93,4 +94,4 @@ func reset_state() -> void:
 		_map_ui_instance.queue_free()
 		var map_ui_scene := preload("res://Scenes/UI/MapUI.tscn")
 		_map_ui_instance = map_ui_scene.instantiate()
-		_map_ui_instance.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+		_map_ui_instance.process_mode = Node.PROCESS_MODE_ALWAYS

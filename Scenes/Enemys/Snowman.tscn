@@ -53,19 +53,19 @@ region = Rect2(64, 0, 32, 32)
 atlas = ExtResource("3_hjs2s")
 region = Rect2(96, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_l8wk1"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_xw338"]
 atlas = ExtResource("2_xw338")
 region = Rect2(0, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_jps5b"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_hjs2s"]
 atlas = ExtResource("2_xw338")
 region = Rect2(32, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_5jcwd"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_infkk"]
 atlas = ExtResource("2_xw338")
 region = Rect2(64, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_wjui6"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_ce338"]
 atlas = ExtResource("2_xw338")
 region = Rect2(96, 0, 32, 32)
 
@@ -188,16 +188,16 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_l8wk1")
+"texture": SubResource("AtlasTexture_xw338")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_jps5b")
+"texture": SubResource("AtlasTexture_hjs2s")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_5jcwd")
+"texture": SubResource("AtlasTexture_infkk")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_wjui6")
+"texture": SubResource("AtlasTexture_ce338")
 }],
 "loop": true,
 "name": &"Idle",
@@ -276,7 +276,7 @@ animations = [{
 size = Vector2(12, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7o4th"]
-size = Vector2(500, 160)
+size = Vector2(400, 200)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x7k7p"]
 size = Vector2(20, 28)
@@ -295,9 +295,8 @@ killzone_path = NodePath("KillZone")
 hurtbox_detector_path = NodePath("HurtBoxDetector")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_31ow8")
-animation = &"Respawn"
+animation = &"Idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(2, 6)
@@ -316,9 +315,10 @@ target_position = Vector2(50, 25)
 collision_mask = 6
 
 [node name="PlayerDetector" type="Area2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerDetector"]
-position = Vector2(80, -40)
+position = Vector2(160, -20)
 shape = SubResource("RectangleShape2D_7o4th")
 
 [node name="KillZone" type="Area2D" parent="."]
@@ -329,7 +329,6 @@ position = Vector2(0, 4)
 shape = SubResource("RectangleShape2D_x7k7p")
 
 [node name="HurtBoxDetector" type="Area2D" parent="."]
-visible = false
 collision_layer = 128
 collision_mask = 16
 
