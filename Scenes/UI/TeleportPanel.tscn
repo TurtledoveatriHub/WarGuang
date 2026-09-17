@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://x3hbxtwnrr30" path="res://Scripts/UI/TeleportPanel.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://bv4wcsihjxeaa" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭1.tres" id="2_gxax5"]
-[ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/2.png" id="2_juc85"]
+[ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/Room3/2.png" id="2_juc85"]
 [ext_resource type="Texture2D" uid="uid://kxm2uujj5ma4" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭3.tres" id="3_5uayw"]
 [ext_resource type="Texture2D" uid="uid://byixw77mgxbb1" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭2.tres" id="4_l5e8y"]
 [ext_resource type="Texture2D" uid="uid://bwow0r831nkda" path="res://Assets/Textures/UIs/SceneUIs/tres/确认1.tres" id="6_q6nrd"]
@@ -38,10 +38,10 @@ texture_hover = ExtResource("4_l5e8y")
 stretch_mode = 0
 
 [node name="Btn1" type="TextureButton" parent="PanelRoot"]
-offset_left = -155.0
-offset_top = -98.0
-offset_right = -123.0
-offset_bottom = -82.0
+offset_left = -156.0
+offset_top = -28.0
+offset_right = -124.0
+offset_bottom = -12.0
 scale = Vector2(2, 2)
 texture_normal = ExtResource("6_q6nrd")
 texture_pressed = ExtResource("7_7prjw")
@@ -51,10 +51,10 @@ script = ExtResource("9_l5e8y")
 target_teleport_id = "Room1-1"
 
 [node name="Btn3" type="TextureButton" parent="PanelRoot"]
-offset_left = 57.0
-offset_top = -20.0
-offset_right = 89.0
-offset_bottom = -4.0
+offset_left = -78.0
+offset_top = -29.0
+offset_right = -46.0
+offset_bottom = -13.0
 scale = Vector2(2, 2)
 texture_normal = ExtResource("6_q6nrd")
 texture_pressed = ExtResource("7_7prjw")
@@ -65,9 +65,9 @@ target_teleport_id = "Room2-1"
 
 [node name="Btn4" type="TextureButton" parent="PanelRoot"]
 offset_left = -232.0
-offset_top = -44.0
+offset_top = -9.0
 offset_right = -200.0
-offset_bottom = -28.0
+offset_bottom = 7.0
 scale = Vector2(2, 2)
 texture_normal = ExtResource("6_q6nrd")
 texture_pressed = ExtResource("7_7prjw")
@@ -75,3 +75,16 @@ texture_hover = ExtResource("8_ex6nn")
 stretch_mode = 0
 script = ExtResource("9_l5e8y")
 target_teleport_id = "Room3-1"
+
+[node name="Btn5" type="TextureButton" parent="PanelRoot"]
+offset_left = 34.0
+offset_top = -5.0
+offset_right = 66.0
+offset_bottom = 11.0
+scale = Vector2(2, 2)
+texture_normal = ExtResource("6_q6nrd")
+texture_pressed = ExtResource("7_7prjw")
+texture_hover = ExtResource("8_ex6nn")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "SnowMountain4-1"

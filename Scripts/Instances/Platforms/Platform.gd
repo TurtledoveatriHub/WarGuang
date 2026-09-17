@@ -56,9 +56,9 @@ enum SpriteEffect { NONE, FLIP }
 ## 是否可破碎
 @export var brittle: bool = false
 ## 破碎倒计时（秒），player站上后等待此时间再播 CLOSE 动画
-@export var break_countdown: float = 0.2
+@export var break_countdown: float = 0.1
 ## 破碎后恢复等待时间（秒）
-@export var recover_time: float = 3.0
+@export var recover_time: float = 2.5
 
 # ── 移动状态（HurtBox 同款）──
 var _start_pos: Vector2

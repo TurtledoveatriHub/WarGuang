@@ -8,6 +8,10 @@ enum MovementMode { STATIC = 0, LINEAR = 1, WAVE = 2, CIRCULAR = 3 }
 enum DamageType { NORMAL = 0, SHADOW = 1 }
 ## 动画相位状态
 enum AnimPhase { ON, CLOSING, OFF, OPENING }
+## 发射器模式状态（仅 enable_launcher_mode 生效时使用）
+enum LauncherState { LOAD_OPEN, ARMED, FIRING, CLOSE_PLAY, END_OFF_WAIT }
+## 触发器模式状态（仅 enable_trigger_mode 生效时使用）
+enum TriggerState { OFF_IDLE, OPENING, ON_ACTIVE, EXIT_HOLD, CLOSING }
 ## Sprite效果（与移动方向无关，仅视觉）
 enum SpriteEffect { NONE, ROTATE, FLIP }
 
@@ -18,13 +22,13 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 ## 是否为传送伤害（独立于普通/阴影，会触发传送受击流程）
 @export var is_warp_damage: bool = false
 ## ★ 对 player 的击退力（Vector2统一参数）
-@export var player_knockback: Vector2 = Vector2(50, 100)
+@export var player_knockback: Vector2 = Vector2(50, 50)
 ## ★ 对 Layer8 敌人的击退力（Vector2统一参数）
 @export var enemy_knockback: Vector2 = Vector2(100, 100)
 ## 伤害冷却时间（秒）
 @export var damage_cooldown_time: float = 0.1
 ## 持续伤害间隔（秒，0=每次冷却后立即触发）
-@export var continuous_damage_interval: float = 0.5
+@export var continuous_damage_interval: float = 0.4
 
 ## 对 Layer8 敌人的伤害值（不区分伤害类型）
 @export var enemy_damage: int = 1
@@ -34,7 +38,7 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 ## 精灵视觉效果：NONE=无, ROTATE=旋转, FLIP=往返水平翻转（碰撞体不翻）
 @export var sprite_effect: SpriteEffect = SpriteEffect.FLIP
 ## 旋转速度（度/秒），仅 ROTATE 模式有效
-@export var rotation_speed: float = 90.0
+@export var rotation_speed: float = 180.0
 ## 旋转方向：true=顺时针，false=逆时针
 @export var clockwise: bool = true
 ## 是否同时旋转碰撞体（可独立启用）
@@ -45,9 +49,9 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 ## 是否周期性开关伤害检测（false=永久ON检测）
 @export var enable_periodic_damage: bool = false
 ## 开启持续时间（秒），结束后播放 CLOSE 切为 OFF
-@export var active_time: float = 3.0
+@export var active_time: float = 2.0
 ## 关闭持续时间（秒），结束后播放 OPEN 切为 ON
-@export var inactive_time: float = 2.0
+@export var inactive_time: float = 1.0
 
 ## 移动模式
 @export_category("移动模式")
@@ -59,7 +63,7 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 ## 移动速度（像素/秒）
 @export var move_speed: float = 240.0
 ## 终点偏移（相对编辑器放置位置）
-@export var end_offset: Vector2 = Vector2(720, 0)
+@export var end_offset: Vector2 = Vector2(0, 200)
 ## 端点停留时间（秒）
 @export var wait_time: float = 0.5
 ## 加速时间（秒）
@@ -82,6 +86,27 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 @export_category("圆周专用参数")
 ## 圆周运动方向（仅在 CIRCULAR 模式有效）
 @export var circular_clockwise: bool = true
+
+## 发射器模式设置
+@export_category("发射器模式")
+## 发射器模式：仅 LINEAR 生效；开启后自动忽略“周期性开关伤害检测”。
+## 流程：起点静止 wait_time 播 OPEN（不伤）→ 切 ON（可伤）→ 单程移动到终点偏移 → 到终点播 CLOSE 切 OFF（不伤）→ 终点静止 wait_time → 瞬移回起点切 OPEN，循环。
+@export var enable_launcher_mode: bool = false
+## 玩家检测（需在发射器模式基础上）：切 ON 后在起点等待，检测到“起点→终点”直线走廊内有玩家才发射。
+@export var enable_player_detect: bool = false
+## 玩家检测走廊宽度（像素，沿起点→终点连线的总宽度）
+@export var player_detect_width: float = 48.0
+## 玩家检测间隔（秒）：非逐帧轮询，降低开销
+@export var player_detect_interval: float = 0.1
+
+## 触发器模式设置
+@export_category("触发器模式")
+## 触发器模式：仅 STATIC 静止模式生效；开启后自动忽略“周期性开关伤害检测”。
+## 平时 OFF 循环（不伤）→ 玩家触碰时播放一遍 OPEN 切 ON 循环（激活伤害）→
+## 玩家离开后延迟 trigger_close_delay 播放一遍 CLOSE 切回 OFF；延迟/切回期间玩家再次触碰则立即再 OPEN。
+@export var enable_trigger_mode: bool = false
+## 玩家离开后切回 OFF 的延迟（秒）
+@export var trigger_close_delay: float = 1.0
 
 ## 高级检测设置
 @export_category("高级检测设置")
@@ -135,6 +160,26 @@ var _phase_timer: float = 0.0
 ## 是否允许伤害检测（ON=true，其余 false）
 var _damage_allowed: bool = true
 
+# 发射器模式状态机变量
+## 当前发射器阶段
+var _launcher_state: LauncherState = LauncherState.LOAD_OPEN
+## 阶段计时器（起点/终点停留、OPEN/CLOSE 播放等待）
+var _launcher_timer: float = 0.0
+## 玩家检测间隔计时器
+var _detect_timer: float = 0.0
+## 发射进度（0=起点，1=终点偏移）
+var _fire_progress: float = 0.0
+## 发射即时速度（像素/秒）
+var _fire_speed: float = 0.0
+
+# 触发器模式状态机变量
+## 当前触发器阶段
+var _trigger_state: TriggerState = TriggerState.OFF_IDLE
+## 离开延迟计时器
+var _trigger_hold_timer: float = 0.0
+## 玩家是否在碰撞体内（每帧轮询刷新）
+var _trigger_player_present: bool = false
+
 # 伤害变量
 var bodies_in_area: Array = []
 var damage_timers: Dictionary = {}
@@ -168,11 +213,37 @@ func _ready():
 	collision_layer = 16   # 2^4 = 层5 HurtBox
 	collision_mask = 129   # 2^0 + 2^7 = 层1 Player + 层8 Enemy
 	
-	# 初始动画
-	animated_sprite.play("ON")
+	# 触发器模式仅支持 STATIC，且与“周期性开关伤害检测”互斥（开启时周期逻辑被忽略）
+	if enable_trigger_mode and movement_mode != MovementMode.STATIC:
+		push_warning("HurtBox: 触发器模式仅支持 STATIC 静止模式，已自动关闭触发器模式")
+		enable_trigger_mode = false
+	# 发射器模式仅支持 LINEAR，且与“周期性开关伤害检测”互斥（开启时周期逻辑被忽略）
+	if enable_launcher_mode and movement_mode != MovementMode.LINEAR:
+		push_warning("HurtBox: 发射器模式仅支持 LINEAR 移动模式，已自动关闭发射器模式")
+		enable_launcher_mode = false
+
+	if enable_trigger_mode:
+		# 触发器初始：OFF 循环（不伤）
+		_trigger_state = TriggerState.OFF_IDLE
+		_trigger_hold_timer = 0.0
+		_trigger_player_present = false
+		_damage_allowed = false
+		animated_sprite.play("OFF")
+	elif enable_launcher_mode:
+		_launcher_state = LauncherState.LOAD_OPEN
+		_launcher_timer = 0.0
+		_detect_timer = 0.0
+		_fire_progress = 0.0
+		_fire_speed = 0.0
+		_damage_allowed = false
+		_moving_to_end = true
+		animated_sprite.play("OPEN")
+	else:
+		# 初始动画
+		animated_sprite.play("ON")
 	
 	if enable_debug:
-		print("HurtBox: 初始化 mode=", movement_mode, " 周期=", enable_periodic_damage)
+		print("HurtBox: 初始化 mode=", movement_mode, " 周期=", enable_periodic_damage, " 发射器=", enable_launcher_mode, " 触发器=", enable_trigger_mode)
 
 
 func _process(delta):
@@ -200,11 +271,16 @@ func _process(delta):
 			if rotate_collision:
 				_for_each_shape(func(s): s.rotation_degrees += rot_amount)
 	
-	# 动画周期
-	update_anim_cycle(delta)
+	# 动画周期：触发器/发射器开启时由各自状态机接管，不再做周期性开关
+	if enable_trigger_mode:
+		_update_trigger_mode(delta)
+	elif not enable_launcher_mode:
+		update_anim_cycle(delta)
 	
-	# 移动
-	if movement_mode != MovementMode.STATIC:
+	# 移动：发射器模式接管移动（单程发射 + 瞬移复位），否则沿用通用往返移动
+	if enable_launcher_mode:
+		_update_launcher(delta)
+	elif movement_mode != MovementMode.STATIC:
 		handle_movement(fixed_delta)
 		# 等待帧时 handle_movement 不会调用 _update_position，显式补调确保位置同步
 		if is_waiting and movement_mode != MovementMode.STATIC:
@@ -507,3 +583,207 @@ func update_anim_cycle(delta: float) -> void:
 				_anim_phase = AnimPhase.ON
 				animated_sprite.play("ON")
 				_damage_allowed = true
+
+
+# ── 发射器模式（仅 LINEAR；与周期性开关互斥）────────────────────────
+
+func _update_launcher(delta: float) -> void:
+	match _launcher_state:
+		LauncherState.LOAD_OPEN:
+			# 起点静止：播 OPEN（不伤），等 wait_time 且 OPEN 播完才切换。
+			_damage_allowed = false
+			if animated_sprite.animation != "OPEN":
+				animated_sprite.play("OPEN")
+			_launcher_timer += delta
+			if _launcher_timer >= wait_time and not animated_sprite.is_playing():
+				_launcher_timer = 0.0
+				_launcher_state = LauncherState.ARMED
+				animated_sprite.play("ON")
+				_damage_allowed = true
+		LauncherState.ARMED:
+			# 起点 ON（可伤）：开启玩家检测则原地等命中走廊，否则立即发射。
+			_damage_allowed = true
+			if animated_sprite.animation != "ON":
+				animated_sprite.play("ON")
+			if enable_player_detect:
+				_detect_timer += delta
+				if _detect_timer >= player_detect_interval:
+					_detect_timer = 0.0
+					if _player_in_fire_lane():
+						_start_firing()
+			else:
+				_start_firing()
+		LauncherState.FIRING:
+			# ON 直线移动到终点偏移。
+			_damage_allowed = true
+			_advance_fire(delta)
+		LauncherState.CLOSE_PLAY:
+			# 到达终点：播 CLOSE（不伤），播完切 OFF 并停留。
+			_damage_allowed = false
+			if animated_sprite.animation != "CLOSE":
+				animated_sprite.play("CLOSE")
+			if not animated_sprite.is_playing():
+				_launcher_state = LauncherState.END_OFF_WAIT
+				_launcher_timer = 0.0
+				animated_sprite.play("OFF")
+		LauncherState.END_OFF_WAIT:
+			# 终点静止（OFF，不伤），等 wait_time 后瞬移回起点进入下一轮。
+			_damage_allowed = false
+			if animated_sprite.animation != "OFF":
+				animated_sprite.play("OFF")
+			_launcher_timer += delta
+			if _launcher_timer >= wait_time:
+				_reset_to_start_for_next_round()
+
+func _start_firing() -> void:
+	_launcher_state = LauncherState.FIRING
+	_fire_progress = 0.0
+	_fire_speed = 0.0
+	_moving_to_end = true
+	global_position = start_pos
+	_damage_allowed = true
+	animated_sprite.play("ON")
+
+## 单程加速/匀速/减速推进（复用 加速/减速/速度 参数）。
+func _advance_fire(delta: float) -> void:
+	if path_length <= 0.0 or move_speed <= 0.0:
+		_finish_fire()
+		return
+	var half_accel: float = acceleration_time * move_speed * 0.5
+	var half_decel: float = deceleration_time * move_speed * 0.5
+	var accel: float = move_speed / acceleration_time if acceleration_time > 0.0 else move_speed
+	var decel: float = move_speed / deceleration_time if deceleration_time > 0.0 else move_speed
+	var dist_done: float = _fire_progress * path_length
+	var dist_left: float = (1.0 - _fire_progress) * path_length
+	if dist_done < half_accel:
+		_fire_speed = min(_fire_speed + accel * delta, move_speed)
+	elif dist_left < half_decel:
+		_fire_speed = max(_fire_speed - decel * delta, 0.0)
+	else:
+		_fire_speed = move_speed
+	var step: float = (_fire_speed * delta) / path_length
+	_fire_progress += step
+	if _fire_progress >= 1.0 - 0.001:
+		_finish_fire()
+		return
+	global_position = start_pos.lerp(end_pos, clampf(_fire_progress, 0.0, 1.0))
+
+func _finish_fire() -> void:
+	_fire_progress = 1.0
+	global_position = end_pos
+	_damage_allowed = false
+	_launcher_state = LauncherState.CLOSE_PLAY
+	animated_sprite.play("CLOSE")
+
+## 瞬移回起点并进入下一轮 OPEN 静止。
+func _reset_to_start_for_next_round() -> void:
+	global_position = start_pos
+	_fire_progress = 0.0
+	_fire_speed = 0.0
+	_detect_timer = 0.0
+	_launcher_timer = 0.0
+	_moving_to_end = true
+	_launcher_state = LauncherState.LOAD_OPEN
+	_damage_allowed = false
+	animated_sprite.play("OPEN")
+
+## 玩家是否位于“起点→终点”直线走廊（宽度 player_detect_width）内。
+## 按 player_detect_interval 间隔轮询，不做逐帧检测。
+func _player_in_fire_lane() -> bool:
+	var seg: Vector2 = end_pos - start_pos
+	var seg_len_sq: float = seg.length_squared()
+	var half_width: float = player_detect_width * 0.5
+	for body in get_tree().get_nodes_in_group("player"):
+		if not is_instance_valid(body) or not body.is_inside_tree():
+			continue
+		var to_body: Vector2 = body.global_position - start_pos
+		var t: float = 0.0
+		if seg_len_sq > 0.0:
+			t = clampf(to_body.dot(seg) / seg_len_sq, 0.0, 1.0)
+		var closest: Vector2 = start_pos + seg * t
+		if body.global_position.distance_to(closest) <= half_width:
+			return true
+	return false
+
+
+# ── 触发器模式（仅 STATIC；与周期性开关互斥）────────────────────────
+
+## 触发器模式逐帧驱动：
+## OFF_IDLE(不伤) → 触碰 → OPENING(播 OPEN 一次) → ON_ACTIVE(ON 循环·激活伤害)
+## → 玩家离开 → EXIT_HOLD(保持 ON，延迟 trigger_close_delay) → CLOSING(播 CLOSE 一次) → OFF_IDLE。
+func _update_trigger_mode(delta: float) -> void:
+	_trigger_player_present = _any_player_overlapping()
+	match _trigger_state:
+		TriggerState.OFF_IDLE:
+			_damage_allowed = false
+			if animated_sprite.animation != "OFF" or not animated_sprite.is_playing():
+				animated_sprite.play("OFF")
+			if _trigger_player_present:
+				_begin_trigger_open()
+		TriggerState.OPENING:
+			_damage_allowed = false
+			if animated_sprite.animation != "OPEN":
+				animated_sprite.play("OPEN")
+			if not animated_sprite.is_playing():
+				# OPEN 播完 → ON 循环并激活伤害
+				_trigger_state = TriggerState.ON_ACTIVE
+				_trigger_hold_timer = 0.0
+				animated_sprite.play("ON")
+				_damage_allowed = true
+		TriggerState.ON_ACTIVE:
+			_damage_allowed = true
+			if animated_sprite.animation != "ON" or not animated_sprite.is_playing():
+				animated_sprite.play("ON")
+			if not _trigger_player_present:
+				# 玩家离开：进入离开延迟（仍保持 ON）
+				_trigger_state = TriggerState.EXIT_HOLD
+				_trigger_hold_timer = 0.0
+		TriggerState.EXIT_HOLD:
+			_damage_allowed = true
+			if animated_sprite.animation != "ON" or not animated_sprite.is_playing():
+				animated_sprite.play("ON")
+			if _trigger_player_present:
+				# 延迟期间玩家又进入 → 回到 ON（保持）
+				_trigger_state = TriggerState.ON_ACTIVE
+				_trigger_hold_timer = 0.0
+			else:
+				_trigger_hold_timer += delta
+				if _trigger_hold_timer >= trigger_close_delay:
+					_begin_trigger_close()
+		TriggerState.CLOSING:
+			_damage_allowed = false
+			if animated_sprite.animation != "CLOSE":
+				animated_sprite.play("CLOSE")
+			if _trigger_player_present:
+				# CLOSE 播放中玩家又触碰 → 立即再 OPEN
+				_begin_trigger_open()
+			elif not animated_sprite.is_playing():
+				# CLOSE 播完 → 回到 OFF（不伤）
+				_trigger_state = TriggerState.OFF_IDLE
+				_trigger_hold_timer = 0.0
+				animated_sprite.play("OFF")
+				_damage_allowed = false
+
+
+## 开始“触碰→OPEN 一次”→ 之后切 ON。
+func _begin_trigger_open() -> void:
+	_trigger_state = TriggerState.OPENING
+	_trigger_hold_timer = 0.0
+	_damage_allowed = false
+	animated_sprite.play("OPEN")
+
+
+## 开始“离开→CLOSE 一次”→ 之后切 OFF。
+func _begin_trigger_close() -> void:
+	_trigger_state = TriggerState.CLOSING
+	_trigger_hold_timer = 0.0
+	_damage_allowed = false
+	animated_sprite.play("CLOSE")
+
+
+## 玩家是否正与任一 CollisionShape2D 重叠。
+func _any_player_overlapping() -> bool:
+	for body in get_overlapping_bodies():
+		if body.is_in_group("player"):
+			return true
+	return false

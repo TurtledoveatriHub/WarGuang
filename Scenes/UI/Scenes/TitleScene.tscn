@@ -1,10 +1,11 @@
-[gd_scene load_steps=23 format=3 uid="uid://cnx8rqa13bm26"]
+[gd_scene load_steps=34 format=3 uid="uid://cnx8rqa13bm26"]
 
 [ext_resource type="Script" uid="uid://2jv58grmryqa" path="res://Scripts/UI/Scenes/TitleScene.gd" id="1_25ulu"]
 [ext_resource type="PackedScene" uid="uid://8vv4frjt0qmt" path="res://Scenes/UI/Scenes/SettingsScene.tscn" id="2_fkiff"]
 [ext_resource type="Script" uid="uid://c6yjpi17utwg8" path="res://Scripts/UI/Scenes/UITransitionAnimator.gd" id="2_transition_animator"]
 [ext_resource type="AudioStream" uid="uid://cs31nir8y35de" path="res://Assets/Audios/BGM/探险.ogg" id="3_1p8n3"]
-[ext_resource type="Texture2D" uid="uid://duyvj1thx76c8" path="res://Assets/Textures/Tiles/Room3/马里奥背景.png" id="5_syapl"]
+[ext_resource type="Texture2D" uid="uid://cs6j2183f22mc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景1.png" id="5_syapl"]
+[ext_resource type="Texture2D" uid="uid://d3gavddfgdl2a" path="res://Assets/Textures/Warmas/wmn.png" id="5_u4xyb"]
 [ext_resource type="Texture2D" uid="uid://1xy7xygxqlmf" path="res://Assets/Textures/UIs/SceneUIs/title沃光标题01.tres" id="6_iwgkb"]
 [ext_resource type="Texture2D" uid="uid://norhspdvctlf" path="res://Assets/Textures/UIs/SceneUIs/title开始游戏01.tres" id="7_kvyf1"]
 [ext_resource type="Texture2D" uid="uid://dosd0gvafei6y" path="res://Assets/Textures/UIs/SceneUIs/title沃光标题02.tres" id="7_syapl"]
@@ -16,25 +17,121 @@
 [ext_resource type="Texture2D" uid="uid://dl3626i63bnb5" path="res://Assets/Textures/UIs/SceneUIs/title退出游戏01.tres" id="13_iwgkb"]
 [ext_resource type="Texture2D" uid="uid://crm3nlbd140st" path="res://Assets/Textures/UIs/SceneUIs/title退出游戏03.tres" id="14_syapl"]
 [ext_resource type="Texture2D" uid="uid://c7q2jgly1ajvi" path="res://Assets/Textures/UIs/SceneUIs/title退出游戏02.tres" id="15_1p8n3"]
+[ext_resource type="Script" uid="uid://dloxn5pxm2x3q" path="res://Scripts/UI/UILoopAnimator.gd" id="17_1p8n3"]
 
-[sub_resource type="Animation" id="Animation_material_enter"]
-resource_name = "material_enter"
-length = 0.4
+[sub_resource type="AtlasTexture" id="AtlasTexture_lnewd"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(0, 128, 32, 32)
 
-[sub_resource type="Animation" id="Animation_material_exit"]
-resource_name = "material_exit"
-length = 0.4
+[sub_resource type="AtlasTexture" id="AtlasTexture_m3y5q"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(32, 128, 32, 32)
 
-[sub_resource type="Animation" id="Animation_material_loop"]
-resource_name = "material_loop"
-loop_mode = 1
+[sub_resource type="AtlasTexture" id="AtlasTexture_mmaj1"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(64, 128, 32, 32)
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_external_material"]
-_data = {
-&"material_enter": SubResource("Animation_material_enter"),
-&"material_exit": SubResource("Animation_material_exit"),
-&"material_loop": SubResource("Animation_material_loop")
-}
+[sub_resource type="AtlasTexture" id="AtlasTexture_mjphl"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(96, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1qwxo"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w1u23"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_474rh"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_10xgk"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ea5f5"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5vedy"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r57i0"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p25vh"]
+atlas = ExtResource("5_u4xyb")
+region = Rect2(224, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u4xyb"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lnewd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m3y5q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mmaj1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mjphl")
+}],
+"loop": false,
+"name": &"end",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1qwxo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w1u23")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_474rh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_10xgk")
+}],
+"loop": true,
+"name": &"loop",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ea5f5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5vedy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r57i0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p25vh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ea5f5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5vedy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r57i0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p25vh")
+}],
+"loop": false,
+"name": &"start",
+"speed": 6.0
+}]
 
 [sub_resource type="Gradient" id="Gradient_fw62u"]
 offsets = PackedFloat32Array(0.13819095, 0.6758794, 1)
@@ -54,10 +151,15 @@ title_bgm_stream = ExtResource("3_1p8n3")
 script = ExtResource("2_transition_animator")
 extra_target_paths = Array[NodePath]([NodePath("../UI")])
 
-[node name="ExternalMaterialAnimator" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_external_material")
-}
+[node name="UILoopAnimator" type="AnimatedSprite2D" parent="." groups=["ui_loop_animator"]]
+z_index = 950
+texture_filter = 1
+position = Vector2(107, 620)
+scale = Vector2(4, 4)
+sprite_frames = SubResource("SpriteFrames_u4xyb")
+animation = &"end"
+script = ExtResource("17_1p8n3")
+autoplay_on_ready = false
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 color = Color(0.5971763, 0.5971761, 0.5971761, 1)
@@ -89,18 +191,17 @@ texture = ExtResource("7_syapl")
 region_rect = Rect2(208, 192, 144, 64)
 
 [node name="TitleClickAreaA" type="TextureButton" parent="."]
-offset_left = 550.0
-offset_top = 80.0
-offset_right = 760.0
-offset_bottom = 205.0
+offset_left = 596.0
+offset_top = 229.0
+offset_right = 621.0
+offset_bottom = 250.0
 mouse_filter = 1
 
 [node name="TitleClickAreaB" type="TextureButton" parent="."]
-visible = false
-offset_left = 550.0
-offset_top = 80.0
-offset_right = 760.0
-offset_bottom = 205.0
+offset_left = 648.0
+offset_top = 214.0
+offset_right = 674.0
+offset_bottom = 234.0
 mouse_filter = 1
 
 [node name="UI" type="VBoxContainer" parent="."]

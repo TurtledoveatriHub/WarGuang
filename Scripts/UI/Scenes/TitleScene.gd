@@ -10,11 +10,12 @@ extends CanvasLayer  # 修复：改为 CanvasLayer
 @onready var settings_button = $UI/SettingsButton
 @onready var quit_button = $UI/QuitButton
 @onready var ui_transition_animator: UITransitionAnimator = $UITransitionAnimator
-@onready var external_material_animator: AnimationPlayer = $ExternalMaterialAnimator
 @onready var title_sprite_a: Sprite2D = $Title
 @onready var title_sprite_b: Sprite2D = get_node_or_null("TitleB")
 @onready var title_click_area_a: BaseButton = get_node_or_null("TitleClickAreaA")
 @onready var title_click_area_b: BaseButton = get_node_or_null("TitleClickAreaB")
+## 常态 UI 循环动画节点缓存（一个场景可以放多个 UILoopAnimator，全部会被驱动）
+var _ui_loop_animators: Array[Node] = []
 
 ## 场景输入锁状态
 var _scene_input_locked: bool = true
@@ -49,6 +50,10 @@ var _active_title_variant: int = TitleVariant.A
 @export var title_shake_strength: float = 7.0
 @export var title_shake_interval: float = 0.03
 
+@export_category("退出游戏")
+## 点击退出后渐入黑屏的时长（秒），然后退出游戏。
+@export var quit_fade_out_duration: float = 1.0
+
 ## 初始化标题场景
 func _ready():
 	start_button.pressed.connect(_on_start_button_pressed)
@@ -69,23 +74,31 @@ func _ready():
 		_title_b_base_scale = title_sprite_b.scale
 	_load_title_variant_state()
 	_apply_title_variant_state(false)
-	
+
+	## 若开场过场动画正在播放，先整体隐藏本场景：
+	## 避免覆盖层透明时“先完整出现、再突兀地播入场动画”。
+	## 等 intro 播完的同一时刻再显形并开始入场演出（见 _begin_enter_sequence）。
+	var boot_waiting: bool = _is_boot_cutscene_playing()
+	if boot_waiting:
+		visible = false
+
 	_set_scene_input_locked(true)
 	if not ui_transition_animator:
+		# 没有过渡动画器时，入场演出直接由本场景触发。
+		visible = true
+		_ui_loop_play_enter()
 		FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
 		_set_scene_input_locked(false)
 	else:
 		_sync_animator_title_target()
 		ui_transition_animator.reset_state()
-		if FadeManager and FadeManager.has_method("get_black_alpha") and FadeManager.get_black_alpha() <= 0.01:
-			call_deferred("_on_scene_transition_enter_begin")
+		var screen_is_black: bool = FadeManager and FadeManager.has_method("get_black_alpha") and FadeManager.get_black_alpha() > 0.01
+		if boot_waiting or not screen_is_black:
+			call_deferred("_begin_enter_sequence")
 	
 	## 播放 UI BGM（在 Inspector 中拖拽 title_bgm_stream）
 	if title_bgm_stream:
 		AudioManager.play_bgm_stream(title_bgm_stream)
-	
-	await get_tree().create_timer(0.1).timeout
-	await _play_external_material_enter()
 	
 	## 修改：调用 LightingManager 的统一函数
 	LightingManager.setup_ui_breathing_effect(self)
@@ -112,6 +125,32 @@ func _ready():
 	#
 	#return result
 
+## 开始本场景的入场演出。
+## 若开场过场动画（BootCutscene）正在播放，则等它播完（intro_finished）再开始，
+## 从而保证：开场动画 → 本场景显形 + 入场演出 → 覆盖层淡出，顺序正确且不阻塞 _ready。
+func _begin_enter_sequence() -> void:
+	var boot: Node = get_node_or_null("/root/BootCutscene")
+	if boot != null and boot.has_method("is_playing") and boot.has_method("is_intro_finished"):
+		var playing: bool = bool(boot.call("is_playing"))
+		var intro_done: bool = bool(boot.call("is_intro_finished"))
+		if playing and not intro_done:
+			# 直接 await 信号本体（Godot 4 中调用协程函数不会返回可 await 的对象）。
+			var intro_signal: Variant = boot.get("intro_finished")
+			if intro_signal is Signal:
+				await intro_signal
+	# 显形与入场演出同一时刻发生，避免“先出现、后播动画”的脱节感。
+	visible = true
+	await _on_scene_transition_enter_begin()
+
+
+## 开场过场动画是否正在播放（含淡出阶段）。
+func _is_boot_cutscene_playing() -> bool:
+	var boot: Node = get_node_or_null("/root/BootCutscene")
+	if boot == null or not boot.has_method("is_playing"):
+		return false
+	return bool(boot.call("is_playing"))
+
+
 ## 处理开始按钮按下
 func _on_start_button_pressed():
 	if _scene_input_locked:
@@ -120,10 +159,10 @@ func _on_start_button_pressed():
 	_reset_title_click_state()
 	
 	_set_scene_input_locked(true)
+	_ui_loop_play_exit()
 	LightingManager.stop_all_light_effects()
 	if ui_transition_animator:
 		await ui_transition_animator.play_exit_transition()
-	await _play_external_material_exit()
 	await SceneManager.switch_scene(ScenePaths.UI_SAVE_SELECT)
 
 ## 处理设置按钮按下
@@ -136,10 +175,10 @@ func _on_settings_button_pressed():
 	settings_button.disabled = true  # 修复：改为 settings_button
 	quit_button.disabled = true
 	_set_scene_input_locked(true)
+	_ui_loop_play_exit()
 	
 	if ui_transition_animator:
 		await ui_transition_animator.play_exit_transition()
-	await _play_external_material_exit()
 	await FadeManager.fade_out(FadeManager.ui_switch_fade_out_duration)
 	
 	if not settings_scene_resource:
@@ -170,7 +209,6 @@ func _on_settings_closed(settings_scene: Node = null):
 	
 	## 关键修复：等待淡入完成后重新设置呼吸效果
 	await FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
-	await _play_external_material_enter()
 	
 	## 新增：重新设置灯光呼吸效果
 	## 等待一帧确保淡入完成
@@ -185,10 +223,16 @@ func _on_quit_button_pressed():
 		return
 	_reset_title_click_state()
 	_set_scene_input_locked(true)
+	_ui_loop_play_exit()
 	AudioManager.play_button_click_sfx()
+	# 关键：黑屏过渡必须在点击瞬间立即开始，与退场动画并行推进，
+	# 而不是等 UITransitionAnimator 的退场动画播完才开始。
+	if FadeManager and FadeManager.has_method("fade_out"):
+		FadeManager.fade_out(quit_fade_out_duration)
 	if ui_transition_animator:
-		await ui_transition_animator.play_exit_transition()
-	await _play_external_material_exit()
+		ui_transition_animator.play_exit_transition()
+	# 只等待黑屏过渡结束，不等待退场动画。
+	await get_tree().create_timer(quit_fade_out_duration).timeout
 	get_tree().quit()
 
 ## 处理标题场景输入
@@ -211,30 +255,43 @@ func _set_scene_input_locked(locked: bool) -> void:
 	settings_button.disabled = locked
 	quit_button.disabled = locked
 
-## 播放标题场景入场动画
+## 播放标题场景入场动画（UILoopAnimator 与之同时触发，保持严格同步）
 func _on_scene_transition_enter_begin() -> void:
 	_set_scene_input_locked(true)
+	_ui_loop_play_enter()
 	if ui_transition_animator:
 		await ui_transition_animator.play_enter_transition()
 	_set_scene_input_locked(false)
 
-## 播放外部材质入场动画
-func _play_external_material_enter() -> void:
-	if not external_material_animator:
-		return
-	if external_material_animator.has_animation("material_enter"):
-		external_material_animator.play("material_enter")
-		await external_material_animator.animation_finished
-	if external_material_animator.has_animation("material_loop"):
-		external_material_animator.play("material_loop")
+## 常态循环动画：立即播放“开始 -> 循环”（本场景内所有 UILoopAnimator）。
+## 禁止 await，不影响场景流程。
+func _ui_loop_play_enter() -> void:
+	for animator in _get_ui_loop_animators():
+		animator.call("play_enter")
 
-## 播放外部材质退场动画
-func _play_external_material_exit() -> void:
-	if not external_material_animator:
-		return
-	if external_material_animator.has_animation("material_exit"):
-		external_material_animator.play("material_exit")
-		await external_material_animator.animation_finished
+## 常态循环动画：立即播放“结束”（本场景内所有 UILoopAnimator）。
+## 禁止 await，不影响场景流程。
+func _ui_loop_play_exit() -> void:
+	for animator in _get_ui_loop_animators():
+		animator.call("play_exit")
+
+## 收集本场景内所有 UILoopAnimator（递归扫描、不依赖节点名）。
+## 一个场景放多个时会被全部驱动，节点被编辑器改名也不会失效。
+func _get_ui_loop_animators() -> Array[Node]:
+	for animator in _ui_loop_animators:
+		if not is_instance_valid(animator) or not is_ancestor_of(animator):
+			_ui_loop_animators.clear()
+			break
+	if _ui_loop_animators.is_empty():
+		_collect_ui_loop_animators(self, _ui_loop_animators)
+	return _ui_loop_animators
+
+func _collect_ui_loop_animators(node: Node, acc: Array[Node]) -> void:
+	for child in node.get_children():
+		var script_ref: Script = child.get_script()
+		if child is AnimatedSprite2D and script_ref != null and str(script_ref.resource_path).ends_with("UILoopAnimator.gd"):
+			acc.append(child)
+		_collect_ui_loop_animators(child, acc)
 
 ## 处理标题A点击
 func _on_title_area_a_pressed() -> void:

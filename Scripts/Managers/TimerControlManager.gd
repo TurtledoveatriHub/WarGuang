@@ -38,11 +38,11 @@ extends Node
 
 @export_category("Hit Stop 预设")
 ## Tier 1 - 极短暂停（秒）
-@export var hit_stop_tier1_duration: float = 0.1
+@export var hit_stop_tier1_duration: float = 0.05
 ## Tier 2 - 短暂停（秒）
-@export var hit_stop_tier2_duration: float = 0.2
+@export var hit_stop_tier2_duration: float = 0.1
 ## Tier 3 - 中等暂停（秒）
-@export var hit_stop_tier3_duration: float = 0.35
+@export var hit_stop_tier3_duration: float = 0.3
 ## Tier 4 - 长时间暂停（秒）
 @export var hit_stop_tier4_duration: float = 1.0
 
@@ -62,11 +62,11 @@ extends Node
 ## 中度慢动作 - 时间缩放（0.0-1.0，越小越慢）
 @export var slow_medium_time_scale: float = 0.5
 ## 中度慢动作 - 过渡时间（秒）
-@export var slow_medium_transition: float = 0.25
+@export var slow_medium_transition: float = 0.2
 
 @export_category("Slow Motion 预设 （heavy）")
 ## 重度慢动作 - 持续时间（秒）
-@export var slow_heavy_duration: float = 0.6
+@export var slow_heavy_duration: float = 0.5
 ## 重度慢动作 - 时间缩放（0.0-1.0，越小越慢）
 @export var slow_heavy_time_scale: float = 0.3
 ## 重度慢动作 - 过渡时间（秒）

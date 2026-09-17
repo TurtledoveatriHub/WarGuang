@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=4 uid="uid://cpl4se47i7uk6"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_83itb"]
-[ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/Room1/雪地瓦片集.tres" id="2_hn54l"]
+[ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="2_hn54l"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="4_auxex"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="5_6vpoh"]
 [ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="5_hofoq"]

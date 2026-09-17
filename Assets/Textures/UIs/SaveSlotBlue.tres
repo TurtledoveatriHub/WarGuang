@@ -1,7 +1,6 @@
 [gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://dmxv540ejjtkg"]
 
-[ext_resource type="Texture2D" uid="uid://dvi0fwdkqjh2u" path="res://Assets/Textures/Backgrounds/1.png" id="1_ixh30"]
+[ext_resource type="Texture2D" uid="uid://mvkfwpucr4xm" path="res://Assets/Textures/UIs/存档2.tres" id="1_ixh30"]
 
 [resource]
 atlas = ExtResource("1_ixh30")
-region = Rect2(90, 60, 33, 36)

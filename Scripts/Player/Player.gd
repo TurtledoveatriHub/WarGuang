@@ -4,7 +4,7 @@ extends CharacterBody2D
 ## 状态枚举 
 enum PlayerState {
 	IDLE, MOVE, RUN, JUMP, DOWN, DASH, GLIDE, HURT, DIE, 
-	SLEEP, LOOKUP, LOOKDOWN, INTERACTIVE, WALLGRIP, WALLJUMP,
+	SLEEP, LOOKUP, LOOKDOWN, INTERACTIVE, RIDECART, WALLGRIP, WALLJUMP,
 	SUPERDASHSTART, SUPERDASH, BACKSTEP
 }
 ## 伤害类型枚举
@@ -115,15 +115,15 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 跳跃移动速度（像素/秒）
 @export var jump_move_speed: float = 120.0
 ## 一段跳初始速度
-@export var jump_velocity: float = -120.0
+@export var jump_velocity: float = -90.0
 ## 二段跳初始速度
-@export var double_jump_velocity: float = -60.0
+@export var double_jump_velocity: float = -40.0
 ## 最大跳跃按住时间（秒）
 @export var max_jump_hold_time: float = 0.2
 ## 跳跃额外速度（长按期间每帧增加）
 @export var jump_hold_boost: float = -30.0
 ## 重力
-@export var gravity: float = 980.0
+@export var gravity: float = 900.0
 ## 最大下落速度
 @export var max_fall_speed: float = 480.0
 ## 土狼时间（离开平台后仍可跳跃的时间）
@@ -138,28 +138,30 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 滑翔设置
 @export_category("滑翔设置")
 ## 进入滑翔的初始水平速度
-@export var glide_init_h_speed: float = 0.0
+@export var glide_init_h_speed: float = 60.0
 ## 滑翔目标水平速度
 @export var glide_target_h_speed: float = 120.0
 ## 滑翔水平加速度（按住方向键时每秒逼近目标水平速度的最大变化率）
-@export var glide_horizontal_acceleration: float = 240.0
+@export var glide_horizontal_acceleration: float = 300.0
 ## 滑翔松开方向键时的水平减速
-@export var glide_release_deceleration: float = 120.0
+@export var glide_release_deceleration: float = 180.0
 ## 滑翔最大下落速度乘数
 @export var glide_max_fall_multiplier: float = 0.25
 ## 进入滑翔后的滞空时间（秒）
-@export var glide_hover_time: float = 0.12
+@export var glide_hover_time: float = 0.1
 ## 滑翔下落倍率过渡时间（秒）
-@export var glide_fall_accel_time: float = 1.6
+@export var glide_fall_accel_time: float = 1.2
+## 滑翔输入冷却：松开跳跃键退出滑翔后，此时间内再次按下跳跃不会重新进入滑翔（秒）
+@export var glide_input_cooldown: float = 0.25
 
 ## 受伤设置
 @export_category("受伤设置")
 ## 进入游戏开始时的禁用时间（秒）
 @export var warp_control_lock_time: float = 1.0
 ## 受伤僵直时间（秒）
-@export var hurt_stun_time: float = 0.4
+@export var hurt_stun_time: float = 0.3
 ## 受伤无敌时间（秒）
-@export var hurt_invincible_time: float = 0.6
+@export var hurt_invincible_time: float = 0.4
 ## 传送伤害飞行峰值速度（像素/秒）
 @export var warp_flight_peak_speed: float = 720.0
 ## 传送伤害飞行最低速度（像素/秒）
@@ -217,7 +219,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 后撤步持续时间（秒）
 @export var backstep_duration: float = 0.12
 ## 后撤步移动速度
-@export var backstep_move_speed: float = 240.0
+@export var backstep_move_speed: float = 180.0
 ## 后撤步防反有效窗口（秒）：<=0 时自动使用后撤步持续时间。
 @export var backstep_counter_window: float = 0.1
 ## 后撤步成功防反后仍保持无敌的持续时间（秒）。
@@ -235,15 +237,15 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 超级冲刺目标速度
 @export var super_dash_speed: float = 420
 ## 超级冲刺加速时间（秒）
-@export var super_dash_accel_time: float = 0.6
+@export var super_dash_accel_time: float = 0.4
 ## 超级冲刺减速时间（秒）
-@export var super_dash_deceleration_time: float = 0.4
+@export var super_dash_deceleration_time: float = 0.6
 ## 超级冲刺输入锁定时间（秒）
 @export var super_dash_input_lock_time: float = 0.2
 ## 超级冲刺开始后允许生成残影的延迟时间（秒）
-@export var super_dash_afterimage_start_delay: float = 0.1
+@export var super_dash_afterimage_start_delay: float = 0.2
 ## 超级冲刺最大持续时间（秒）
-@export var super_dash_max_duration: float = 2.2
+@export var super_dash_max_duration: float = 1.6
 
 ## 奔跑设置
 @export_category("奔跑设置")
@@ -306,7 +308,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 离墙后触发墙跳的缓冲窗口（秒）
 @export var wall_jump_escape_buffer_time: float = 0.1  
 ## 墙跳水平初速度（离开墙体的水平速度）
-@export var wall_jump_h_speed: float = 120.0
+@export var wall_jump_h_speed: float = 90.0
 ## 墙跳垂直速度
 @export var wall_jump_v_speed: float = -180.0
 ## 墙跳后重新附着延迟（秒）
@@ -415,6 +417,8 @@ var jump1start_played: bool = false              # JUMP1START 已播放标志
 var should_jump1start: bool = false              # 下次进 JUMP 态时先播 JUMP1START
 var _landing_downend_active: bool = false        # 着陆后等待DOWNEND播完再切IDLE
 var was_gliding_before_dash: bool = false       # 标记冲刺前是否在滑翔状态
+var glide_input_cooldown_remaining: float = 0.0  # 滑翔输入冷却剩余时间（松开跳跃退出滑翔后开始计时）
+var glide_input_buffered: bool = false           # 滑翔输入缓冲：冷却中按下跳跃且一直按住，冷却结束可自动进入滑翔
 
 ## 受伤相关
 var is_invincible: bool = false                 # 标记是否处于无敌状态
@@ -445,6 +449,9 @@ var is_respawn_invincible: bool = false         # 标记是否为重生无敌（
 
 ## 内部禁用时间变量
 var door_teleport_lock_time: float = 0.5        # 门传送后禁用时间（内部变量，由Door设置）
+## 矿车骑乘相关
+var riding_minecart: Node = null               # 骑乘中的矿车引用（null=未骑乘）
+var riding_hurt_remaining: float = 0.0          # 骑乘受击时 Hurt 动画剩余时长（秒）
 var control_lock_timer: float = 0.0             # 控制锁定计时器
 var is_control_locked: bool = false             # 标记玩家控制是否被锁定
 var door_autowalk_active: bool = false          # Door 传送后的自动走位是否激活

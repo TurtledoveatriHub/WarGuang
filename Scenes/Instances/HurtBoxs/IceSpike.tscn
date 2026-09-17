@@ -1,0 +1,181 @@
+[gd_scene load_steps=17 format=3 uid="uid://ba0eej1ktxrbm"]
+
+[ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_50htr"]
+[ext_resource type="Texture2D" uid="uid://bm258n0bhuxf7" path="res://Assets/Textures/Instances/SnowMountain/冰锥.png" id="3_eq7s1"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_50htr"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(128, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eq7s1"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(160, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ne15l"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(0, 48, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c0kg0"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(160, 48, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rrc3v"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(0, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8vnav"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(32, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d2t4a"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(64, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uhask"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(96, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_07b7q"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(32, 48, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5xt24"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(64, 48, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dmips"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(96, 48, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m5v4c"]
+atlas = ExtResource("3_eq7s1")
+region = Rect2(128, 48, 32, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3abc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_50htr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eq7s1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ne15l")
+}],
+"loop": false,
+"name": &"CLOSE",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c0kg0")
+}],
+"loop": true,
+"name": &"OFF",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8vnav")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d2t4a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uhask")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uhask")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rrc3v")
+}],
+"loop": true,
+"name": &"ON",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_07b7q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5xt24")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dmips")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m5v4c")
+}],
+"loop": false,
+"name": &"OPEN",
+"speed": 12.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_50htr"]
+radius = 6.0
+height = 35.0
+
+[node name="IceSpike" type="Area2D" node_paths=PackedStringArray("collision_shapes")]
+visibility_layer = 16
+collision_layer = 16
+collision_mask = 129
+script = ExtResource("1_50htr")
+sprite_effect = 0
+movement_mode = 1
+move_speed = 480.0
+wait_time = 0.2
+acceleration_time = 0.3
+deceleration_time = 0.0
+enable_launcher_mode = true
+enable_player_detect = true
+collision_shapes = [NodePath("CollisionShape2D")]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_3abc")
+animation = &"ON"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 16
+position = Vector2(-1, -1)
+shape = SubResource("CapsuleShape2D_50htr")

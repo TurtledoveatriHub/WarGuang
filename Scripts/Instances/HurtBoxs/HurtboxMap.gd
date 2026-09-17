@@ -5,9 +5,9 @@ extends TileMapLayer
 ## 默认是否传送伤害
 @export var default_is_warp: bool = false
 ## ★ 对 player 的击退力（Vector2统一参数）
-@export var player_knockback: Vector2 = Vector2(50, 100)
+@export var player_knockback: Vector2 = Vector2(30, 50)
 ## ★ 对 Layer8 敌人的击退力（Vector2统一参数）
-@export var enemy_knockback: Vector2 = Vector2(1000, 100)
+@export var enemy_knockback: Vector2 = Vector2(100, 100)
 ## 伤害冷却间隔（秒）
 @export var damage_cooldown_time: float = 0.2
 

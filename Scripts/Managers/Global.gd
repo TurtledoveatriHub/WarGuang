@@ -35,6 +35,10 @@ var collected_items: Array = []
 # 可破坏石墙摧毁记录（当前存档）- 从存档数据中读取/保存
 var destructible_walls_destroyed: Array = []
 
+# 已被永久触发的“隐藏房间/隐藏背景”记录（元素为 region_id，形如 room_id::层名 或自定义 save_id）
+# 仅 permanent_hide=true 的 HiddenRegionFade 在完成淡出后登记，随存档读写。
+var hidden_rooms_activated: Array = []
+
 ## 疯子挑战状态记录
 
 # 第一阶段挑战状态记录
@@ -158,6 +162,7 @@ func initialize_new_game():
 	save_point_position = Vector2.ZERO
 	last_checkpoint_position = Vector2.ZERO
 	last_checkpoint_type = "static"
+	hidden_rooms_activated = []
 	
 	var task_manager = get_node_or_null("/root/TaskManager")
 	if task_manager:
@@ -246,6 +251,7 @@ func get_save_data() -> Dictionary:
 		"maniac_stage10_last_challenge_failed": maniac_stage10_last_challenge_failed,
 		
 		"destructible_walls_destroyed": destructible_walls_destroyed.duplicate(true),
+		"hidden_rooms_activated": hidden_rooms_activated.duplicate(),
 		"discovered_rooms": MapManager.discovered_rooms.duplicate() if MapManager else [],
 		"activated_teleports": TeleportManager.activated.duplicate() if TeleportManager else [],
 		"tp_coords": TeleportManager.get_save_coords() if TeleportManager and TeleportManager.has_method("get_save_coords") else {},
@@ -400,8 +406,27 @@ func load_save_data(data: Dictionary):
 		MapManager.load_save_data(data)
 	if TeleportManager and TeleportManager.has_method("load_save_data"):
 		TeleportManager.load_save_data(data)
+	# 隐藏房间（永久淡出）已激活记录
+	if data.has("hidden_rooms_activated") and typeof(data["hidden_rooms_activated"]) == TYPE_ARRAY:
+		hidden_rooms_activated = data["hidden_rooms_activated"].duplicate()
+	else:
+		hidden_rooms_activated = []
 	
 	print("Global: 存档数据加载完成")
+
+
+## 登记一个隐藏区域已被永久触发（permanent_hide=true 淡出完成时调用）。
+func mark_hidden_room_activated(region_id: String) -> void:
+	if region_id == "":
+		return
+	if region_id in hidden_rooms_activated:
+		return
+	hidden_rooms_activated.append(region_id)
+
+
+## 查询某隐藏区域是否已在存档中永久触发。
+func is_hidden_room_activated(region_id: String) -> bool:
+	return region_id in hidden_rooms_activated
 
 func has_cinematic_flag(flag_id: String) -> bool:
 	if flag_id.strip_edges() == "":

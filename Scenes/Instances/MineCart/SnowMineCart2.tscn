@@ -1,0 +1,110 @@
+[gd_scene load_steps=12 format=3 uid="uid://dw28jmn0x6xdr"]
+
+[ext_resource type="Script" uid="uid://0mjagkn16vdd" path="res://Scripts/Instances/MineCart/MineCart.gd" id="1_qlrtd"]
+[ext_resource type="AudioStream" uid="uid://cqqlb62bedu8f" path="res://Assets/Audios/SFX/UI/鼠标点击音效.wav" id="2_lhmg1"]
+[ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/a.wav" id="3_bnfh8"]
+[ext_resource type="SpriteFrames" uid="uid://bo6tmy6ys866l" path="res://Assets/Textures/FXs/InstanceFXs/MineCartFX.tres" id="4_qlrtd"]
+[ext_resource type="Script" uid="uid://3sc2mg6jcng3" path="res://Scripts/Instances/MineCart/MineCartTrack.gd" id="5_t3e13"]
+[ext_resource type="Texture2D" uid="uid://c1jrdgisl8krh" path="res://Assets/Textures/Instances/MineCart/轨道.png" id="6_12b4c"]
+[ext_resource type="Texture2D" uid="uid://bwh35fdj2awsl" path="res://Assets/Textures/Instances/MineCart/缆车.png" id="7_gvxsf"]
+[ext_resource type="Texture2D" uid="uid://brov0gixu2g0a" path="res://Assets/Textures/Instances/MineCart/轮子.png" id="8_nqiyd"]
+[ext_resource type="Texture2D" uid="uid://xygjp77wxevl" path="res://Assets/Textures/UIs/SceneUIs/tres/回退1.tres" id="9_afaup"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_st"]
+size = Vector2(160, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_en"]
+size = Vector2(160, 80)
+
+[node name="SonwMineCart2" type="Node2D"]
+script = ExtResource("1_qlrtd")
+board_sfx = ExtResource("2_lhmg1")
+disembark_sfx = ExtResource("3_bnfh8")
+smoke_frames = ExtResource("4_qlrtd")
+rail_offset = Vector2(0, -4)
+
+[node name="Track" type="Node2D" parent="."]
+script = ExtResource("5_t3e13")
+debug_draw_track = true
+rail_texture = ExtResource("6_12b4c")
+
+[node name="Point0" type="Marker2D" parent="Track"]
+position = Vector2(2336, -848)
+
+[node name="Point1" type="Marker2D" parent="Track"]
+position = Vector2(1664, -848)
+
+[node name="Arc2" type="Marker2D" parent="Track"]
+position = Vector2(1616, -864)
+
+[node name="Point3" type="Marker2D" parent="Track"]
+position = Vector2(1600, -912)
+
+[node name="Arc4" type="Marker2D" parent="Track"]
+position = Vector2(1584, -960)
+
+[node name="Point5" type="Marker2D" parent="Track"]
+position = Vector2(1536, -976)
+
+[node name="Point6" type="Marker2D" parent="Track"]
+position = Vector2(768, -976)
+
+[node name="Arc7" type="Marker2D" parent="Track"]
+position = Vector2(720, -960)
+
+[node name="Point8" type="Marker2D" parent="Track"]
+position = Vector2(704, -912)
+
+[node name="Point9" type="Marker2D" parent="Track"]
+position = Vector2(704, 704)
+
+[node name="RotateGroup" type="Node2D" parent="."]
+position = Vector2(2312, -832)
+
+[node name="Body" type="Sprite2D" parent="RotateGroup"]
+z_index = 18
+position = Vector2(0, 27)
+texture = ExtResource("7_gvxsf")
+
+[node name="WheelFront" type="Sprite2D" parent="RotateGroup"]
+z_index = 18
+position = Vector2(-1, 3)
+texture = ExtResource("8_nqiyd")
+
+[node name="WheelBack" type="Sprite2D" parent="RotateGroup"]
+z_index = 18
+position = Vector2(-1, -7)
+texture = ExtResource("8_nqiyd")
+
+[node name="PlayerAnchor" type="Marker2D" parent="RotateGroup"]
+position = Vector2(0, 31)
+
+[node name="AreaA" type="Area2D" parent="."]
+position = Vector2(2336, -824)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaA"]
+shape = SubResource("RectangleShape2D_st")
+
+[node name="InteractionPrompt" type="Sprite2D" parent="AreaA"]
+visible = false
+position = Vector2(0, -46)
+texture = ExtResource("9_afaup")
+
+[node name="ExitA" type="Marker2D" parent="."]
+position = Vector2(2312, -816)
+
+[node name="AreaB" type="Area2D" parent="."]
+position = Vector2(-2192, -808)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaB"]
+shape = SubResource("RectangleShape2D_en")
+
+[node name="InteractionPrompt" type="Sprite2D" parent="AreaB"]
+visible = false
+position = Vector2(0, -46)
+texture = ExtResource("9_afaup")
+
+[node name="ExitB" type="Marker2D" parent="."]
+position = Vector2(-2168, -800)

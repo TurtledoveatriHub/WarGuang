@@ -22,5 +22,7 @@ room_positions = {
 "RoomDream10": Vector2(3392, 1088),
 "SnowMountain1": Vector2(60000, 0),
 "SnowMountain2": Vector2(63520, -320),
-"SnowMountain3": Vector2(66720, 960)
+"SnowMountain3": Vector2(66720, 960),
+"SnowMountain4": Vector2(68720, 960),
+"SnowMountain5": Vector2(70720, 960)
 }

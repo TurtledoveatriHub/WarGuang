@@ -1,0 +1,157 @@
+[gd_scene load_steps=22 format=3 uid="uid://8fgwvc0o8k5q"]
+
+[ext_resource type="Script" uid="uid://jolprxfg3rym" path="res://Scripts/UI/BootCutscene.gd" id="1_2u0jc"]
+[ext_resource type="Texture2D" uid="uid://c06cr3f3ip0ci" path="res://Assets/Textures/开场动画测试.png" id="2_bh5cf"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3csli"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(0, 0, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5u3ks"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(256, 0, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2ymff"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(512, 0, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0ygsn"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(768, 0, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gv6gx"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(1024, 0, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uodki"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(1280, 0, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0muer"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(0, 144, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5pguc"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(256, 144, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6jk8g"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(512, 144, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1k3oy"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(768, 144, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_k3p4t"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(1024, 144, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l43bc"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(1280, 144, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uqqy2"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(0, 288, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2nmb3"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(256, 288, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y6id5"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(512, 288, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_425hh"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(768, 288, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a2e87"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(1024, 288, 256, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6o88g"]
+atlas = ExtResource("2_bh5cf")
+region = Rect2(1280, 288, 256, 144)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bh5cf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3csli")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5u3ks")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2ymff")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0ygsn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gv6gx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uodki")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0muer")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5pguc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6jk8g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1k3oy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_k3p4t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l43bc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uqqy2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2nmb3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y6id5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_425hh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a2e87")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6o88g")
+}],
+"loop": false,
+"name": &"intro",
+"speed": 6.0
+}]
+
+[node name="BootCutscene" type="CanvasLayer"]
+layer = 950
+script = ExtResource("1_2u0jc")
+
+[node name="Overlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
+
+[node name="CutsceneSprite" type="AnimatedSprite2D" parent="."]
+position = Vector2(640, 360)
+scale = Vector2(5, 5)
+sprite_frames = SubResource("SpriteFrames_bh5cf")
+animation = &"intro"

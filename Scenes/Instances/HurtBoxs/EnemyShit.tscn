@@ -1,0 +1,77 @@
+[gd_scene load_steps=10 format=3 uid="uid://b2bcmv7t70mjs"]
+
+[ext_resource type="Script" uid="uid://coyhoi2hy0saj" path="res://Scripts/Instances/HurtBoxs/EnemyBullet.gd" id="1_8e4pi"]
+[ext_resource type="Texture2D" uid="uid://bo1fegc8f63ti" path="res://Assets/Textures/Enemys/夜露攻击手段.png" id="2_8e4pi"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a1nvj"]
+atlas = ExtResource("2_8e4pi")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dg7ed"]
+atlas = ExtResource("2_8e4pi")
+region = Rect2(144, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1kjtv"]
+atlas = ExtResource("2_8e4pi")
+region = Rect2(192, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3sjlu"]
+atlas = ExtResource("2_8e4pi")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o286q"]
+atlas = ExtResource("2_8e4pi")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_yh0qb"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a1nvj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dg7ed")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1kjtv")
+}],
+"loop": false,
+"name": &"Die",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3sjlu")
+}],
+"loop": true,
+"name": &"Fly",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o286q")
+}],
+"loop": false,
+"name": &"Spawn",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vvqta"]
+size = Vector2(24, 6)
+
+[node name="EnemyShit" type="Area2D"]
+collision_layer = 64
+collision_mask = 39
+script = ExtResource("1_8e4pi")
+speed = 420.0
+life_time = 2.0
+affected_by_gravity = true
+accel_time = 0.1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_yh0qb")
+animation = &"Spawn"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-1, 1)
+shape = SubResource("RectangleShape2D_vvqta")

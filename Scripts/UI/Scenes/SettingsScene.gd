@@ -18,6 +18,11 @@ extends CanvasLayer
 @onready var master_volume_slider = $SettingsRoot/PagesRoot/AudioPage/VolumeContainer/MasterVolumeLabel/MasterVolumeSlider
 @onready var bgm_volume_slider = $SettingsRoot/PagesRoot/AudioPage/VolumeContainer/BGMVolumeLabel/BGMVolumeSlider
 @onready var sfx_volume_slider = $SettingsRoot/PagesRoot/AudioPage/VolumeContainer/SFXVolumeLabel/SFXVolumeSlider
+@onready var master_volume_label: Label = get_node_or_null("SettingsRoot/PagesRoot/AudioPage/VolumeContainer/MasterVolumeLabel")
+@onready var bgm_volume_label: Label = get_node_or_null("SettingsRoot/PagesRoot/AudioPage/VolumeContainer/BGMVolumeLabel")
+@onready var sfx_volume_label: Label = get_node_or_null("SettingsRoot/PagesRoot/AudioPage/VolumeContainer/SFXVolumeLabel")
+## 常态 UI 循环动画节点缓存（一个场景可以放多个 UILoopAnimator，全部会被驱动）
+var _ui_loop_animators: Array[Node] = []
 
 ## 场景来源信息
 var opened_from: String = ""
@@ -30,7 +35,8 @@ var _page_switch_in_progress: bool = false
 
 @export_category("Settings 页面内切换动画")
 ## 强制在 PC 端以移动端控制页面进行调试测试。
-@export var force_mobile_controls_for_testing: bool = true
+## 默认 false：PC 上显示 PCControlsPage；需要测试移动端页面时在 Inspector 勾选。
+@export var force_mobile_controls_for_testing: bool = false
 ## 设置页面入场动画时长，单位：秒。
 @export var page_enter_duration: float = 0.22
 ## 设置页面退场动画时长，单位：秒。
@@ -39,6 +45,9 @@ var _page_switch_in_progress: bool = false
 @export var page_peak_scale_multiplier: float = 1.12
 ## 退场动画最小缩放倍率。
 @export var page_exit_min_scale_multiplier: float = 0.02
+## 页面缩放动画的轴心（PagesRoot 局部坐标，默认 = 屏幕中心）。
+## Node2D 没有 pivot 属性（编辑器无法拖拽），这里用位置补偿等价实现“绕屏幕中心缩放”。
+@export var page_scale_pivot: Vector2 = Vector2(640.0, 360.0)
 ## 页面动画起始位移量，单位：像素。
 @export var page_drift_distance: float = 18.0
 
@@ -102,6 +111,7 @@ func _ready():
 		bgm_volume_slider.value = AudioManager.get_bus_volume_percent("BGM")
 	if sfx_volume_slider:
 		sfx_volume_slider.value = AudioManager.get_bus_volume_percent("SFX")
+	_refresh_all_volume_labels()
 
 	_set_scene_input_locked(true)
 	if ui_transition_animator:
@@ -109,6 +119,8 @@ func _ready():
 		if FadeManager and FadeManager.has_method("get_black_alpha") and FadeManager.get_black_alpha() <= 0.01:
 			call_deferred("_on_scene_transition_enter_begin")
 	else:
+		# 没有过渡动画器时，入场演出直接由本场景触发。
+		_ui_loop_play_enter()
 		_set_scene_input_locked(false)
 	
 	# ESC冷却
@@ -198,6 +210,12 @@ func _restore_page_base_state(page: CanvasItem) -> void:
 	page.scale = _page_base_scales.get(page_name, page.scale)
 	page.modulate = _page_base_modulates.get(page_name, page.modulate)
 
+## 计算“绕 page_scale_pivot 缩放 scale_factor 倍”时该页面应有的位置。
+## 原理：绕点 C 缩放时，位置需同步补偿为 C + (base - C) * factor；
+## 因为位置是该倍率的仿射函数，与缩放使用同一缓动即可保证全程绕 C 缩放。
+func _pivot_scaled_position(base_position: Vector2, scale_factor: float, extra_offset: Vector2 = Vector2.ZERO) -> Vector2:
+	return page_scale_pivot + (base_position - page_scale_pivot) * scale_factor + extra_offset
+
 func _play_page_enter(page: CanvasItem) -> void:
 	var page_name := _name_by_page(page)
 	if page_name == "":
@@ -205,13 +223,14 @@ func _play_page_enter(page: CanvasItem) -> void:
 	var base_position: Vector2 = _page_base_positions.get(page_name, page.position)
 	var base_scale: Vector2 = _page_base_scales.get(page_name, page.scale)
 	var base_modulate: Color = _page_base_modulates.get(page_name, page.modulate)
-	page.position = Vector2(base_position.x, base_position.y + page_drift_distance)
+	# 起始态：放大 + 下移 + 全透明；缩放轴心 = page_scale_pivot（默认屏幕中心）。
 	page.scale = base_scale * page_peak_scale_multiplier
+	page.position = _pivot_scaled_position(base_position, page_peak_scale_multiplier, Vector2(0.0, page_drift_distance))
 	page.modulate = Color(base_modulate.r, base_modulate.g, base_modulate.b, 0.0)
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_CUBIC)
 	tween.set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(page, "position:y", base_position.y, page_enter_duration)
+	tween.parallel().tween_property(page, "position", base_position, page_enter_duration)
 	tween.parallel().tween_property(page, "scale", base_scale, page_enter_duration)
 	tween.parallel().tween_property(page, "modulate:a", base_modulate.a, page_enter_duration)
 	await tween.finished
@@ -222,10 +241,15 @@ func _play_page_exit(page: CanvasItem) -> void:
 		return
 	var base_position: Vector2 = _page_base_positions.get(page_name, page.position)
 	var base_scale: Vector2 = _page_base_scales.get(page_name, page.scale)
+	# 起始态：回到基态，保证从当前位置开始平滑推进。
+	page.position = base_position
+	page.scale = base_scale
+	# 终态：缩小 + 下移 + 全透明；同样以 page_scale_pivot 为轴心。
+	var target_position: Vector2 = _pivot_scaled_position(base_position, page_exit_min_scale_multiplier, Vector2(0.0, page_drift_distance))
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_CUBIC)
 	tween.set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(page, "position:y", base_position.y + page_drift_distance, page_exit_duration)
+	tween.parallel().tween_property(page, "position", target_position, page_exit_duration)
 	tween.parallel().tween_property(page, "scale", base_scale * page_exit_min_scale_multiplier, page_exit_duration)
 	tween.parallel().tween_property(page, "modulate:a", 0.0, page_exit_duration)
 	await tween.finished
@@ -367,6 +391,8 @@ func _close_settings():
 	# 父场景的暗化状态由 GameSettingScene 自己控制，返回父场景后
 	# 只需要恢复按键交互，而不要重新触发 “打开 GameSettingScene” 的暗化逻辑。
 	_set_scene_input_locked(true)
+	# 常态循环动画：与退场过渡同时立即切换“结束”动画，不 await。
+	_ui_loop_play_exit()
 	if ui_transition_animator:
 		await ui_transition_animator.play_exit_transition()
 	
@@ -383,12 +409,28 @@ func _close_settings():
 ## 音量控制函数
 func _on_master_volume_changed(value: float):
 	AudioManager.set_bus_volume_percent("Master", value)
+	if master_volume_label:
+		master_volume_label.text = "主  音 量：%d%%" % int(round(clampf(value, 0.0, 100.0)))
 
 func _on_bgm_volume_changed(value: float):
 	AudioManager.set_bus_volume_percent("BGM", value)
+	if bgm_volume_label:
+		bgm_volume_label.text = "背景音量：%d%%" % int(round(clampf(value, 0.0, 100.0)))
 
 func _on_sfx_volume_changed(value: float):
 	AudioManager.set_bus_volume_percent("SFX", value)
+	if sfx_volume_label:
+		sfx_volume_label.text = "音效音量：%d%%" % int(round(clampf(value, 0.0, 100.0)))
+
+
+## 根据当前滑块值刷新三个音量标题的百分比显示。
+func _refresh_all_volume_labels() -> void:
+	if master_volume_label and master_volume_slider:
+		master_volume_label.text = "主  音 量：%d%%" % int(round(clampf(master_volume_slider.value, 0.0, 100.0)))
+	if bgm_volume_label and bgm_volume_slider:
+		bgm_volume_label.text = "背景音量：%d%%" % int(round(clampf(bgm_volume_slider.value, 0.0, 100.0)))
+	if sfx_volume_label and sfx_volume_slider:
+		sfx_volume_label.text = "音效音量：%d%%" % int(round(clampf(sfx_volume_slider.value, 0.0, 100.0)))
 
 ## 音量滑块拖拽开始时播放点击音效
 func _on_volume_slider_drag_started():
@@ -413,8 +455,42 @@ func _set_scene_input_locked(locked: bool) -> void:
 	_set_category_buttons_enabled(true)
 	_set_category_button_state(_current_page_name)
 
+
+## 常态循环动画：立即播放“开始 -> 循环”（本场景内所有 UILoopAnimator）。
+## 禁止 await，不影响场景流程。
+func _ui_loop_play_enter() -> void:
+	for animator in _get_ui_loop_animators():
+		animator.call("play_enter")
+
+## 常态循环动画：立即播放“结束”（本场景内所有 UILoopAnimator）。
+## 禁止 await，不影响场景流程。
+func _ui_loop_play_exit() -> void:
+	for animator in _get_ui_loop_animators():
+		animator.call("play_exit")
+
+## 收集本场景内所有 UILoopAnimator（递归扫描、不依赖节点名）。
+## 一个场景放多个时会被全部驱动，节点被编辑器改名也不会失效。
+func _get_ui_loop_animators() -> Array[Node]:
+	for animator in _ui_loop_animators:
+		if not is_instance_valid(animator) or not is_ancestor_of(animator):
+			_ui_loop_animators.clear()
+			break
+	if _ui_loop_animators.is_empty():
+		_collect_ui_loop_animators(self, _ui_loop_animators)
+	return _ui_loop_animators
+
+func _collect_ui_loop_animators(node: Node, acc: Array[Node]) -> void:
+	for child in node.get_children():
+		var script_ref: Script = child.get_script()
+		if child is AnimatedSprite2D and script_ref != null and str(script_ref.resource_path).ends_with("UILoopAnimator.gd"):
+			acc.append(child)
+		_collect_ui_loop_animators(child, acc)
+
+
 func _on_scene_transition_enter_begin() -> void:
 	_set_scene_input_locked(true)
+	# 常态循环动画：与 UITransitionAnimator 入场完全同一时刻触发（不 await、不阻塞）。
+	_ui_loop_play_enter()
 	if ui_transition_animator:
 		await ui_transition_animator.play_enter_transition()
 	_set_scene_input_locked(false)

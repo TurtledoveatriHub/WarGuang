@@ -27,6 +27,8 @@ const ROOM_COLORS := {
 	"SnowMountain2": Color(0.5, 0.9, 0.8, 0.3),
 	"SnowMountain3": Color(0.5, 0.7, 1.0, 0.3),
 	"SnowMountain4": Color(0.6, 0.9, 0.7, 0.3),
+	"SnowMountain5": Color(0.5, 0.7, 1.0, 0.3),
+	"SnowMountain6": Color(0.6, 0.9, 0.7, 0.3),
 }
 
 var _data: RoomLayoutData = null

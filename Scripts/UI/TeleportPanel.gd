@@ -24,6 +24,7 @@ var source_teleport_id: String = ""
 	$PanelRoot/Btn1,
 	$PanelRoot/Btn3,
 	$PanelRoot/Btn4,
+	$PanelRoot/Btn5,
 ]
 
 var _original_modulate: Color

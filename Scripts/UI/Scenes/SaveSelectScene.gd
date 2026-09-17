@@ -29,6 +29,8 @@ var _scene_input_locked: bool = true
 @export var room_filled_texture_map: Dictionary = {}
 
 @onready var ui_transition_animator: UITransitionAnimator = $UITransitionAnimator
+## 常态 UI 循环动画节点缓存（一个场景可以放多个 UILoopAnimator，全部会被驱动）
+var _ui_loop_animators: Array[Node] = []
 
 @onready var save_slot_buttons = [
 	$SaveSlot1,
@@ -67,6 +69,8 @@ func _ready():
 	
 	$BackButton.pressed.connect(_on_back_button_pressed)
 	if not ui_transition_animator:
+		# 没有过渡动画器时，入场演出直接由本场景触发。
+		_ui_loop_play_enter()
 		FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
 		_set_scene_input_locked(false)
 	else:
@@ -195,6 +199,8 @@ func _on_save_slot_pressed(slot_index: int):
 		return
 
 	_set_scene_input_locked(true)
+	# 常态循环动画：与退场过渡同时立即切换“结束”动画，不 await。
+	_ui_loop_play_exit()
 	if ui_transition_animator:
 		await ui_transition_animator.play_exit_transition()
 	
@@ -324,7 +330,6 @@ func _on_confirm_delete(slot_index: int):
 			Global.destructible_walls_destroyed = []
 			# 保险措施：避免后续逻辑把运行态数据再保存回已删除的槽位
 			Global.current_save_slot = -1
-			print("SaveSelectScene: 已清空当前存档的石墙摧毁记录")
 
 ## 处理返回按钮按下
 ## 处理返回按钮按下
@@ -337,6 +342,8 @@ func _on_back_button_pressed():
 		return
 
 	_set_scene_input_locked(true)
+	# 常态循环动画：与退场过渡同时立即切换“结束”动画，不 await。
+	_ui_loop_play_exit()
 	if ui_transition_animator:
 		await ui_transition_animator.play_exit_transition()
 		
@@ -357,9 +364,41 @@ func _set_scene_input_locked(locked: bool) -> void:
 	_scene_input_locked = locked
 	_set_buttons_enabled(not locked)
 
+## 常态循环动画：立即播放“开始 -> 循环”（本场景内所有 UILoopAnimator）。
+## 禁止 await，不影响场景流程。
+func _ui_loop_play_enter() -> void:
+	for animator in _get_ui_loop_animators():
+		animator.call("play_enter")
+
+## 常态循环动画：立即播放“结束”（本场景内所有 UILoopAnimator）。
+## 禁止 await，不影响场景流程。
+func _ui_loop_play_exit() -> void:
+	for animator in _get_ui_loop_animators():
+		animator.call("play_exit")
+
+## 收集本场景内所有 UILoopAnimator（递归扫描、不依赖节点名）。
+## 一个场景放多个时会被全部驱动，节点被编辑器改名也不会失效。
+func _get_ui_loop_animators() -> Array[Node]:
+	for animator in _ui_loop_animators:
+		if not is_instance_valid(animator) or not is_ancestor_of(animator):
+			_ui_loop_animators.clear()
+			break
+	if _ui_loop_animators.is_empty():
+		_collect_ui_loop_animators(self, _ui_loop_animators)
+	return _ui_loop_animators
+
+func _collect_ui_loop_animators(node: Node, acc: Array[Node]) -> void:
+	for child in node.get_children():
+		var script_ref: Script = child.get_script()
+		if child is AnimatedSprite2D and script_ref != null and str(script_ref.resource_path).ends_with("UILoopAnimator.gd"):
+			acc.append(child)
+		_collect_ui_loop_animators(child, acc)
+
 ## 播放入场动画后解锁输入
 func _on_scene_transition_enter_begin() -> void:
 	_set_scene_input_locked(true)
+	# 常态循环动画：与 UITransitionAnimator 入场完全同一时刻触发（不 await、不阻塞）。
+	_ui_loop_play_enter()
 	if ui_transition_animator:
 		await ui_transition_animator.play_enter_transition()
 	_set_scene_input_locked(false)

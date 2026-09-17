@@ -1,9 +1,11 @@
-[gd_scene load_steps=42 format=3 uid="uid://bv4un04ljd8ix"]
+[gd_scene load_steps=39 format=3 uid="uid://bv4un04ljd8ix"]
 
 [ext_resource type="Script" uid="uid://c5bnxy7sxs4o4" path="res://Scripts/Enemys/RegularEnemy.gd" id="1_v1wb1"]
+[ext_resource type="PackedScene" uid="uid://bb7u8dqe3lep" path="res://Scenes/Instances/HurtBoxs/EnemyIceBall.tscn" id="2_infkk"]
 [ext_resource type="Texture2D" uid="uid://bofk2fa78wx82" path="res://Assets/Textures/Warmas/w1.png" id="2_xw338"]
 [ext_resource type="Texture2D" uid="uid://d46ruf7uw1ee" path="res://Assets/Textures/Warmas/w2.png" id="3_hjs2s"]
 [ext_resource type="Script" uid="uid://c1qg2xnuu7c8k" path="res://Scripts/Enemys/EnemyBase.gd" id="4_xw338"]
+[ext_resource type="Script" uid="uid://dcwdjd1fwukf4" path="res://Scripts/Enemys/EnemyAudio.gd" id="5_aud"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_d47tu"]
 atlas = ExtResource("3_hjs2s")
@@ -100,22 +102,6 @@ region = Rect2(192, 0, 32, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_esxac"]
 atlas = ExtResource("2_xw338")
 region = Rect2(224, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_f6nxf"]
-atlas = ExtResource("2_xw338")
-region = Rect2(64, 64, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_r36ng"]
-atlas = ExtResource("2_xw338")
-region = Rect2(96, 64, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_y8xyb"]
-atlas = ExtResource("2_xw338")
-region = Rect2(64, 128, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_wb6ns"]
-atlas = ExtResource("2_xw338")
-region = Rect2(96, 128, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ml1sw"]
 atlas = ExtResource("2_xw338")
@@ -239,23 +225,6 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_f6nxf")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_r36ng")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_y8xyb")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_wb6ns")
-}],
-"loop": false,
-"name": &"Respawn",
-"speed": 6.0
-}, {
-"frames": [{
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_ml1sw")
 }, {
 "duration": 1.0,
@@ -273,37 +242,39 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v1wb1"]
-size = Vector2(12, 20)
+size = Vector2(8, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7o4th"]
-size = Vector2(400, 200)
+size = Vector2(512, 288)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x7k7p"]
-size = Vector2(20, 28)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_gh3d9"]
-size = Vector2(24, 28)
+size = Vector2(12, 16)
 
 [node name="Snowman" type="CharacterBody2D"]
 collision_layer = 128
 collision_mask = 6
 script = ExtResource("1_v1wb1")
-obstacle_detector_path = NodePath("ObstacleDetector")
-cliff_detector_path = NodePath("CliffDetector")
-player_detector_path = NodePath("PlayerDetector")
-killzone_path = NodePath("KillZone")
-hurtbox_detector_path = NodePath("HurtBoxDetector")
+bullet_scene = ExtResource("2_infkk")
+enable_bullet_attack = true
+shoot_range = 256.0
+bullet_count = 3
+bullet_gap = 0.4
+muzzle_offset = Vector2(0, 0)
+bullet_parabolic = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_31ow8")
-animation = &"Idle"
+animation = &"Run"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(2, 6)
+position = Vector2(1, 2)
 shape = SubResource("RectangleShape2D_v1wb1")
 
 [node name="EnemyBase" type="Node2D" parent="."]
 script = ExtResource("4_xw338")
+
+[node name="EnemyAudio" type="Node" parent="."]
+script = ExtResource("5_aud")
 
 [node name="ObstacleDetector" type="RayCast2D" parent="."]
 position = Vector2(0, 13)
@@ -315,23 +286,13 @@ target_position = Vector2(50, 25)
 collision_mask = 6
 
 [node name="PlayerDetector" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerDetector"]
-position = Vector2(160, -20)
+position = Vector2(96, -48)
 shape = SubResource("RectangleShape2D_7o4th")
 
 [node name="KillZone" type="Area2D" parent="."]
 collision_layer = 128
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="KillZone"]
-position = Vector2(0, 4)
 shape = SubResource("RectangleShape2D_x7k7p")
-
-[node name="HurtBoxDetector" type="Area2D" parent="."]
-collision_layer = 128
-collision_mask = 16
-
-[node name="DetectShape" type="CollisionShape2D" parent="HurtBoxDetector"]
-position = Vector2(0, 4)
-shape = SubResource("RectangleShape2D_gh3d9")

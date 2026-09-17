@@ -1,7 +1,7 @@
 [gd_scene load_steps=91 format=3 uid="uid://dwj2ydwabq3n0"]
 
 [ext_resource type="Script" uid="uid://b641fcmvm5n4c" path="res://Scripts/Player/Player.gd" id="1_kyqiw"]
-[ext_resource type="PackedScene" uid="uid://dq4jgo8v4l7kq" path="res://Scenes/Instances/Afterimage.tscn" id="2_t26db"]
+[ext_resource type="PackedScene" uid="uid://dq4jgo8v4l7kq" path="res://Scenes/Instances/ObjectPools/Afterimage.tscn" id="2_t26db"]
 [ext_resource type="Script" uid="uid://bhexx6mj1xv3q" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_2d.gd" id="3_ude3g"]
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="4_jmcll"]
 [ext_resource type="Script" uid="uid://bw1fmebkjwy7o" path="res://Scripts/Tools/AfterimageTrail.gd" id="5_afterimagetrail"]
@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://d3gavddfgdl2a" path="res://Assets/Textures/Warmas/wmn.png" id="8_0kmp4"]
 [ext_resource type="Script" uid="uid://db7uppi456x2k" path="res://Scripts/Player/PlayerAudioController.gd" id="8_audio_controller"]
 [ext_resource type="AudioStream" uid="uid://ba0qy4ogo4g61" path="res://Assets/Audios/SFX/Player/jump2.wav" id="8_jump_placeholder"]
-[ext_resource type="SpriteFrames" uid="uid://wjbyfthj2wul" path="res://Assets/Textures/FXs/PlayerFXs/PlayerFX001.tres" id="8_player_fx_frames"]
+[ext_resource type="SpriteFrames" uid="uid://wjbyfthj2wul" path="res://Assets/Textures/FXs/PlayerFXs/PlayerFX.tres" id="8_player_fx_frames"]
 [ext_resource type="AudioStream" uid="uid://r0cd2hghqoae" path="res://Assets/Audios/SFX/Player/dash.wav" id="9_dash_placeholder"]
 [ext_resource type="AudioStream" uid="uid://bc322m6eyh1kt" path="res://Assets/Audios/SFX/Player/landing.wav" id="9_io2mu"]
 [ext_resource type="AudioStream" uid="uid://ypg2ort126og" path="res://Assets/Audios/SFX/Player/runjump.wav" id="10_0u84n"]
@@ -616,7 +616,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_io2mu"]
-size = Vector2(10, 14)
+size = Vector2(12, 14)
 
 [sub_resource type="Resource" id="Resource_ude3g"]
 script = ExtResource("4_jmcll")
@@ -695,7 +695,7 @@ sprite_frames = SubResource("SpriteFrames_jbabp")
 animation = &"IDLE"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 4)
+position = Vector2(1, 4)
 shape = SubResource("RectangleShape2D_io2mu")
 
 [node name="PhantomCamera2D" type="Node2D" parent="." node_paths=PackedStringArray("follow_target")]

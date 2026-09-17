@@ -3,13 +3,9 @@ class_name PlayerFeedbackService
 
 # 统一处理跑步、冲刺和 JumpBox 残影的节奏与池切换。
 static func handle_afterimages(player: Node, fixed_delta: float) -> void:
-	var current_fps = Engine.get_frames_per_second()
-	if current_fps < 45:
-		player.afterimage_spawn_rate = lerp(player.afterimage_spawn_rate, 2.0, fixed_delta * 2.0)
-	elif current_fps > 55:
-		player.afterimage_spawn_rate = lerp(player.afterimage_spawn_rate, 0.8, fixed_delta * 2.0)
-
-	player.afterimage_spawn_rate = clamp(player.afterimage_spawn_rate, 0.5, 2.0)
+	# 残影节奏不再依赖 Engine.get_frames_per_second()：设备帧率波动会导致密度闪变。
+	# 固定为 1.0，即生成间隔恒等于各残影配置的 spawn_interval。
+	player.afterimage_spawn_rate = 1.0
 
 	match player.current_state:
 		player.PlayerState.DASH:
@@ -81,8 +77,7 @@ static func get_afterimage_type_name(player: Node, state: int, is_jumpbox: bool 
 			return "normal"
 
 static func create_afterimage(player: Node, state: int, is_jumpbox: bool = false, custom_type: String = "") -> void:
-	if Engine.get_frames_per_second() < 45:
-		return
+	# 不再因瞬时低帧率跳过生成（会造成残影断续）。如需性能保护，建议改为可配置的质量开关。
 	if player.afterimage_trail == null:
 		player._ensure_afterimage_trail()
 	if player.afterimage_trail != null:

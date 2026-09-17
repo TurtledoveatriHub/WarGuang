@@ -12,10 +12,10 @@
 [ext_resource type="Texture2D" uid="uid://cilxl6s3ql74f" path="res://Assets/Textures/UIs/MobieControlsUI/冲刺1.tres" id="10_7uw37"]
 [ext_resource type="Script" uid="uid://ujho0n07mac4" path="res://Scripts/Events/NewSaveOpeningEventDirector.gd" id="10_new_save_opening"]
 [ext_resource type="Texture2D" uid="uid://cmqn3lq3grd75" path="res://Assets/Textures/UIs/MobieControlsUI/冲刺2.tres" id="11_21net"]
-[ext_resource type="Texture2D" uid="uid://dnua3kkv0wkqj" path="res://Assets/Textures/Backgrounds/4.png" id="11_70mj8"]
+[ext_resource type="Texture2D" uid="uid://dnua3kkv0wkqj" path="res://Assets/Textures/Backgrounds/Room3/4.png" id="11_70mj8"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="11_om4ip"]
 [ext_resource type="Script" uid="uid://dij1xd6xmfvis" path="res://Scripts/Events/RoomCinematicEventDirector.gd" id="11_room_cinematic"]
-[ext_resource type="Texture2D" uid="uid://dvi0fwdkqjh2u" path="res://Assets/Textures/Backgrounds/1.png" id="12_dcv5v"]
+[ext_resource type="Texture2D" uid="uid://dvi0fwdkqjh2u" path="res://Assets/Textures/Backgrounds/Room3/1.png" id="12_dcv5v"]
 [ext_resource type="Texture2D" uid="uid://bw8x5folvwdp1" path="res://Assets/Textures/UIs/MobieControlsUI/交互1.tres" id="12_exifc"]
 [ext_resource type="Texture2D" uid="uid://br0syxlpkp878" path="res://Assets/Textures/UIs/MobieControlsUI/交互2.tres" id="13_j582q"]
 [ext_resource type="Texture2D" uid="uid://dpose46mf52q0" path="res://Assets/Textures/UIs/MobieControlsUI/超级冲刺1.tres" id="14_uc6ms"]
@@ -36,7 +36,6 @@ glow_bloom = 0.22
 script = ExtResource("1_dcv5v")
 
 [node name="GlobalCanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0.4915833, 0.49158323, 0.49158323, 1)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_jbabp")
@@ -50,6 +49,7 @@ shadow_enabled = true
 physics_interpolation_mode = 1
 position = Vector2(0, -704)
 zoom = Vector2(2, 2)
+process_callback = 0
 limit_enabled = false
 position_smoothing_speed = 8.0
 
@@ -165,6 +165,58 @@ texture_normal = ExtResource("16_bjlxe")
 texture_hover = ExtResource("17_r5aow")
 stretch_mode = 3
 
+[node name="DpadUp" type="TextureButton" parent="MobileTouchHUD/Root"]
+visible = false
+layout_mode = 0
+offset_left = 104.0
+offset_top = 360.0
+offset_right = 168.0
+offset_bottom = 424.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("6_545fw")
+stretch_mode = 3
+
+[node name="DpadDown" type="TextureButton" parent="MobileTouchHUD/Root"]
+visible = false
+layout_mode = 0
+offset_left = 104.0
+offset_top = 552.0
+offset_right = 168.0
+offset_bottom = 616.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("6_545fw")
+stretch_mode = 3
+
+[node name="DpadLeft" type="TextureButton" parent="MobileTouchHUD/Root"]
+visible = false
+layout_mode = 0
+offset_left = 8.0
+offset_top = 456.0
+offset_right = 72.0
+offset_bottom = 520.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("6_545fw")
+stretch_mode = 3
+
+[node name="DpadRight" type="TextureButton" parent="MobileTouchHUD/Root"]
+visible = false
+layout_mode = 0
+offset_left = 200.0
+offset_top = 456.0
+offset_right = 264.0
+offset_bottom = 520.0
+scale = Vector2(2, 2)
+focus_mode = 0
+mouse_filter = 2
+texture_normal = ExtResource("6_545fw")
+stretch_mode = 3
+
 [node name="VignetteEffect" parent="." instance=ExtResource("8_jbabp")]
 
 [node name="BootCinematicDirector" type="CanvasLayer" parent="."]
@@ -176,6 +228,7 @@ script = ExtResource("9_boot_cinematic")
 
 [node name="NewSaveOpeningEventDirector" type="Node" parent="EventDirectors"]
 script = ExtResource("10_new_save_opening")
+opening_room_id = "GrassLand1"
 intro_text_theme = ExtResource("11_om4ip")
 intro_text_lines = PackedStringArray("序章", "黑暗正在退去", "新的旅程开始了")
 intro_text_line_hold_times = PackedFloat32Array(1, 0.5, 1)

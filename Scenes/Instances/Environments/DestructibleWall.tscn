@@ -1,0 +1,119 @@
+[gd_scene load_steps=15 format=3 uid="uid://ch51hg2xln7gy"]
+
+[ext_resource type="Script" uid="uid://bnwr7hcg7b7je" path="res://Scripts/Instances/DestructibleWall.gd" id="1_wall"]
+[ext_resource type="Texture2D" uid="uid://84vpi6k4oljc" path="res://Assets/Textures/Instances/SnowMountain/石墙.png" id="2_lt2x3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(10, 30)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lt2x3"]
+atlas = ExtResource("2_lt2x3")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xfggi"]
+atlas = ExtResource("2_lt2x3")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kmksv"]
+atlas = ExtResource("2_lt2x3")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2lbkv"]
+atlas = ExtResource("2_lt2x3")
+region = Rect2(96, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5dcxc"]
+atlas = ExtResource("2_lt2x3")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mxay4"]
+atlas = ExtResource("2_lt2x3")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iucdf"]
+atlas = ExtResource("2_lt2x3")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_48ni2"]
+atlas = ExtResource("2_lt2x3")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y128i"]
+atlas = ExtResource("2_lt2x3")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wutf2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lt2x3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xfggi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kmksv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2lbkv")
+}],
+"loop": false,
+"name": &"DESTROYED",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5dcxc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mxay4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iucdf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_48ni2")
+}],
+"loop": false,
+"name": &"HIT",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y128i")
+}],
+"loop": true,
+"name": &"IDLE",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lt2x3"]
+
+[node name="DestructibleWall" type="Node2D"]
+script = ExtResource("1_wall")
+hit_count_required = null
+facing_direction = null
+velocity_threshold_min = null
+velocity_threshold_max = null
+wall_id = null
+
+[node name="WallBody" type="StaticBody2D" parent="."]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallBody"]
+light_mask = 2
+position = Vector2(5, 0)
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="WallBody"]
+sprite_frames = SubResource("SpriteFrames_wutf2")
+animation = &"IDLE"
+
+[node name="WallDetector" type="Area2D" parent="."]
+scale = Vector2(2, 2)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDetector"]
+light_mask = 2
+position = Vector2(2, 0)
+shape = SubResource("RectangleShape2D_lt2x3")

@@ -1,0 +1,158 @@
+[gd_scene load_steps=12 format=3 uid="uid://bc76ni7hble1f"]
+
+[ext_resource type="Script" uid="uid://0mjagkn16vdd" path="res://Scripts/Instances/MineCart/MineCart.gd" id="1_cart"]
+[ext_resource type="Script" uid="uid://3sc2mg6jcng3" path="res://Scripts/Instances/MineCart/MineCartTrack.gd" id="2_trk"]
+[ext_resource type="AudioStream" uid="uid://cqqlb62bedu8f" path="res://Assets/Audios/SFX/UI/鼠标点击音效.wav" id="2_wr80o"]
+[ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/a.wav" id="3_d82lh"]
+[ext_resource type="SpriteFrames" uid="uid://bo6tmy6ys866l" path="res://Assets/Textures/FXs/InstanceFXs/MineCartFX.tres" id="4_d82lh"]
+[ext_resource type="Texture2D" uid="uid://c1jrdgisl8krh" path="res://Assets/Textures/Instances/MineCart/轨道.png" id="6_d82lh"]
+[ext_resource type="Texture2D" uid="uid://xygjp77wxevl" path="res://Assets/Textures/UIs/SceneUIs/tres/回退1.tres" id="6_hgfgm"]
+[ext_resource type="Texture2D" uid="uid://bwh35fdj2awsl" path="res://Assets/Textures/Instances/MineCart/缆车.png" id="7_6fufq"]
+[ext_resource type="Texture2D" uid="uid://brov0gixu2g0a" path="res://Assets/Textures/Instances/MineCart/轮子.png" id="8_yc8uq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_st"]
+size = Vector2(160, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_en"]
+size = Vector2(160, 80)
+
+[node name="MineCart" type="Node2D"]
+script = ExtResource("1_cart")
+board_sfx = ExtResource("2_wr80o")
+disembark_sfx = ExtResource("3_d82lh")
+smoke_frames = ExtResource("4_d82lh")
+
+[node name="Track" type="Node2D" parent="."]
+script = ExtResource("2_trk")
+debug_draw_track = true
+rail_texture = ExtResource("6_d82lh")
+
+[node name="Point0" type="Marker2D" parent="Track"]
+
+[node name="Point1" type="Marker2D" parent="Track"]
+position = Vector2(256, 0)
+
+[node name="Arc2" type="Marker2D" parent="Track"]
+position = Vector2(296, -24)
+
+[node name="Point3" type="Marker2D" parent="Track"]
+position = Vector2(320, -64)
+
+[node name="Point4" type="Marker2D" parent="Track"]
+position = Vector2(320, -192)
+
+[node name="Arc5" type="Marker2D" parent="Track"]
+position = Vector2(296, -231)
+
+[node name="Point6" type="Marker2D" parent="Track"]
+position = Vector2(256, -255)
+
+[node name="Point7" type="Marker2D" parent="Track"]
+position = Vector2(-832, -256)
+
+[node name="Arc8" type="Marker2D" parent="Track"]
+position = Vector2(-896, -288)
+
+[node name="Point9" type="Marker2D" parent="Track"]
+position = Vector2(-960, -256)
+
+[node name="Point10" type="Marker2D" parent="Track"]
+position = Vector2(-1343, 256)
+
+[node name="Point11" type="Marker2D" parent="Track"]
+position = Vector2(-1664, 256)
+
+[node name="Arc12" type="Marker2D" parent="Track"]
+position = Vector2(-1712, 384)
+
+[node name="Point13" type="Marker2D" parent="Track"]
+position = Vector2(-1664, 512)
+
+[node name="Point14" type="Marker2D" parent="Track"]
+position = Vector2(-576, 512)
+
+[node name="Gap15" type="Marker2D" parent="Track"]
+position = Vector2(-576, 512)
+
+[node name="Point16" type="Marker2D" parent="Track"]
+position = Vector2(-384, 640)
+
+[node name="Point17" type="Marker2D" parent="Track"]
+position = Vector2(0, 640)
+
+[node name="Arc18" type="Marker2D" parent="Track"]
+position = Vector2(136, 584)
+
+[node name="Point19" type="Marker2D" parent="Track"]
+position = Vector2(192, 448)
+
+[node name="Arc20" type="Marker2D" parent="Track"]
+position = Vector2(136, 312)
+
+[node name="Point21" type="Marker2D" parent="Track"]
+position = Vector2(0, 256)
+
+[node name="Arc22" type="Marker2D" parent="Track"]
+position = Vector2(-136, 312)
+
+[node name="Point23" type="Marker2D" parent="Track"]
+position = Vector2(-192, 448)
+
+[node name="Arc24" type="Marker2D" parent="Track"]
+position = Vector2(-136, 584)
+
+[node name="Point25" type="Marker2D" parent="Track"]
+position = Vector2(0, 640)
+
+[node name="Point26" type="Marker2D" parent="Track"]
+position = Vector2(512, 640)
+
+[node name="RotateGroup" type="Node2D" parent="."]
+position = Vector2(0, 2)
+
+[node name="Body" type="Sprite2D" parent="RotateGroup"]
+z_index = 18
+position = Vector2(0, 27)
+texture = ExtResource("7_6fufq")
+
+[node name="WheelFront" type="Sprite2D" parent="RotateGroup"]
+z_index = 18
+position = Vector2(-1, 3)
+texture = ExtResource("8_yc8uq")
+
+[node name="WheelBack" type="Sprite2D" parent="RotateGroup"]
+z_index = 18
+position = Vector2(-1, -7)
+texture = ExtResource("8_yc8uq")
+
+[node name="PlayerAnchor" type="Marker2D" parent="RotateGroup"]
+position = Vector2(0, 31)
+
+[node name="AreaA" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaA"]
+shape = SubResource("RectangleShape2D_st")
+
+[node name="InteractionPrompt" type="Sprite2D" parent="AreaA"]
+visible = false
+position = Vector2(0, -46)
+texture = ExtResource("6_hgfgm")
+
+[node name="ExitA" type="Marker2D" parent="."]
+position = Vector2(24, 8)
+
+[node name="AreaB" type="Area2D" parent="."]
+position = Vector2(512, 640)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaB"]
+shape = SubResource("RectangleShape2D_en")
+
+[node name="InteractionPrompt" type="Sprite2D" parent="AreaB"]
+visible = false
+position = Vector2(0, -46)
+texture = ExtResource("6_hgfgm")
+
+[node name="ExitB" type="Marker2D" parent="."]
+position = Vector2(488, 648)

@@ -22,7 +22,7 @@ const UI_DARK_OVERLAY = "res://Scenes/Managers/DarkOverlay.tscn"
 const PLAYER_UI_DIR = "res://Scenes/Player/PlayerUI"
 const PLAYER_HEALTH_UNIT = PLAYER_UI_DIR + "/HealthUnit.tscn"
 const PLAYER_UI = PLAYER_UI_DIR + "/PlayerUI.tscn"
-const PLAYER_AFTERIMAGE = "res://Scenes/Instances/Afterimage.tscn"
+const PLAYER_AFTERIMAGE = "res://Scenes/Instances/ObjectPools/Afterimage.tscn"
 
 # ============================================
 # NPC 场景
@@ -110,6 +110,9 @@ const ROOM_PATHS = {
 	"SnowMountain2": ROOMS_DIR + "SnowMountain/SnowMountain2.tscn",
 	"SnowMountain3": ROOMS_DIR + "SnowMountain/SnowMountain3.tscn",
 	"SnowMountain4": ROOMS_DIR + "SnowMountain/SnowMountain4.tscn",
+	"SnowMountain5": ROOMS_DIR + "SnowMountain/SnowMountain5.tscn",
+	"SnowMountain6": ROOMS_DIR + "SnowMountain/SnowMountain6.tscn",
+	
 }
 
 ## 获取房间场景文件路径

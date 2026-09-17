@@ -30,9 +30,13 @@ static func sync_room_and_camera_for_respawn(player: Node, preferred_room_id: St
 	if RoomManager and RoomManager.has_method("get_room_id_by_position") and RoomManager.has_method("load_room"):
 		var target_room_id: String = preferred_room_id
 		if target_room_id == "":
+			# 死亡/重生：必须落在“存档房间”（last_save_room）。
+			# 不能依赖按坐标反查：传送/走远后存档房间可能已被按需卸载（rooms 里已删除），
+			# get_room_id_by_position 只能看到已加载房间，会回退到当前房间，导致复活仍留在传送到的房间。
+			if Global and typeof(Global.last_save_room) == TYPE_STRING and Global.last_save_room != "":
+				target_room_id = Global.last_save_room
+		if target_room_id == "":
 			target_room_id = RoomManager.get_room_id_by_position(player.global_position)
-		if target_room_id == "" and Global and typeof(Global.last_save_room) == TYPE_STRING and Global.last_save_room != "":
-			target_room_id = Global.last_save_room
 		if target_room_id != "":
 			if RoomManager.has_method("suppress_player_room_enter"):
 				RoomManager.suppress_player_room_enter(1.25)

@@ -1,6 +1,8 @@
 extends RefCounted
 class_name PlayerDamageOrchestratorService
 
+const PlayerMineCartRideServiceScript = preload("res://Scripts/Player/PlayerMineCartRideService.gd")
+
 const DAMAGE_NORMAL := 0
 const DAMAGE_SHADOW := 1
 const DAMAGE_WARP_NORMAL := 2
@@ -26,6 +28,11 @@ static func take_damage_with_type(player: Node, damage_source_position: Vector2,
 		return
 
 	if player.PlayerDamageFlowServiceScript.should_ignore_damage(player):
+		return
+
+	# 骑乘矿车时的非致命伤害：只扣血+沿轨道击退，不下车（致命伤害继续走正常流程）
+	if player.get("riding_minecart") != null \
+	and PlayerMineCartRideServiceScript.try_riding_damage(player, damage, int(damage_type), knockback_force, damage_source_position):
 		return
 
 	player.PlayerDamageFlowServiceScript.clear_counter_slow_for_damage(player)

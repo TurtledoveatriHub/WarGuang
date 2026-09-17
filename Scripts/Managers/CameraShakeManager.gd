@@ -69,9 +69,9 @@ extends Node
 
 @export_category("全方位强抖动（通用）")
 ## 全方位强抖动 - X 轴抖动强度（像素）
-@export var shake_general_strong_x_intensity: float = 60.0
+@export var shake_general_strong_x_intensity: float = 50.0
 ## 全方位强抖动 - Y 轴抖动强度（像素）
-@export var shake_general_strong_y_intensity: float = 60.0
+@export var shake_general_strong_y_intensity: float = 50.0
 ## 全方位强抖动 - 持续时间（秒）
 @export var shake_general_strong_duration: float = 1.5
 ## 全方位强抖动 - 抖动速度（Hz，越高越密集）
@@ -81,9 +81,9 @@ extends Node
 
 @export_category("全方位中抖动（通用）")
 ## 全方位中抖动 - X 轴抖动强度（像素）
-@export var shake_general_moderate_x_intensity: float = 35.0
+@export var shake_general_moderate_x_intensity: float = 30.0
 ## 全方位中抖动 - Y 轴抖动强度（像素）
-@export var shake_general_moderate_y_intensity: float = 35.0
+@export var shake_general_moderate_y_intensity: float = 30.0
 ## 全方位中抖动 - 持续时间（秒）
 @export var shake_general_moderate_duration: float = 0.4
 ## 全方位中抖动 - 抖动速度（Hz，越高越密集）
@@ -93,13 +93,13 @@ extends Node
 
 @export_category("全方位弱抖动（通用）")
 ## 全方位弱抖动 - X 轴抖动强度（像素）
-@export var shake_general_weak_x_intensity: float = 20.0
+@export var shake_general_weak_x_intensity: float = 15.0
 ## 全方位弱抖动 - Y 轴抖动强度（像素）
-@export var shake_general_weak_y_intensity: float = 20.0
+@export var shake_general_weak_y_intensity: float = 15.0
 ## 全方位弱抖动 - 持续时间（秒）
 @export var shake_general_weak_duration: float = 0.3
 ## 全方位弱抖动 - 抖动速度（Hz，越高越密集）
-@export var shake_general_weak_speed: float = 20.0
+@export var shake_general_weak_speed: float = 10.0
 ## 全方位弱抖动 - 衰减类型：0=线性，1=快速，2=缓慢
 @export var shake_general_weak_falloff: int = 0
 

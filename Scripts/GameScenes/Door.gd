@@ -58,6 +58,9 @@ func _check_overlapping_player() -> void:
 	await get_tree().create_timer(1.0).timeout
 	if not is_instance_valid(self) or not is_enabled:
 		return
+	# 只对“本门所属房间”做延迟重叠检测，避免预加载的相邻房间的门被误触发。
+	if not _is_in_current_room():
+		return
 	for b in get_overlapping_bodies():
 		if b.is_in_group("player") and can_teleport:
 			print("[Door] 已在区域内(延迟1s后检测): id=", door_id)
@@ -70,8 +73,29 @@ func _exit_tree():
 	if door_id != "" and DoorManager:
 		DoorManager.unregister_door(self)
 
+
+## 本门是否属于当前正在游玩的房间。
+## 用于避免“预加载的相邻房间”里（世界坐标可能暂时重叠）的门误触发传送/交互。
+func _is_in_current_room() -> bool:
+	if not RoomManager:
+		return true
+	if RoomManager.current_room == "":
+		return true
+	return RoomManager.current_room == get_room_id()
+
+
+## 玩家此刻是否真的与本门 Area2D 重叠（不依赖可能残留的缓存标记 is_player_inside）。
+func _has_player_overlap() -> bool:
+	for body in get_overlapping_bodies():
+		if body.is_in_group("player"):
+			return true
+	return false
+
 func _on_body_entered(body):
 	if body.is_in_group("player") and is_enabled:
+		# 只响应本门所属房间：避免预加载的相邻房间（世界坐标可能重叠）中的门误触发。
+		if not _is_in_current_room():
+			return
 		if body.has_method("is_in_death_state") and body.is_in_death_state():
 			return
 		is_player_inside = true
@@ -96,9 +120,13 @@ func _on_body_exited(body):
 		_hide_interaction_prompt()
 
 func _input(event):
-	if use_interaction_mode and event.is_action_pressed("interactive") and is_player_inside:
+	if use_interaction_mode and event.is_action_pressed("interactive"):
 		var player = get_tree().get_first_node_in_group("player")
 		if player and player.has_method("get_player_state") and player.get_player_state() == player.PlayerState.DASH:
+			return
+		# 方案A：完全不依赖可能残留的缓存标记 is_player_inside。
+		# 按下瞬间必须满足：本门属于当前房间，且玩家此刻确实与本门重叠。
+		if not _is_in_current_room() or not _has_player_overlap():
 			return
 		_hide_interaction_prompt()
 		# 交互模式同样走标准的黑屏→传送流程
@@ -148,7 +176,9 @@ func _teleport_player(player: Node) -> void:
 		for adj in RoomManager.rooms[RoomManager.current_room].adjacent:
 			if RoomManager.has_method("ensure_room_loaded"):
 				RoomManager.ensure_room_loaded(adj)
-				RoomManager.load_room(adj)
+				# 用 skip_unload 预加载，避免在本传送协程中释放房间（可能连带释放本门节点）；
+				# 真正的远处房间回收统一交给协程末尾的延迟卸载。
+				RoomManager.load_room(adj, true)
 	
 	if not loaded_room and target_room_id != "":
 		push_error("Door: 目标房间加载失败 room_id=", target_room_id)
@@ -208,6 +238,12 @@ func _teleport_player(player: Node) -> void:
 	await FadeManager.fade_in(fade_out_duration)
 	
 	other_door.is_player_inside = true
+
+	# 门传送同样需要回收远处房间（Door 以 skip_unload 加载，不会自行卸载）。
+	# 必须在协程最后、且交给 Autoload 延迟执行：若立即卸载，可能连同正在执行本协程的
+	# 门节点所在房间一起被释放，导致流程中断（曾引发致命异常）。
+	if RoomManager and RoomManager.has_method("unload_distant_rooms"):
+		RoomManager.call_deferred("unload_distant_rooms", door_target_room)
 
 ## 获取门所在房间的 ID
 func get_room_id() -> String:

@@ -192,29 +192,28 @@ func _detect_surface_type() -> int:
 	if not collider:
 		return -1
 
-	# 检测 TileMapLayer / TileMap，并优雅处理未配置 surface_type 自定义数据层的情况。
-	if collider is TileMapLayer:
+	# 检测脚下的 TileMapLayer / TileMap：统一通过其 tile_set 的“自定义数据层 surface_type”读取表面类型。
+	# 注意本 Godot 版本：判断“是否存在该自定义数据层”用 TileSet.has_custom_data_layer_by_name，
+	# 读取“某格该层的值”用 TileData.get_custom_data_by_layer_id。
+	if collider is TileMapLayer or collider is TileMap:
 		var local_pos: Vector2 = collider.to_local(result.get("position", Vector2.ZERO))
 		var cell: Vector2i = collider.local_to_map(local_pos)
 		var tile_data = collider.get_cell_tile_data(cell)
-		if tile_data:
-			var layer_id: int = tile_data.get_custom_data_layer_by_name("surface_type")
-			if layer_id >= 0:
-				var value = tile_data.get_custom_data("surface_type")
-				if typeof(value) == TYPE_INT:
-					_cached_surface_type = int(value)
-					return _cached_surface_type
-	elif collider is TileMap:
-		var local_pos: Vector2 = collider.to_local(result.get("position", Vector2.ZERO))
-		var cell: Vector2i = collider.local_to_map(local_pos)
-		var tile_data = collider.get_cell_tile_data(cell)
-		if tile_data:
-			var layer_id: int = tile_data.get_custom_data_layer_by_name("surface_type")
-			if layer_id >= 0:
-				var value = tile_data.get_custom_data("surface_type")
-				if typeof(value) == TYPE_INT:
-					_cached_surface_type = int(value)
-					return _cached_surface_type
+		_cached_surface_type = _read_surface_type(collider.tile_set, tile_data)
+	return -1
+
+## 从 TileSet 的 surface_type 自定义数据层读取格子表面类型；无该层/无数据/非 int → -1。
+func _read_surface_type(tile_set_ref: TileSet, tile_data: TileData) -> int:
+	if tile_set_ref == null or tile_data == null:
+		return -1
+	if not tile_set_ref.has_custom_data_layer_by_name("surface_type"):
+		return -1
+	var layer_id: int = tile_set_ref.get_custom_data_layer_by_name("surface_type")
+	if layer_id < 0:
+		return -1
+	var value = tile_data.get_custom_data_by_layer_id(layer_id)
+	if typeof(value) == TYPE_INT:
+		return int(value)
 	return -1
 
 ## 超级冲刺飞行音效管理

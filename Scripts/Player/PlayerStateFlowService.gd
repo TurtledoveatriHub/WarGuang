@@ -12,6 +12,21 @@ const PlayerObserveStateServiceScript = preload("res://Scripts/Player/PlayerObse
 
 # 统一空中转墙附着入口，避免 JUMP/DOWN/GLIDE/WALLJUMP 判定分散。
 static func handle_state(player: Node, fixed_delta: float, move_input: float, jump_just_pressed: bool, jump_pressed: bool, jump_just_released: bool, dash_just_pressed: bool) -> void:
+	# 滑翔输入冷却：松开跳跃键退出滑翔后的一小段时间内不允许再次进入滑翔。
+	# 冷却在任意状态下逐帧递减；在 GLIDE 态松开跳跃的当帧开始计时。
+	if player.glide_input_cooldown_remaining > 0.0:
+		player.glide_input_cooldown_remaining = maxf(player.glide_input_cooldown_remaining - fixed_delta, 0.0)
+	if player.current_state == player.PlayerState.GLIDE and jump_just_released and player.glide_input_cooldown_remaining <= 0.0:
+		player.glide_input_cooldown_remaining = player.glide_input_cooldown
+	# 松开跳跃即取消缓冲（只有“一直按住直到冷却结束”才会自动滑翔）
+	if jump_just_released:
+		player.glide_input_buffered = false
+	# 冷却结束：若滑翔输入被缓冲且仍按住跳跃、条件满足 → 直接进入滑翔
+	if player.glide_input_cooldown_remaining <= 0.0 and player.glide_input_buffered:
+		player.glide_input_buffered = false
+		if player.can_glide and not player.is_gliding and jump_pressed and not player.is_double_jump_holding and player.glide_unlocked:
+			player.start_glide()
+
 	match player.current_state:
 		player.PlayerState.IDLE:
 			handle_idle_state(player, fixed_delta, move_input, jump_just_pressed, dash_just_pressed)
@@ -84,8 +99,11 @@ static func handle_jump_state(player: Node, fixed_delta: float, move_input: floa
 		return
 
 	if player.can_glide and not player.is_gliding and jump_just_pressed and not player.is_double_jump_holding and player.glide_unlocked:
-		player.start_glide()
-		return
+		if player.glide_input_cooldown_remaining <= 0.0:
+			player.start_glide()
+			return
+		# 冷却中按下跳跃：记录缓冲，按住直到冷却结束则自动进入滑翔
+		player.glide_input_buffered = true
 
 	if jump_pressed and player.jump_hold_timer < player.max_jump_hold_time:
 		player.velocity.y += player.jump_hold_boost
@@ -131,8 +149,11 @@ static func handle_down_state(player: Node, fixed_delta: float, move_input: floa
 		return
 
 	if player.can_glide and not player.is_gliding and jump_just_pressed and not player.is_double_jump_holding and player.glide_unlocked:
-		player.start_glide()
-		return
+		if player.glide_input_cooldown_remaining <= 0.0:
+			player.start_glide()
+			return
+		# 冷却中按下跳跃：记录缓冲，按住直到冷却结束则自动进入滑翔
+		player.glide_input_buffered = true
 
 	if jump_pressed and player.jump_hold_timer < player.max_jump_hold_time and player.has_double_jumped:
 		player.velocity.y += player.jump_hold_boost

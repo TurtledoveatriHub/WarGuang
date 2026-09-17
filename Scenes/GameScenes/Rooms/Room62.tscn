@@ -2,13 +2,13 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_4yjim"]
 [ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="2_1c38w"]
-[ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/Room1/雪地瓦片集.tres" id="3_221lp"]
-[ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/Room1/雪地物块瓦片集.tres" id="4_b53ou"]
-[ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/Room1/雪地背景瓦片集.tres" id="5_3y2i5"]
-[ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/HurtBox.tscn" id="6_41r20"]
+[ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="3_221lp"]
+[ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地物块瓦片集.tres" id="4_b53ou"]
+[ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="5_3y2i5"]
+[ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/IceCrystal.tscn" id="6_41r20"]
 [ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="7_78njv"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="8_duqft"]
-[ext_resource type="PackedScene" uid="uid://dvyyx1gsopmfx" path="res://Scenes/Instances/Coins/Coin.tscn" id="9_3wqb3"]
+[ext_resource type="PackedScene" uid="uid://dvyyx1gsopmfx" path="res://Scenes/Instances/Items/Coin.tscn" id="9_3wqb3"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="10_ug2vf"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="11_hd6wn"]
 

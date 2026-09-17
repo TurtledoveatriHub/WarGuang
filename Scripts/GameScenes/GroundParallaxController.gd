@@ -92,6 +92,15 @@ func _process(_delta: float) -> void:
 		return
 	var reference: Vector2 = _get_reference_position()
 	var reference_delta: Vector2 = reference - _base_reference
+	## 大幅跳变（复活/切房传送等）时直接以新参考为中心重锚，避免逐格追赶造成长时间“不响应”。
+	var snap_span: float = maxf(_tile_size.x, _tile_size.y) * 3.0
+	if snap_span <= 0.0:
+		snap_span = 768.0
+	if reference_delta.length_squared() > snap_span * snap_span:
+		_entry_anchor = reference
+		_base_reference = reference
+		_center_cell = Vector2i.ZERO
+		reference_delta = Vector2.ZERO
 	var parallax_offset: Vector2 = reference_delta * parallax_ratio
 	## 换格：while前向（安全，cell增加后条件自动放松），if后向（防级联）
 	_update_center_cell(reference_delta)
@@ -352,16 +361,28 @@ func _is_reference_ready_for_room() -> bool:
 
 
 ## 获取跟随参考坐标。
+## 死亡/复活等控制锁期间相机可能不跟随玩家（相机离玩家过远），此时回退用玩家坐标，
+## 保证背景始终随玩家响应；相机追近后自动恢复用相机中心做平滑视差。
 func _get_reference_position() -> Vector2:
 	if not RoomManager:
 		return Vector2.ZERO
 	var player := RoomManager.player_ref
 	if not is_instance_valid(player):
 		return Vector2.ZERO
-	if use_camera_center and player.get_viewport():
-		var camera := player.get_viewport().get_camera_2d()
-		if is_instance_valid(camera):
-			return camera.global_position
 	if player is Node2D:
-		return (player as Node2D).global_position
+		var player_pos: Vector2 = (player as Node2D).global_position
+		# 死亡演出期间（HP 归零→黑屏前）相机会被“冻结”在固定位置以配合死亡流程，
+		# 若仍以相机中心为参考背景就会静止。此窗口改以玩家位置跟随，
+		# 让死亡动画（下坠/滑落等）期间背景也持续响应；不触碰相机-重生同步链路。
+		if player.has_method("is_in_death_state") and player.is_in_death_state():
+			return player_pos
+		if use_camera_center and player.get_viewport():
+			var camera := player.get_viewport().get_camera_2d()
+			if is_instance_valid(camera):
+				var tile_max: float = maxf(_tile_size.x, _tile_size.y)
+				if tile_max <= 0.0:
+					tile_max = 256.0
+				if camera.global_position.distance_squared_to(player_pos) <= (tile_max * 2.0) * (tile_max * 2.0):
+					return camera.global_position
+		return player_pos
 	return Vector2.ZERO
