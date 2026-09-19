@@ -69,8 +69,15 @@ var _sfx_instances: Array = []
 var _sfx_pool: Array[AudioStreamPlayer] = []
 const _SFX_POOL_SIZE: int = 12
 
-## 全局统一点击音效（所有 UI 场景共用，替换时只需改此处默认值）
-var button_click_sfx: AudioStream
+## 全局统一点击音效（所有 UI 场景共用）。默认直接指向资源；要换改这里的 preload 路径即可。
+## （本脚本是 autoload 脚本而非场景，因此 @export 在这里无法在 Inspector 编辑。）
+var button_click_sfx: AudioStream = preload("res://Assets/Audios/SFX/UI/鼠标点击音效.wav")
+## 全局统一悬停音效（所有 UI 场景共用）。
+var button_hover_sfx: AudioStream = preload("res://Assets/Audios/SFX/UI/a.wav")
+## 悬停音效最小触发间隔（秒）：鼠标快速扫过一排按钮时不至于叠成一团噪音
+const HOVER_SFX_MIN_INTERVAL: float = 0.035
+## 上一次悬停音效的时间戳（毫秒）
+var _last_hover_sfx_ms: int = -100000
 ## 音频闪避 Tween
 var audio_duck_tween: Tween
 
@@ -84,9 +91,7 @@ func _ready():
 		p.name = &"SFXPool_%d" % i
 		add_child(p)
 		_sfx_pool.append(p)
-	# 如果未拖拽统一点击音效，从默认路径加载
-	if not button_click_sfx and ResourceLoader.exists("res://Assets/Audios/SFX/UI/鼠标点击音效.wav"):
-		button_click_sfx = load("res://Assets/Audios/SFX/UI/鼠标点击音效.wav")
+	# 音效资源已在变量声明处用 preload 指向默认值（不在函数里写硬编码加载）
 
 # ============================================================
 # 🎵 BGM 流式接口（场景通过拖拽传入 AudioStream）
@@ -240,9 +245,22 @@ func stop_bgm(_fade_duration: float = BGM_FADE_OUT_DURATION):
 func play_stream_sfx(stream: AudioStream, bus: String = SFX_BUS) -> void:
 	play_stream_sfx_prioritized(stream, SFX_PRIORITY_NORMAL, bus)
 
-## 全局统一点击音效（所有UI场景共用此方法）
-func play_button_click_sfx() -> void:
-	play_stream_sfx(button_click_sfx)
+## 全局统一点击音效（所有UI场景共用此方法）。
+## stream 传 null 时使用全局默认点击音效；组件需要自定义音效时可直接传入。
+func play_button_click_sfx(stream: AudioStream = null) -> void:
+	play_stream_sfx(stream if stream != null else button_click_sfx)
+
+## 全局统一悬停音效（所有UI场景共用此方法）。
+## 带全局节流：HOVER_SFX_MIN_INTERVAL 以内的重复调用会被丢弃，避免快速扫过一排按钮时音效叠成一团。
+func play_button_hover_sfx(stream: AudioStream = null) -> void:
+	var s: AudioStream = stream if stream != null else button_hover_sfx
+	if s == null:
+		return
+	var now: int = Time.get_ticks_msec()
+	if now - _last_hover_sfx_ms < int(HOVER_SFX_MIN_INTERVAL * 1000.0):
+		return
+	_last_hover_sfx_ms = now
+	play_stream_sfx_prioritized(s, SFX_PRIORITY_LOW)
 
 ## 播放一次性音效（带优先级 + 对象池）
 func play_stream_sfx_prioritized(stream: AudioStream, priority: int = SFX_PRIORITY_NORMAL, bus: String = SFX_BUS) -> void:

@@ -1,11 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://b5jls6ojf2s46"]
+[gd_scene load_steps=9 format=3 uid="uid://b5jls6ojf2s46"]
 
 [ext_resource type="Script" uid="uid://bk48dj574g6b5" path="res://Scripts/UI/MapUI.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://b8m7xj4t4q3ic" path="res://Assets/Textures/UIs/SceneUIs/2.png" id="2_86af7"]
-[ext_resource type="Texture2D" uid="uid://dvv0jc1oeuum5" path="res://Assets/Textures/UIs/PlayerUIs/w.png" id="3_kx77s"]
-[ext_resource type="Texture2D" uid="uid://bv4wcsihjxeaa" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭1.tres" id="4_86af7"]
-[ext_resource type="Texture2D" uid="uid://kxm2uujj5ma4" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭3.tres" id="5_5gpec"]
-[ext_resource type="Texture2D" uid="uid://byixw77mgxbb1" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭2.tres" id="6_1artu"]
+[ext_resource type="Texture2D" uid="uid://cs6j2183f22mc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景1.png" id="2_1artu"]
+[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆.tres" id="3_1artu"]
+[ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="4_1artu"]
+[ext_resource type="Texture2D" uid="uid://ilccd3mmcucq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置按下纹理.tres" id="5_i1hk5"]
+[ext_resource type="Texture2D" uid="uid://dul5pjyqmngpq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置悬停纹理.tres" id="6_1mtfi"]
+[ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="7_1artu"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="8_1artu"]
 
 [node name="MapUI" type="CanvasLayer"]
 script = ExtResource("1")
@@ -18,28 +20,44 @@ mouse_filter = 2
 color = Color(0, 0, 0, 0)
 
 [node name="ContentRoot" type="Control" parent="."]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="MapContainer" type="Node2D" parent="ContentRoot"]
 
 [node name="MapTexture" type="Sprite2D" parent="ContentRoot/MapContainer"]
-modulate = Color(0.47202516, 0.47202522, 0.47202516, 1)
+modulate = Color(0.27022174, 0.27022198, 0.27022186, 1)
 position = Vector2(609, 291)
-texture = ExtResource("2_86af7")
+texture = ExtResource("2_1artu")
 
 [node name="PlayerIcon" type="Sprite2D" parent="ContentRoot/MapContainer"]
 position = Vector2(478, 343)
-texture = ExtResource("3_kx77s")
+texture = ExtResource("3_1artu")
 
 [node name="CloseBtn" type="TextureButton" parent="ContentRoot"]
-offset_left = 828.0
-offset_top = 152.0
-offset_right = 844.0
-offset_bottom = 168.0
-scale = Vector2(2, 2)
-texture_normal = ExtResource("4_86af7")
-texture_pressed = ExtResource("5_5gpec")
-texture_hover = ExtResource("6_1artu")
+layout_mode = 0
+offset_left = 837.0
+offset_top = 143.0
+offset_right = 869.0
+offset_bottom = 175.0
+texture_normal = ExtResource("4_1artu")
+texture_pressed = ExtResource("5_i1hk5")
+texture_hover = ExtResource("6_1mtfi")
+script = ExtResource("7_1artu")
+
+[node name="Label" type="Label" parent="ContentRoot/CloseBtn"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("8_1artu")
+theme_override_font_sizes/font_size = 10
+text = " X"
+horizontal_alignment = 1
+vertical_alignment = 1

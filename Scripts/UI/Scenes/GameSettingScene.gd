@@ -1,4 +1,4 @@
-extends CanvasLayer
+extends UIScene  # UI 页面统一基类（生命周期 / 输入锁 / 动效总线）
 
 ## 设置界面场景（在 Inspector 中拖拽 SettingsScene.tscn）
 @export var settings_scene_resource: PackedScene
@@ -38,7 +38,8 @@ signal menu_closed
 var original_modulate_color: Color
 var game_canvas_modulate: CanvasModulate
 var is_open: bool = false
-var settings_instance: Node = null
+## 本页面的开合动画自己包办（按钮的缩放也是它驱动的），因此不走动效总线，
+## 避免总线的按钮错开缩放与自己的开合动画同时写 scale 而打架。
 var _base_visual_scales: Dictionary = {}
 var _base_visual_positions: Dictionary = {}
 var _base_visual_modulates: Dictionary = {}
@@ -48,6 +49,9 @@ var _is_game_lighting_dimmed: bool = false
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# 本页面自带整体开合动画，且自己管理按钮启用状态：不动效总线、不吞事件。
+	use_fx_bus = false
+	lock_swallows_mouse = false
 	
 	continue_button.pressed.connect(_on_continue_button_pressed)
 	settings_button.pressed.connect(_on_settings_button_pressed)
@@ -75,7 +79,26 @@ func _ready():
 	_cache_visual_base_scales()
 	_set_menu_buttons_enabled(false)
 	await _play_open_animation()
-	_set_menu_buttons_enabled(true)
+	# 解锁 = 启用三个按钮 + 允许 ESC / 返回键
+	set_input_locked(false)
+
+## 覆盖基类：把输入锁应用到本页面的按钮上。
+func _on_input_lock_applied(locked: bool) -> void:
+	_set_menu_buttons_enabled(not locked)
+
+## 覆盖基类：ESC 关闭本面板（设置覆盖层开着时不关）。
+func _on_ui_cancel() -> void:
+	if not is_open:
+		return
+	if UIRouter.has_overlay():
+		return
+	await _close_game_setting()
+
+func _input(event: InputEvent) -> void:
+	super._input(event)
+	## 设置界面打开时阻止 Tab 打开地图
+	if event.is_action_pressed("map") and is_open:
+		get_viewport().set_input_as_handled()
 
 func _close_menu():
 	is_open = false
@@ -129,7 +152,7 @@ func _close_game_setting():
 
 	_is_closing = true
 	is_open = false
-	_set_menu_buttons_enabled(false)
+	set_input_locked(true)
 	await _play_close_animation()
 	if DarkOverlay and is_instance_valid(DarkOverlay):
 		DarkOverlay.reset_overlay()
@@ -157,48 +180,24 @@ func _set_mobile_hud_visibility(show_state: bool) -> void:
 			hud._set_visible_state(show_state)
 
 func _on_settings_button_pressed():
-	if not is_open or settings_instance:
+	if not is_open or UIRouter.has_overlay():
 		return
-	
-	continue_button.disabled = true
-	settings_button.disabled = true
-	main_menu_button.disabled = true
-	
+
 	# 修复：使用@export 的资源而不是 preload
 	if not settings_scene_resource:
 		push_error("GameSettingScene: settings_scene_resource 未配置！")
 		return
-	
-	settings_instance = settings_scene_resource.instantiate()
-	settings_instance.setup("GameSettingScene", self)
-	settings_instance.layer = layer + 1
-	get_tree().root.add_child(settings_instance)
+
+	var settings_page: Node = settings_scene_resource.instantiate()
+	settings_page.layer = layer + 1
 	# 关键修正：SettingsScene 打开时不得叠加任何暗化层。
 	# 场景后方已经由 DarkOverlay 提供唯一一层暗化（单一开关状态），
-	# 若再调暗全局 CanvasModulate，就会形成“多层暗化”，
-	# 且返回 GameSettingScene 后还会残留一层无法消除。
-	if settings_instance.has_method("_on_scene_transition_enter_begin"):
-		settings_instance._on_scene_transition_enter_begin()
-
-func _on_settings_closed(settings_scene: Node = null):
-	if settings_scene and is_instance_valid(settings_scene):
-		settings_scene.queue_free()
-	settings_instance = null
-	
-	continue_button.disabled = false
-	settings_button.disabled = false
-	main_menu_button.disabled = false
-	
-	if continue_button is Control:
-		continue_button.grab_focus()
-	
-	# 关键修正：SettingsScene 关闭时，不得再干预 GameSettingScene 的全局暗化状态。
-	# 真实的亮度恢复必须发生在 GameSettingScene 自己退出时，
-	# 否则会在返回主菜单时反复重复执行 “打开 GameSettingScene” 逻辑。 
-	FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
+	# 若再调暗全局 CanvasModulate，就会形成“多层暗化”，返回后还会残留一层无法消除。
+	# 退场/淡出/挂载/入场/淡入的顺序统一由 UIRouter 定义。
+	await UIRouter.open_overlay(settings_page, self)
 
 func _on_main_menu_button_pressed():
-	AudioManager.play_button_click_sfx()
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	
 	if not is_open or _is_closing:
 		return
@@ -218,7 +217,7 @@ func _on_main_menu_button_pressed():
 	if Global.current_save_slot >= 0:
 		SaveManager.save_game(Global.current_save_slot, Global.get_save_data())
 
-	_set_menu_buttons_enabled(false)
+	set_input_locked(true)
 	await _play_close_animation()
 	if DarkOverlay and is_instance_valid(DarkOverlay):
 		DarkOverlay.hide_overlay()
@@ -228,18 +227,7 @@ func _on_main_menu_button_pressed():
 	if not switched:
 		_is_closing = false
 		is_open = true
-		_set_menu_buttons_enabled(true)
-
-func _input(event):
-	if event.is_action_pressed("ui_cancel") and is_open:
-		if settings_instance:
-			return
-		else:
-			await _close_game_setting()
-			get_viewport().set_input_as_handled()
-	## 设置界面打开时阻止 Tab 打开地图
-	if event.is_action_pressed("map") and is_open:
-		get_viewport().set_input_as_handled()
+		set_input_locked(false)
 
 func _exit_tree():
 	if is_open:
@@ -255,21 +243,6 @@ func _restore_game_lighting_immediate() -> void:
 	if game_canvas_modulate and is_instance_valid(game_canvas_modulate):
 		game_canvas_modulate.color = original_modulate_color
 		_is_game_lighting_dimmed = false
-
-func _open_settings_menu():
-	if not settings_scene_resource:
-		push_error("GameSettingScene: settings_scene_resource 未配置！请在 Inspector 中拖拽 SettingsScene.tscn")
-		return
-	
-	settings_button.disabled = true
-	main_menu_button.disabled = true
-	
-	settings_instance = settings_scene_resource.instantiate()
-	settings_instance.setup("GameSettingScene", self)
-	
-	settings_instance.layer = layer + 1
-	
-	get_tree().root.add_child(settings_instance)
 
 func _cache_visual_base_scales() -> void:
 	_base_visual_scales.clear()

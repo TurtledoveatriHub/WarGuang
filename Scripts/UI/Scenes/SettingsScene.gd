@@ -1,5 +1,5 @@
 # SettingsScene.gd
-extends CanvasLayer
+extends UIScene  # UI 页面统一基类（生命周期 / 输入锁 / 动效总线）
 
 ## 设置场景主脚本
 ## 节点引用
@@ -12,7 +12,8 @@ extends CanvasLayer
 @onready var graphics_page = get_node_or_null("SettingsRoot/PagesRoot/GraphicsPage") # 画面页面
 @onready var effect_level_option: OptionButton = get_node_or_null("SettingsRoot/PagesRoot/GraphicsPage/EffectLevelContainer/EffectLevelOption")
 @onready var close_button = $BackButton                        # 关闭按钮
-@onready var ui_transition_animator: UITransitionAnimator = $UITransitionAnimator
+## 过渡轨道已并入 UIFxDirector（动效总线）：这里保留旧名字指向总线，业务代码无需改动。
+@onready var ui_transition_animator: Node = _get_fx_bus()
 
 ## 音量滑块引用（根据你的实际节点路径调整）
 @onready var master_volume_slider = $SettingsRoot/PagesRoot/AudioPage/VolumeContainer/MasterVolumeLabel/MasterVolumeSlider
@@ -21,15 +22,14 @@ extends CanvasLayer
 @onready var master_volume_label: Label = get_node_or_null("SettingsRoot/PagesRoot/AudioPage/VolumeContainer/MasterVolumeLabel")
 @onready var bgm_volume_label: Label = get_node_or_null("SettingsRoot/PagesRoot/AudioPage/VolumeContainer/BGMVolumeLabel")
 @onready var sfx_volume_label: Label = get_node_or_null("SettingsRoot/PagesRoot/AudioPage/VolumeContainer/SFXVolumeLabel")
-## 常态 UI 循环动画节点缓存（一个场景可以放多个 UILoopAnimator，全部会被驱动）
-var _ui_loop_animators: Array[Node] = []
+## 常态 UI 循环动画由基类的动效总线统一驱动，本脚本不再自带收集与播放逻辑。
 
-## 场景来源信息
-var opened_from: String = ""
-var parent_scene: Node = null
-## ESC键启用状态
 var esc_enabled: bool = false
-var _scene_input_locked: bool = true
+## 当前展示的分类页（决定哪个按钮画 texture_pressed）。
+var _category_active_page: String = "audio"
+## 分类按钮当前是否可点（= 输入锁状态）。
+var _category_buttons_interactive: bool = true
+
 var _current_page_name: String = "audio"
 var _page_switch_in_progress: bool = false
 
@@ -71,6 +71,8 @@ func _connect_unique_signal(signal_ref: Signal, callable_ref: Callable) -> void:
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 100
+	# 本页面锁定输入时**不吞鼠标事件**：移动端布局编辑态下按钮仍需接收拖动。
+	lock_swallows_mouse = false
 	_settings_canvas_modulate = get_node_or_null("CanvasModulate") as CanvasModulate
 	if _settings_canvas_modulate and is_instance_valid(_settings_canvas_modulate):
 		_settings_canvas_original_color = _settings_canvas_modulate.color
@@ -100,9 +102,9 @@ func _ready():
 	if effect_level_option:
 		_connect_unique_signal(effect_level_option.item_selected, _on_effect_level_selected)
 	
-	# 设置焦点
-	if audio_button is Control and is_inside_tree():
-		audio_button.grab_focus()
+	# 设置焦点：正在展示的分类按钮是不可聚焦的（focus_mode = NONE），必须跳过，
+	# 否则引擎会打印 "This control can't grab focus"。
+	_grab_initial_category_focus()
 	
 	# 同步滑块值与实际总线音量
 	if master_volume_slider:
@@ -113,16 +115,13 @@ func _ready():
 		sfx_volume_slider.value = AudioManager.get_bus_volume_percent("SFX")
 	_refresh_all_volume_labels()
 
-	_set_scene_input_locked(true)
+	set_input_locked(true)
 	if ui_transition_animator:
 		ui_transition_animator.reset_state()
-		if FadeManager and FadeManager.has_method("get_black_alpha") and FadeManager.get_black_alpha() <= 0.01:
-			call_deferred("_on_scene_transition_enter_begin")
-	else:
-		# 没有过渡动画器时，入场演出直接由本场景触发。
-		_ui_loop_play_enter()
-		_set_scene_input_locked(false)
-	
+	# 黑屏场景切换时由 SceneManager / UIRouter 显式调用 ui_enter()；
+	# 非黑屏（编辑器直接运行本场景）时自行入场；没有过渡动画器时同样走这条路。
+	auto_enter_unless_black()
+
 	# ESC冷却
 	var esc_timer = Timer.new()
 	esc_timer.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -136,11 +135,6 @@ func _ready():
 			esc_timer.queue_free()
 	)
 	add_child(esc_timer)
-
-## 设置场景来源
-func setup(from_scene: String, parent: Node = null):
-	opened_from = from_scene
-	parent_scene = parent
 
 ## 切换页面
 func switch_to_page(page_name: String):
@@ -157,6 +151,10 @@ func _switch_to_page(page_name: String, animated: bool = true) -> void:
 
 	var previous_page: CanvasItem = _resolve_page(_current_page_name)
 	_page_switch_in_progress = true
+	# 立即切「哪个分类被选中」的视觉状态（贴图 + 缩放/位移），不等页面切换动画播完 ——
+	# 否则旧分类按钮会一直亮着，看着像点击没响应。
+	_current_page_name = page_name
+	_set_category_button_state(page_name)
 	if previous_page and previous_page != target_page:
 		if animated:
 			await _play_page_exit(previous_page)
@@ -169,8 +167,6 @@ func _switch_to_page(page_name: String, animated: bool = true) -> void:
 	else:
 		_restore_page_base_state(target_page)
 
-	_current_page_name = page_name
-	_set_category_button_state(page_name)
 	_page_switch_in_progress = false
 
 func _is_mobile_platform() -> bool:
@@ -273,14 +269,61 @@ func _set_only_page_visible(active_page: String) -> void:
 		page.visible = page_name == active_page
 
 func _set_category_buttons_enabled(enabled: bool) -> void:
-	audio_button.disabled = not enabled
-	controls_button.disabled = not enabled
-	graphics_button.disabled = not enabled
+	_category_buttons_interactive = enabled
+	_apply_category_buttons()
 
 func _set_category_button_state(active_page: String) -> void:
-	audio_button.disabled = active_page == "audio"
-	controls_button.disabled = active_page == "controls" or active_page == "pc_controls" or active_page == "mobie_controls" or active_page == "mobile_controls"
-	graphics_button.disabled = active_page == "graphics"
+	_category_active_page = active_page
+	_apply_category_buttons()
+
+## 把「当前展示哪一页」+「是否可点」应用到三个分类按钮上。
+func _apply_category_buttons() -> void:
+	_apply_category_button(audio_button, _category_active_page == "audio")
+	_apply_category_button(controls_button, _category_active_page == "controls" or _category_active_page == "pc_controls" or _category_active_page == "mobie_controls" or _category_active_page == "mobile_controls")
+	_apply_category_button(graphics_button, _category_active_page == "graphics")
+
+## 正在展示的分类按钮用 **texture_pressed** 表现「已选中」，**不再用 disabled**
+## （disabled 会画 texture_disabled，那不是我们要的「按下态」贴图）。
+## TextureButton 只有在 toggle_mode + button_pressed 时才画 texture_pressed，
+## 所以这里用「切换态 + 忽略鼠标」代替 disabled。
+func _apply_category_button(button: TextureButton, active: bool) -> void:
+	if button == null:
+		return
+	button.disabled = false
+	button.toggle_mode = true
+	button.button_pressed = active
+	var interactive: bool = _category_buttons_interactive and not active
+	button.mouse_filter = Control.MOUSE_FILTER_STOP if interactive else Control.MOUSE_FILTER_IGNORE
+	button.focus_mode = Control.FOCUS_ALL if interactive else Control.FOCUS_NONE
+	# 正在展示的那个按钮除了「按下态贴图」，还要保持按下时的大小缩放与位移；
+	# 切换到其它分类时传 false，它会自行恢复原状。
+	if button.has_method("set_locked_visual"):
+		button.call("set_locked_visual", active)
+
+## 覆盖基类：退出设置页时把分类按钮恢复成默认外观（默认贴图 + 缩放/位移复位）。
+## 否则退场动画期间「正在展示」的那个按钮会一直是按下态，看着像没退干净。
+func _on_page_exit() -> void:
+	_release_category_visuals()
+
+
+## 把三个分类按钮的「选中态」全部撤掉（贴图 + 缩放/位移）。
+func _release_category_visuals() -> void:
+	for button in [audio_button, controls_button, graphics_button]:
+		if button == null:
+			continue
+		button.button_pressed = false
+		if button.has_method("set_locked_visual"):
+			button.call("set_locked_visual", false)
+
+
+## 初始焦点：给第一个可交互的分类按钮（跳过当前展示的那一个）。
+func _grab_initial_category_focus() -> void:
+	if not is_inside_tree():
+		return
+	for button in [audio_button, controls_button, graphics_button]:
+		if button is Control and button.focus_mode != Control.FOCUS_NONE and not button.disabled:
+			button.grab_focus()
+			return
 
 func _populate_effect_level_options() -> void:
 	if not effect_level_option:
@@ -306,9 +349,9 @@ func _apply_effect_level(level: int) -> void:
 
 ## 音频按钮按下
 func _on_audio_button_pressed():
-	if _scene_input_locked or _page_switch_in_progress:
+	if is_input_locked() or _page_switch_in_progress:
 		return
-	AudioManager.play_button_click_sfx()
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	
 	# 静默取消控制页面中的映射
 	if pc_controls_page and pc_controls_page.has_method("cancel_current_mapping"):
@@ -320,9 +363,9 @@ func _on_audio_button_pressed():
 
 ## 控制按钮按下
 func _on_controls_button_pressed():
-	if _scene_input_locked or _page_switch_in_progress:
+	if is_input_locked() or _page_switch_in_progress:
 		return
-	AudioManager.play_button_click_sfx()
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	
 	# 静默取消任何映射
 	if pc_controls_page and pc_controls_page.has_method("cancel_current_mapping"):
@@ -334,9 +377,9 @@ func _on_controls_button_pressed():
 	await _switch_to_page(target_page_name)
 
 func _on_graphics_button_pressed():
-	if _scene_input_locked or _page_switch_in_progress:
+	if is_input_locked() or _page_switch_in_progress:
 		return
-	AudioManager.play_button_click_sfx()
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	if pc_controls_page and pc_controls_page.has_method("cancel_current_mapping"):
 		pc_controls_page.cancel_current_mapping()
 	if mobie_controls_page and mobie_controls_page.has_method("cancel_current_mapping"):
@@ -345,26 +388,18 @@ func _on_graphics_button_pressed():
 
 ## 关闭按钮按下
 func _on_close_button_pressed():
-	if _scene_input_locked:
+	if is_input_locked():
 		return
-	AudioManager.play_button_click_sfx()
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	_close_settings()
 
-## 处理输入
-func _input(event):
-	if _scene_input_locked:
-		# 锁定状态时，不吞掉鼠标点击；允许编辑界面中的按钮继续接收点击事件。
-		if event is InputEventKey or event is InputEventJoypadButton:
-			get_viewport().set_input_as_handled()
+## 覆盖基类：ESC 关闭（重新映射中不关闭）
+func _on_ui_cancel() -> void:
+	if not esc_enabled:
 		return
-	if event.is_action_pressed("ui_cancel") and esc_enabled:
-		# 检查是否正在重新映射
-		if InputMapManager.is_remapping():
-			# 正在重新映射，不关闭设置
-			return
-		
-		get_viewport().set_input_as_handled()
-		_close_settings()
+	if InputMapManager.is_remapping():
+		return
+	_close_settings()
 
 ## 关闭设置场景
 func _connect_mobile_controls_signals() -> void:
@@ -374,36 +409,26 @@ func _connect_mobile_controls_signals() -> void:
 
 func _on_mobile_controls_page_saved() -> void:
 	# 取消布局编辑时的场景暗化逻辑：只恢复交互锁定，不再操作全局亮度。
-	_set_scene_input_locked(false)
+	set_input_locked(false)
 
 func _close_settings():
 	set_process_input(false)
 	set_process_unhandled_input(false)
-	
+
 	if close_button:
 		close_button.disabled = true
-	
+
 	# 取消任何正在进行的重新映射
 	if InputMapManager:
 		InputMapManager.cancel_remap()
 
-	# 关键修正：SettingsScene 关闭时，不得再操作父层 DarkOverlay。
-	# 父场景的暗化状态由 GameSettingScene 自己控制，返回父场景后
-	# 只需要恢复按键交互，而不要重新触发 “打开 GameSettingScene” 的暗化逻辑。
-	_set_scene_input_locked(true)
-	# 常态循环动画：与退场过渡同时立即切换“结束”动画，不 await。
-	_ui_loop_play_exit()
-	if ui_transition_animator:
-		await ui_transition_animator.play_exit_transition()
-	
-	# 根据来源通知父场景
-	if opened_from == "GameSettingScene" and parent_scene and is_instance_valid(parent_scene):
-		if parent_scene.has_method("_on_settings_closed"):
-			await parent_scene._on_settings_closed(self)
-	elif opened_from == "TitleScene" and parent_scene and is_instance_valid(parent_scene):
-		if parent_scene.has_method("_on_settings_closed"):
-			await parent_scene._on_settings_closed(self)
+	# SettingsScene 关闭时不得再操作父层 DarkOverlay：父场景的暗化状态由它自己控制。
+	# 退场动画 / 淡出 / 释放 / 宿主页面重新入场 / 淡入 的顺序只在 UIRouter 里定义一处。
+	# 若本页面不是被 UIRouter 打开的（例如编辑器里单独运行），则退场后直接释放自己。
+	if UIRouter.has_overlay():
+		await UIRouter.close_overlay()
 	else:
+		await ui_exit()
 		queue_free()
 
 ## 音量控制函数
@@ -439,58 +464,20 @@ func _on_volume_slider_drag_started():
 func _exit_tree():
 	LightingManager.stop_all_light_effects()
 
-func is_scene_interaction_locked() -> bool:
-	return _scene_input_locked
-
-func _set_scene_input_locked(locked: bool) -> void:
-	_scene_input_locked = locked
+## 覆盖基类：把输入锁应用到本页面的按钮上。
+## 注意：本页面锁定输入时**不吞鼠标事件**（基类 lock_swallows_mouse 已设为 false），
+## 因为移动端布局编辑态下仍需让按钮接收拖动事件。
+func _on_input_lock_applied(locked: bool) -> void:
 	if locked:
-		audio_button.disabled = true
-		controls_button.disabled = true
-		graphics_button.disabled = true
+		_set_category_buttons_enabled(false)
 		close_button.disabled = true
 		return
 
 	close_button.disabled = false
 	_set_category_buttons_enabled(true)
 	_set_category_button_state(_current_page_name)
+	# 锁定期间分类按钮会被设成不可聚焦（引擎会顺手释放焦点），解锁后补一次初始焦点
+	_grab_initial_category_focus()
 
 
-## 常态循环动画：立即播放“开始 -> 循环”（本场景内所有 UILoopAnimator）。
-## 禁止 await，不影响场景流程。
-func _ui_loop_play_enter() -> void:
-	for animator in _get_ui_loop_animators():
-		animator.call("play_enter")
-
-## 常态循环动画：立即播放“结束”（本场景内所有 UILoopAnimator）。
-## 禁止 await，不影响场景流程。
-func _ui_loop_play_exit() -> void:
-	for animator in _get_ui_loop_animators():
-		animator.call("play_exit")
-
-## 收集本场景内所有 UILoopAnimator（递归扫描、不依赖节点名）。
-## 一个场景放多个时会被全部驱动，节点被编辑器改名也不会失效。
-func _get_ui_loop_animators() -> Array[Node]:
-	for animator in _ui_loop_animators:
-		if not is_instance_valid(animator) or not is_ancestor_of(animator):
-			_ui_loop_animators.clear()
-			break
-	if _ui_loop_animators.is_empty():
-		_collect_ui_loop_animators(self, _ui_loop_animators)
-	return _ui_loop_animators
-
-func _collect_ui_loop_animators(node: Node, acc: Array[Node]) -> void:
-	for child in node.get_children():
-		var script_ref: Script = child.get_script()
-		if child is AnimatedSprite2D and script_ref != null and str(script_ref.resource_path).ends_with("UILoopAnimator.gd"):
-			acc.append(child)
-		_collect_ui_loop_animators(child, acc)
-
-
-func _on_scene_transition_enter_begin() -> void:
-	_set_scene_input_locked(true)
-	# 常态循环动画：与 UITransitionAnimator 入场完全同一时刻触发（不 await、不阻塞）。
-	_ui_loop_play_enter()
-	if ui_transition_animator:
-		await ui_transition_animator.play_enter_transition()
-	_set_scene_input_locked(false)
+## ---- 以下动效 / 等待 / 节点收集逻辑已全部上提到 UIScene / UIFxDirector，本文件不再重复实现 ----

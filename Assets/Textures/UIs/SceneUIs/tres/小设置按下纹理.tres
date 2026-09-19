@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://ilccd3mmcucq"]
+
+[ext_resource type="Texture2D" uid="uid://cjwrsdge5lawp" path="res://Assets/Textures/UIs/SceneUIs/按钮纹理集.png" id="1_241n4"]
+
+[resource]
+atlas = ExtResource("1_241n4")
+region = Rect2(224, 64, 32, 32)

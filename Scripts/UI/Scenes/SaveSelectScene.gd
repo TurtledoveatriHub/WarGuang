@@ -1,4 +1,4 @@
-extends CanvasLayer  # 修复：改为 CanvasLayer
+extends UIScene  # UI 页面统一基类（生命周期 / 输入锁 / 动效总线）
 
 ## 删除确认对话框场景（在 Inspector 中拖拽 DeleteConfirmDialog.tscn）
 @export var delete_confirm_scene: PackedScene
@@ -13,24 +13,20 @@ class SaveData:
 	var timestamp: String = ""
 
 var save_slots = []  ## 存档槽数据数组，存储每个槽位的存档信息
-var delete_button_connections = []  ## 删除按钮连接状态数组，记录每个删除按钮是否已连接信号
 var is_dialog_open: bool = false  ## 删除确认对话框是否打开状态
-
-var _scene_input_locked: bool = true
-
-@export_category("SaveSlot 交互反馈")
-@export var slot_hover_offset_y: float = 8.0
-@export var slot_hover_duration: float = 0.08
-@export var slot_hover_outline_width: int = 2
-@export var slot_hover_outline_color: Color = Color(1, 1, 1, 1)
+## 当前选中的存档槽（-1 = 未选中）。选中后才会出现「进入存档 / 清空存档」两个按钮。
+var _selected_slot: int = -1
+## 两个操作按钮当前是否显示中。
+var _action_buttons_shown: bool = false
+## 操作按钮动画的代次号：连点存档槽时只让最后一次生效。
+var _action_anim_token: int = 0
 
 @export_category("SaveSlot 填充纹理按区域映射")
 ## 按房间ID配置填充纹理（键为房间ID，值为 Texture2D）。
 @export var room_filled_texture_map: Dictionary = {}
 
-@onready var ui_transition_animator: UITransitionAnimator = $UITransitionAnimator
-## 常态 UI 循环动画节点缓存（一个场景可以放多个 UILoopAnimator，全部会被驱动）
-var _ui_loop_animators: Array[Node] = []
+## 过渡轨道已并入 UIFxDirector（动效总线）：这里保留旧名字指向总线，业务代码无需改动。
+@onready var ui_transition_animator: Node = _get_fx_bus()
 
 @onready var save_slot_buttons = [
 	$SaveSlot1,
@@ -44,38 +40,29 @@ var _ui_loop_animators: Array[Node] = []
 	$SaveSlot3/PlayTimeLabel
 ]
 
-var _slot_base_positions: Array[Vector2] = []
-var _slot_empty_base_positions: Array[Vector2] = []
-var _slot_filled_base_positions: Array[Vector2] = []
-var _slot_tweens: Array[Tween] = []
-var _slot_outlines: Array[Panel] = []
+## 选中某个存档槽后才出现的操作按钮（图片按钮 + 文本子节点，挂在 UIButtonFx 组件上）
+@onready var enter_save_button: TextureButton = $EnterSaveButton
+@onready var clear_save_button: TextureButton = $ClearSaveButton
+
 ## 房间ID到纹理的运行时查询表
 var _room_texture_lookup: Dictionary = {}
 
 ## 初始化存档选择场景
 func _ready():
-	delete_button_connections.resize(3)
-	for i in range(3):
-		delete_button_connections[i] = false
-	
 	_load_save_data()
 	_rebuild_room_texture_lookup()
-	_cache_slot_transforms()
 	_connect_signals()
 	_update_slot_display()
-	_set_scene_input_locked(true)
+	set_input_locked(true)
 	if ui_transition_animator:
 		ui_transition_animator.reset_state()
-	
+
 	$BackButton.pressed.connect(_on_back_button_pressed)
-	if not ui_transition_animator:
-		# 没有过渡动画器时，入场演出直接由本场景触发。
-		_ui_loop_play_enter()
-		FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
-		_set_scene_input_locked(false)
-	else:
-		if FadeManager and FadeManager.has_method("get_black_alpha") and FadeManager.get_black_alpha() <= 0.01:
-			call_deferred("_on_scene_transition_enter_begin")
+	# 两个操作按钮默认不显示，选中存档槽后才进入场动画出现。
+	_set_action_buttons_visible(false)
+	# 黑屏场景切换时由 SceneManager / UIRouter 显式调用 ui_enter()；
+	# 非黑屏（编辑器直接运行本场景）时自行入场。
+	auto_enter_unless_black()
 	
 	await get_tree().create_timer(0.1).timeout
 	
@@ -98,51 +85,6 @@ func _load_save_data():
 			save_data.timestamp = save_info.get("timestamp", "")
 		save_slots.append(save_data)
 
-## 缓存存档槽基准位置
-func _cache_slot_transforms() -> void:
-	_slot_base_positions.clear()
-	_slot_empty_base_positions.clear()
-	_slot_filled_base_positions.clear()
-	_slot_tweens.clear()
-	_slot_outlines.clear()
-	for slot_button in save_slot_buttons:
-		_slot_base_positions.append(slot_button.position)
-		_slot_empty_base_positions.append(slot_button.get_node("EmptySlot").position)
-		_slot_filled_base_positions.append(slot_button.get_node("FilledSlot").position)
-		_slot_tweens.append(null)
-		_slot_outlines.append(_ensure_slot_outline(slot_button))
-
-## 确保 SaveSlot 拥有可复用的白色描边面板
-func _ensure_slot_outline(slot_button: TextureButton) -> Panel:
-	var outline: Panel = slot_button.get_node_or_null("HoverOutline") as Panel
-	if outline == null:
-		outline = Panel.new()
-		outline.name = "HoverOutline"
-		slot_button.add_child(outline)
-
-	outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	outline.focus_mode = Control.FOCUS_NONE
-	outline.z_index = 20
-	outline.anchor_left = 0.0
-	outline.anchor_top = 0.0
-	outline.anchor_right = 1.0
-	outline.anchor_bottom = 1.0
-	outline.offset_left = 0.0
-	outline.offset_top = 0.0
-	outline.offset_right = 0.0
-	outline.offset_bottom = 0.0
-
-	var border_style := StyleBoxFlat.new()
-	border_style.bg_color = Color(1, 1, 1, 0.0)
-	border_style.border_color = slot_hover_outline_color
-	border_style.border_width_left = slot_hover_outline_width
-	border_style.border_width_top = slot_hover_outline_width
-	border_style.border_width_right = slot_hover_outline_width
-	border_style.border_width_bottom = slot_hover_outline_width
-	outline.add_theme_stylebox_override("panel", border_style)
-	outline.modulate = Color(1, 1, 1, 0.0)
-	return outline
-
 ## 连接信号
 ## 连接存档槽相关信号
 func _connect_signals():
@@ -153,21 +95,13 @@ func _connect_signals():
 			slot_button.pressed.disconnect(_on_save_slot_pressed)
 		
 		slot_button.pressed.connect(_on_save_slot_pressed.bind(i))
-		if slot_button.mouse_entered.is_connected(_on_save_slot_mouse_entered):
-			slot_button.mouse_entered.disconnect(_on_save_slot_mouse_entered)
-		if slot_button.mouse_exited.is_connected(_on_save_slot_mouse_exited):
-			slot_button.mouse_exited.disconnect(_on_save_slot_mouse_exited)
-		slot_button.mouse_entered.connect(_on_save_slot_mouse_entered.bind(i))
-		slot_button.mouse_exited.connect(_on_save_slot_mouse_exited.bind(i))
-		
-		if not delete_button_connections[i]:
-			var delete_button = slot_button.get_node("DeleteButton")
-			
-			if delete_button.pressed.is_connected(_on_delete_button_pressed):
-				delete_button.pressed.disconnect(_on_delete_button_pressed)
-			
-			delete_button.pressed.connect(_on_delete_button_pressed.bind(i))
-			delete_button_connections[i] = true
+	
+	# 悬停反馈（缩放 / 像素位移 / 文本提亮 / 音效）已交给 SaveSlot 上的 UIButtonFx 组件，
+	# 这里不再手写 mouse_entered / mouse_exited 补间。
+	if not enter_save_button.pressed.is_connected(_on_enter_save_pressed):
+		enter_save_button.pressed.connect(_on_enter_save_pressed)
+	if not clear_save_button.pressed.is_connected(_on_clear_save_pressed):
+		clear_save_button.pressed.connect(_on_clear_save_pressed)
 
 ## 更新存档槽显示
 ## 刷新存档槽显示
@@ -180,7 +114,6 @@ func _update_slot_display():
 		
 		slot_button.get_node("EmptySlot").visible = !save_data.exists
 		filled_slot.visible = save_data.exists
-		slot_button.get_node("DeleteButton").visible = save_data.exists
 		if save_data.exists:
 			filled_slot.texture = _resolve_filled_texture(i, save_data.last_save_room, filled_slot.texture)
 			play_time_label.text = _format_play_time(save_data.play_time_seconds)
@@ -189,22 +122,16 @@ func _update_slot_display():
 			play_time_label.visible = false
 
 ## 处理存档槽按钮按下
-## 处理存档槽按下
+## 点击存档槽：只做「选中」，不再直接进游戏；
+## 进游戏还是清空存档由随后出现的两个操作按钮决定。
 func _on_save_slot_pressed(slot_index: int):
-	if _scene_input_locked:
+	if is_input_locked() or is_dialog_open:
 		return
-	AudioManager.play_button_click_sfx()
-	
-	if is_dialog_open:
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
+	if slot_index == _selected_slot and _action_buttons_shown:
 		return
-
-	_set_scene_input_locked(true)
-	# 常态循环动画：与退场过渡同时立即切换“结束”动画，不 await。
-	_ui_loop_play_exit()
-	if ui_transition_animator:
-		await ui_transition_animator.play_exit_transition()
-	
-	await SceneManager.start_game_from_save(slot_index)
+	_selected_slot = slot_index
+	_refresh_action_buttons()
 
 ## 重建房间纹理映射缓存（运行时只做字典查询）
 ## 重建房间到纹理的查询表
@@ -236,69 +163,90 @@ func _format_play_time(total_seconds: int) -> String:
 	var seconds: int = safe_seconds % 60
 	return "游戏时长 %02d:%02d:%02d" % [hours, minutes, seconds]
 
-## 停止指定槽位的悬停动画
-func _kill_slot_tween(slot_index: int) -> void:
-	if slot_index < 0 or slot_index >= _slot_tweens.size():
+## 显示「进入存档 / 清空存档」两个按钮。
+## 若它们已经显示着（玩家点了另一个存档槽）：**先完整播一遍出场动画，再重新播入场动画**。
+## 注意：它们也是 UIButtonFx 组件，所以页面退场时会被 UIFxDirector 一并带走（此时它们正好是可见的）。
+## 这里只对这两个组件本身调 play_enter()/play_exit()，不经过总线
+## —— 否则会把整页所有组件重新播一遍。
+func _refresh_action_buttons() -> void:
+	if _selected_slot < 0 or _selected_slot >= save_slots.size():
 		return
-	var tween: Tween = _slot_tweens[slot_index]
-	if tween and tween.is_valid():
-		tween.kill()
-	_slot_tweens[slot_index] = null
+	_action_anim_token += 1
+	var token: int = _action_anim_token
+	if _action_buttons_shown:
+		_action_buttons_shown = false
+		# 用「时长等待」而不是 await 动画信号：Tween 被 kill 时不会发 finished，
+		# 等信号会有挂死的风险（本项目吃过大亏）。
+		enter_save_button.play_exit()
+		clear_save_button.play_exit()
+		var exit_wait: float = maxf(enter_save_button.get_fx_duration("exit"), clear_save_button.get_fx_duration("exit"))
+		await wait_seconds(exit_wait)
+		if token != _action_anim_token:
+			return
+	# 空存档没有「清空」语义，把清空按钮藏起来（而不是让它点下去没反应）
+	var has_save: bool = save_slots[_selected_slot].exists
+	enter_save_button.visible = true
+	clear_save_button.visible = has_save
+	enter_save_button.play_enter(0.0)
+	if has_save:
+		clear_save_button.play_enter(0.06)
+	_action_buttons_shown = true
 
-## 处理存档槽悬停进入
-func _on_save_slot_mouse_entered(slot_index: int) -> void:
-	if _scene_input_locked or is_dialog_open:
+## 隐藏两个操作按钮并复位它们的动效状态（下次显示时会重新播入场）
+func _set_action_buttons_visible(shown: bool) -> void:
+	_action_buttons_shown = shown
+	_action_anim_token += 1
+	enter_save_button.visible = shown
+	clear_save_button.visible = shown
+	if not shown:
+		enter_save_button.settle_now()
+		clear_save_button.settle_now()
+
+## 点击「进入存档」：真正进入游戏
+func _on_enter_save_pressed() -> void:
+	if is_input_locked() or is_dialog_open or _selected_slot < 0:
 		return
-	var slot_button: TextureButton = save_slot_buttons[slot_index]
-	var empty_slot: Sprite2D = slot_button.get_node("EmptySlot")
-	var filled_slot: Sprite2D = slot_button.get_node("FilledSlot")
-	var outline: Panel = _slot_outlines[slot_index]
-	_kill_slot_tween(slot_index)
-	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_CUBIC)
-	tween.set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(empty_slot, "position:y", _slot_empty_base_positions[slot_index].y - slot_hover_offset_y, slot_hover_duration)
-	tween.parallel().tween_property(filled_slot, "position:y", _slot_filled_base_positions[slot_index].y - slot_hover_offset_y, slot_hover_duration)
-	tween.parallel().tween_property(outline, "modulate:a", 1.0, slot_hover_duration)
-	_slot_tweens[slot_index] = tween
+	# 退场动画 / 黑屏 / 换场景 / 新页入场的顺序只在 UIRouter 里定义一处。
+	await ui_exit()
+	await SceneManager.start_game_from_save(_selected_slot)
 
-## 处理存档槽悬停离开
-func _on_save_slot_mouse_exited(slot_index: int) -> void:
-	var slot_button: TextureButton = save_slot_buttons[slot_index]
-	var empty_slot: Sprite2D = slot_button.get_node("EmptySlot")
-	var filled_slot: Sprite2D = slot_button.get_node("FilledSlot")
-	var outline: Panel = _slot_outlines[slot_index]
-	_kill_slot_tween(slot_index)
-	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_CUBIC)
-	tween.set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(empty_slot, "position", _slot_empty_base_positions[slot_index], slot_hover_duration)
-	tween.parallel().tween_property(filled_slot, "position", _slot_filled_base_positions[slot_index], slot_hover_duration)
-	tween.parallel().tween_property(outline, "modulate:a", 0.0, slot_hover_duration)
-	_slot_tweens[slot_index] = tween
-
-## 处理输入事件（新增ESC键初始冷却检查）
-## 处理存档选择场景输入
-func _input(event):
-	if _scene_input_locked:
-		if event is InputEventKey or event is InputEventMouseButton or event is InputEventJoypadButton:
-			get_viewport().set_input_as_handled()
+## 覆盖基类：ESC 返回（对话框打开时不返回）。
+## ESC 不受输入锁限制：输入锁只用来防连点，若把它也拿来挡 ESC，
+## 就会出现「动画还没结束所以按什么都没反应」的误解。
+func _on_ui_cancel() -> void:
+	if is_dialog_open:
 		return
-	if event.is_action_pressed("ui_cancel") and not is_dialog_open:
-		_on_back_button_pressed()
+	_go_back_to_title()
 
-## 处理删除按钮按下
-func _on_delete_button_pressed(slot_index: int):
-	AudioManager.play_button_click_sfx()
+## 点击返回按钮（受输入锁保护；按钮本身在锁定时也是 disabled 的）
+func _on_back_button_pressed():
+	if is_input_locked():
+		return
+	if is_dialog_open:
+		return
+	_go_back_to_title()
+
+func _go_back_to_title() -> void:
+	LightingManager.stop_all_light_effects()
+	# 退场动画 / 黑屏 / 换场景 / 新页入场的顺序只在 UIRouter 里定义一处。
+	await UIRouter.goto_scene(ScenePaths.UI_TITLE)
+
+## 点击「清空存档」：弹删除确认对话框
+func _on_clear_save_pressed():
+	if is_input_locked() or is_dialog_open or _selected_slot < 0:
+		return
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	if not delete_confirm_scene:
 		push_error("SaveSelectScene: delete_confirm_scene 未配置！请在 Inspector 中拖拽 DeleteConfirmDialog.tscn")
 		return
 	
+	# 对话框期间标记为打开：避免玩家在弹窗后面还能点到存档槽
+	is_dialog_open = true
 	LightingManager.dim_lights(0.0, 0.5)
 	
 	var confirm_dialog = delete_confirm_scene.instantiate()
 	add_child(confirm_dialog)
-	confirm_dialog.confirm_callback = _on_confirm_delete.bind(slot_index)
+	confirm_dialog.confirm_callback = _on_confirm_delete.bind(_selected_slot)
 	confirm_dialog.tree_exited.connect(_on_dialog_closed)
 
 ## 设置所有按钮的启用状态
@@ -307,6 +255,8 @@ func _set_buttons_enabled(enabled: bool):
 	for slot_button in save_slot_buttons:
 		slot_button.disabled = !enabled
 	$BackButton.disabled = !enabled
+	enter_save_button.disabled = !enabled
+	clear_save_button.disabled = !enabled
 
 ## 处理对话框关闭
 ## 处理删除确认对话框关闭
@@ -324,6 +274,9 @@ func _on_confirm_delete(slot_index: int):
 	if SaveManager.delete_save(slot_index):
 		save_slots[slot_index].exists = false
 		_update_slot_display()
+		# 槽位已空：收起两个操作按钮并清除选中
+		_selected_slot = -1
+		_set_action_buttons_visible(false)
 		
 		# 关键修复：如果删除的是当前存档，需要清空 Global 数据
 		if slot_index == Global.current_save_slot:
@@ -331,74 +284,14 @@ func _on_confirm_delete(slot_index: int):
 			# 保险措施：避免后续逻辑把运行态数据再保存回已删除的槽位
 			Global.current_save_slot = -1
 
-## 处理返回按钮按下
-## 处理返回按钮按下
-func _on_back_button_pressed():
-	if _scene_input_locked:
-		return
-	AudioManager.play_button_click_sfx()
-	
-	if is_dialog_open:
-		return
-
-	_set_scene_input_locked(true)
-	# 常态循环动画：与退场过渡同时立即切换“结束”动画，不 await。
-	_ui_loop_play_exit()
-	if ui_transition_animator:
-		await ui_transition_animator.play_exit_transition()
-		
-	LightingManager.stop_all_light_effects()
-	await SceneManager.switch_scene(ScenePaths.UI_TITLE)
-
 ## 退出场景时停止灯光效果
 ## 退出场景时清理灯光
 func _exit_tree():
 	LightingManager.stop_all_light_effects()
 
-## 查询当前交互锁状态
-func is_scene_interaction_locked() -> bool:
-	return _scene_input_locked
-
-## 设置场景输入锁
-func _set_scene_input_locked(locked: bool) -> void:
-	_scene_input_locked = locked
+## 覆盖基类：把输入锁应用到本页面的按钮上。
+func _on_input_lock_applied(locked: bool) -> void:
 	_set_buttons_enabled(not locked)
 
-## 常态循环动画：立即播放“开始 -> 循环”（本场景内所有 UILoopAnimator）。
-## 禁止 await，不影响场景流程。
-func _ui_loop_play_enter() -> void:
-	for animator in _get_ui_loop_animators():
-		animator.call("play_enter")
 
-## 常态循环动画：立即播放“结束”（本场景内所有 UILoopAnimator）。
-## 禁止 await，不影响场景流程。
-func _ui_loop_play_exit() -> void:
-	for animator in _get_ui_loop_animators():
-		animator.call("play_exit")
-
-## 收集本场景内所有 UILoopAnimator（递归扫描、不依赖节点名）。
-## 一个场景放多个时会被全部驱动，节点被编辑器改名也不会失效。
-func _get_ui_loop_animators() -> Array[Node]:
-	for animator in _ui_loop_animators:
-		if not is_instance_valid(animator) or not is_ancestor_of(animator):
-			_ui_loop_animators.clear()
-			break
-	if _ui_loop_animators.is_empty():
-		_collect_ui_loop_animators(self, _ui_loop_animators)
-	return _ui_loop_animators
-
-func _collect_ui_loop_animators(node: Node, acc: Array[Node]) -> void:
-	for child in node.get_children():
-		var script_ref: Script = child.get_script()
-		if child is AnimatedSprite2D and script_ref != null and str(script_ref.resource_path).ends_with("UILoopAnimator.gd"):
-			acc.append(child)
-		_collect_ui_loop_animators(child, acc)
-
-## 播放入场动画后解锁输入
-func _on_scene_transition_enter_begin() -> void:
-	_set_scene_input_locked(true)
-	# 常态循环动画：与 UITransitionAnimator 入场完全同一时刻触发（不 await、不阻塞）。
-	_ui_loop_play_enter()
-	if ui_transition_animator:
-		await ui_transition_animator.play_enter_transition()
-	_set_scene_input_locked(false)
+## ---- 以下动效 / 等待 / 节点收集逻辑已全部上提到 UIScene / UIFxDirector，本文件不再重复实现 ----

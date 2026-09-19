@@ -181,6 +181,12 @@ func _resolve_target_bgm(_scene_path: String) -> String:
 
 func _do_scene_transition(scene_path: String, fade_out_duration: float, black_hold_duration: float, fade_in_duration: float, target_bgm: String) -> void:
 	await FadeManager.fade_out(fade_out_duration)
+	UIRouter.set_phase(UIRouter.Phase.BLACK)
+	# 淡出结束的这一刻屏幕刚好全黑 —— 以此为起点计「全黑时长」。
+	# 关键：change_scene 会花时间加载/实例化新场景（不可预测），
+	# 如果直接再等 black_hold_duration，实际全黑时长就变成「加载时间 + 参数值」，
+	# 这就是「调小参数黑屏依然很长」的原因。改为减去已耗时间，参数即真实全黑时长。
+	var black_start_ms: int = Time.get_ticks_msec()
 
 	if target_bgm != "":
 		await AudioManager.play_bgm(target_bgm, fade_out_duration)
@@ -189,14 +195,31 @@ func _do_scene_transition(scene_path: String, fade_out_duration: float, black_ho
 	await get_tree().process_frame
 
 	if black_hold_duration > 0.0:
-		await get_tree().create_timer(black_hold_duration).timeout
+		var elapsed_black: float = float(Time.get_ticks_msec() - black_start_ms) / 1000.0
+		var remain_black: float = maxf(0.0, black_hold_duration - elapsed_black)
+		if remain_black > 0.0:
+			await get_tree().create_timer(remain_black).timeout
 
-	# 在黑屏准备淡出时触发新场景入场动画（此时仍处在黑屏下）。
+	# 黑幕完全遮住屏幕时只「摆位」：把所有动效轨道置为入场起始态（不播动画）。
+	# 这样等下的入场动画才不会在黑幕/淡入期间被盖掉。
 	var current_scene := get_tree().current_scene
-	if current_scene and current_scene.has_method("_on_scene_transition_enter_begin"):
-		current_scene._on_scene_transition_enter_begin()
+	if current_scene and current_scene.has_method("ui_prepare_enter"):
+		current_scene.call("ui_prepare_enter")
 
+	# 防呆：FadeManager 是 autoload，若游戏侧过场事件（新存档开场 / 梦境房间）留下的
+	# hold_black 标签没被释放，fade_in() 会直接拒绝淡入（force_black 后立即返回），
+	# 表现为「参数改了也没用、黑屏异常久」。UI 场景切换与会场过场无关，清掉即可。
+	if FadeManager and FadeManager.has_method("clear_black_holds"):
+		FadeManager.clear_black_holds()
+
+	# 先淡入：等黑屏过渡**完全结束**、画面完全可见，之后才播入场动画。
+	# （反过来做的话，入场动画会被黑幕/淡入盖掉：轻则只看到后半段，重则已经播完）
+	UIRouter.set_phase(UIRouter.Phase.ENTERING)
 	await FadeManager.fade_in(fade_in_duration)
+
+	if current_scene and current_scene.has_method("ui_enter"):
+		await current_scene.call("ui_enter")
+	UIRouter.set_phase(UIRouter.Phase.IDLE)
 
 func _begin_scene_switch(tag: String) -> bool:
 	if _scene_switch_in_progress:

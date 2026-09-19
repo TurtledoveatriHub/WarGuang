@@ -1,23 +1,25 @@
-[gd_scene load_steps=34 format=3 uid="uid://cnx8rqa13bm26"]
+[gd_scene load_steps=37 format=3 uid="uid://cnx8rqa13bm26"]
 
 [ext_resource type="Script" uid="uid://2jv58grmryqa" path="res://Scripts/UI/Scenes/TitleScene.gd" id="1_25ulu"]
 [ext_resource type="PackedScene" uid="uid://8vv4frjt0qmt" path="res://Scenes/UI/Scenes/SettingsScene.tscn" id="2_fkiff"]
-[ext_resource type="Script" uid="uid://c6yjpi17utwg8" path="res://Scripts/UI/Scenes/UITransitionAnimator.gd" id="2_transition_animator"]
 [ext_resource type="AudioStream" uid="uid://cs31nir8y35de" path="res://Assets/Audios/BGM/探险.ogg" id="3_1p8n3"]
-[ext_resource type="Texture2D" uid="uid://cs6j2183f22mc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景1.png" id="5_syapl"]
 [ext_resource type="Texture2D" uid="uid://d3gavddfgdl2a" path="res://Assets/Textures/Warmas/wmn.png" id="5_u4xyb"]
-[ext_resource type="Texture2D" uid="uid://1xy7xygxqlmf" path="res://Assets/Textures/UIs/SceneUIs/title沃光标题01.tres" id="6_iwgkb"]
-[ext_resource type="Texture2D" uid="uid://norhspdvctlf" path="res://Assets/Textures/UIs/SceneUIs/title开始游戏01.tres" id="7_kvyf1"]
-[ext_resource type="Texture2D" uid="uid://dosd0gvafei6y" path="res://Assets/Textures/UIs/SceneUIs/title沃光标题02.tres" id="7_syapl"]
-[ext_resource type="Texture2D" uid="uid://ho0xrtpie15r" path="res://Assets/Textures/UIs/SceneUIs/title开始游戏03.tres" id="8_lcuoq"]
-[ext_resource type="Texture2D" uid="uid://cyinqwyo2a28j" path="res://Assets/Textures/UIs/SceneUIs/title开始游戏02.tres" id="9_s4mlw"]
-[ext_resource type="Texture2D" uid="uid://bjw3vmf4u7cyw" path="res://Assets/Textures/UIs/SceneUIs/title游戏设置01.tres" id="10_hapmd"]
-[ext_resource type="Texture2D" uid="uid://b3llq6q8mdy3w" path="res://Assets/Textures/UIs/SceneUIs/title游戏设置03.tres" id="11_60md4"]
-[ext_resource type="Texture2D" uid="uid://b5d5lryk1pk0a" path="res://Assets/Textures/UIs/SceneUIs/title游戏设置02.tres" id="12_lhhs8"]
-[ext_resource type="Texture2D" uid="uid://dl3626i63bnb5" path="res://Assets/Textures/UIs/SceneUIs/title退出游戏01.tres" id="13_iwgkb"]
-[ext_resource type="Texture2D" uid="uid://crm3nlbd140st" path="res://Assets/Textures/UIs/SceneUIs/title退出游戏03.tres" id="14_syapl"]
-[ext_resource type="Texture2D" uid="uid://c7q2jgly1ajvi" path="res://Assets/Textures/UIs/SceneUIs/title退出游戏02.tres" id="15_1p8n3"]
+[ext_resource type="Texture2D" uid="uid://1xy7xygxqlmf" path="res://Assets/Textures/UIs/SceneUIs/tres/title沃光标题01.tres" id="6_iwgkb"]
+[ext_resource type="Texture2D" uid="uid://dosd0gvafei6y" path="res://Assets/Textures/UIs/SceneUIs/tres/title沃光标题02.tres" id="7_syapl"]
+[ext_resource type="Texture2D" uid="uid://do3a77icxxaeg" path="res://Assets/Textures/UIs/SceneUIs/标题.png" id="8_mmaj1"]
+[ext_resource type="Texture2D" uid="uid://brcf0udadvrxa" path="res://Assets/Textures/UIs/SceneUIs/黑板.png" id="9_lnewd"]
+[ext_resource type="Texture2D" uid="uid://dj5otapvnobfv" path="res://Assets/Textures/UIs/SceneUIs/cc.png" id="9_mmaj1"]
+[ext_resource type="Material" uid="uid://phy0qo6fkhl8" path="res://Assets/Instances/TitleSceneParticle.tres" id="10_mjphl"]
+[ext_resource type="Texture2D" uid="uid://bfxe5gkbkkx8r" path="res://Assets/Textures/UIs/SceneUIs/1.png" id="11_lnewd"]
+[ext_resource type="Texture2D" uid="uid://dpdyrq21bh47g" path="res://Assets/Textures/UIs/SceneUIs/3.png" id="12_m3y5q"]
+[ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="13_m3y5q"]
+[ext_resource type="Texture2D" uid="uid://dk2iy0xo6ucju" path="res://Assets/Textures/UIs/SceneUIs/2.png" id="13_mmaj1"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="14_mmaj1"]
 [ext_resource type="Script" uid="uid://dloxn5pxm2x3q" path="res://Scripts/UI/UILoopAnimator.gd" id="17_1p8n3"]
+[ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="17_m3y5q"]
+[ext_resource type="Texture2D" uid="uid://c3fxh3guo8uut" path="res://Assets/Textures/UIs/SceneUIs/3x.png" id="18_mmaj1"]
+[ext_resource type="Texture2D" uid="uid://b6ji0vannv3pj" path="res://Assets/Textures/UIs/SceneUIs/2x.png" id="19_mjphl"]
+[ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="20_mmaj1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lnewd"]
 atlas = ExtResource("5_u4xyb")
@@ -134,27 +136,41 @@ animations = [{
 }]
 
 [sub_resource type="Gradient" id="Gradient_fw62u"]
-offsets = PackedFloat32Array(0.13819095, 0.6758794, 1)
-colors = PackedColorArray(0.3911856, 0.39118528, 0.39118534, 1, 0.10526919, 0.105269104, 0.105269134, 1, 0, 0, 0, 1)
+offsets = PackedFloat32Array(0, 0.14572865, 0.6809045, 1)
+colors = PackedColorArray(0.52312064, 0.5231202, 0.5231202, 1, 0.5729885, 0.57298815, 0.57298833, 1, 0.10526919, 0.105269104, 0.105269134, 1, 0, 0, 0, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_syapl"]
 gradient = SubResource("Gradient_fw62u")
 fill = 1
-fill_from = Vector2(0.4764957, 0.2948718)
+fill_from = Vector2(0, 1)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mmaj1"]
+particles_animation = true
+particles_anim_h_frames = 3
+particles_anim_v_frames = 1
+particles_anim_loop = true
 
 [node name="TitleScene" type="CanvasLayer"]
 script = ExtResource("1_25ulu")
 settings_scene_resource = ExtResource("2_fkiff")
 title_bgm_stream = ExtResource("3_1p8n3")
+title_shake_duration = null
+title_shake_strength = null
+title_shake_interval = null
+quit_fade_out_duration = null
+fx_bus_path = null
+use_fx_bus = null
+fx_deadline_seconds = null
+lock_swallows_mouse = null
+overlay_pass_through_input = null
 
-[node name="UITransitionAnimator" type="Node" parent="."]
-script = ExtResource("2_transition_animator")
-extra_target_paths = Array[NodePath]([NodePath("../UI")])
+[node name="UIFxDirector" type="Node" parent="."]
+script = ExtResource("20_mmaj1")
 
 [node name="UILoopAnimator" type="AnimatedSprite2D" parent="." groups=["ui_loop_animator"]]
 z_index = 950
 texture_filter = 1
-position = Vector2(107, 620)
+position = Vector2(1190, 639)
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_u4xyb")
 animation = &"end"
@@ -162,79 +178,216 @@ script = ExtResource("17_1p8n3")
 autoplay_on_ready = false
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0.5971763, 0.5971761, 0.5971761, 1)
+color = Color(0.6851458, 0.6851457, 0.685146, 1)
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
-position = Vector2(640, 359.99997)
+position = Vector2(640, 360)
 scale = Vector2(20, 11.25)
-color = Color(0.67687863, 0.6768787, 0.6768785, 1)
+color = Color(0.8196549, 0.81965435, 0.8196547, 1)
 range_layer_min = 1
 range_layer_max = 100
 texture = SubResource("GradientTexture2D_syapl")
+texture_scale = 1.4
 
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(640.00006, 360.00003)
 scale = Vector2(2.5, 2.5)
-texture = ExtResource("5_syapl")
+texture = ExtResource("8_mmaj1")
+
+[node name="MeteorFx" type="GPUParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_mmaj1")
+position = Vector2(300, 900)
+amount = 12
+texture = ExtResource("9_mmaj1")
+lifetime = 1.8
+preprocess = 1.0
+visibility_rect = Rect2(-1300, -1100, 4600, 1200)
+process_material = ExtResource("10_mjphl")
+
+[node name="BG" type="Sprite2D" parent="."]
+position = Vector2(245.00002, 120)
+scale = Vector2(3, 3)
+texture = ExtResource("9_lnewd")
 
 [node name="Title" type="Sprite2D" parent="."]
-position = Vector2(646.00006, 187)
+position = Vector2(250, 144)
 scale = Vector2(2.5, 2.5)
 texture = ExtResource("6_iwgkb")
 region_rect = Rect2(208, 192, 144, 64)
 
 [node name="TitleB" type="Sprite2D" parent="."]
 visible = false
-position = Vector2(641.00006, 179)
+position = Vector2(240, 144)
 scale = Vector2(2.5, 2.5)
 texture = ExtResource("7_syapl")
 region_rect = Rect2(208, 192, 144, 64)
 
 [node name="TitleClickAreaA" type="TextureButton" parent="."]
-offset_left = 596.0
-offset_top = 229.0
-offset_right = 621.0
-offset_bottom = 250.0
+offset_left = 201.0
+offset_top = 186.0
+offset_right = 226.0
+offset_bottom = 207.0
 mouse_filter = 1
 
 [node name="TitleClickAreaB" type="TextureButton" parent="."]
-offset_left = 648.0
-offset_top = 214.0
-offset_right = 674.0
-offset_bottom = 234.0
+offset_left = 249.0
+offset_top = 179.0
+offset_right = 275.0
+offset_bottom = 199.0
 mouse_filter = 1
 
-[node name="UI" type="VBoxContainer" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -59.0
-offset_top = 67.0
-offset_right = 69.0
-offset_bottom = 211.0
+[node name="StartButton" type="TextureButton" parent="."]
+offset_left = 1048.0
+offset_top = 88.0
+offset_right = 1224.0
+offset_bottom = 120.0
+scale = Vector2(2.5, 2.5)
+pivot_offset = Vector2(88, 16)
+texture_normal = ExtResource("11_lnewd")
+texture_pressed = ExtResource("12_m3y5q")
+texture_hover = ExtResource("13_mmaj1")
+script = ExtResource("13_m3y5q")
+hover_offset = Vector2(-48, 0)
+enter_drift_distance = Vector2(360, 0)
+exit_drift_distance = Vector2(360, 0)
+
+[node name="Label" type="Label" parent="StartButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+pivot_offset = Vector2(88, 16)
+theme = ExtResource("14_mmaj1")
+text = "开始游戏   "
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SettingsButton" type="TextureButton" parent="."]
+offset_left = 1048.0
+offset_top = 218.0
+offset_right = 1224.0
+offset_bottom = 250.0
 scale = Vector2(2.5, 2.5)
-pivot_offset = Vector2(62.479996, 68.07999)
-theme_override_constants/separation = 16
-alignment = 1
+pivot_offset = Vector2(88, 16)
+texture_normal = ExtResource("11_lnewd")
+texture_pressed = ExtResource("12_m3y5q")
+texture_hover = ExtResource("13_mmaj1")
+script = ExtResource("13_m3y5q")
+hover_offset = Vector2(-48, 0)
+enter_drift_distance = Vector2(360, 0)
+exit_drift_distance = Vector2(360, 0)
 
-[node name="StartButton" type="TextureButton" parent="UI"]
-layout_mode = 2
-texture_normal = ExtResource("7_kvyf1")
-texture_pressed = ExtResource("8_lcuoq")
-texture_hover = ExtResource("9_s4mlw")
+[node name="Label" type="Label" parent="SettingsButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(88, 16)
+theme = ExtResource("14_mmaj1")
+text = "游戏设置   "
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="SettingsButton" type="TextureButton" parent="UI"]
-layout_mode = 2
-texture_normal = ExtResource("10_hapmd")
-texture_pressed = ExtResource("11_60md4")
-texture_hover = ExtResource("12_lhhs8")
+[node name="ACHButton" type="TextureButton" parent="."]
+offset_left = 1048.0
+offset_top = 348.0
+offset_right = 1224.0
+offset_bottom = 380.0
+scale = Vector2(2.5, 2.5)
+pivot_offset = Vector2(88, 16)
+texture_normal = ExtResource("11_lnewd")
+texture_pressed = ExtResource("12_m3y5q")
+texture_hover = ExtResource("13_mmaj1")
+script = ExtResource("13_m3y5q")
+hover_offset = Vector2(-48, 0)
+enter_drift_distance = Vector2(360, 0)
+exit_drift_distance = Vector2(360, 0)
 
-[node name="QuitButton" type="TextureButton" parent="UI"]
-layout_mode = 2
-texture_normal = ExtResource("13_iwgkb")
-texture_pressed = ExtResource("14_syapl")
-texture_hover = ExtResource("15_1p8n3")
+[node name="Label" type="Label" parent="ACHButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(88, 16)
+theme = ExtResource("14_mmaj1")
+text = "游戏成就   "
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QuitButton" type="TextureButton" parent="."]
+offset_left = 1048.0
+offset_top = 478.0
+offset_right = 1224.0
+offset_bottom = 510.0
+scale = Vector2(2.5, 2.5)
+pivot_offset = Vector2(88, 16)
+texture_normal = ExtResource("11_lnewd")
+texture_pressed = ExtResource("12_m3y5q")
+texture_hover = ExtResource("13_mmaj1")
+script = ExtResource("13_m3y5q")
+hover_offset = Vector2(-48, 0)
+enter_drift_distance = Vector2(360, 0)
+exit_drift_distance = Vector2(360, 0)
+
+[node name="Label" type="Label" parent="QuitButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(88, 16)
+theme = ExtResource("14_mmaj1")
+text = "退出游戏   "
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AboutAuthor" type="TextureButton" parent="."]
+offset_left = 29.0
+offset_top = 258.0
+offset_right = 97.0
+offset_bottom = 280.0
+scale = Vector2(2, 2)
+texture_normal = ExtResource("17_m3y5q")
+texture_pressed = ExtResource("18_mmaj1")
+texture_hover = ExtResource("19_mjphl")
+script = ExtResource("13_m3y5q")
+
+[node name="Label" type="Label" parent="AboutAuthor"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("14_mmaj1")
+text = "关于作者"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UpdateNotes" type="TextureButton" parent="."]
+offset_left = 196.0
+offset_top = 258.0
+offset_right = 264.0
+offset_bottom = 280.0
+scale = Vector2(2, 2)
+texture_normal = ExtResource("17_m3y5q")
+texture_pressed = ExtResource("18_mmaj1")
+texture_hover = ExtResource("19_mjphl")
+script = ExtResource("13_m3y5q")
+
+[node name="Label" type="Label" parent="UpdateNotes"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("14_mmaj1")
+text = "游戏公告"
+horizontal_alignment = 1
+vertical_alignment = 1

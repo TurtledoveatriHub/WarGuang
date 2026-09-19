@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://8fgwvc0o8k5q"]
+[gd_scene load_steps=17 format=3 uid="uid://8fgwvc0o8k5q"]
 
 [ext_resource type="Script" uid="uid://jolprxfg3rym" path="res://Scripts/UI/BootCutscene.gd" id="1_2u0jc"]
 [ext_resource type="Texture2D" uid="uid://c06cr3f3ip0ci" path="res://Assets/Textures/开场动画测试.png" id="2_bh5cf"]
@@ -39,10 +39,6 @@ region = Rect2(256, 144, 256, 144)
 atlas = ExtResource("2_bh5cf")
 region = Rect2(512, 144, 256, 144)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_1k3oy"]
-atlas = ExtResource("2_bh5cf")
-region = Rect2(768, 144, 256, 144)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_k3p4t"]
 atlas = ExtResource("2_bh5cf")
 region = Rect2(1024, 144, 256, 144)
@@ -58,22 +54,6 @@ region = Rect2(0, 288, 256, 144)
 [sub_resource type="AtlasTexture" id="AtlasTexture_2nmb3"]
 atlas = ExtResource("2_bh5cf")
 region = Rect2(256, 288, 256, 144)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_y6id5"]
-atlas = ExtResource("2_bh5cf")
-region = Rect2(512, 288, 256, 144)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_425hh"]
-atlas = ExtResource("2_bh5cf")
-region = Rect2(768, 288, 256, 144)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_a2e87"]
-atlas = ExtResource("2_bh5cf")
-region = Rect2(1024, 288, 256, 144)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_6o88g"]
-atlas = ExtResource("2_bh5cf")
-region = Rect2(1280, 288, 256, 144)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_bh5cf"]
 animations = [{
@@ -106,7 +86,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_6jk8g")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_1k3oy")
+"texture": SubResource("AtlasTexture_k3p4t")
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_k3p4t")
@@ -119,22 +99,10 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_2nmb3")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_y6id5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_425hh")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_a2e87")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_6o88g")
 }],
 "loop": false,
 "name": &"intro",
-"speed": 6.0
+"speed": 12.0
 }]
 
 [node name="BootCutscene" type="CanvasLayer"]

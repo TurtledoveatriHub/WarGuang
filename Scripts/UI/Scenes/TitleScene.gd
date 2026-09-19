@@ -1,4 +1,4 @@
-extends CanvasLayer  # 修复：改为 CanvasLayer
+extends UIScene  # UI 页面统一基类（生命周期 / 输入锁 / 动效总线）
 
 ## 设置界面场景（在 Inspector 中拖拽 SettingsScene.tscn）
 @export var settings_scene_resource: PackedScene
@@ -6,21 +6,16 @@ extends CanvasLayer  # 修复：改为 CanvasLayer
 @export var title_bgm_stream: AudioStream
 
 
-@onready var start_button = $UI/StartButton
-@onready var settings_button = $UI/SettingsButton
-@onready var quit_button = $UI/QuitButton
-@onready var ui_transition_animator: UITransitionAnimator = $UITransitionAnimator
+@onready var start_button = $StartButton
+@onready var settings_button = $SettingsButton
+@onready var quit_button = $QuitButton
+## 过渡轨道已并入 UIFxDirector（动效总线）：这里保留旧名字指向总线，业务代码无需改动。
+@onready var ui_transition_animator: Node = _get_fx_bus()
 @onready var title_sprite_a: Sprite2D = $Title
 @onready var title_sprite_b: Sprite2D = get_node_or_null("TitleB")
 @onready var title_click_area_a: BaseButton = get_node_or_null("TitleClickAreaA")
 @onready var title_click_area_b: BaseButton = get_node_or_null("TitleClickAreaB")
-## 常态 UI 循环动画节点缓存（一个场景可以放多个 UILoopAnimator，全部会被驱动）
-var _ui_loop_animators: Array[Node] = []
 
-## 场景输入锁状态
-var _scene_input_locked: bool = true
-## Settings 覆盖层打开状态
-var _settings_overlay_open: bool = false
 ## 当前标题点击计数
 var _title_click_count: int = 0
 ## 标题是否正在抖动
@@ -75,26 +70,23 @@ func _ready():
 	_load_title_variant_state()
 	_apply_title_variant_state(false)
 
-	## 若开场过场动画正在播放，先整体隐藏本场景：
-	## 避免覆盖层透明时“先完整出现、再突兀地播入场动画”。
+	## 若开场过场动画正在播放，先把「入场演出的主角」隐藏起来：
+	## UITransitionAnimator 的目标 + 所有 UILoopAnimator + 所有按钮动效组件。
+	## Background / 光源 / CanvasModulate 等背景元素**保持可见**（可提前显示）。
 	## 等 intro 播完的同一时刻再显形并开始入场演出（见 _begin_enter_sequence）。
 	var boot_waiting: bool = _is_boot_cutscene_playing()
 	if boot_waiting:
-		visible = false
+		_hide_enter_showcase()
 
-	_set_scene_input_locked(true)
-	if not ui_transition_animator:
-		# 没有过渡动画器时，入场演出直接由本场景触发。
-		visible = true
-		_ui_loop_play_enter()
-		FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
-		_set_scene_input_locked(false)
-	else:
-		_sync_animator_title_target()
+	set_input_locked(true)
+	if ui_transition_animator:
 		ui_transition_animator.reset_state()
-		var screen_is_black: bool = FadeManager and FadeManager.has_method("get_black_alpha") and FadeManager.get_black_alpha() > 0.01
-		if boot_waiting or not screen_is_black:
-			call_deferred("_begin_enter_sequence")
+	# 开场过场还在播 → 等它播完再入场；否则若不是黑屏（编辑器直接运行该场景）就立即入场。
+	# 黑屏场景切换时，由 SceneManager / UIRouter 在黑屏下显式调用 ui_enter()。
+	if boot_waiting:
+		call_deferred("_begin_enter_sequence")
+	else:
+		auto_enter_unless_black()
 	
 	## 播放 UI BGM（在 Inspector 中拖拽 title_bgm_stream）
 	if title_bgm_stream:
@@ -103,27 +95,6 @@ func _ready():
 	## 修改：调用 LightingManager 的统一函数
 	LightingManager.setup_ui_breathing_effect(self)
 
-#func setup_breathing_effect():
-	#var point_lights = _find_nodes_by_type(self, "PointLight2D")
-	#for light in point_lights:
-		#if light is PointLight2D:
-			#light.energy = 1.0
-			#if not light.is_in_group("ui_point_lights"):
-				#light.add_to_group("ui_point_lights")
-	#
-	#LightingManager.stop_all_light_effects()
-	#await get_tree().create_timer(0.05).timeout
-	#LightingManager.create_breathing_effect()
-#
-#func _find_nodes_by_type(root: Node, type: String) -> Array:
-	#var result = []
-	#if root.get_class() == type:
-		#result.append(root)
-	#
-	#for child in root.get_children():
-		#result.append_array(_find_nodes_by_type(child, type))
-	#
-	#return result
 
 ## 开始本场景的入场演出。
 ## 若开场过场动画（BootCutscene）正在播放，则等它播完（intro_finished）再开始，
@@ -139,8 +110,8 @@ func _begin_enter_sequence() -> void:
 			if intro_signal is Signal:
 				await intro_signal
 	# 显形与入场演出同一时刻发生，避免“先出现、后播动画”的脱节感。
-	visible = true
-	await _on_scene_transition_enter_begin()
+	_restore_enter_showcase()
+	await ui_enter()
 
 
 ## 开场过场动画是否正在播放（含淡出阶段）。
@@ -153,149 +124,98 @@ func _is_boot_cutscene_playing() -> bool:
 
 ## 处理开始按钮按下
 func _on_start_button_pressed():
-	if _scene_input_locked:
+	if is_input_locked():
 		return
-	AudioManager.play_button_click_sfx()
 	_reset_title_click_state()
-	
-	_set_scene_input_locked(true)
-	_ui_loop_play_exit()
 	LightingManager.stop_all_light_effects()
-	if ui_transition_animator:
-		await ui_transition_animator.play_exit_transition()
-	await SceneManager.switch_scene(ScenePaths.UI_SAVE_SELECT)
+	# 退场动画 / 黑屏 / 换场景 / 新页入场的顺序只在 UIRouter 里定义一处。
+	await UIRouter.goto_scene(ScenePaths.UI_SAVE_SELECT)
 
-## 处理设置按钮按下
+## 处理设置按钮按下（以覆盖层方式打开设置界面）
 func _on_settings_button_pressed():
-	if _scene_input_locked:
+	if is_input_locked():
 		return
-	AudioManager.play_button_click_sfx()
 	_reset_title_click_state()
-	start_button.disabled = true
-	settings_button.disabled = true  # 修复：改为 settings_button
-	quit_button.disabled = true
-	_set_scene_input_locked(true)
-	_ui_loop_play_exit()
-	
-	if ui_transition_animator:
-		await ui_transition_animator.play_exit_transition()
-	await FadeManager.fade_out(FadeManager.ui_switch_fade_out_duration)
-	
 	if not settings_scene_resource:
 		push_error("TitleScene: settings_scene_resource 未配置！请在 Inspector 中拖拽 SettingsScene.tscn")
 		return
-	
-	var settings_scene = settings_scene_resource.instantiate()
-	settings_scene.setup("TitleScene", self)
-	get_tree().root.add_child(settings_scene)
-	_settings_overlay_open = true
-	if settings_scene.has_method("_on_scene_transition_enter_begin"):
-		settings_scene.call_deferred("_on_scene_transition_enter_begin")
-	
-	await FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
-
-## 处理Settings返回标题
-func _on_settings_closed(settings_scene: Node = null):
-	_settings_overlay_open = false
-	_reset_title_click_state()
-	await FadeManager.fade_out(FadeManager.ui_switch_fade_out_duration)
-	if settings_scene and is_instance_valid(settings_scene):
-		settings_scene.queue_free()
-	start_button.disabled = false
-	settings_button.disabled = false
-	quit_button.disabled = false
-	if ui_transition_animator:
-		_on_scene_transition_enter_begin()
-	
-	## 关键修复：等待淡入完成后重新设置呼吸效果
-	await FadeManager.fade_in(FadeManager.ui_switch_fade_in_duration)
-	
-	## 新增：重新设置灯光呼吸效果
-	## 等待一帧确保淡入完成
-	await get_tree().process_frame
-	
-	## 调用 LightingManager 统一函数
-	LightingManager.setup_ui_breathing_effect(self)
+	var settings_page: Node = settings_scene_resource.instantiate()
+	await UIRouter.open_overlay(settings_page, self)
 
 ## 处理退出按钮按下
 func _on_quit_button_pressed():
-	if _scene_input_locked:
+	if is_input_locked():
 		return
 	_reset_title_click_state()
-	_set_scene_input_locked(true)
-	_ui_loop_play_exit()
-	AudioManager.play_button_click_sfx()
-	# 关键：黑屏过渡必须在点击瞬间立即开始，与退场动画并行推进，
-	# 而不是等 UITransitionAnimator 的退场动画播完才开始。
-	if FadeManager and FadeManager.has_method("fade_out"):
-		FadeManager.fade_out(quit_fade_out_duration)
-	if ui_transition_animator:
-		ui_transition_animator.play_exit_transition()
-	# 只等待黑屏过渡结束，不等待退场动画。
-	await get_tree().create_timer(quit_fade_out_duration).timeout
-	get_tree().quit()
+	# 黑屏过渡在点击瞬间立即开始，与退场动画并行推进，不等退场动画播完。
+	UIRouter.quit_game(quit_fade_out_duration)
 
-## 处理标题场景输入
-func _input(event):
-	if _settings_overlay_open:
-		return
-	if not _scene_input_locked:
-		return
-	if event is InputEventKey or event is InputEventMouseButton or event is InputEventJoypadButton:
-		get_viewport().set_input_as_handled()
-
-## 查询当前场景交互锁
-func is_scene_interaction_locked() -> bool:
-	return _scene_input_locked
-
-## 设置标题场景输入锁
-func _set_scene_input_locked(locked: bool) -> void:
-	_scene_input_locked = locked
+## 覆盖基类：把锁定状态应用到本页面的按钮上。
+## （事件吞噬、覆盖层穿透、解锁时机都由基类统一处理）
+func _on_input_lock_applied(locked: bool) -> void:
 	start_button.disabled = locked
 	settings_button.disabled = locked
 	quit_button.disabled = locked
 
-## 播放标题场景入场动画（UILoopAnimator 与之同时触发，保持严格同步）
-func _on_scene_transition_enter_begin() -> void:
-	_set_scene_input_locked(true)
-	_ui_loop_play_enter()
+## 覆盖基类：本页面入场时的额外表现（灯光呼吸重建）。
+## 注意：这里**不能 await 帧**，否则入场动画会晚一帧才开始，
+## 表现为「标题/按钮先完整显示一帧，然后才突然插入场动画」。
+func _on_page_enter() -> void:
+	_reset_title_click_state()
+	LightingManager.setup_ui_breathing_effect(self)
+
+## 覆盖基类：本页面退场时的额外表现。
+func _on_page_exit() -> void:
+	LightingManager.stop_all_light_effects()
+
+
+## ------------------------------------------------------------------
+## 入场演出主角的隐藏 / 恢复（开场过场期间）
+## ------------------------------------------------------------------
+
+## 过场期间被主动隐藏的节点及其原始可见性。
+var _enter_showcase_nodes: Array[CanvasItem] = []
+var _enter_showcase_visibilities: Array[bool] = []
+
+## 隐藏「入场演出主角」：动画器目标 + UILoopAnimator + 按钮动效组件。
+func _hide_enter_showcase() -> void:
+	_restore_enter_showcase()
+	for target in _collect_enter_showcase():
+		_enter_showcase_nodes.append(target)
+		_enter_showcase_visibilities.append(target.visible)
+		target.visible = false
+
+## 恢复被隐藏过的节点（只还原我们改过的那几个，不碰本来就隐藏的节点如 TitleB）。
+func _restore_enter_showcase() -> void:
+	for i in _enter_showcase_nodes.size():
+		var target: CanvasItem = _enter_showcase_nodes[i]
+		if is_instance_valid(target):
+			target.visible = _enter_showcase_visibilities[i]
+	_enter_showcase_nodes.clear()
+	_enter_showcase_visibilities.clear()
+
+func _collect_enter_showcase() -> Array[CanvasItem]:
+	var targets: Array[CanvasItem] = []
+	# 动画器目标（Title / TitleB 都在列表里；哪个可见由变体状态决定）
 	if ui_transition_animator:
-		await ui_transition_animator.play_enter_transition()
-	_set_scene_input_locked(false)
+		for p in ui_transition_animator.target_paths:
+			if p.is_empty():
+				continue
+			var node: Node = ui_transition_animator.get_node_or_null(p)
+			if node is CanvasItem and not targets.has(node):
+				targets.append(node)
+	for animator in get_ui_loop_animators():
+		if animator is CanvasItem and not targets.has(animator):
+			targets.append(animator)
+	for component in get_fx_components():
+		if component is CanvasItem and not targets.has(component):
+			targets.append(component)
+	return targets
 
-## 常态循环动画：立即播放“开始 -> 循环”（本场景内所有 UILoopAnimator）。
-## 禁止 await，不影响场景流程。
-func _ui_loop_play_enter() -> void:
-	for animator in _get_ui_loop_animators():
-		animator.call("play_enter")
-
-## 常态循环动画：立即播放“结束”（本场景内所有 UILoopAnimator）。
-## 禁止 await，不影响场景流程。
-func _ui_loop_play_exit() -> void:
-	for animator in _get_ui_loop_animators():
-		animator.call("play_exit")
-
-## 收集本场景内所有 UILoopAnimator（递归扫描、不依赖节点名）。
-## 一个场景放多个时会被全部驱动，节点被编辑器改名也不会失效。
-func _get_ui_loop_animators() -> Array[Node]:
-	for animator in _ui_loop_animators:
-		if not is_instance_valid(animator) or not is_ancestor_of(animator):
-			_ui_loop_animators.clear()
-			break
-	if _ui_loop_animators.is_empty():
-		_collect_ui_loop_animators(self, _ui_loop_animators)
-	return _ui_loop_animators
-
-func _collect_ui_loop_animators(node: Node, acc: Array[Node]) -> void:
-	for child in node.get_children():
-		var script_ref: Script = child.get_script()
-		if child is AnimatedSprite2D and script_ref != null and str(script_ref.resource_path).ends_with("UILoopAnimator.gd"):
-			acc.append(child)
-		_collect_ui_loop_animators(child, acc)
 
 ## 处理标题A点击
 func _on_title_area_a_pressed() -> void:
-	if _scene_input_locked or _settings_overlay_open or _title_shaking:
+	if is_input_locked() or is_overlay_active() or _title_shaking:
 		return
 	if _active_title_variant != TitleVariant.A:
 		return
@@ -303,7 +223,7 @@ func _on_title_area_a_pressed() -> void:
 
 ## 处理标题B点击
 func _on_title_area_b_pressed() -> void:
-	if _scene_input_locked or _settings_overlay_open or _title_shaking:
+	if is_input_locked() or is_overlay_active() or _title_shaking:
 		return
 	if _active_title_variant != TitleVariant.B:
 		return
@@ -390,21 +310,10 @@ func _apply_title_variant_state(reset_counter: bool = true) -> void:
 		title_click_area_a.visible = _active_title_variant == TitleVariant.A
 	if title_click_area_b:
 		title_click_area_b.visible = _active_title_variant == TitleVariant.B
-	_sync_animator_title_target()
 	if ui_transition_animator:
 		ui_transition_animator.reset_state()
 	if reset_counter:
 		_title_click_count = 0
-
-## 同步动画器标题目标
-func _sync_animator_title_target() -> void:
-	if not ui_transition_animator:
-		return
-	ui_transition_animator.title_path = NodePath("../Title") if _active_title_variant == TitleVariant.A else NodePath("../TitleB")
-	if ui_transition_animator.has_method("refresh_title_target_only"):
-		ui_transition_animator.refresh_title_target_only()
-	elif ui_transition_animator.has_method("refresh_targets"):
-		ui_transition_animator.refresh_targets()
 
 ## 读取标题变体持久化状态
 func _load_title_variant_state() -> void:

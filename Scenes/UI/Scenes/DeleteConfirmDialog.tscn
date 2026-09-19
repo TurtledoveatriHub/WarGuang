@@ -1,14 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://b81s4uybrdtsf"]
+[gd_scene load_steps=8 format=3 uid="uid://b81s4uybrdtsf"]
 
 [ext_resource type="Script" uid="uid://g5mcy2rrpi1j" path="res://Scripts/UI/Scenes/DeleteConfirmDialog.gd" id="1_8trha"]
-[ext_resource type="Texture2D" uid="uid://bnf2wds016uy8" path="res://Assets/Textures/UIs/SceneUIs/tres/场景UI集.png" id="2_rl7e0"]
-[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="2_s464x"]
-[ext_resource type="Texture2D" uid="uid://bwow0r831nkda" path="res://Assets/Textures/UIs/SceneUIs/tres/确认1.tres" id="4_wv8yg"]
-[ext_resource type="Texture2D" uid="uid://knvng6xnqnc1" path="res://Assets/Textures/UIs/SceneUIs/tres/确认3.tres" id="5_8pcg6"]
-[ext_resource type="Texture2D" uid="uid://di5f8dpskcf3n" path="res://Assets/Textures/UIs/SceneUIs/tres/确认2.tres" id="6_nvsot"]
-[ext_resource type="Texture2D" uid="uid://d3up5h4l7og6c" path="res://Assets/Textures/UIs/SceneUIs/tres/取消1.tres" id="7_lchh4"]
-[ext_resource type="Texture2D" uid="uid://bg28yyvx1w0e3" path="res://Assets/Textures/UIs/SceneUIs/tres/取消3.tres" id="8_ww0du"]
-[ext_resource type="Texture2D" uid="uid://bqxqw0qqnx73x" path="res://Assets/Textures/UIs/SceneUIs/tres/取消2.tres" id="9_uxqie"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="2_s464x"]
+[ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/对话框背景.png" id="2_v568y"]
+[ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="5_qrub3"]
+[ext_resource type="Texture2D" uid="uid://b6ji0vannv3pj" path="res://Assets/Textures/UIs/SceneUIs/2x.png" id="6_wv8yg"]
+[ext_resource type="Texture2D" uid="uid://c3fxh3guo8uut" path="res://Assets/Textures/UIs/SceneUIs/3x.png" id="7_8pcg6"]
+[ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="7_nvsot"]
 
 [node name="DeleteConfirmDialog" type="CanvasLayer"]
 layer = 50
@@ -16,37 +14,63 @@ script = ExtResource("1_8trha")
 
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(597, 313)
-scale = Vector2(3, 3)
-texture = ExtResource("2_rl7e0")
-region_enabled = true
-region_rect = Rect2(9, 169, 158, 110)
+scale = Vector2(2, 2)
+texture = ExtResource("2_v568y")
 
 [node name="Message" type="Label" parent="Background"]
-offset_left = -40.333332
-offset_top = -14.000001
-offset_right = 36.666668
-offset_bottom = -3.000001
+offset_left = -87.0
+offset_top = -31.5
+offset_right = 4.0
+offset_bottom = -20.5
+scale = Vector2(2, 2)
 theme = ExtResource("2_s464x")
 theme_override_colors/font_color = Color(0.5, 0.050000012, 0.050000012, 1)
 theme_override_font_sizes/font_size = 10
 text = "是否删除存档？"
 
 [node name="ButtonContainer" type="HBoxContainer" parent="Background"]
-offset_left = -49.66667
-offset_top = 24.666674
-offset_right = 44.33333
-offset_bottom = 40.66667
-theme_override_constants/separation = 30
+offset_left = -80.50001
+offset_top = 21.000002
+offset_right = 83.49999
+offset_bottom = 53.0
+alignment = 1
 
 [node name="ConfirmButton" type="TextureButton" parent="Background/ButtonContainer"]
 layout_mode = 2
-texture_normal = ExtResource("4_wv8yg")
-texture_pressed = ExtResource("5_8pcg6")
-texture_hover = ExtResource("6_nvsot")
+texture_normal = ExtResource("5_qrub3")
+texture_pressed = ExtResource("6_wv8yg")
+texture_hover = ExtResource("7_8pcg6")
+stretch_mode = 3
+script = ExtResource("7_nvsot")
+
+[node name="Label" type="Label" parent="Background/ButtonContainer/ConfirmButton"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_s464x")
+theme_override_font_sizes/font_size = 10
+text = "确认删除"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CancelButton" type="TextureButton" parent="Background/ButtonContainer"]
 layout_mode = 2
-texture_normal = ExtResource("7_lchh4")
-texture_pressed = ExtResource("8_ww0du")
-texture_hover = ExtResource("9_uxqie")
+texture_normal = ExtResource("5_qrub3")
+texture_pressed = ExtResource("6_wv8yg")
+texture_hover = ExtResource("7_8pcg6")
 stretch_mode = 3
+script = ExtResource("7_nvsot")
+
+[node name="Label" type="Label" parent="Background/ButtonContainer/CancelButton"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_s464x")
+theme_override_font_sizes/font_size = 10
+text = "手滑了。"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -76,6 +76,10 @@ class_name MineCart
 @export var wheel_radius: float = 11.0
 ## 车轮自转视觉上限（度/秒；超出会被截断，避免高速时像素纹理闪/乱）
 @export var wheel_max_spin_deg_per_s: float = 900.0
+## 车轮自转累计角度（弧度）。车轮贴图是「预烘焙旋转帧图集」，
+## 运行时只把累计角度映射成 frame 索引——切帧只是换一块纹理区域，零重采样，
+## 因此 Nearest 采样下也能得到干净的旋转（不再需要将车轮单独改成 Linear）。
+var _wheel_spin_rad: float = 0.0
 ## 上下车烟雾特效 SpriteFrames（动画名 Smoke；留空=程序化占位圆点烟雾），由矿车自身发出
 @export var smoke_frames: SpriteFrames
 
@@ -148,7 +152,7 @@ func _ready() -> void:
 	if _rotate_group:
 		_rotate_group.scale = Vector2.ONE
 		_rotate_group.rotation = 0.0
-	# 车身保持 Nearest；车轮会旋转，因此在 _ensure_wheel_rig 里单独给轮子开 Linear
+	# 车身保持 Nearest；车轮贴图是预烘焙旋转帧，运行时只切 frame（零重采样），同样保持 Nearest。
 	var area_a := get_node_or_null(area_a_path) as Area2D
 	_area_a_node = area_a
 	if area_a:
@@ -171,8 +175,13 @@ func _make_placeholder_visual() -> void:
 	if body and body.texture == null:
 		body.texture = _make_rect_tex(40, 16, Color(0.75, 0.6, 0.35))
 	for wheel in [_wheel_front, _wheel_back]:
-		if wheel and (wheel as Sprite2D).texture == null:
-			(wheel as Sprite2D).texture = _make_circle_tex(int(wheel_radius * 2.0), Color(0.3, 0.3, 0.32))
+		var spr := wheel as Sprite2D
+		if spr and spr.texture == null:
+			# 占位图没有图集，必须把分帧参数复位，否则 11px 圆点会被当成 24 帧图集切碎
+			spr.hframes = 1
+			spr.vframes = 1
+			spr.frame = 0
+			spr.texture = _make_circle_tex(int(wheel_radius * 2.0), Color(0.3, 0.3, 0.32))
 
 
 func _make_rect_tex(w: int, h: int, color: Color) -> Texture2D:
@@ -219,8 +228,8 @@ func _ensure_wheel_rig() -> void:
 				wheel.get_parent().remove_child(wheel)
 			rig.add_child(wheel)
 		if wheel:
-			# 旋转的车轮用 Linear 过滤（避免 Nearest 旋转产生锯齿/乱纹理）；车身仍 Nearest
-			wheel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+			# 旋转已烘焙进贴图帧，运行时不再对车轮做 rotation，保持 Nearest 即可（像素不糊）
+			wheel.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_wheel_rig = rig
 
 
@@ -568,10 +577,24 @@ func _update_cart_pose(delta: float = 0.0) -> void:
 		var spin_rad: float = _v / maxf(wheel_radius, 0.5) * delta
 		var spin_max: float = deg_to_rad(maxf(wheel_max_spin_deg_per_s, 0.0)) * delta
 		spin_rad = clampf(spin_rad, -spin_max, spin_max)
-		if _wheel_front:
-			_wheel_front.rotation += spin_rad
-		if _wheel_back:
-			_wheel_back.rotation += spin_rad
+		_wheel_spin_rad = fposmod(_wheel_spin_rad + spin_rad, TAU)
+		_apply_wheel_spin()
+
+
+## 把累计自转角映射成帧索引（或退回真实 rotation）。
+## 车轮贴图 = tools/pixel_rotation_baker.gd 生成的旋转帧图集：
+## 帧数直接取 Sprite2D.hframes，索引 = 角度/360° × 帧数。
+## 若贴图没分帧（hframes <= 1，例如占位圆点）则退回真实 rotation，保证至少能动。
+func _apply_wheel_spin() -> void:
+	for wheel in [_wheel_front, _wheel_back]:
+		var spr := wheel as Sprite2D
+		if spr == null:
+			continue
+		if spr.hframes > 1:
+			var idx: int = int(floor(fposmod(_wheel_spin_rad, TAU) / TAU * float(spr.hframes)))
+			spr.frame = clampi(idx, 0, spr.hframes - 1)
+		else:
+			spr.rotation = _wheel_spin_rad
 
 
 ## 上车时按“出发方向”固定纹理朝向（美术默认向右）：出发向右不翻转，出发向左则开始时翻转。

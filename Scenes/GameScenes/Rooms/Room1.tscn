@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=4 uid="uid://dmmevbmmo24d7"]
+[gd_scene load_steps=38 format=4 uid="uid://dmmevbmmo24d7"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_am8bf"]
 [ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="2_5m2yc"]
@@ -16,12 +16,8 @@
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="9_p3cyr"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="10_1j37t"]
 [ext_resource type="TileSet" uid="uid://l0lm3765u81y" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地前景瓦片集.tres" id="11_0ktdd"]
-[ext_resource type="PackedScene" uid="uid://b5u66wh2js8e" path="res://Scenes/NPCs/MerchantNPC.tscn" id="12_h1sdq"]
-[ext_resource type="PackedScene" uid="uid://c27lxln10kkbv" path="res://Scenes/NPCs/MasterNPC.tscn" id="13_gmrqp"]
-[ext_resource type="PackedScene" uid="uid://bjlvqrcplff4s" path="res://Scenes/NPCs/ManiacNPC.tscn" id="15_s3xg4"]
+[ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/IceCrystal.tscn" id="12_gak4c"]
 [ext_resource type="PackedScene" uid="uid://ch51hg2xln7gy" path="res://Scenes/Instances/Environments/DestructibleWall.tscn" id="16_5m2yc"]
-[ext_resource type="AudioStream" uid="uid://debkka622reug" path="res://Assets/Audios/SFX/Player/hurt.wav" id="16_gak4c"]
-[ext_resource type="AudioStream" uid="uid://r0cd2hghqoae" path="res://Assets/Audios/SFX/Player/dash.wav" id="17_x7ydx"]
 [ext_resource type="PackedScene" uid="uid://dhvpsakgvr6v5" path="res://Scenes/Instances/Environments/CameraFocusBeacon.tscn" id="18_focus"]
 [ext_resource type="Script" uid="uid://cmr8exyv7c35t" path="res://Scripts/Tools/ChallengeController.gd" id="18_nwqed"]
 [ext_resource type="PackedScene" uid="uid://bv4un04ljd8ix" path="res://Scenes/Enemys/Snowman.tscn" id="19_v08q0"]
@@ -108,6 +104,10 @@ tile_set = ExtResource("11_0ktdd")
 
 [node name="HurtBoxs" type="Node2D" parent="."]
 
+[node name="IceCrystal" parent="HurtBoxs" instance=ExtResource("12_gak4c")]
+position = Vector2(-93, 26)
+movement_mode = 0
+
 [node name="JumpBoxs" type="Node2D" parent="."]
 
 [node name="JumpBox" parent="JumpBoxs" instance=ExtResource("8_t3bp4")]
@@ -119,18 +119,6 @@ position = Vector2(265, -248)
 [node name="Platforms" type="Node2D" parent="."]
 
 [node name="NPCs" type="Node2D" parent="."]
-
-[node name="Merchant" parent="NPCs" instance=ExtResource("12_h1sdq")]
-position = Vector2(-224, 52)
-
-[node name="MasterNPC" parent="NPCs" instance=ExtResource("13_gmrqp")]
-position = Vector2(-170, 48)
-
-[node name="ManiacNPC" parent="NPCs" instance=ExtResource("15_s3xg4")]
-position = Vector2(133, 160)
-move_speed = 80.0
-challenge_controller_path = NodePath("../../Challenges/ChallengeController")
-npc_interact_sounds = Array[AudioStream]([ExtResource("16_gak4c"), ExtResource("17_x7ydx")])
 
 [node name="Challenges" type="Node2D" parent="."]
 visible = false

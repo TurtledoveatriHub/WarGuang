@@ -464,7 +464,7 @@ func show_save_label():
 
 # 游戏设置相关函数
 func _on_game_setting_button_pressed():
-	AudioManager.play_button_click_sfx()
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	
 	_open_game_setting_menu()
 

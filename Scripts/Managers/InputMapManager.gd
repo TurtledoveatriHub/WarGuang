@@ -211,9 +211,22 @@ func get_action_key_display(action: String) -> String:
 	var events = InputMap.action_get_events(action)
 	for event in events:
 		if event is InputEventKey:
-			return event.as_text()
+			return _format_key_event(event)
 	
 	return "未设置"
+
+
+## 统一的按键文本格式化。
+## 不能用 InputEventKey.as_text()：项目自带的默认动作只给了 physical_keycode，
+## as_text() 会输出 “W (Physical)”；而重新映射后只给 keycode，输出 “W” —— 两套文本不一致。
+## 这里始终取“有值的那个键码”再用 OS.get_keycode_string() 输出，两种来源结果完全一致。
+static func _format_key_event(event: InputEventKey) -> String:
+	var code: Key = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+	if code == 0:
+		code = event.keycode
+	if code == 0:
+		return "未设置"
+	return OS.get_keycode_string(code)
 
 ## 重置到默认
 func reset_to_default() -> bool:

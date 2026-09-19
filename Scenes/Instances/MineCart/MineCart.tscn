@@ -6,9 +6,9 @@
 [ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/a.wav" id="3_d82lh"]
 [ext_resource type="SpriteFrames" uid="uid://bo6tmy6ys866l" path="res://Assets/Textures/FXs/InstanceFXs/MineCartFX.tres" id="4_d82lh"]
 [ext_resource type="Texture2D" uid="uid://c1jrdgisl8krh" path="res://Assets/Textures/Instances/MineCart/轨道.png" id="6_d82lh"]
-[ext_resource type="Texture2D" uid="uid://xygjp77wxevl" path="res://Assets/Textures/UIs/SceneUIs/tres/回退1.tres" id="6_hgfgm"]
 [ext_resource type="Texture2D" uid="uid://bwh35fdj2awsl" path="res://Assets/Textures/Instances/MineCart/缆车.png" id="7_6fufq"]
-[ext_resource type="Texture2D" uid="uid://brov0gixu2g0a" path="res://Assets/Textures/Instances/MineCart/轮子.png" id="8_yc8uq"]
+[ext_resource type="Texture2D" uid="uid://dejbumaq8x8hm" path="res://Assets/Textures/Instances/MineCart/轮子_rot24.png" id="8_d82lh"]
+[ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="9_d82lh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_st"]
 size = Vector2(160, 80)
@@ -117,13 +117,17 @@ texture = ExtResource("7_6fufq")
 
 [node name="WheelFront" type="Sprite2D" parent="RotateGroup"]
 z_index = 18
+texture_filter = 1
 position = Vector2(-1, 3)
-texture = ExtResource("8_yc8uq")
+texture = ExtResource("8_d82lh")
+hframes = 24
 
 [node name="WheelBack" type="Sprite2D" parent="RotateGroup"]
 z_index = 18
+texture_filter = 1
 position = Vector2(-1, -7)
-texture = ExtResource("8_yc8uq")
+texture = ExtResource("8_d82lh")
+hframes = 24
 
 [node name="PlayerAnchor" type="Marker2D" parent="RotateGroup"]
 position = Vector2(0, 31)
@@ -135,9 +139,8 @@ collision_layer = 0
 shape = SubResource("RectangleShape2D_st")
 
 [node name="InteractionPrompt" type="Sprite2D" parent="AreaA"]
-visible = false
 position = Vector2(0, -46)
-texture = ExtResource("6_hgfgm")
+texture = ExtResource("9_d82lh")
 
 [node name="ExitA" type="Marker2D" parent="."]
 position = Vector2(24, 8)
@@ -150,9 +153,8 @@ collision_layer = 0
 shape = SubResource("RectangleShape2D_en")
 
 [node name="InteractionPrompt" type="Sprite2D" parent="AreaB"]
-visible = false
 position = Vector2(0, -46)
-texture = ExtResource("6_hgfgm")
+texture = ExtResource("9_d82lh")
 
 [node name="ExitB" type="Marker2D" parent="."]
 position = Vector2(488, 648)

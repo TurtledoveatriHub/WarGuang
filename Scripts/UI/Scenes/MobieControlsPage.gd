@@ -492,8 +492,8 @@ func _fade_layout_overlay(show_state: bool) -> void:
 func _request_scene_lock(locked: bool) -> void:
 	var current: Node = self
 	while current:
-		if current.has_method("_set_scene_input_locked"):
-			current._set_scene_input_locked(locked)
+		if current.has_method("set_input_locked"):
+			current.call("set_input_locked", locked)
 			return
 		current = current.get_parent()
 
@@ -512,10 +512,22 @@ func _on_save_and_close_pressed() -> void:
 
 func _on_reset_layout_pressed() -> void:
 	# 仅重置布局到编辑器默认位置，不退出编辑态。
+	# 关键：先删掉磁盘上的旧布局再重置 —— 历史保存的数据会一直覆盖编辑器里的位置，
+	# 这就是「在编辑器里调好了位置、游戏里却还是老位置」的根源。
+	_delete_saved_layout_file()
 	_default_button_positions = _editor_default_positions.duplicate()
 	_apply_layout_to_buttons()
 	_save_layout_to_disk()
 	_notify_mobile_hud_reload()
+
+
+## 删除磁盘上保存的虚拟按键布局（等价于「清除已保存的布局」）。
+func _delete_saved_layout_file() -> void:
+	if not FileAccess.file_exists(_layout_config_path):
+		return
+	var err: int = DirAccess.remove_absolute(ProjectSettings.globalize_path(_layout_config_path))
+	if err != OK:
+		push_warning("MobieControlsPage: 删除布局文件失败（err=%d）" % err)
 
 func _notify_mobile_hud_reload() -> void:
 	# 让游戏场景中存活的移动端 HUD 立即重新读取磁盘配置并应用，
@@ -615,18 +627,14 @@ func get_layout_config() -> Dictionary:
 	return {
 		"layout": layout,
 		"layout_mode": _move_mode,
-		"dpad_center": Vector2(120.0, 540.0),
 		"button_scale": _button_scale,
 		"button_alpha": default_button_alpha,
 	}
 
 func apply_layout_config(config: Dictionary) -> void:
 	# 更新当前布局：来自运行时 HUD 或其它模块，保持兼容接口。
+	# 注意：旧版这里会拿配置里的 dpad_center 把摇杆基座/球强行摆到某个写死的坐标，
+	# 那会覆盖编辑器里摆好的位置，已删除 —— 位置一律以 layout 里的值为准。
 	if config.has("layout"):
 		_default_button_positions = config["layout"]
 		_apply_layout_to_buttons()
-	if config.has("dpad_center"):
-		if _joystick_base:
-			_joystick_base.position = config["dpad_center"] - _joystick_base.size * 0.5
-		if _joystick_thumb:
-			_joystick_thumb.position = config["dpad_center"] - _joystick_thumb.size * 0.5

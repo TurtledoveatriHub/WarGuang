@@ -1,58 +1,94 @@
-[gd_scene load_steps=13 format=3 uid="uid://ti5ndmbw2337"]
+[gd_scene load_steps=12 format=3 uid="uid://ti5ndmbw2337"]
 
 [ext_resource type="Script" uid="uid://0r1sd45ghf8l" path="res://Scripts/UI/Scenes/GameSettingScene.gd" id="1_vf3dq"]
 [ext_resource type="PackedScene" uid="uid://8vv4frjt0qmt" path="res://Scenes/UI/Scenes/SettingsScene.tscn" id="2_aemly"]
-[ext_resource type="Texture2D" uid="uid://bnf2wds016uy8" path="res://Assets/Textures/UIs/SceneUIs/tres/场景UI集.png" id="3_urdrt"]
-[ext_resource type="Texture2D" uid="uid://xygjp77wxevl" path="res://Assets/Textures/UIs/SceneUIs/tres/回退1.tres" id="4_urdrt"]
-[ext_resource type="Texture2D" uid="uid://40v6kkfpqldt" path="res://Assets/Textures/UIs/SceneUIs/tres/回退3.tres" id="5_hmv1b"]
-[ext_resource type="Texture2D" uid="uid://duklbrpm0cx67" path="res://Assets/Textures/UIs/SceneUIs/tres/回退2.tres" id="6_2syoe"]
-[ext_resource type="Texture2D" uid="uid://bkwq7q3nhcwib" path="res://Assets/Textures/UIs/SceneUIs/tres/更改设置1.tres" id="7_1r1p8"]
-[ext_resource type="Texture2D" uid="uid://c8lov8jclog7u" path="res://Assets/Textures/UIs/SceneUIs/tres/更改设置3.tres" id="8_g4qhq"]
-[ext_resource type="Texture2D" uid="uid://didtmh22n0ejg" path="res://Assets/Textures/UIs/SceneUIs/tres/更改设置2.tres" id="9_fnua2"]
-[ext_resource type="Texture2D" uid="uid://cxmn1wm3r65dw" path="res://Assets/Textures/UIs/SceneUIs/tres/退回标题1.tres" id="10_kd82h"]
-[ext_resource type="Texture2D" uid="uid://cns6coaem0l0r" path="res://Assets/Textures/UIs/SceneUIs/tres/退回标题3.tres" id="11_eq7uf"]
-[ext_resource type="Texture2D" uid="uid://me0dbdwwg4ge" path="res://Assets/Textures/UIs/SceneUIs/tres/退回标题2.tres" id="12_bmvyg"]
+[ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/对话框背景.png" id="3_w4fwv"]
+[ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="4_w4fwv"]
+[ext_resource type="Texture2D" uid="uid://ilccd3mmcucq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置按下纹理.tres" id="5_urdrt"]
+[ext_resource type="Texture2D" uid="uid://dul5pjyqmngpq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置悬停纹理.tres" id="6_hmv1b"]
+[ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="7_2syoe"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="8_w4fwv"]
+[ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="9_w4fwv"]
+[ext_resource type="Texture2D" uid="uid://b6ji0vannv3pj" path="res://Assets/Textures/UIs/SceneUIs/2x.png" id="10_urdrt"]
+[ext_resource type="Texture2D" uid="uid://c3fxh3guo8uut" path="res://Assets/Textures/UIs/SceneUIs/3x.png" id="11_hmv1b"]
 
 [node name="GameSettingScene" type="CanvasLayer"]
 script = ExtResource("1_vf3dq")
 settings_scene_resource = ExtResource("2_aemly")
 
 [node name="Background" type="Sprite2D" parent="."]
-position = Vector2(557, 299)
-scale = Vector2(3, 3)
-texture = ExtResource("3_urdrt")
-region_enabled = true
-region_rect = Rect2(9, 169, 158, 110)
+position = Vector2(594, 306)
+scale = Vector2(2, 2)
+texture = ExtResource("3_w4fwv")
 
 [node name="ContinueButton" type="TextureButton" parent="."]
-offset_left = 724.0
-offset_top = 181.0
-offset_right = 742.6667
-offset_bottom = 197.0
-scale = Vector2(3, 3)
+offset_left = 791.0
+offset_top = 175.0
+offset_right = 823.0
+offset_bottom = 207.0
+scale = Vector2(2, 2)
 pivot_offset = Vector2(9.333328, 8)
-texture_normal = ExtResource("4_urdrt")
-texture_pressed = ExtResource("5_hmv1b")
-texture_hover = ExtResource("6_2syoe")
+texture_normal = ExtResource("4_w4fwv")
+texture_pressed = ExtResource("5_urdrt")
+texture_hover = ExtResource("6_hmv1b")
+script = ExtResource("7_2syoe")
+
+[node name="Label" type="Label" parent="ContinueButton"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("8_w4fwv")
+theme_override_font_sizes/font_size = 10
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="SettingsButton" type="TextureButton" parent="."]
-offset_left = 531.0
-offset_top = 241.00002
-offset_right = 579.0
-offset_bottom = 257.0
+offset_left = 501.00003
+offset_top = 229.0
+offset_right = 569.0
+offset_bottom = 251.0
 scale = Vector2(3, 3)
 pivot_offset = Vector2(23.666656, 7.9999924)
-texture_normal = ExtResource("7_1r1p8")
-texture_pressed = ExtResource("8_g4qhq")
-texture_hover = ExtResource("9_fnua2")
+texture_normal = ExtResource("9_w4fwv")
+texture_pressed = ExtResource("10_urdrt")
+texture_hover = ExtResource("11_hmv1b")
+script = ExtResource("7_2syoe")
+
+[node name="Label" type="Label" parent="SettingsButton"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("8_w4fwv")
+theme_override_font_sizes/font_size = 10
+text = "打开设置"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="MainMenuButton" type="TextureButton" parent="."]
-offset_left = 531.0
-offset_top = 331.0
-offset_right = 579.0
-offset_bottom = 347.0
+offset_left = 503.00003
+offset_top = 332.0
+offset_right = 571.0
+offset_bottom = 354.0
 scale = Vector2(3, 3)
 pivot_offset = Vector2(24.333328, 8)
-texture_normal = ExtResource("10_kd82h")
-texture_pressed = ExtResource("11_eq7uf")
-texture_hover = ExtResource("12_bmvyg")
+texture_normal = ExtResource("9_w4fwv")
+texture_pressed = ExtResource("10_urdrt")
+texture_hover = ExtResource("11_hmv1b")
+script = ExtResource("7_2syoe")
+
+[node name="Label" type="Label" parent="MainMenuButton"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("8_w4fwv")
+theme_override_font_sizes/font_size = 10
+text = "退回标题"
+horizontal_alignment = 1
+vertical_alignment = 1

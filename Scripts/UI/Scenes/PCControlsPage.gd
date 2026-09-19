@@ -107,7 +107,7 @@ func _get_action_from_hbox(hbox_name: String) -> String:
 	return ""
 
 func _on_action_remap_button_pressed(action: String):
-	AudioManager.play_button_click_sfx()
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	if InputMapManager.is_remapping():
 		InputMapManager.switch_remap_action(action)
 		show_waiting_hint()
@@ -217,7 +217,7 @@ func _process(delta):
 			reset_hint_label.visible = false
 
 func _on_reset_button_pressed():
-	AudioManager.play_button_click_sfx()
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	if InputMapManager.is_remapping():
 		InputMapManager.cancel_remap()
 		return

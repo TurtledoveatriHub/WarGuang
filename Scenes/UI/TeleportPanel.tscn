@@ -1,14 +1,16 @@
-[gd_scene load_steps=10 format=3 uid="uid://diylsfmb0ckg5"]
+[gd_scene load_steps=12 format=3 uid="uid://diylsfmb0ckg5"]
 
 [ext_resource type="Script" uid="uid://x3hbxtwnrr30" path="res://Scripts/UI/TeleportPanel.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://bv4wcsihjxeaa" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭1.tres" id="2_gxax5"]
 [ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/Room3/2.png" id="2_juc85"]
-[ext_resource type="Texture2D" uid="uid://kxm2uujj5ma4" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭3.tres" id="3_5uayw"]
-[ext_resource type="Texture2D" uid="uid://byixw77mgxbb1" path="res://Assets/Textures/UIs/SceneUIs/tres/关闭2.tres" id="4_l5e8y"]
-[ext_resource type="Texture2D" uid="uid://bwow0r831nkda" path="res://Assets/Textures/UIs/SceneUIs/tres/确认1.tres" id="6_q6nrd"]
-[ext_resource type="Texture2D" uid="uid://knvng6xnqnc1" path="res://Assets/Textures/UIs/SceneUIs/tres/确认3.tres" id="7_7prjw"]
-[ext_resource type="Texture2D" uid="uid://di5f8dpskcf3n" path="res://Assets/Textures/UIs/SceneUIs/tres/确认2.tres" id="8_ex6nn"]
+[ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="3_juc85"]
+[ext_resource type="Texture2D" uid="uid://ilccd3mmcucq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置按下纹理.tres" id="4_q6nrd"]
+[ext_resource type="Texture2D" uid="uid://dul5pjyqmngpq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置悬停纹理.tres" id="5_7prjw"]
+[ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="6_ex6nn"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="7_ex6nn"]
+[ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="8_ex6nn"]
+[ext_resource type="Texture2D" uid="uid://b6ji0vannv3pj" path="res://Assets/Textures/UIs/SceneUIs/2x.png" id="9_7alhu"]
 [ext_resource type="Script" uid="uid://dw76ryy8ii6g7" path="res://Scripts/UI/TeleportPanelButton.gd" id="9_l5e8y"]
+[ext_resource type="Texture2D" uid="uid://c3fxh3guo8uut" path="res://Assets/Textures/UIs/SceneUIs/3x.png" id="10_pq6s8"]
 
 [node name="TeleportPanel" type="CanvasLayer"]
 script = ExtResource("1")
@@ -27,64 +29,120 @@ position = Vector2(618, 330)
 texture = ExtResource("2_juc85")
 
 [node name="CloseBtn" type="TextureButton" parent="PanelRoot"]
-offset_left = 258.0
-offset_top = -175.0
-offset_right = 274.0
-offset_bottom = -159.0
-scale = Vector2(2, 2)
-texture_normal = ExtResource("2_gxax5")
-texture_pressed = ExtResource("3_5uayw")
-texture_hover = ExtResource("4_l5e8y")
+offset_left = 228.0
+offset_top = -148.0
+offset_right = 260.0
+offset_bottom = -116.0
+texture_normal = ExtResource("3_juc85")
+texture_pressed = ExtResource("4_q6nrd")
+texture_hover = ExtResource("5_7prjw")
 stretch_mode = 0
+script = ExtResource("6_ex6nn")
+
+[node name="Label" type="Label" parent="PanelRoot/CloseBtn"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Btn1" type="TextureButton" parent="PanelRoot"]
-offset_left = -156.0
+offset_left = -164.0
 offset_top = -28.0
-offset_right = -124.0
-offset_bottom = -12.0
-scale = Vector2(2, 2)
-texture_normal = ExtResource("6_q6nrd")
-texture_pressed = ExtResource("7_7prjw")
-texture_hover = ExtResource("8_ex6nn")
+offset_right = -96.0
+offset_bottom = -6.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
 stretch_mode = 0
 script = ExtResource("9_l5e8y")
 target_teleport_id = "Room1-1"
 
+[node name="Label" type="Label" parent="PanelRoot/Btn1"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Btn3" type="TextureButton" parent="PanelRoot"]
-offset_left = -78.0
+offset_left = -86.0
 offset_top = -29.0
-offset_right = -46.0
-offset_bottom = -13.0
-scale = Vector2(2, 2)
-texture_normal = ExtResource("6_q6nrd")
-texture_pressed = ExtResource("7_7prjw")
-texture_hover = ExtResource("8_ex6nn")
+offset_right = -18.0
+offset_bottom = -7.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
 stretch_mode = 0
 script = ExtResource("9_l5e8y")
 target_teleport_id = "Room2-1"
 
+[node name="Label" type="Label" parent="PanelRoot/Btn3"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Btn4" type="TextureButton" parent="PanelRoot"]
-offset_left = -232.0
+offset_left = -240.0
 offset_top = -9.0
-offset_right = -200.0
-offset_bottom = 7.0
-scale = Vector2(2, 2)
-texture_normal = ExtResource("6_q6nrd")
-texture_pressed = ExtResource("7_7prjw")
-texture_hover = ExtResource("8_ex6nn")
+offset_right = -172.0
+offset_bottom = 13.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
 stretch_mode = 0
 script = ExtResource("9_l5e8y")
 target_teleport_id = "Room3-1"
 
+[node name="Label" type="Label" parent="PanelRoot/Btn4"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Btn5" type="TextureButton" parent="PanelRoot"]
-offset_left = 34.0
+offset_left = 26.0
 offset_top = -5.0
-offset_right = 66.0
-offset_bottom = 11.0
-scale = Vector2(2, 2)
-texture_normal = ExtResource("6_q6nrd")
-texture_pressed = ExtResource("7_7prjw")
-texture_hover = ExtResource("8_ex6nn")
+offset_right = 94.0
+offset_bottom = 17.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
 stretch_mode = 0
 script = ExtResource("9_l5e8y")
 target_teleport_id = "SnowMountain4-1"
+
+[node name="Label" type="Label" parent="PanelRoot/Btn5"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1

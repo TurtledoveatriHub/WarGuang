@@ -15,9 +15,14 @@ extends CanvasLayer
 ## 移动方案切换（摇杆 ↔ 十字键）时的淡入淡出时长，单位：秒。
 @export var move_mode_fade_duration: float = 0.25
 ## 调试用：在 PC 上也打开移动端 HUD 以验证布局和输入。
-@export var force_mobile_test_mode: bool = true
+@export var force_mobile_test_mode: bool = false
 ## 虚拟按键布局保存路径。
 @export var layout_file_path: String = "user://mobile_controls_layout.cfg"
+
+## 勾选后：运行时忽略 user:// 保存的布局，始终使用**本场景（MainGameScene/MobileTouchHUD）
+## 编辑器里摆放的节点位置**。透明度 / 大小 / 移动方案仍从配置文件读取。
+## 用途：当你想“直接在编辑器里摆 HUD 位置”，不希望被设置页保存的布局覆盖时打开。
+@export var use_scene_layout_only: bool = false
 ## 摇杆最大拖动半径（像素）。这是实际控制范围，决定摇杆响应跨度。
 @export var joystick_radius: float = 72.0
 ## 摇杆死区：小于此值时不触发方向，避免轻微偏移导致方向抖动。
@@ -100,7 +105,8 @@ func _coerce_layout_to_pixels(layout: Dictionary) -> Dictionary:
 
 func _collect_scene_positions() -> Dictionary:
 	var result: Dictionary = {}
-	for key in ["MoveJoystick", "MoveJoystickThumb", "JumpButton", "DashButton", "InteractButton", "SuperDashButton", "MapButton"]:
+	# 注意：这里也必须包含十字键四个节点，否则“以编辑器为准”时它们不会回到场景摆放位置。
+	for key in ["MoveJoystick", "MoveJoystickThumb", "DpadUp", "DpadDown", "DpadLeft", "DpadRight", "JumpButton", "DashButton", "InteractButton", "SuperDashButton", "MapButton"]:
 		var target = get_node_or_null("Root/%s" % key)
 		if target is Control:
 			result[key] = target.position
@@ -114,7 +120,11 @@ func _load_layout_from_disk() -> void:
 		_layout_config = _collect_scene_positions()
 		return
 	var saved_layout = config.get_value("mobile_controls", "layout", _collect_scene_positions())
-	_layout_config = _coerce_layout_to_pixels(saved_layout)
+	if use_scene_layout_only:
+		# 显式选择“以本场景编辑器摆放为准”，忽略设置页保存到 user:// 的布局。
+		_layout_config = _collect_scene_positions()
+	else:
+		_layout_config = _coerce_layout_to_pixels(saved_layout)
 	_button_alpha = clampf(float(config.get_value("mobile_controls", "button_alpha", 1.0)), 0.0, 1.0)
 	_button_scale = clampf(float(config.get_value("mobile_controls", "button_scale", 1.0)), 0.5, 2.0)
 	_move_mode = int(config.get_value("mobile_controls", "move_mode", 0))
@@ -171,23 +181,10 @@ func _apply_layout_from_config(animate_mode: bool = false) -> void:
 	_apply_move_mode(animate_mode)
 
 func _default_layout() -> Dictionary:
-	# 默认布局来源，和设置页保持一致，并根据当前视口比例进行比例缩放。
-	var viewport_size := _get_viewport_size()
-	var scale_x := 1.0
-	var scale_y := 1.0
-	if viewport_size.x > 0.0:
-		scale_x = viewport_size.x / 1280.0
-	if viewport_size.y > 0.0:
-		scale_y = viewport_size.y / 720.0
-	return {
-		"MoveJoystick": Vector2(120.0 * scale_x, 540.0 * scale_y),
-		"MoveJoystickThumb": Vector2(138.0 * scale_x, 558.0 * scale_y),
-		"JumpButton": Vector2(1110.0 * scale_x, 500.0 * scale_y),
-		"DashButton": Vector2(1180.0 * scale_x, 590.0 * scale_y),
-		"InteractButton": Vector2(1035.0 * scale_x, 585.0 * scale_y),
-		"SuperDashButton": Vector2(960.0 * scale_x, 610.0 * scale_y),
-		"MapButton": Vector2(1160.0 * scale_x, 420.0 * scale_y),
-	}
+	# 已废弃：以前这里写死了一套坐标（含摇杆/摇杆球），会盖掉编辑器里的摆放。
+	# 现在一律以「配置文件 → 否则本场景节点位置」（见 _collect_scene_positions）为准，
+	# 所以这里返回空字典：没有任何键时不会覆盖任何节点。
+	return {}
 
 func _set_visible_state(show_state: bool) -> void:
 	# 设置 HUD 可见性，并执行淡入淡出。

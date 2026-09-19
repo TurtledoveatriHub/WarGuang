@@ -90,12 +90,6 @@ static func load_main_game() -> PackedScene:
 const ROOMS_DIR = "res://Scenes/GameScenes/Rooms/"
 const ROOM_PATHS = {
 	"Room1": ROOMS_DIR + "Room1.tscn",
-	"Room2": ROOMS_DIR + "Room2.tscn",
-	"Room3": ROOMS_DIR + "Room3.tscn",
-	"Room4": ROOMS_DIR + "Room4.tscn",
-	"Room5": ROOMS_DIR + "Room5.tscn",
-	"Room6": ROOMS_DIR + "Room6.tscn",
-	"RoomDream10": ROOMS_DIR + "RoomDream10.tscn",
 	"Room39": ROOMS_DIR + "Room39.tscn",
 	"Room61": ROOMS_DIR + "Room61.tscn",
 	"Room62": ROOMS_DIR + "Room62.tscn",
@@ -106,12 +100,23 @@ const ROOM_PATHS = {
 	"Room67": ROOMS_DIR + "Room67.tscn",
 	"Room68": ROOMS_DIR + "Room68.tscn",
 	"Room69": ROOMS_DIR + "Room69.tscn",
+	"Room5": ROOMS_DIR + "GrassLand/Room5.tscn",
+	"Room6": ROOMS_DIR + "GrassLand/Room6.tscn",
+	"RoomDream10": ROOMS_DIR + "RoomDream10.tscn",
+	
+	"GrassLand1": ROOMS_DIR + "GrassLand/GrassLand1.tscn",
+	"GrassLand2": ROOMS_DIR + "GrassLand/GrassLand2.tscn",
+	"GrassLand3": ROOMS_DIR + "GrassLand/GrassLand3.tscn",
+	"GrassLand4": ROOMS_DIR + "GrassLand/GrassLand4.tscn",
+	
 	"SnowMountain1": ROOMS_DIR + "SnowMountain/SnowMountain1.tscn",
 	"SnowMountain2": ROOMS_DIR + "SnowMountain/SnowMountain2.tscn",
 	"SnowMountain3": ROOMS_DIR + "SnowMountain/SnowMountain3.tscn",
 	"SnowMountain4": ROOMS_DIR + "SnowMountain/SnowMountain4.tscn",
 	"SnowMountain5": ROOMS_DIR + "SnowMountain/SnowMountain5.tscn",
 	"SnowMountain6": ROOMS_DIR + "SnowMountain/SnowMountain6.tscn",
+	
+	"SuperMario2": ROOMS_DIR + "SuperMario/SuperMario2.tscn",
 	
 }
 

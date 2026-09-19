@@ -22,11 +22,11 @@ extends CanvasLayer
 
 @export_category("时长参数")
 ## 进场动画播完后的停留时长（秒），0 = 立刻开始淡出。
-@export var intro_hold_duration: float = 0.2
+@export var intro_hold_duration: float = 0.0
 ## 淡出时长（秒）。
-@export var fade_out_duration: float = 0.4
+@export var fade_out_duration: float = 0.0
 ## 总时长兜底上限（秒）。超过该时长强制结束，避免异常时黑屏卡死。
-@export var max_total_duration: float = 10.0
+@export var max_total_duration: float = 6.0
 
 ## 进场动画播放完毕、淡出即将开始的那一刻发出。
 ## 外部（如 TitleScene）可在此刻开始自己的入场演出，从而与淡出无缝衔接。
