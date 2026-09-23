@@ -8,21 +8,35 @@
 extends Node
 class_name PlayerAudioController
 
+
+@export_category("移动音效")
+## 默认脚步声（无材质标记时的回退）
+@export var default_step_sfx: AudioStream
+## 行走脚步声（无表面检测时的回退）
+@export var move_step_sfx: AudioStream
+## 材质脚步声映射 — key=surface_type(int), value=AudioStream
+## 在 TileSet 的 Custom Data Layers 中给 Tile 设置 surface_type 值（0=默认, 1=石头, 2=泥土…）
+@export var surface_step_map: Dictionary = {}
+
+@export_category("跳跃落地音效")
 ## 一段跳音效 — 地面起跳时播放
 @export var jump1_sfx: AudioStream
 ## 二段跳音效 — 空中再次跳跃时播放
 @export var jump2_sfx: AudioStream
-
+## 奔跑跳跃音效 — 奔跑状态下起跳时播放（比普通起跳更厚重）
+@export var run_jump_sfx: AudioStream
 ## 普通落地音效 — 从空中回到地面时播放
 @export var landing_sfx: AudioStream
 ## 高空重落地音效 — 从高处下落落地时播放
 @export var landing_heavy_sfx: AudioStream
 
+@export_category("冲刺音效")
 ## 普通冲刺音效 — 地面或空中冲刺起始时播放
 @export var dash_sfx: AudioStream
 ## 暗影冲刺音效 — 解锁黑冲后冲刺时播放
 @export var black_dash_sfx: AudioStream
 
+@export_category("滑翔攀墙墙跳音效")
 ## 滑翔音效 — 进入滑翔时播放一遍（不循环）
 @export var glide_sfx: AudioStream
 ## 攀墙音效 — 抓住墙壁时播放一遍（不循环）
@@ -32,27 +46,17 @@ class_name PlayerAudioController
 ## 奔跑撞墙音效 — 奔跑时撞到墙壁时播放
 @export var wall_bump_sfx: AudioStream
 
+@export_category("受伤死亡音效")
 ## 受伤音效 — 受到伤害时播放（不分普通/传送，伤害方块音效由方块自身触发）
 @export var hurt_sfx: AudioStream
 ## 死亡音效 — 玩家死亡时播放
 @export var die_sfx: AudioStream
 
-## 默认脚步声（无材质标记时的回退）
-@export var default_step_sfx: AudioStream
-## 行走脚步声（无表面检测时的回退）
-@export var move_step_sfx: AudioStream
-## 材质脚步声映射 — key=surface_type(int), value=AudioStream
-## 在 TileSet 的 Custom Data Layers 中给 Tile 设置 surface_type 值（0=默认, 1=石头, 2=泥土…）
-@export var surface_step_map: Dictionary = {}
-
+@export_category("超级冲刺音效")
 ## 超级冲刺蓄力音效 — 蓄力期间的持续音效（循环）
-
-# ----- 表面检测缓存 -----
-## 缓存的当前表面类型（-1=未知/无）
-var _cached_surface_type: int = -1
-## 表面类型缓存帧（避免每帧重复射线检测）
-var _surface_cache_frame: int = -1
 @export var super_dash_charge_sfx: AudioStream
+## 超级冲刺蓄力完成音效 — 蓄力满时播放一遍（之后不再播蓄力音效，即使仍按住）
+@export var super_dash_charge_complete_sfx: AudioStream
 ## 超级冲刺飞行起始音效 — 发射瞬间播放一遍
 @export var super_dash_start_sfx: AudioStream
 ## 超级冲刺飞行循环音效 — 飞行期间持续播放（循环）
@@ -60,15 +64,19 @@ var _surface_cache_frame: int = -1
 ## 超级冲刺结束音效 — 减速阶段播放
 @export var super_dash_end_sfx: AudioStream
 
+@export_category("后撤步音效")
 ## 后撤步音效 — 后撤步时播放
 @export var backstep_sfx: AudioStream
 ## 后撤步防反成功音效 — 防反成功时播放
 @export var backstep_counter_sfx: AudioStream
 
+@export_category("特殊效果音效")
 ## 睡眠音效 — 玩家睡觉时播放
 @export var sleep_sfx: AudioStream
-## 奔跑跳跃音效 — 奔跑状态下起跳时播放（比普通起跳更厚重）
-@export var run_jump_sfx: AudioStream
+
+## ============================================================
+## ⚙️ 参数配置
+## ============================================================
 
 ## 受伤时 BGM 闪避设置
 @export_category("受伤 BGM 闪避")
@@ -76,10 +84,6 @@ var _surface_cache_frame: int = -1
 @export var hurt_bgm_duck_duration: float = 1.5
 ## 受伤时 BGM 降低到的音量（0~1, 0=静音, 1=原音量）
 @export var hurt_bgm_duck_volume: float = 0.3
-
-## ============================================================
-## ⚙️ 参数配置
-## ============================================================
 
 ## 脚步声周期
 @export_category("脚步声周期")
@@ -107,6 +111,14 @@ var loop_keys: Dictionary = {}
 var was_super_dash_flying: bool = false
 ## 超级冲刺飞行循环是否已启动
 var super_dash_loop_started: bool = false
+## 蓄力完成音效是否已播放过（本次蓄力内只播一次）
+var _charge_complete_played: bool = false
+
+## ----- 表面检测缓存 -----
+## 缓存的当前表面类型（-1=未知/无）
+var _cached_surface_type: int = -1
+## 表面类型缓存帧（避免每帧重复射线检测）
+var _surface_cache_frame: int = -1
 
 ## ============================================================
 ## 🏗️ 初始化
@@ -137,6 +149,7 @@ func _process(delta: float) -> void:
 		return
 	_handle_step_sfx(delta)
 	_handle_super_dash_audio()
+	_handle_super_dash_charge_complete()
 
 ## 脚步声处理（含表面材质检测）
 func _handle_step_sfx(delta: float) -> void:
@@ -247,6 +260,23 @@ func _handle_super_dash_audio() -> void:
 
 	was_super_dash_flying = is_flying
 
+## 蓄力完成检测：蓄力满时停掉蓄力循环音效，并播一遍“蓄力完成”音效
+## （之后即使仍按住超级冲刺键，也不会再播 super_dash_charge_sfx）
+func _handle_super_dash_charge_complete() -> void:
+	if not is_instance_valid(player):
+		return
+	if player.current_state != player.PlayerState.SUPERDASHSTART:
+		_charge_complete_played = false
+		return
+	if _charge_complete_played:
+		return
+	if player.super_dash_charge_timer < player.super_dash_charge_time:
+		return
+	_charge_complete_played = true
+	_stop_loop("super_dash_charge")
+	_play_one_shot(super_dash_charge_complete_sfx)
+
+
 ## ============================================================
 ## 🎬 反馈事件处理
 ## ============================================================
@@ -263,8 +293,12 @@ func _on_state_changed(payload: Dictionary) -> void:
 	## 进入状态处理
 	match to_state:
 		player.PlayerState.JUMP:
+			# 垂直冲刺结束会自然进入 JUMP/DOWN（速度向上），这不是真正跳跃，不播跳跃音效；
+			# 否则上冲刺会以“跳跃音效”收尾（冲刺起始的 dash_sfx 已经播过）。
+			if from_state == player.PlayerState.DASH and player.dash_locked_vector.y != 0:
+				pass
 			# 二段跳优先（不受奔跑跳跃影响），其次奔跑跳跃替换一段跳
-			if player.has_double_jumped:
+			elif player.has_double_jumped:
 				_play_one_shot(jump2_sfx)
 			elif player.is_run_jumping:
 				_play_one_shot(run_jump_sfx)
@@ -293,6 +327,7 @@ func _on_state_changed(payload: Dictionary) -> void:
 			_play_one_shot(die_sfx)
 
 		player.PlayerState.SUPERDASHSTART:
+			_charge_complete_played = false
 			_start_loop("super_dash_charge", super_dash_charge_sfx)
 
 		player.PlayerState.BACKSTEP:
@@ -305,6 +340,7 @@ func _on_state_changed(payload: Dictionary) -> void:
 	match from_state:
 		player.PlayerState.SUPERDASHSTART:
 			_stop_loop("super_dash_charge")
+			_charge_complete_played = false
 
 ## 落地事件 — 根据下落速度区分普通落地/重落地
 func _on_landed(payload: Dictionary) -> void:

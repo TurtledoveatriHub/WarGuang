@@ -1,0 +1,48 @@
+[gd_scene load_steps=7 format=3 uid="uid://ck7fy1kuqx8h0"]
+
+[ext_resource type="Script" uid="uid://cd2ehi3gyr35l" path="res://Scripts/Instances/Props/MechanismObject.gd" id="1_bshj2"]
+[ext_resource type="Texture2D" uid="uid://wqn1286kqmh3" path="res://Assets/Textures/Instances/GrassLand/机关门.png" id="2_4g8th"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ufgdw"]
+atlas = ExtResource("2_4g8th")
+region = Rect2(0, 0, 32, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iepp6"]
+atlas = ExtResource("2_4g8th")
+region = Rect2(32, 0, 32, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bxywi"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ufgdw")
+}],
+"loop": false,
+"name": &"OFF",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iepp6")
+}],
+"loop": false,
+"name": &"ON",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate"]
+size = Vector2(14, 46)
+
+[node name="MechanismGate" type="Node2D"]
+script = ExtResource("1_bshj2")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_bxywi")
+animation = &"OFF"
+
+[node name="Body" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body"]
+shape = SubResource("RectangleShape2D_gate")

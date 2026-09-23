@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://bgd4cnk4b8qrx" path="res://Scripts/GameScenes/MainGameScene.gd" id="1_dcv5v"]
 [ext_resource type="PackedScene" uid="uid://dwj2ydwabq3n0" path="res://Scenes/Player/Player.tscn" id="1_wdg0h"]
 [ext_resource type="PackedScene" uid="uid://kkrfw8yl08js" path="res://Scenes/Player/PlayerUI/PlayerUI.tscn" id="2_4xi3m"]
-[ext_resource type="Texture2D" uid="uid://d25qqy4l3uw55" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆.tres" id="6_545fw"]
-[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆.tres" id="7_2ehfc"]
+[ext_resource type="Texture2D" uid="uid://d25qqy4l3uw55" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆2.tres" id="6_545fw"]
+[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆1.tres" id="7_2ehfc"]
 [ext_resource type="PackedScene" uid="uid://bq2thpcuuy615" path="res://Scenes/GameScenes/VignetteEffect.tscn" id="8_jbabp"]
 [ext_resource type="Texture2D" uid="uid://bn2av7db8mp0" path="res://Assets/Textures/UIs/MobieControlsUI/跳跃1.tres" id="8_oc6dx"]
 [ext_resource type="Script" uid="uid://dvqwec3j18pnf" path="res://Scripts/Events/BootCinematicDirector.gd" id="9_boot_cinematic"]
@@ -12,10 +12,10 @@
 [ext_resource type="Texture2D" uid="uid://cilxl6s3ql74f" path="res://Assets/Textures/UIs/MobieControlsUI/冲刺1.tres" id="10_7uw37"]
 [ext_resource type="Script" uid="uid://ujho0n07mac4" path="res://Scripts/Events/NewSaveOpeningEventDirector.gd" id="10_new_save_opening"]
 [ext_resource type="Texture2D" uid="uid://cmqn3lq3grd75" path="res://Assets/Textures/UIs/MobieControlsUI/冲刺2.tres" id="11_21net"]
-[ext_resource type="Texture2D" uid="uid://dnua3kkv0wkqj" path="res://Assets/Textures/Backgrounds/Room3/4.png" id="11_70mj8"]
+[ext_resource type="Texture2D" uid="uid://dnua3kkv0wkqj" path="res://Assets/Textures/Backgrounds/WindValley/4.png" id="11_70mj8"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="11_om4ip"]
 [ext_resource type="Script" uid="uid://dij1xd6xmfvis" path="res://Scripts/Events/RoomCinematicEventDirector.gd" id="11_room_cinematic"]
-[ext_resource type="Texture2D" uid="uid://dvi0fwdkqjh2u" path="res://Assets/Textures/Backgrounds/Room3/1.png" id="12_dcv5v"]
+[ext_resource type="Texture2D" uid="uid://dvi0fwdkqjh2u" path="res://Assets/Textures/Backgrounds/WindValley/1.png" id="12_dcv5v"]
 [ext_resource type="Texture2D" uid="uid://bw8x5folvwdp1" path="res://Assets/Textures/UIs/MobieControlsUI/交互1.tres" id="12_exifc"]
 [ext_resource type="Texture2D" uid="uid://br0syxlpkp878" path="res://Assets/Textures/UIs/MobieControlsUI/交互2.tres" id="13_j582q"]
 [ext_resource type="Texture2D" uid="uid://dpose46mf52q0" path="res://Assets/Textures/UIs/MobieControlsUI/超级冲刺1.tres" id="14_uc6ms"]
@@ -47,7 +47,7 @@ shadow_enabled = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 physics_interpolation_mode = 1
-position = Vector2(0, -704)
+position = Vector2(0, -640)
 zoom = Vector2(2, 2)
 process_callback = 0
 limit_enabled = false
@@ -59,7 +59,7 @@ process_physics_priority = 300
 script = ExtResource("18_iaaki")
 
 [node name="Player" parent="." instance=ExtResource("1_wdg0h")]
-position = Vector2(0, -704)
+position = Vector2(0, -640)
 
 [node name="RoomContainer" type="Node2D" parent="."]
 

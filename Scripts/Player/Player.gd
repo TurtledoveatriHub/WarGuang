@@ -110,6 +110,19 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 空中无输入时 DOWN 状态的基础衰减倍率（越大停得越快）
 @export var air_no_input_deceleration_multiplier_down: float = 0.4
 
+## 卡死脱困（被碰撞体挤压时向上脱困）
+@export_category("卡死脱困")
+## 是否启用“被挤压卡死时自动向上脱困”
+@export var crush_escape_enabled: bool = true
+## 判定为卡死的连续物理帧数（越小越灵敏，越大越不易误触）
+@export var crush_detect_frames: int = 8
+## 脱困上推速度（像素/秒，60 时约 1 像素/帧）
+@export var crush_escape_speed: float = 60.0
+## 单帧脱困最大上推距离（像素，限制它可避免瞬间穿墙）
+@export var crush_escape_max_step: float = 4.0
+## 判定“有实体正在挤过来”的单帧位移阈值（像素，机关平台/门等移动碰撞体）
+@export var crush_mover_min_delta: float = 1.0
+
 ## 跳跃设置
 @export_category("跳跃设置")
 ## 跳跃移动速度（像素/秒）
@@ -290,10 +303,6 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## JumpBox 水平速度上限（像素/秒）
 @export var jumpbox_max_horizontal_speed: float = 420.0
 
-@export_category("调试")
-## 记录受伤后相机跳位相关状态
-@export var camera_damage_debug: bool = false
-
 @export_category("攀墙设置")
 ## 攀墙下滑速度（像素/秒）
 @export var wall_slide_speed: float = 300.0
@@ -352,6 +361,19 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 冲刺边缘修正的最大尝试次数
 @export var dash_edge_correction_steps: int = 8
 
+@export_category("调试")
+## 记录受伤后相机跳位相关状态
+@export var camera_damage_debug: bool = false
+## 调试：打印冲刺期间的纹理旋转相关状态（默认关闭）
+@export var debug_dash_rotation: bool = false
+
+@export_category("单向平台设置")
+## 是否允许“下 + 跳跃”穿过单向平台
+## （平台需自身是单向：图块碰撞多边形勾了 One Way，或碰撞形状勾了 one_way_collision）
+@export var one_way_drop_enabled: bool = true
+## 穿越期间忽略该平台的时长（秒）
+@export var one_way_drop_time: float = 0.2
+
 #endregion
 
 ##内部变量
@@ -359,6 +381,10 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 
 ## PlayerUI引用
 var player_ui: CanvasLayer                      # 玩家UI的引用，用于更新血量、钱币等UI元素
+## 单向平台穿越剩余时间（>0 表示正在忽略脚下的单向平台）
+var _one_way_drop_timer: float = 0.0
+## 本次穿越期间被临时忽略的碰撞体 RID
+var _one_way_ignored_rids: Array[RID] = []
 
 ## 动画管理相关
 var current_animation: String = ""              # 当前播放的动画名称，用于防止重复播放同一动画
@@ -644,6 +670,8 @@ var horizontal_input_priority: int = 0
 ## 场景初始化，设置玩家节点、能力状态、计时器和各种效果引用
 func _ready():
 	PlayerBootstrapServiceScript.initialize_on_ready(self)
+	## 卡死脱困：记录初始位置，避免首帧把“未移动”误判为卡死
+	crush_escape_last_pos = global_position
 	## ★ 连接精灵动画结束信号，用于 JUMP1START→JUMP1LOOP 切换
 	if animated_sprite:
 		animated_sprite.animation_finished.connect(_on_sprite_anim_finished)
@@ -719,6 +747,11 @@ func _physics_process(delta):
 	var jump_pressed: bool = input_snapshot.get("jump_pressed", false)
 	var jump_just_released: bool = input_snapshot.get("jump_just_released", false)
 	var dash_just_pressed: bool = input_snapshot.get("dash_just_pressed", false)
+	## ========== 单向平台：下 + 跳跃 穿越 ==========
+	_update_one_way_drop(fixed_delta)
+	if _try_drop_through_one_way(jump_just_pressed):
+		## 已触发穿越：吞掉这次跳跃，避免同时起跳
+		jump_just_pressed = false
 	## ========== 阶段7：物理状态更新 ==========
 	## 更新墙体检测
 	update_wall_detection()
@@ -769,6 +802,8 @@ func _physics_process(delta):
 	move_and_slide()
 	if counter_move_scale != 1.0:
 		velocity /= counter_move_scale
+	## 被碰撞体挤压卡死时向上脱困（在物理步之后处理，不影响正常移动）
+	_apply_crush_escape(fixed_delta)
 	_apply_ground_motion_pixel_residual()
 	PlayerRuntimeFlowServiceScript.finalize_post_physics(self, fixed_delta, move_input, previous_was_on_floor)
 
@@ -808,6 +843,199 @@ func _apply_platform_follow() -> void:
 			# 直接按平台位移增量移动 player 位置，确保同步跟随
 			global_position += plat_vel * delta
 			return
+
+
+## 单向平台穿越计时：到期后恢复被忽略的碰撞。
+func _update_one_way_drop(delta: float) -> void:
+	if _one_way_drop_timer <= 0.0:
+		return
+	_one_way_drop_timer -= delta
+	if _one_way_drop_timer <= 0.0:
+		_restore_one_way_ignored()
+
+
+## 尝试“下 + 跳跃”穿过脚下的单向平台。返回 true 表示已触发（调用方需吞掉这次跳跃）。
+func _try_drop_through_one_way(jump_just_pressed: bool) -> bool:
+	if not one_way_drop_enabled or not jump_just_pressed or not is_on_floor():
+		return false
+	if Input.get_axis("up", "down") <= 0.5:
+		return false
+	var ignored_rids: Array[RID] = []
+	for i in range(get_slide_collision_count()):
+		var col: KinematicCollision2D = get_slide_collision(i)
+		if col != null and _is_one_way_collision(col):
+			ignored_rids.append(col.get_collider_rid())
+	if ignored_rids.is_empty():
+		return false
+	_restore_one_way_ignored()
+	for rid in ignored_rids:
+		PhysicsServer2D.body_add_collision_exception(rid, get_rid())
+		_one_way_ignored_rids.append(rid)
+	_one_way_drop_timer = maxf(one_way_drop_time, 0.05)
+	# 立即生效：本帧就给一个向下初速，让它离开平台表面
+	velocity.y = maxf(velocity.y, 20.0)
+	return true
+
+
+## 恢复本次穿越临时忽略的碰撞体
+func _restore_one_way_ignored() -> void:
+	for rid in _one_way_ignored_rids:
+		PhysicsServer2D.body_remove_collision_exception(rid, get_rid())
+	_one_way_ignored_rids.clear()
+
+
+## 判断某次接触是否是“单向平台”：
+##  - 场景平台：有 CollisionShape2D 勾了 one_way_collision
+##  - TileMap 图块：该格碰撞多边形勾了 One Way（就是引擎自己用来判定单向图块的那个标记）
+func _is_one_way_collision(col: KinematicCollision2D) -> bool:
+	var collider: Object = col.get_collider()
+	if collider is Node:
+		for child in (collider as Node).get_children():
+			if child is CollisionShape2D and (child as CollisionShape2D).one_way_collision:
+				return true
+	if collider is TileMapLayer:
+		var tilemap: TileMapLayer = collider as TileMapLayer
+		if tilemap.tile_set == null:
+			return false
+		# 用“接触点”取格子，而不是玩家自身坐标：
+		# 玩家原点在身体中心，站在平台上时原点落在平台上方的空气格里，取不到平台图块，
+		# 会导致单向判定永远失败（这正是“下加跳跃穿不过去”的原因）。
+		# 接触点就在平台表面（图块上边缘），沿法线反方向偏移 2px 采到图块内部，保证落在平台那一格。
+		var probe: Vector2 = col.get_position() - col.get_normal() * 2.0
+		var cell: Vector2i = tilemap.local_to_map(tilemap.to_local(probe))
+		var data: TileData = tilemap.get_cell_tile_data(cell)
+		if data == null:
+			return false
+		for physics_layer in tilemap.tile_set.get_physics_layers_count():
+			for poly in data.get_collision_polygons_count(physics_layer):
+				if data.is_collision_polygon_one_way(physics_layer, poly):
+					return true
+	return false
+
+
+## 卡死脱困：上一物理帧的位置（用于判断本帧是否真的移动了）
+var crush_escape_last_pos: Vector2 = Vector2.ZERO
+## 卡死脱困：连续“疑似卡死”的帧计数
+var crush_escape_frames: int = 0
+## 卡死脱困：上一帧各碰撞体的位置（instance_id -> 位置），用于识别“有实体正挤过来”
+var crush_mover_last_pos: Dictionary = {}
+## 卡死脱困候选方向（按优先级：上 → 左 → 右 → 下）
+const CRUSH_ESCAPE_DIRS: PackedVector2Array = [Vector2.UP, Vector2.LEFT, Vector2.RIGHT, Vector2.DOWN]
+
+## 被碰撞体挤压卡死时的自动脱困
+## 满足以下任一条件即视为被挤压：
+##   条件A（空中卡死）：未落地、重力无法生效（|velocity.y| < 5）、位置几乎不变、且本帧被实体阻挡
+##   条件B（被挤压）：有碰撞体从侧面/下方挤过来（单帧位移 ≥ crush_mover_min_delta，
+##                    且接触法线不是向上，避免把“站在移动平台/缆车上”误判为挤压），
+##                    同时自己被墙卡住或完全无法移动
+## 连续满足 crush_detect_frames 帧后，每帧按以下优先级尝试挤出：
+##   上 → 左 → 右 → 下（完全畅通的方向优先）；
+##   若四个方向都被挡，则选“被非地形碰撞体挡住”的方向（机关/移动平台可推动）；
+##   全被地形（TileMapLayers）挡住时不做任何强制移动，避免被挤进关卡几何里。
+## 移动使用 move_and_collide，由物理引擎自行解决碰撞，因此不会穿墙。
+func _apply_crush_escape(delta: float) -> void:
+	if not crush_escape_enabled:
+		return
+	if is_game_paused:
+		return
+	if current_state == PlayerState.HURT or current_state == PlayerState.DIE:
+		return
+	if current_state == PlayerState.RIDECART:
+		return
+	var moved: float = global_position.distance_to(crush_escape_last_pos)
+	crush_escape_last_pos = global_position
+	var contacts: Array[Dictionary] = _collect_slide_contacts()
+	var mover_incoming: bool = _has_incoming_side_mover(contacts)
+	## 条件A：空中被卡住
+	var jammed_air: bool = (not is_on_floor()) \
+		and absf(velocity.y) < 5.0 \
+		and moved < 0.2 \
+		and contacts.size() > 0
+	## 条件B：有实体从侧面/下方挤过来，且自己被卡住（贴墙或完全无法移动）
+	var jammed_by_mover: bool = mover_incoming and (is_on_wall() or moved < 0.2)
+	if not (jammed_air or jammed_by_mover):
+		crush_escape_frames = 0
+		return
+	crush_escape_frames += 1
+	if crush_escape_frames < maxi(crush_detect_frames, 1):
+		return
+	var dir: Vector2 = _pick_escape_direction()
+	if dir == Vector2.ZERO:
+		return
+	var step: float = minf(crush_escape_speed * delta, maxf(crush_escape_max_step, 0.1))
+	var before: Vector2 = global_position
+	move_and_collide(dir * step)
+	if global_position.distance_to(before) > 0.001:
+		# 成功挤出：清掉与脱困方向对抗的速度分量，避免和挤压互相抵消
+		velocity -= dir * velocity.dot(dir)
+
+
+## 选择一个可脱困的方向
+## 1) 优先完全畅通的方向；
+## 2) 其次选“被非地形碰撞体（机关/移动平台等）挡住”的方向——地形不可移动，挤不出去；
+## 3) 四个方向全被地形挡住时返回 ZERO（不强行挤）。
+func _pick_escape_direction() -> Vector2:
+	var probe: float = maxf(crush_escape_max_step, 1.0)
+	var fallback: Vector2 = Vector2.ZERO
+	for d in CRUSH_ESCAPE_DIRS:
+		var hit: KinematicCollision2D = move_and_collide(d * probe, true)
+		if hit == null:
+			return d
+		if fallback == Vector2.ZERO:
+			if not _is_world_tile_blocker(hit.get_collider()):
+				fallback = d
+	return fallback
+
+
+## 该碰撞体是否属于“地形/关卡碰撞”（TileMap 层）
+## 脱困时尽量避开，避免把玩家挤进不可移动的关卡几何
+func _is_world_tile_blocker(node: Object) -> bool:
+	if node == null:
+		return false
+	if not (node is Node):
+		return false
+	var n: Node = node
+	if n is TileMapLayer or n.is_class("TileMapLayer") or n.is_class("TileMap"):
+		return true
+	var parent: Node = n.get_parent()
+	if parent == null:
+		return false
+	return parent is TileMapLayer or parent.is_class("TileMapLayer") or parent.is_class("TileMap")
+
+
+## 收集本帧 move_and_slide 的接触信息（碰撞体 + 接触法线）
+func _collect_slide_contacts() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for i in range(get_slide_collision_count()):
+		var col: KinematicCollision2D = get_slide_collision(i)
+		if col == null:
+			continue
+		var body: Object = col.get_collider()
+		if body is Node2D:
+			result.append({"body": body as Node2D, "normal": col.get_normal()})
+	return result
+
+
+## 本帧是否存在“从侧面/下方挤过来”的移动碰撞体
+##（法线向上的接触视为“站上去”，不算挤压，避免误判乘坐移动平台）
+func _has_incoming_side_mover(contacts: Array[Dictionary]) -> bool:
+	if contacts.is_empty():
+		crush_mover_last_pos.clear()
+		return false
+	var min_delta: float = maxf(crush_mover_min_delta, 0.01)
+	var incoming: bool = false
+	for c in contacts:
+		var body: Node2D = c["body"]
+		var normal: Vector2 = c["normal"]
+		var id: int = body.get_instance_id()
+		var pos: Vector2 = body.global_position
+		var is_side_or_below: bool = normal.y > -0.5
+		if crush_mover_last_pos.has(id) and is_side_or_below:
+			var prev: Vector2 = crush_mover_last_pos[id]
+			if pos.distance_to(prev) >= min_delta:
+				incoming = true
+		crush_mover_last_pos[id] = pos
+	return incoming
 
 
 ## 检测游戏暂停状态
@@ -923,6 +1151,33 @@ func try_double_jump(jump_just_pressed: bool) -> bool:
 ## 处理二段跳期间按住跳跃键时的角色旋转效果
 func handle_jump2_rotation(fixed_delta):
 	PlayerAirAbilityServiceScript.handle_jump2_rotation(self, fixed_delta)
+	## 调试：逐物理帧打印旋转相关状态（含二段跳旋转期间）
+	if debug_dash_rotation:
+		_debug_print_dash_rotation()
+
+## 调试：打印冲刺/二段跳旋转的全部关键状态（每物理帧一行，冲刺前后与二段跳旋转期间都会输出）
+func _debug_print_dash_rotation() -> void:
+	## 精灵当前动画名（用于确认此刻到底在播哪套图）
+	var sprite_anim: String = ""
+	## 精灵当前帧序号
+	var sprite_frame: int = -1
+	if is_instance_valid(animated_sprite) and animated_sprite.sprite_frames != null:
+		sprite_anim = String(animated_sprite.animation)
+		sprite_frame = animated_sprite.frame
+	print("[DashRot] f=", Engine.get_physics_frames(),
+		" st=", current_state,
+		" anim=", current_animation,
+		" sp=", sprite_anim, "#", sprite_frame,
+		" flip=", animated_sprite.flip_h,
+		" v=", velocity,
+		" dir=", dash_locked_vector,
+		" rot=", animated_sprite.rotation_degrees,
+		" j2=", jump2_rotation,
+		" dbl=", has_double_jumped,
+		" hold=", is_double_jump_holding,
+		" floor=", is_on_floor(),
+		" pim=", animated_sprite.physics_interpolation_mode,
+		" pfrac=", snappedf(Engine.get_physics_interpolation_fraction(), 0.01))
 
 func can_accept_jumpbox_bounce() -> bool:
 	return PlayerAirAbilityServiceScript.can_accept_jumpbox_bounce(self)

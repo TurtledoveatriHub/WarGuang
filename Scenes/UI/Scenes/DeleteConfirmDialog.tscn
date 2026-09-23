@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://b81s4uybrdtsf"]
+[gd_scene load_steps=9 format=3 uid="uid://b81s4uybrdtsf"]
 
 [ext_resource type="Script" uid="uid://g5mcy2rrpi1j" path="res://Scripts/UI/Scenes/DeleteConfirmDialog.gd" id="1_8trha"]
+[ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="2_qrub3"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="2_s464x"]
 [ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/对话框背景.png" id="2_v568y"]
 [ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="5_qrub3"]
@@ -11,6 +12,10 @@
 [node name="DeleteConfirmDialog" type="CanvasLayer"]
 layer = 50
 script = ExtResource("1_8trha")
+
+[node name="UIFxDirector" type="Node" parent="."]
+script = ExtResource("2_qrub3")
+target_paths = Array[NodePath]([NodePath("../Background")])
 
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(597, 313)

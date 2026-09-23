@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=3 uid="uid://dekrt2dtacnvc"]
+
+[ext_resource type="Script" uid="uid://0f0qymy75vah" path="res://Scripts/Instances/Props/Switch.gd" id="1_hk478"]
+[ext_resource type="Texture2D" uid="uid://cy2gwpiimwxb0" path="res://Assets/Textures/Instances/GrassLand/开关.png" id="2_d0waj"]
+[ext_resource type="Texture2D" uid="uid://xygjp77wxevl" path="res://Assets/Textures/UIs/SceneUIs/tres/回退1.tres" id="3_st2e8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_st2e8"]
+atlas = ExtResource("2_d0waj")
+region = Rect2(0, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_72awk"]
+atlas = ExtResource("2_d0waj")
+region = Rect2(16, 16, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2h4en"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_st2e8")
+}],
+"loop": false,
+"name": &"OFF",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_72awk")
+}],
+"loop": false,
+"name": &"ON",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_switch"]
+size = Vector2(24, 24)
+
+[node name="JoystickSwitch" type="Area2D"]
+collision_layer = 32
+script = ExtResource("1_hk478")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_2h4en")
+animation = &"OFF"
+
+[node name="InteractionPrompt" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(0, -20)
+texture = ExtResource("3_st2e8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_switch")

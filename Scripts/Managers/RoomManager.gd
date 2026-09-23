@@ -97,6 +97,10 @@ func load_room(room_id: String, skip_unload: bool = false):
 	
 	current_room = room_id
 	
+	# 登记为“已走过、待绘制”：地图上暂时不显示，需与静态检查点交互后才正式绘制
+	if MapManager and MapManager.has_method("mark_room_pending"):
+		MapManager.mark_room_pending(room_id)
+	
 	if global_canvas_modulate:
 		var room_data = rooms[room_id]
 		var target_color = room_data.get("color", Color.WHITE)

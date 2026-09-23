@@ -23,6 +23,7 @@ point_count = 2
 curve = SubResource("Curve_icrye")
 
 [resource]
+lifetime_randomness = 0.3
 particle_flag_disable_z = true
 emission_shape = 3
 emission_box_extents = Vector3(700, 64, 0)

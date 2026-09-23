@@ -42,6 +42,8 @@ var _input_locked: bool = true
 var _overlay_active: bool = false
 ## 是否已经进入退场流程（防止 ESC 在退场途中重复触发返回）。
 var _exit_started: bool = false
+## 本页入场动画是否已播完（ESC 必须等它播完才允许触发，否则退场动画会打断入场）。
+var _enter_done: bool = false
 ## 动效总线缓存。
 var _fx_bus: Node = null
 ## 循环动画节点缓存（没有总线时的降级路径用）。
@@ -64,6 +66,7 @@ func _enter_tree() -> void:
 func ui_enter() -> void:
 	_overlay_active = false
 	_exit_started = false
+	_enter_done = false
 	set_input_locked(true)
 	# 调用方（SceneManager / UIRouter）没在黑屏期间 prepare 过时兜底补一次
 	# （例如编辑器直接运行本场景），保证入场动画一定从起始态开始。
@@ -75,6 +78,7 @@ func ui_enter() -> void:
 	await _on_page_enter()
 	_play_fx_enter()
 	await ui_await_idle()
+	_enter_done = true
 	set_input_locked(false)
 
 
@@ -191,7 +195,7 @@ func _input(event: InputEvent) -> void:
 	# 过去它会让「入场/退场动画播放期间按 ESC 毫无反应」，表现成「ESC 返回失效」。
 	# 这里放在吞噬之前处理，并用 _exit_started 防止退场途中重复触发。
 	# 被覆盖层盖住的宿主页面不处理（交给上层覆盖层）。
-	if not _exit_started and not is_overlay_active() and event.is_action_pressed("ui_cancel"):
+	if not _exit_started and _enter_done and not is_overlay_active() and event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_on_ui_cancel()
 		return

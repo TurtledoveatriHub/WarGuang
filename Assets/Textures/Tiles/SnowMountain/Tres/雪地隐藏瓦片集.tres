@@ -1,7 +1,7 @@
 [gd_resource type="TileSet" load_steps=5 format=3 uid="uid://b2t5qvh6262fk"]
 
-[ext_resource type="Texture2D" uid="uid://qas8amasmxcd" path="res://Assets/Textures/Tiles/SnowMountain/雪地瓦片2.png" id="1_dptdu"]
-[ext_resource type="Texture2D" uid="uid://voprutx7awr3" path="res://Assets/Textures/Tiles/SnowMountain/雪地瓦片1.png" id="2_dptdu"]
+[ext_resource type="Texture2D" uid="uid://comjg58skxuxe" path="res://Assets/Textures/Tiles/SnowMountain/雪地瓦片2.png" id="1_dptdu"]
+[ext_resource type="Texture2D" uid="uid://cwir1trgre1i2" path="res://Assets/Textures/Tiles/SnowMountain/雪地瓦片1.png" id="2_r1pvg"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ybci3"]
 texture = ExtResource("1_dptdu")
@@ -409,7 +409,7 @@ texture = ExtResource("1_dptdu")
 11:4/0/terrains_peering_bit/top_right_corner = 1
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hwvxb"]
-texture = ExtResource("2_dptdu")
+texture = ExtResource("2_r1pvg")
 0:0/0 = 0
 0:0/0/terrain_set = 0
 0:0/0/terrain = 0

@@ -1,0 +1,104 @@
+[gd_scene load_steps=13 format=3 uid="uid://c8p4bv4n7if4"]
+
+[ext_resource type="Script" uid="uid://bh2ckgvruvdj2" path="res://Scripts/Entities/Neutrals/StoneBug.gd" id="1_stonebug"]
+[ext_resource type="Texture2D" uid="uid://cggvea5jfwmtx" path="res://Assets/Textures/Entities/Neutrals/石头虫.png" id="2_x0srl"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lqtnq"]
+atlas = ExtResource("2_x0srl")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mw0v2"]
+atlas = ExtResource("2_x0srl")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fb703"]
+atlas = ExtResource("2_x0srl")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qch5r"]
+atlas = ExtResource("2_x0srl")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4c3v0"]
+atlas = ExtResource("2_x0srl")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v6f4g"]
+atlas = ExtResource("2_x0srl")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ovkuj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lqtnq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mw0v2")
+}],
+"loop": false,
+"name": &"Idle",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fb703")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qch5r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4c3v0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v6f4g")
+}],
+"loop": true,
+"name": &"Move",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(18, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bugdetect"]
+size = Vector2(60, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_detect"]
+size = Vector2(180, 80)
+
+[node name="StoneBug" type="CharacterBody2D"]
+z_index = 30
+collision_layer = 256
+collision_mask = 359
+script = ExtResource("1_stonebug")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_ovkuj")
+animation = &"Idle"
+frame = 1
+frame_progress = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 6)
+shape = SubResource("RectangleShape2D_body")
+
+[node name="CliffDetector" type="RayCast2D" parent="."]
+target_position = Vector2(20, 18)
+collision_mask = 6
+
+[node name="BugDetector" type="Area2D" parent="."]
+position = Vector2(19, 4)
+collision_layer = 256
+collision_mask = 256
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BugDetector"]
+position = Vector2(-5, -1)
+shape = SubResource("RectangleShape2D_bugdetect")
+
+[node name="PlayerDetector" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerDetector"]
+shape = SubResource("RectangleShape2D_detect")

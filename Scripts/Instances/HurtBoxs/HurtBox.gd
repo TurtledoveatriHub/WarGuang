@@ -22,9 +22,9 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 ## 是否为传送伤害（独立于普通/阴影，会触发传送受击流程）
 @export var is_warp_damage: bool = false
 ## ★ 对 player 的击退力（Vector2统一参数）
-@export var player_knockback: Vector2 = Vector2(50, 50)
+@export var player_knockback: Vector2 = Vector2(200, 500)
 ## ★ 对 Layer8 敌人的击退力（Vector2统一参数）
-@export var enemy_knockback: Vector2 = Vector2(100, 100)
+@export var enemy_knockback: Vector2 = Vector2(100, 200)
 ## 伤害冷却时间（秒）
 @export var damage_cooldown_time: float = 0.1
 ## 持续伤害间隔（秒，0=每次冷却后立即触发）
@@ -106,7 +106,7 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 ## 玩家离开后延迟 trigger_close_delay 播放一遍 CLOSE 切回 OFF；延迟/切回期间玩家再次触碰则立即再 OPEN。
 @export var enable_trigger_mode: bool = false
 ## 玩家离开后切回 OFF 的延迟（秒）
-@export var trigger_close_delay: float = 1.0
+@export var trigger_close_delay: float = 1.5
 
 ## 高级检测设置
 @export_category("高级检测设置")
@@ -222,8 +222,14 @@ func _ready():
 		push_warning("HurtBox: 发射器模式仅支持 LINEAR 移动模式，已自动关闭发射器模式")
 		enable_launcher_mode = false
 
+	# 过渡动画（OPEN/CLOSE）在逻辑上必须“播完即停”，若 sprite_frames 被设为循环则此处强制改为不循环；
+	# 而 ON/OFF 这类由美术决定是否循环的动画不做任何强制修改。
+	if enable_trigger_mode or enable_launcher_mode or enable_periodic_damage:
+		_force_once_animation("OPEN")
+		_force_once_animation("CLOSE")
+
 	if enable_trigger_mode:
-		# 触发器初始：OFF 循环（不伤）
+		# 触发器初始：OFF（不伤）；是否循环由 sprite_frames 决定，脚本不强制修改
 		_trigger_state = TriggerState.OFF_IDLE
 		_trigger_hold_timer = 0.0
 		_trigger_player_present = false
@@ -544,6 +550,22 @@ func _for_each_shape(action: Callable) -> void:
 
 # ── 动画周期 ──────────────────────────────────────
 
+## 把“只播放一遍”的过渡动画强制为不循环（仅在 sprite_frames 被设成循环时才修改）
+## 仅用于逻辑上必须播完就停的过渡动画（OPEN/CLOSE），ON/OFF 不做强制。
+func _force_once_animation(anim_name: String) -> void:
+	if not is_instance_valid(animated_sprite) or animated_sprite.sprite_frames == null:
+		return
+	var frames: SpriteFrames = animated_sprite.sprite_frames
+	if not frames.has_animation(anim_name):
+		return
+	if not frames.get_animation_loop(anim_name):
+		return
+	# 需要修改循环标记：先复制一份，避免影响共享同一 SpriteFrames 的其它实例
+	frames = frames.duplicate() as SpriteFrames
+	animated_sprite.sprite_frames = frames
+	frames.set_animation_loop(anim_name, false)
+
+
 func update_anim_cycle(delta: float) -> void:
 	if not is_instance_valid(animated_sprite):
 		return
@@ -557,7 +579,9 @@ func update_anim_cycle(delta: float) -> void:
 	match _anim_phase:
 		AnimPhase.ON:
 			_damage_allowed = true
-			animated_sprite.play("ON")
+			# 仅在动画未选中时切换，避免把 sprite_frames 设为“只播一遍”的 ON 反复重启而看起来像循环
+			if animated_sprite.animation != "ON":
+				animated_sprite.play("ON")
 			_phase_timer += delta
 			if _phase_timer >= active_time:
 				_anim_phase = AnimPhase.CLOSING
@@ -571,7 +595,9 @@ func update_anim_cycle(delta: float) -> void:
 				animated_sprite.play("OFF")
 		AnimPhase.OFF:
 			_damage_allowed = false
-			animated_sprite.play("OFF")
+			# 同上：不重启已播完的 OFF，尊重 sprite_frames 的循环设置
+			if animated_sprite.animation != "OFF":
+				animated_sprite.play("OFF")
 			_phase_timer += delta
 			if _phase_timer >= inactive_time:
 				_anim_phase = AnimPhase.OPENING
@@ -716,7 +742,8 @@ func _update_trigger_mode(delta: float) -> void:
 	match _trigger_state:
 		TriggerState.OFF_IDLE:
 			_damage_allowed = false
-			if animated_sprite.animation != "OFF" or not animated_sprite.is_playing():
+			# 不重启已播完的 OFF：若 sprite_frames 设为只播一遍则保持最后一帧
+			if animated_sprite.animation != "OFF":
 				animated_sprite.play("OFF")
 			if _trigger_player_present:
 				_begin_trigger_open()
@@ -732,7 +759,8 @@ func _update_trigger_mode(delta: float) -> void:
 				_damage_allowed = true
 		TriggerState.ON_ACTIVE:
 			_damage_allowed = true
-			if animated_sprite.animation != "ON" or not animated_sprite.is_playing():
+			# 不重启已播完的 ON：sprite_frames 设为循环则自然循环，设为只播一遍则保持最后一帧
+			if animated_sprite.animation != "ON":
 				animated_sprite.play("ON")
 			if not _trigger_player_present:
 				# 玩家离开：进入离开延迟（仍保持 ON）
@@ -740,7 +768,7 @@ func _update_trigger_mode(delta: float) -> void:
 				_trigger_hold_timer = 0.0
 		TriggerState.EXIT_HOLD:
 			_damage_allowed = true
-			if animated_sprite.animation != "ON" or not animated_sprite.is_playing():
+			if animated_sprite.animation != "ON":
 				animated_sprite.play("ON")
 			if _trigger_player_present:
 				# 延迟期间玩家又进入 → 回到 ON（保持）

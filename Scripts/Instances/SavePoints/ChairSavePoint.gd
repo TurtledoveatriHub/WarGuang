@@ -52,6 +52,10 @@ func _interact_with_chair():
 	# 记录当前房间到全局数据（需要扩展Global）
 	Global.last_save_room = current_room_id
 	
+	# 已走过的房间在此刻正式绘制到地图上（参考空洞骑士：在存档点才更新地图）
+	if MapManager and MapManager.has_method("commit_pending_rooms"):
+		MapManager.commit_pending_rooms()
+	
 	# 播放存档音效
 	AudioManager.play_stream_sfx(save_interact_sfx)
 	

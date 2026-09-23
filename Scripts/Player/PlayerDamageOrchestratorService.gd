@@ -45,6 +45,13 @@ static func take_damage_with_type(player: Node, damage_source_position: Vector2,
 
 	player.hurt_direction = player.PlayerDamageFlowServiceScript.compute_hurt_direction(player, damage_source_position, knockback_force)
 	## Hollow Knight 风格：先施加一个受控冲量，然后由受伤状态做拖拽衰减，避免一击直接被抛飞。
+	## 注意：必须先抵消“与击退方向相反”的现有速度分量，否则例如高速下落踩到伤害块时，
+	## 原本向下的速度远大于向上的冲量，体感就是“被往下推”（击退方向失效）。
+	if knockback_force != Vector2.ZERO:
+		var kb_dir: Vector2 = knockback_force.normalized()
+		var along: float = player.velocity.dot(kb_dir)
+		if along < 0.0:
+			player.velocity -= kb_dir * along
 	var impulse: Vector2 = knockback_force * 0.7
 	var clamped_impulse: Vector2 = Vector2(
 		clamp(impulse.x, -220.0, 220.0),

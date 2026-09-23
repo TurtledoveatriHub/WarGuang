@@ -1,10 +1,14 @@
-[gd_scene load_steps=16 format=3 uid="uid://f7j6a5p8vguo"]
+[gd_scene load_steps=19 format=3 uid="uid://f7j6a5p8vguo"]
 
 [ext_resource type="Script" uid="uid://dbgaf7wy7ajxv" path="res://Scripts/UI/MyBalloon.gd" id="1_m6elf"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="2_ecih3"]
 [ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/对话框背景.png" id="2_ji2e4"]
 [ext_resource type="PackedScene" uid="uid://ckvgyvclnwggo" path="res://addons/dialogue_manager/dialogue_label.tscn" id="2_o83wj"]
+[ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="2_rrj0s"]
 [ext_resource type="Script" uid="uid://bb52rsfwhkxbn" path="res://addons/dialogue_manager/dialogue_responses_menu.gd" id="3_exgiy"]
+[ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="6_ao5jq"]
+[ext_resource type="Texture2D" uid="uid://c3fxh3guo8uut" path="res://Assets/Textures/UIs/SceneUIs/3x.png" id="7_qylx3"]
+[ext_resource type="Texture2D" uid="uid://b6ji0vannv3pj" path="res://Assets/Textures/UIs/SceneUIs/2x.png" id="8_fp63g"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_spyqn"]
 bg_color = Color(0, 0, 0, 1)
@@ -68,17 +72,26 @@ PanelContainer/styles/panel = SubResource("StyleBoxFlat_qkmqt")
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ecih3"]
 texture = ExtResource("2_ji2e4")
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rrj0s"]
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_uk1on"]
+texture = ExtResource("6_ao5jq")
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jhwcg"]
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1kjoe"]
+texture = ExtResource("7_qylx3")
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ao5jq"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qylx3"]
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_f1ug6"]
+texture = ExtResource("8_fp63g")
 
 [node name="MyBalloon" type="CanvasLayer"]
 layer = 100
 script = ExtResource("1_m6elf")
+
+[node name="UIFxDirector" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("2_rrj0s")
+target_paths = Array[NodePath]([NodePath("../Balloon/MarginContainer")])
+enter_duration = 0.6
+enter_peak_hold_duration = 0.16
+exit_peak_hold_duration = 0.16
 
 [node name="Balloon" type="Control" parent="."]
 unique_name_in_owner = true
@@ -96,10 +109,10 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 384.0
-offset_top = -656.0
-offset_right = -384.0
-offset_bottom = -368.0
+offset_left = 160.0
+offset_top = -672.0
+offset_right = -608.0
+offset_bottom = -384.0
 grow_horizontal = 2
 grow_vertical = 0
 pivot_offset = Vector2(256, 144)
@@ -112,49 +125,54 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_ecih3")
 [node name="MarginContainer" type="MarginContainer" parent="Balloon/MarginContainer/PanelContainer"]
 layout_mode = 2
 
-[node name="ResponsesMenu" type="VBoxContainer" parent="Balloon/MarginContainer/PanelContainer/MarginContainer" node_paths=PackedStringArray("response_template")]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 8
-mouse_filter = 0
-theme = ExtResource("2_ecih3")
-theme_override_constants/separation = 2
-alignment = 1
-script = ExtResource("3_exgiy")
-response_template = NodePath("ResponseExample")
-
-[node name="ResponseExample" type="Button" parent="Balloon/MarginContainer/PanelContainer/MarginContainer/ResponsesMenu"]
-modulate = Color(0.78431374, 0.78431374, 0.78431374, 1)
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxEmpty_rrj0s")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_jhwcg")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_ao5jq")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_qylx3")
-text = "Response example"
-
 [node name="VBoxContainer" type="VBoxContainer" parent="Balloon/MarginContainer/PanelContainer/MarginContainer"]
 layout_mode = 2
 
 [node name="CharacterLabel" type="RichTextLabel" parent="Balloon/MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 mouse_filter = 1
 theme = ExtResource("2_ecih3")
 theme_override_font_sizes/normal_font_size = 20
 bbcode_enabled = true
-text = "沃玛："
+text = "沃玛"
 fit_content = true
-scroll_active = false
+vertical_alignment = 2
 
 [node name="DialogueLabel" parent="Balloon/MarginContainer/PanelContainer/MarginContainer/VBoxContainer" instance=ExtResource("2_o83wj")]
 unique_name_in_owner = true
 modulate = Color(0.78431374, 0.78431374, 0.78431374, 1)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_vertical = 6
-theme = ExtResource("2_ecih3")
 theme_override_font_sizes/normal_font_size = 20
-text = "我家里有蜘蛛！！！啊啊啊啊啊啊..."
+text = "蜘蛛啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊"
 horizontal_alignment = 1
-vertical_alignment = 1
+
+[node name="ResponsesMenu" type="VBoxContainer" parent="Balloon" node_paths=PackedStringArray("response_template")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 704.0
+offset_top = 72.0
+offset_right = 776.0
+offset_bottom = 83.0
+scale = Vector2(2, 2)
+size_flags_vertical = 8
+theme = ExtResource("2_ecih3")
+theme_override_constants/separation = 4
+script = ExtResource("3_exgiy")
+response_template = NodePath("ResponseExample")
+
+[node name="ResponseExample" type="Button" parent="Balloon/ResponsesMenu"]
+modulate = Color(0.78431374, 0.78431374, 0.78431374, 1)
+custom_minimum_size = Vector2(100, 25)
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxTexture_uk1on")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_1kjoe")
+theme_override_styles/hover = SubResource("StyleBoxTexture_f1ug6")
+text = "魔法药水"
+text_overrun_behavior = 3
 
 [connection signal="gui_input" from="Balloon" to="." method="_on_balloon_gui_input"]

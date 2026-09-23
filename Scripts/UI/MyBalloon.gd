@@ -24,6 +24,8 @@ var dialogue_line: DialogueLine:
 @onready var character_label: RichTextLabel = %CharacterLabel
 @onready var dialogue_label: DialogueLabel = %DialogueLabel
 @onready var responses_menu: DialogueResponsesMenu = %ResponsesMenu
+## 动效总线：文本框的入场动画由它驱动（目标在 Inspector 的 target_paths 里配）。
+@onready var fx_bus: Node = $UIFxDirector
 
 # 渐黑渐显相关
 var fade_manager: Node = null
@@ -55,6 +57,29 @@ func _ready() -> void:
 	# 获取 FadeManager
 	fade_manager = get_node_or_null("/root/FadeManager")
 
+	# 场景里可能存有示例文本（作者调试用），这里先清空，避免弹框瞬间露出示例内容
+	if character_label:
+		character_label.text = ""
+	# 长文本防溢出：自动换行 + 固定高度 + 可滚动。
+	# fit_content=true 时文本超高会直接把内容撑出面板、盖住选项与角色名，改为固定高度内滚。
+	if dialogue_label:
+		dialogue_label.text = ""
+		dialogue_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		dialogue_label.fit_content = false
+		dialogue_label.scroll_active = true
+		if dialogue_label.custom_minimum_size.y < 80.0:
+			dialogue_label.custom_minimum_size.y = 120.0
+
+## 等 UIFxDirector 的过渡入场播完（用「时长」等待，绝不 await Tween 信号：
+## 被 kill 的 Tween 不会发 finished，等信号会直接卡死）。
+func _wait_fx_enter() -> void:
+	if fx_bus == null or not is_instance_valid(fx_bus):
+		return
+	var seconds: float = float(fx_bus.get("enter_duration")) + float(fx_bus.get("transition_enter_delay"))
+	if seconds > 0.0:
+		await get_tree().create_timer(seconds).timeout
+
+
 ## 递归设置所有子节点的 mouse_filter（排除 ResponsesMenu）
 func _set_mouse_filter_excluding_responses(node: Node, filter: int):
 	if node is Control and node != responses_menu:
@@ -64,29 +89,34 @@ func _set_mouse_filter_excluding_responses(node: Node, filter: int):
 
 func apply_dialogue_line() -> void:
 	is_waiting_for_input = false
-	
-	# 转场后不立即显示对话框
-	if not is_blocking_input:
-		balloon.show()
-	else:
-		balloon.hide()
-	
-	# 确保正确设置焦点模式
-	balloon.focus_mode = Control.FOCUS_ALL
-	if responses_menu:
-		responses_menu.focus_mode = Control.FOCUS_ALL
-	
-	# 设置选项菜单的 next_action
-	if responses_menu:
-		responses_menu.next_action = next_action
-	
-	# 延迟一帧确保节点已完全添加到场景树
-	await get_tree().process_frame
-	
+
+	# ★ 先写入本次对话内容，再显示弹框。
+	# 否则 balloon.show() 会先画出场景里残留的示例文本，下一帧才被覆盖
+	# （表现就是“每次交互都先闪一帧示例文本”）。
 	character_label.visible = not dialogue_line.character.is_empty()
 	character_label.text = tr(dialogue_line.character, "dialogue") if character_label.visible else ""
 
 	dialogue_label.dialogue_line = dialogue_line
+
+	# 显示/隐藏弹框
+	if not is_blocking_input:
+		balloon.show()
+		# 文本框入场动画（由总线驱动；目标在 MyBalloon.tscn 的 UIFxDirector 里配）
+		fx_bus.call("play_enter")
+	else:
+		balloon.hide()
+
+	# 确保正确设置焦点模式
+	balloon.focus_mode = Control.FOCUS_ALL
+	if responses_menu:
+		responses_menu.focus_mode = Control.FOCUS_ALL
+
+	# 设置选项菜单的 next_action
+	if responses_menu:
+		responses_menu.next_action = next_action
+
+	# 延迟一帧确保节点已完全添加到场景树
+	await get_tree().process_frame
 
 	if responses_menu:
 		responses_menu.hide()
@@ -97,6 +127,8 @@ func apply_dialogue_line() -> void:
 		dialogue_label.show()
 		
 		if not dialogue_line.text.is_empty():
+			# 等入场动画播完再开始打字：否则文字会在框体还没出现时就开始输出
+			await _wait_fx_enter()
 			dialogue_label.type_out()
 			await dialogue_label.finished_typing
 
@@ -118,6 +150,8 @@ func apply_dialogue_line() -> void:
 			await get_tree().process_frame
 			await get_tree().process_frame
 			
+			# 选项菜单是「有选项时才出现」的，不能跟整页入场一起播 → 单独播一次入场。
+			fx_bus.call("play_single_enter", responses_menu)
 			responses_menu.show()
 			
 			var menu_items = responses_menu.get_menu_items()
@@ -175,7 +209,9 @@ func _unhandled_input(event):
 			next(dialogue_line.next_id)
 			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed("interactive"):
-			next(dialogue_line.next_id)
+			# 交互键只负责「开始对话」，不推进文本（推进是 dialogue_next / 空格的事）。
+			# 但仍然要吃掉事件：否则同一个按键会穿透到 NPC / 传送点等交互物，
+			# 在最后一句时表现为「刚关闭对话就又立刻触发交互」。
 			get_viewport().set_input_as_handled()
 		elif event is InputEventScreenTouch and event.pressed:
 			next(dialogue_line.next_id)

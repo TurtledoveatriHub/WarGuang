@@ -118,6 +118,8 @@ var _transition_active: bool = false
 var _hovering: bool = false
 ## 是否长期保持「悬停 / 按下」视觉（选中的分类按钮等）。
 var locked_visual: bool = false
+## 入场动画结束时鼠标已在按钮上、但页面还锁着输入 → 等解锁那一帧再补悬停。
+var _pending_hover_sync: bool = false
 ## 位置漂移进度：0 = 完全偏移，1 = 归位。
 var _drift_progress: float = 1.0
 ## 当前漂移向量（单位距离 × 方向）。
@@ -422,6 +424,16 @@ func set_locked_visual(enabled: bool) -> void:
 func _sync_hover_state() -> void:
 	if locked_visual:
 		return
+	# 入场动画结束时页面往往还锁着输入：按钮可能是 disabled，
+	# 也可能被页面改成 mouse_filter = IGNORE（例如设置页的分类按钮）。
+	# 这种状态下判定悬停必然失败，改为交给 _process 在「真正可悬停」的那一帧补上 ——
+	# 否则就会出现「贴图已是 hover、但没有缩放/位移」（TitleScene）
+	# 或「完全无视鼠标」（SettingsScene）这类错位。
+	if not _can_receive_hover():
+		_pending_hover_sync = true
+		set_process(true)
+		return
+	_pending_hover_sync = false
 	if _is_mouse_over():
 		if not _hovering:
 			_on_mouse_entered()
@@ -429,13 +441,16 @@ func _sync_hover_state() -> void:
 		_on_mouse_exited()
 
 
-## 鼠标当前是否真的停在本按钮上（入场/移出信号被忽略时用它兜底）。
+## 当前是否「真的能收到悬停」（disabled / mouse_filter=IGNORE / 不可见 时收不到）。
+func _can_receive_hover() -> bool:
+	if disabled or not is_visible_in_tree():
+		return false
+	return mouse_filter != Control.MOUSE_FILTER_IGNORE
+
+
+## 鼠标当前是否停在本按钮上（入场/移出信号被忽略时用它兜底）。
 func _is_mouse_over() -> bool:
-	if disabled or mouse_filter == Control.MOUSE_FILTER_IGNORE:
-		return false
-	if not is_visible_in_tree():
-		return false
-	return get_global_rect().has_point(get_global_mouse_position())
+	return _can_receive_hover() and get_global_rect().has_point(get_global_mouse_position())
 
 
 ## 应用「悬停 / 按下」视觉（缩放 + 像素位移 + 旋转 + 文本提亮）。
@@ -475,12 +490,20 @@ func _on_mouse_exited() -> void:
 
 
 ## 悬停期间每帧检查：按钮被 disabled（场景锁定输入 / 面板开始整体动画）时立即归位，
-## 避免本组件的 Tween 与场景级 Tween 同时写 scale 造成抖动。
+## 避免本组件的 Tween 与场景级 Tween 同时写 scale 造成抖动；
+## 同时负责「解锁那一帧」补上入场结束时应有的悬停表现。
 func _process(_delta: float) -> void:
 	if _hovering and disabled:
 		_hovering = false
-		set_process(false)
 		_end_hover()
+		if not _pending_hover_sync:
+			set_process(false)
+		return
+	if _pending_hover_sync and _can_receive_hover():
+		_pending_hover_sync = false
+		_sync_hover_state()
+		if not _hovering:
+			set_process(false)
 
 
 func _end_hover() -> void:

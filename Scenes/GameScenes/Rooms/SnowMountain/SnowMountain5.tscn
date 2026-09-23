@@ -20,7 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/IceCrystal.tscn" id="15_4kdpe"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="15_e37xx"]
 [ext_resource type="PackedScene" uid="uid://ba0eej1ktxrbm" path="res://Scenes/Instances/HurtBoxs/IceSpike.tscn" id="16_6kb3p"]
-[ext_resource type="PackedScene" uid="uid://dj33j0wqfbh6n" path="res://Scenes/Enemys/SacredBird.tscn" id="18_6kb3p"]
+[ext_resource type="PackedScene" uid="uid://dj33j0wqfbh6n" path="res://Scenes/Entities/Enemys/SacredBird.tscn" id="18_6kb3p"]
 [ext_resource type="PackedScene" uid="uid://dbsqhd2of3pjn" path="res://Scenes/Instances/MineCart/SonwMineCart1.tscn" id="21_di1ct"]
 [ext_resource type="PackedScene" uid="uid://dw28jmn0x6xdr" path="res://Scenes/Instances/MineCart/SnowMineCart2.tscn" id="23_di1ct"]
 

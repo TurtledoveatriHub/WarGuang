@@ -595,26 +595,6 @@ func _on_virtual_button_gui_input(event: InputEvent, button: TextureButton) -> v
 	if event is InputEventScreenDrag:
 		_drag_button_by_event(target_button, event.relative)
 
-func _get_default_layout() -> Dictionary:
-	# 默认移动端布局：目标是编辑器中拖拽的初始位置，脚本不直接硬编码最终使用位置。
-	return {
-		"MoveJoystick": {"position": Vector2(120.0, 540.0), "size": 96.0},
-		"JumpButton": {"position": Vector2(1110.0, 500.0), "size": 72.0},
-		"DashButton": {"position": Vector2(1180.0, 590.0), "size": 72.0},
-		"InteractButton": {"position": Vector2(1035.0, 585.0), "size": 72.0},
-		"SuperDashButton": {"position": Vector2(960.0, 610.0), "size": 72.0},
-		"MapButton": {"position": Vector2(1160.0, 420.0), "size": 56.0},
-	}
-
-func _get_default_layout_positions() -> Dictionary:
-	# 将默认布局转成位置字典，供保存/重置逻辑调用。
-	var positions: Dictionary = {}
-	var layout := _get_default_layout()
-	for key in layout.keys():
-		positions[key] = layout[key]["position"]
-	positions["MoveJoystickThumb"] = layout["MoveJoystick"]["position"] + Vector2(18.0, 18.0)
-	return positions
-
 func cancel_current_mapping() -> void:
 	# 兼容设置页调用接口，与 PC 端控制页保持一致。
 	pass
@@ -622,8 +602,6 @@ func cancel_current_mapping() -> void:
 func get_layout_config() -> Dictionary:
 	# 返回布局配置：供运行时 HUD 或其他模块读取。
 	var layout := _default_button_positions.duplicate()
-	if layout.is_empty():
-		layout = _get_default_layout_positions()
 	return {
 		"layout": layout,
 		"layout_mode": _move_mode,

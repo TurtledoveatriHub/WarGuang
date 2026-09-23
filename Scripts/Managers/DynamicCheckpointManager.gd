@@ -23,7 +23,6 @@ func register_checkpoint(checkpoint_id: String, position: Vector2, room_id: Stri
 func set_current_checkpoint(id: String, current_room: String):
 	var key: String = _make_key(current_room, id)
 	var cp_room: String = checkpoint_rooms.get(key, "")
-	print("[DCM] set_current: id=", id, " room=", current_room, " key=", key, " found=", cp_room)
 	if cp_room == "" or cp_room != current_room:
 		print("错误：检查点 ", id, " 不属于当前房间 ", current_room)
 		return

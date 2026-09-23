@@ -62,9 +62,9 @@ animations = [{
 script = ExtResource("1_6ahw5")
 delete_confirm_scene = ExtResource("2_axbvp")
 room_filled_texture_map = {
+"GrassLand1": ExtResource("2_1iexe"),
+"GrassLand3": ExtResource("3_283jm"),
 "Room1": ExtResource("3_283jm"),
-"Room2": ExtResource("2_1iexe"),
-"Room3": ExtResource("3_283jm"),
 "RoomDream10": ExtResource("2_1iexe")
 }
 

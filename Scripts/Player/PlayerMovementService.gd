@@ -446,6 +446,14 @@ static func handle_wallgrip_state(player: Node, fixed_delta: float, move_input: 
 	if locked_wall_direction == 0:
 		locked_wall_direction = player.wall_direction
 
+	# 攀墙朝向锁定：面朝所贴的墙（右墙朝右、左墙朝左）。
+	# 否则会沿用进入攀墙前的旧朝向，出现“右墙却朝左”的错误表现。
+	if locked_wall_direction != 0:
+		var face_right: bool = locked_wall_direction > 0
+		if player.is_facing_right != face_right:
+			player.is_facing_right = face_right
+			player.animated_sprite.flip_h = not face_right
+
 	var toward_wall = (move_input > 0 and locked_wall_direction == 1) or (move_input < 0 and locked_wall_direction == -1)
 	var away_from_wall = (move_input < 0 and locked_wall_direction == 1) or (move_input > 0 and locked_wall_direction == -1)
 

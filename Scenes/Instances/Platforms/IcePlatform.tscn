@@ -228,6 +228,7 @@ size = Vector2(54, 16)
 
 [node name="IcePlatform" type="Node2D"]
 script = ExtResource("1_5b8b7")
+movement_mode = 1
 horizontal_speed_multiplier = 1.5
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

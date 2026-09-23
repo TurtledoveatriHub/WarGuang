@@ -257,16 +257,8 @@ func get_room_id() -> String:
 		if room_data and room_data.has("id"):
 			return room_data.id
 	
-	# 备用方案：从场景树路径推断房间
-	var scene_path = get_path()
-	if "Room1" in scene_path:
-		return "Room1"
-	elif "Room2" in scene_path:
-		return "Room2"
-	elif "Room3" in scene_path:
-		return "Room3"
-	
-	push_warning("Door.get_room_id(): 无法确定房间 ID，路径=", scene_path)
+	# 未挂载在 Room 节点下时无法确定归属房间
+	push_warning("Door.get_room_id(): 无法确定房间 ID，路径=", get_path())
 	return ""
 
 ## 禁用传送功能

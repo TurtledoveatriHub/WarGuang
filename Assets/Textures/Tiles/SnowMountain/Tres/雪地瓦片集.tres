@@ -1,7 +1,7 @@
 [gd_resource type="TileSet" load_steps=5 format=3 uid="uid://cgw26w3s2aaur"]
 
-[ext_resource type="Texture2D" uid="uid://qas8amasmxcd" path="res://Assets/Textures/Tiles/SnowMountain/雪地瓦片2.png" id="1_g3mfr"]
-[ext_resource type="Texture2D" uid="uid://voprutx7awr3" path="res://Assets/Textures/Tiles/SnowMountain/雪地瓦片1.png" id="2_4y8g5"]
+[ext_resource type="Texture2D" uid="uid://comjg58skxuxe" path="res://Assets/Textures/Tiles/SnowMountain/雪地瓦片2.png" id="1_g3mfr"]
+[ext_resource type="Texture2D" uid="uid://cwir1trgre1i2" path="res://Assets/Textures/Tiles/SnowMountain/雪地瓦片1.png" id="2_4y8g5"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ybci3"]
 texture = ExtResource("1_g3mfr")

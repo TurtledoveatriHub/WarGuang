@@ -1,4 +1,4 @@
-# Scripts/Resources/ScenePaths.gd
+# Scripts/Managers/ScenePaths.gd
 extends Node
 ## 全局场景路径管理器
 ## 集中管理所有场景和资源路径
@@ -27,9 +27,9 @@ const PLAYER_AFTERIMAGE = "res://Scenes/Instances/ObjectPools/Afterimage.tscn"
 # ============================================
 # NPC 场景
 # ============================================
-const NPC_MANIAC = "res://Scenes/NPCs/ManiacNPC.tscn"
-const NPC_MERCHANT = "res://Scenes/NPCs/MerchantNPC.tscn"
-const NPC_MASTER = "res://Scenes/NPCs/MasterNPC.tscn"
+const NPC_MANIAC = "res://Scenes/Entities/NPCs/ManiacNPC.tscn"
+const NPC_MERCHANT = "res://Scenes/Entities/NPCs/MerchantNPC.tscn"
+const NPC_MASTER = "res://Scenes/Entities/NPCs/MasterNPC.tscn"
 
 # ============================================
 # 游戏主场景
@@ -91,23 +91,22 @@ const ROOMS_DIR = "res://Scenes/GameScenes/Rooms/"
 const ROOM_PATHS = {
 	"Room1": ROOMS_DIR + "Room1.tscn",
 	"Room39": ROOMS_DIR + "Room39.tscn",
-	"Room61": ROOMS_DIR + "Room61.tscn",
-	"Room62": ROOMS_DIR + "Room62.tscn",
-	"Room63": ROOMS_DIR + "Room63.tscn",
-	"Room64": ROOMS_DIR + "Room64.tscn",
-	"Room65": ROOMS_DIR + "Room65.tscn",
-	"Room66": ROOMS_DIR + "Room66.tscn",
-	"Room67": ROOMS_DIR + "Room67.tscn",
-	"Room68": ROOMS_DIR + "Room68.tscn",
-	"Room69": ROOMS_DIR + "Room69.tscn",
-	"Room5": ROOMS_DIR + "GrassLand/Room5.tscn",
-	"Room6": ROOMS_DIR + "GrassLand/Room6.tscn",
-	"RoomDream10": ROOMS_DIR + "RoomDream10.tscn",
-	
 	"GrassLand1": ROOMS_DIR + "GrassLand/GrassLand1.tscn",
 	"GrassLand2": ROOMS_DIR + "GrassLand/GrassLand2.tscn",
 	"GrassLand3": ROOMS_DIR + "GrassLand/GrassLand3.tscn",
 	"GrassLand4": ROOMS_DIR + "GrassLand/GrassLand4.tscn",
+	"GrassLand5": ROOMS_DIR + "GrassLand/GrassLand5.tscn",
+	"GrassLand6": ROOMS_DIR + "GrassLand/GrassLand6.tscn",
+	"GrassLand7": ROOMS_DIR + "GrassLand/GrassLand7.tscn",
+	"GrassLand8": ROOMS_DIR + "GrassLand/GrassLand8.tscn",
+	"GrassLand9": ROOMS_DIR + "GrassLand/GrassLand9.tscn",
+	"GrassLand10": ROOMS_DIR + "GrassLand/GrassLand10.tscn",
+	"GrassLand11": ROOMS_DIR + "GrassLand/GrassLand11.tscn",
+	"GrassLand12": ROOMS_DIR + "GrassLand/GrassLand12.tscn",
+	"GrassLand13": ROOMS_DIR + "GrassLand/GrassLand13.tscn",
+	"GrassLand14": ROOMS_DIR + "GrassLand/GrassLand14.tscn",
+	"GrassLand15": ROOMS_DIR + "GrassLand/GrassLand15.tscn",
+	"RoomDream10": ROOMS_DIR + "RoomDream10.tscn",
 	
 	"SnowMountain1": ROOMS_DIR + "SnowMountain/SnowMountain1.tscn",
 	"SnowMountain2": ROOMS_DIR + "SnowMountain/SnowMountain2.tscn",

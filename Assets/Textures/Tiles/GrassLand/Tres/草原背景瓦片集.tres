@@ -1,9 +1,9 @@
 [gd_resource type="TileSet" load_steps=3 format=3 uid="uid://ddmqsmr1batw4"]
 
-[ext_resource type="Texture2D" uid="uid://dsrmcf6iyqrkk" path="res://Assets/Textures/Tiles/SnowMountain/雪地背景瓦片1.png" id="2_asipf"]
+[ext_resource type="Texture2D" uid="uid://bc8nqg77t3n3i" path="res://Assets/Textures/Tiles/GrassLand/草原背景瓦片.png" id="1_x8l7a"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nrlf5"]
-texture = ExtResource("2_asipf")
+texture = ExtResource("1_x8l7a")
 0:0/0 = 0
 0:0/0/terrain_set = 0
 0:0/0/terrain = 0
@@ -196,6 +196,18 @@ texture = ExtResource("2_asipf")
 10:4/0/terrain_set = 0
 10:4/0/terrain = 0
 10:4/0/probability = 0.5
+3:0/0 = 0
+5:0/0 = 0
+9:0/0 = 0
+3:1/0 = 0
+5:1/0 = 0
+9:1/0 = 0
+3:2/0 = 0
+5:2/0 = 0
+9:2/0 = 0
+3:4/0 = 0
+5:4/0 = 0
+9:4/0 = 0
 
 [resource]
 terrain_set_0/mode = 2

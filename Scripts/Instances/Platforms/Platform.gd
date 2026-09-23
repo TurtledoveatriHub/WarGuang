@@ -26,7 +26,7 @@ enum SpriteEffect { NONE, FLIP }
 ## 移动通用参数（HurtBox 同款）
 @export_category("移动通用参数")
 ## 移动速度（像素/秒）
-@export var move_speed: float = 100.0
+@export var move_speed: float = 120.0
 ## 终点偏移（相对初始位置）
 @export var end_offset: Vector2 = Vector2(200, 0)
 ## 端点停留时间（秒）
@@ -36,7 +36,7 @@ enum SpriteEffect { NONE, FLIP }
 ## 减速时间（秒）
 @export var deceleration_time: float = 1.0
 ## 精灵视觉效果
-@export var sprite_effect: SpriteEffect = SpriteEffect.FLIP
+@export var sprite_effect: SpriteEffect = SpriteEffect.NONE
 
 
 ## 圆周专用参数

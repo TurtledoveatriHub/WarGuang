@@ -1,8 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://b5jls6ojf2s46"]
+[gd_scene load_steps=8 format=3 uid="uid://b5jls6ojf2s46"]
 
-[ext_resource type="Script" uid="uid://bk48dj574g6b5" path="res://Scripts/UI/MapUI.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://cs6j2183f22mc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景1.png" id="2_1artu"]
-[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆.tres" id="3_1artu"]
+[ext_resource type="Script" uid="uid://bjrd5th63r0w" path="res://Scripts/UI/MapUI.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆1.tres" id="3_1artu"]
 [ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="4_1artu"]
 [ext_resource type="Texture2D" uid="uid://ilccd3mmcucq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置按下纹理.tres" id="5_i1hk5"]
 [ext_resource type="Texture2D" uid="uid://dul5pjyqmngpq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置悬停纹理.tres" id="6_1mtfi"]
@@ -29,11 +28,6 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="MapContainer" type="Node2D" parent="ContentRoot"]
-
-[node name="MapTexture" type="Sprite2D" parent="ContentRoot/MapContainer"]
-modulate = Color(0.27022174, 0.27022198, 0.27022186, 1)
-position = Vector2(609, 291)
-texture = ExtResource("2_1artu")
 
 [node name="PlayerIcon" type="Sprite2D" parent="ContentRoot/MapContainer"]
 position = Vector2(478, 343)

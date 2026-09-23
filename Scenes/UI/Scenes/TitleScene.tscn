@@ -154,18 +154,12 @@ particles_anim_loop = true
 script = ExtResource("1_25ulu")
 settings_scene_resource = ExtResource("2_fkiff")
 title_bgm_stream = ExtResource("3_1p8n3")
-title_shake_duration = null
-title_shake_strength = null
-title_shake_interval = null
-quit_fade_out_duration = null
-fx_bus_path = null
-use_fx_bus = null
-fx_deadline_seconds = null
-lock_swallows_mouse = null
-overlay_pass_through_input = null
 
 [node name="UIFxDirector" type="Node" parent="."]
 script = ExtResource("20_mmaj1")
+debug_log = true
+target_paths = Array[NodePath]([NodePath("../BG"), NodePath("../Title"), NodePath("../TitleB")])
+drift_distance = Vector2(0, -192)
 
 [node name="UILoopAnimator" type="AnimatedSprite2D" parent="." groups=["ui_loop_animator"]]
 z_index = 950
@@ -196,12 +190,12 @@ texture = ExtResource("8_mmaj1")
 
 [node name="MeteorFx" type="GPUParticles2D" parent="."]
 material = SubResource("CanvasItemMaterial_mmaj1")
-position = Vector2(300, 900)
+position = Vector2(160, 900)
 amount = 12
 texture = ExtResource("9_mmaj1")
-lifetime = 1.8
+lifetime = 1.5
 preprocess = 1.0
-visibility_rect = Rect2(-1300, -1100, 4600, 1200)
+visibility_rect = Rect2(-700, -1100, 4200, 1200)
 process_material = ExtResource("10_mjphl")
 
 [node name="BG" type="Sprite2D" parent="."]
@@ -349,11 +343,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AboutAuthor" type="TextureButton" parent="."]
-offset_left = 29.0
-offset_top = 258.0
-offset_right = 97.0
-offset_bottom = 280.0
+offset_left = 63.0
+offset_top = 274.0
+offset_right = 131.0
+offset_bottom = 296.0
 scale = Vector2(2, 2)
+pivot_offset = Vector2(34, 11)
 texture_normal = ExtResource("17_m3y5q")
 texture_pressed = ExtResource("18_mmaj1")
 texture_hover = ExtResource("19_mjphl")
@@ -371,11 +366,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="UpdateNotes" type="TextureButton" parent="."]
-offset_left = 196.0
-offset_top = 258.0
-offset_right = 264.0
-offset_bottom = 280.0
+offset_left = 230.0
+offset_top = 274.0
+offset_right = 298.0
+offset_bottom = 296.0
 scale = Vector2(2, 2)
+pivot_offset = Vector2(34, 11)
 texture_normal = ExtResource("17_m3y5q")
 texture_pressed = ExtResource("18_mmaj1")
 texture_hover = ExtResource("19_mjphl")

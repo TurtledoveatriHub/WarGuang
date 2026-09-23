@@ -1,0 +1,43 @@
+[gd_resource type="ParticleProcessMaterial" load_steps=5 format=3 uid="uid://car7bvmbkqur7"]
+
+[sub_resource type="Curve" id="Curve_klaev"]
+_data = [Vector2(0.021978028, 0.583684), 0.0, 1.321204, 0, 0, Vector2(0.16208792, 0.70523614), 0.0, 0.0, 0, 0, Vector2(0.8571429, 0.3193081), 0.0, 0.0, 0, 0, Vector2(1, 0.32234693), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_ww1fb"]
+curve = SubResource("Curve_klaev")
+
+[sub_resource type="Gradient" id="Gradient_mmaj1"]
+offsets = PackedFloat32Array(0, 0.1, 0.78064513, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 0.37602848, 0.3760285, 0.3760284, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rntas"]
+gradient = SubResource("Gradient_mmaj1")
+
+[resource]
+lifetime_randomness = 0.5
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(400, 50, 0)
+angle_min = -720.0
+angle_max = 720.0
+direction = Vector3(1, 1, 0)
+spread = 180.0
+initial_velocity_min = 60.0
+initial_velocity_max = 420.0
+gravity = Vector3(0, 0, 0)
+linear_accel_min = -120.0
+linear_accel_max = 119.99999
+radial_accel_min = -120.0
+radial_accel_max = 119.99999
+tangential_accel_min = -120.0
+tangential_accel_max = 119.99999
+damping_max = 25.000002
+scale_min = 0.099999994
+color_ramp = SubResource("GradientTexture1D_rntas")
+hue_variation_min = -1.0
+hue_variation_max = -0.5
+anim_speed_min = 3.0
+anim_speed_max = 12.0
+anim_offset_max = 1.0
+anim_offset_curve = SubResource("CurveTexture_ww1fb")

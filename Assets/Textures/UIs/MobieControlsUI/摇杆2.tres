@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://d25qqy4l3uw55"]
+
+[ext_resource type="Texture2D" uid="uid://cc8opuk6rp52x" path="res://Assets/Textures/UIs/MobieControlsUI/移动按键图.png" id="1_xdvux"]
+
+[resource]
+atlas = ExtResource("1_xdvux")
+region = Rect2(18, 0, 38, 38)

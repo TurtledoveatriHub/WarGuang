@@ -22,9 +22,9 @@
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="15_nouxh"]
 [ext_resource type="PackedScene" uid="uid://djjlaharmqnms" path="res://Scenes/Instances/Platforms/BreakableIcePlatform.tscn" id="16_nuo8m"]
 [ext_resource type="PackedScene" uid="uid://ba0eej1ktxrbm" path="res://Scenes/Instances/HurtBoxs/IceSpike.tscn" id="17_8ssuy"]
-[ext_resource type="PackedScene" uid="uid://bv4un04ljd8ix" path="res://Scenes/Enemys/Snowman.tscn" id="19_q00c4"]
-[ext_resource type="PackedScene" uid="uid://dlv8b3hprlwy" path="res://Scenes/Enemys/SnowBird.tscn" id="20_q4kib"]
-[ext_resource type="PackedScene" uid="uid://dj33j0wqfbh6n" path="res://Scenes/Enemys/SacredBird.tscn" id="21_jxq8l"]
+[ext_resource type="PackedScene" uid="uid://bv4un04ljd8ix" path="res://Scenes/Entities/Enemys/Snowman.tscn" id="19_q00c4"]
+[ext_resource type="PackedScene" uid="uid://dlv8b3hprlwy" path="res://Scenes/Entities/Enemys/SnowBird.tscn" id="20_q4kib"]
+[ext_resource type="PackedScene" uid="uid://dj33j0wqfbh6n" path="res://Scenes/Entities/Enemys/SacredBird.tscn" id="21_jxq8l"]
 [ext_resource type="PackedScene" uid="uid://cbxsbnigsn8l2" path="res://Scenes/Instances/Props/TeleportPoint.tscn" id="23_q1rpw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]

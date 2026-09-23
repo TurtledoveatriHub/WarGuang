@@ -180,12 +180,6 @@ func _apply_layout_from_config(animate_mode: bool = false) -> void:
 	# 统一应用不透明度 + 大小，并按当前移动方案切换摇杆/十字键。
 	_apply_move_mode(animate_mode)
 
-func _default_layout() -> Dictionary:
-	# 已废弃：以前这里写死了一套坐标（含摇杆/摇杆球），会盖掉编辑器里的摆放。
-	# 现在一律以「配置文件 → 否则本场景节点位置」（见 _collect_scene_positions）为准，
-	# 所以这里返回空字典：没有任何键时不会覆盖任何节点。
-	return {}
-
 func _set_visible_state(show_state: bool) -> void:
 	# 设置 HUD 可见性，并执行淡入淡出。
 	if not _root:

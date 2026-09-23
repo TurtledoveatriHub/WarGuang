@@ -7,7 +7,7 @@ class_name TextArea
 @export var size: Vector2 = Vector2(320, 320) : set = set_size
 
 ## 参考颜色（仅编辑器可见）
-@export var debug_color: Color = Color.from_rgba8(0, 200, 50, 35)
+@export var debug_color: Color = Color.from_rgba8(0, 188, 209, 80)
 
 ## 运行时是否可见（默认 false，只在编辑器显示）
 @export var show_in_game: bool = false

@@ -148,7 +148,7 @@ func _load_from_save():
 		await get_tree().process_frame
 		var target_room_id := Global.last_save_room
 		if target_room_id == "":
-			target_room_id = "Room1"
+			target_room_id = "GrassLand1"
 		if the_player.has_method("sync_room_and_camera_for_respawn"):
 			await the_player.sync_room_and_camera_for_respawn(target_room_id, true)
 			await get_tree().process_frame

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bs7ste1w61ecf" path="res://Scripts/Player/PlayerUI/PlayerUI.gd" id="1_uyejk"]
 [ext_resource type="PackedScene" uid="uid://ti5ndmbw2337" path="res://Scenes/UI/Scenes/GameSettingScene.tscn" id="3_dk7d2"]
-[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆.tres" id="4_iuhd6"]
+[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆1.tres" id="4_iuhd6"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="4_ruvwe"]
 [ext_resource type="PackedScene" uid="uid://h0kyvxadfyys" path="res://Scenes/Player/PlayerUI/HealthUnit.tscn" id="5_27bup"]
 [ext_resource type="Texture2D" uid="uid://dh3o6v2fippdq" path="res://Assets/Textures/UIs/MobieControlsUI/超级冲刺2.tres" id="5_iuhd6"]

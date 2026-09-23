@@ -1,22 +1,32 @@
 extends TileMapLayer
 
-## 默认伤害类型（0=普通，1=阴影）
+## ── 默认伤害属性 ──
+## 默认伤害类型（0=普通，1=阴影；仅当格子没写 dmg_type 自定义数据时生效）
 @export var default_damage_type: int = 0
-## 默认是否传送伤害
+## 默认是否传送伤害（仅当格子没写 is_warp 自定义数据时生效）
 @export var default_is_warp: bool = false
-## ★ 对 player 的击退力（Vector2统一参数）
-@export var player_knockback: Vector2 = Vector2(30, 50)
-## ★ 对 Layer8 敌人的击退力（Vector2统一参数）
-@export var enemy_knockback: Vector2 = Vector2(100, 100)
-## 伤害冷却间隔（秒）
+
+## ── 击退力（仅作为“格子没有 knockback 自定义数据”时的默认值）──
+## 对 player 的击退力：X=水平、Y=垂直，取绝对值作为幅度，
+## 方向由“伤害格中心 → 受击者”推导（站在格子上方会被向上弹）。
+@export var player_knockback: Vector2 = Vector2(200, 500)
+## 对 Layer8 敌人的击退力：同样取绝对值，方向由“伤害格中心 → 敌人”推导。
+## 注意：敌人没有“按格子覆盖”的逻辑，一律使用这个值。
+@export var enemy_knockback: Vector2 = Vector2(100, 200)
+## 同一受击者的伤害冷却间隔（秒），防止一帧内重复结算
 @export var damage_cooldown_time: float = 0.2
 
-## 对 Layer8 敌人的伤害值（不区分伤害类型）
+## 对 Layer8 敌人的伤害值（不区分伤害类型；玩家伤害由 dmg_type 决定：普通 1、阴影 2）
 @export var enemy_damage: int = 1
 
-## 自定义数据层名称（需与 TileSet 编辑器中完全一致）
+## ── TileSet 自定义数据层名称（必须与 TileSet 编辑器里的层名完全一致）──
+## 伤害类型数据层名（0=普通，1=阴影）
 @export var data_damage_type: String = "dmg_type"
+## 是否传送伤害数据层名（true/false）
 @export var data_is_warp: String = "is_warp"
+## 击退力数据层名（Vector2）。
+## ★ 优先级：格子若写了该数据 → 该格子用它；没写 → 用 player_knockback（玩家）。
+##   也就是说 data_knockback 指的是“取值的层名”，真正生效的是“层里有值的那个格子”。
 @export var data_knockback: String = "knockback"
 
 var _hurt_area: Area2D

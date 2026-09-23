@@ -1,7 +1,7 @@
 [gd_resource type="ParticleProcessMaterial" load_steps=3 format=3 uid="uid://phy0qo6fkhl8"]
 
 [sub_resource type="Gradient" id="Gradient_mmaj1"]
-offsets = PackedFloat32Array(0, 0.1, 0.7, 1)
+offsets = PackedFloat32Array(0, 0.07096774, 0.83548385, 1)
 colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_rntas"]
@@ -10,17 +10,17 @@ gradient = SubResource("Gradient_mmaj1")
 [resource]
 particle_flag_disable_z = true
 emission_shape = 3
-emission_box_extents = Vector3(1000, 64, 0)
-direction = Vector3(0.7, -0.7, 0)
-spread = 5.0
-initial_velocity_min = 540.0
+emission_box_extents = Vector3(1000, 50, 0)
+direction = Vector3(0.5, -0.5, 0)
+spread = 0.0
+initial_velocity_min = 420.0
 initial_velocity_max = 960.0
-linear_accel_min = 240.0
-linear_accel_max = 480.0
+gravity = Vector3(0, 0, 0)
+linear_accel_min = 420.0
+linear_accel_max = 960.0
 scale_max = 2.5
-scale_over_velocity_max = 2.5
 color_ramp = SubResource("GradientTexture1D_rntas")
 hue_variation_min = -2.2351742e-08
-hue_variation_max = 0.019999977
+hue_variation_max = 0.029999977
 anim_speed_min = 6.0
 anim_speed_max = 12.0

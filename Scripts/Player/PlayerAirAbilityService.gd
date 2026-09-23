@@ -54,20 +54,27 @@ static func try_double_jump(player: Node, jump_just_pressed: bool) -> bool:
 	return false
 
 static func handle_jump2_rotation(player: Node, fixed_delta: float) -> void:
+	# 二段跳按住时的整圈旋转（原有行为）
 	if player.current_animation == "JUMP2" and player.has_double_jumped and player.is_double_jump_holding:
 		player.jump2_rotation += player.jump2_rotation_speed * fixed_delta
 		player.animated_sprite.rotation_degrees = fmod(player.jump2_rotation, 360)
-	elif player.current_state == player.PlayerState.DASH and player.dash_locked_vector.y != 0:
-		# 垂直冲刺纹理旋转：朝右时向上-90°/向下+90°，朝左时反转（因 flip_h 镜像）。
-		var is_flipped: bool = player.animated_sprite.flip_h
-		if player.dash_locked_vector.y < 0:
-			player.animated_sprite.rotation_degrees = -90.0 if not is_flipped else 90.0
-		else:
-			player.animated_sprite.rotation_degrees = 90.0 if not is_flipped else -90.0
-	else:
-		if player.animated_sprite.rotation_degrees != 0:
-			player.animated_sprite.rotation_degrees = 0
-			player.jump2_rotation = 0
+		return
+
+	# 垂直冲刺纹理旋转：朝右时向上 -90°、向下 +90°；朝左时取反（flip_h 镜像）
+	var target_degrees: float = 0.0
+	if player.current_state == player.PlayerState.DASH and player.dash_locked_vector.y != 0:
+		target_degrees = -90.0 if player.dash_locked_vector.y < 0 else 90.0
+		if player.animated_sprite.flip_h:
+			target_degrees = -target_degrees
+	# 不旋转期间把二段跳旋转累加器对齐到当前角度，
+	# 避免冲刺打断二段跳旋转后，切回 JUMP2 时从旧累加值瞬间跳到别的角度。
+	player.jump2_rotation = target_degrees
+	if not is_equal_approx(player.animated_sprite.rotation_degrees, target_degrees):
+		player.animated_sprite.rotation_degrees = target_degrees
+		# 本项目开启了物理插值（common/physics_interpolation=true）：
+		# 纹理角度是瞬间跳变的，必须重置插值，否则渲染会用上一物理帧的角度插值过来，
+		# 在冲刺开始 / 冲刺结束那一帧显示出“只转了一半”的斜角。
+		player.animated_sprite.reset_physics_interpolation()
 
 ## 尝试把离墙后的短缓冲跳跃结算为墙跳。
 static func try_wall_jump_from_escape_buffer(player: Node, jump_just_pressed: bool) -> bool:

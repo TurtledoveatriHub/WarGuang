@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://diylsfmb0ckg5"]
 
 [ext_resource type="Script" uid="uid://x3hbxtwnrr30" path="res://Scripts/UI/TeleportPanel.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/Room3/2.png" id="2_juc85"]
+[ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/WindValley/2.png" id="2_juc85"]
 [ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="3_juc85"]
 [ext_resource type="Texture2D" uid="uid://ilccd3mmcucq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置按下纹理.tres" id="4_q6nrd"]
 [ext_resource type="Texture2D" uid="uid://dul5pjyqmngpq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置悬停纹理.tres" id="5_7prjw"]

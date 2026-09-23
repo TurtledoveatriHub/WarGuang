@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://djq7wirgbw64u" path="res://Assets/Textures/UIs/存档1.tres" id="2_nryg2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tbx8o"]
-size = Vector2(640, 384)
+size = Vector2(360, 256)
 
 [node name="CameraFocusBeacon" type="Area2D"]
 script = ExtResource("1_script")
@@ -15,11 +15,11 @@ max_focus_offset = 320.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(0.25, 0.85, 1, 0.7)
-scale = Vector2(4, 4)
+scale = Vector2(2, 2)
 texture = ExtResource("2_nryg2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -36)
+position = Vector2(0, -16)
 shape = SubResource("RectangleShape2D_tbx8o")
 
 [node name="FocusTarget" type="Marker2D" parent="."]

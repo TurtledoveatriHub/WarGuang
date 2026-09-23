@@ -83,14 +83,14 @@ extends Node
 ## 没有计数器、没有代次号，所以**不存在「批次被取代后计数涓漏导致 busy 永远为真」的可能**。
 var _enter_deadline_ms: int = 0
 var _exit_deadline_ms: int = 0
-## 过渡轨道缓存（按场景根缓存，避免每次都全树扫描）。
-var _transition_cache: Node = null
-
 ## 过渡目标（解析后的节点）及其编辑器基态。
 var _targets: Array[CanvasItem] = []
 var _init_modulates: Array[Color] = []
 var _init_positions: Array[Vector2] = []
 var _init_scales: Array[Vector2] = []
+## 每个目标是否允许位移补间：父节点是 Container 时不允许
+## （容器重排会覆盖 position，且 Godot 会对「向容器子节点写 position」报错）。
+var _target_allows_drift: Array[bool] = []
 ## 位移/缩放 Tween 与淡化 Tween（分开，避免同一属性在一条 Tween 里重复补间）。
 var _transition_tween: Tween = null
 var _transition_fade_tween: Tween = null
@@ -165,11 +165,7 @@ func prepare_enter(root: Node = null) -> void:
 			if comp.has_method("prepare_enter"):
 				comp.call("prepare_enter")
 	if drive_transition:
-		var transition: Node = find_transition(root)
-		if transition != null and transition.has_method("prepare_enter_transition"):
-			transition.call("prepare_enter_transition")
-		elif transition == null:
-			prepare_enter_transition()
+		prepare_enter_transition()
 	_enter_deadline_ms = 0
 
 
@@ -190,34 +186,12 @@ func collect_components(root: Node = null) -> Array[Node]:
 	# 互斥：同一个节点不能同时被「过渡轨道」和「组件轨道」驱动 ——
 	# 两套 Tween 同时写 scale/position/modulate 会互相覆盖（表现为抖动、位移叠加）。
 	# 这类节点默认交给过渡轨道，从组件列表里移除。
-	var transition: Node = find_transition(actual_root)
-	if transition != null and transition.has_method("get_transition_targets"):
-		var targets: Variant = transition.call("get_transition_targets")
-		if targets is Array:
-			for t in targets:
-				if found.has(t):
-					found.erase(t)
-					if debug_log:
-						print("[UIFxDirector] 跳过同时参与过渡轨道的组件：%s" % t.name)
-	elif transition == null:
-		# 旧节点不存在时，用总线自己的过渡目标做同样的互斥
-		for t in _targets:
-			if found.has(t):
-				found.erase(t)
-				if debug_log:
-					print("[UIFxDirector] 跳过同时参与过渡轨道的组件：%s" % t.name)
+	for t in _targets:
+		if found.has(t):
+			found.erase(t)
+			if debug_log:
+				print("[UIFxDirector] 跳过同时参与过渡轨道的组件：%s" % t.name)
 	return found
-
-
-## 本页面内的过渡动画器（鸭子类型：有 play_enter_transition / play_exit_transition）。
-func find_transition(root: Node = null) -> Node:
-	if _transition_cache != null and is_instance_valid(_transition_cache):
-		return _transition_cache
-	var actual_root: Node = root if root != null else get_parent()
-	if actual_root == null:
-		return null
-	_transition_cache = _find_by_method(actual_root, ["play_enter_transition", "play_exit_transition"])
-	return _transition_cache
 
 
 ## 本页面内的常态循环动画器（递归扫描、不依赖节点名）。
@@ -292,7 +266,8 @@ func play_enter_transition(delay: float = 0.0) -> void:
 	for i in _targets.size():
 		var target: CanvasItem = _targets[i]
 		_transition_tween.parallel().tween_property(target, "scale", _init_scales[i], settle_duration)
-		_transition_tween.parallel().tween_property(target, "position", _init_positions[i], settle_duration)
+		if _target_allows_drift[i]:
+			_transition_tween.parallel().tween_property(target, "position", _init_positions[i], settle_duration)
 	await _transition_tween.finished
 
 
@@ -325,12 +300,45 @@ func play_exit_transition(delay: float = 0.0) -> void:
 	_transition_tween.chain()
 	for i in _targets.size():
 		var target: CanvasItem = _targets[i]
-		_transition_tween.parallel().tween_property(target, "position", _init_positions[i] + drift_distance, vanish_duration)
+		if _target_allows_drift[i]:
+			_transition_tween.parallel().tween_property(target, "position", _init_positions[i] + drift_distance, vanish_duration)
 		_transition_tween.parallel().tween_property(target, "scale", Vector2.ZERO, vanish_duration)
 	await _transition_tween.finished
 
 
 # ──────────────── 过渡轨道：内部 ────────────────
+
+## 让单个节点单独播一次入场（不改动其它目标，也不影响 total 计时）。
+## 用途：某些节点是「需要时才出现」的 —— 例如对话的选项菜单不能跟整页入场一起播，
+## 在它出现的那一刻调这个即可。
+func play_single_enter(target: CanvasItem, duration: float = -1.0) -> void:
+	if target == null or not is_instance_valid(target):
+		return
+	var total: float = duration if duration > 0.0 else enter_duration
+	var base_modulate: Color = target.modulate
+	var base_scale: Vector2 = target.scale
+	var base_pos: Vector2 = target.position
+	var allow_drift: bool = not (target is Control and target.get_parent() is Container)
+	target.modulate = Color(base_modulate.r, base_modulate.g, base_modulate.b, 0.0)
+	target.scale = Vector2.ZERO
+	if allow_drift:
+		target.position = base_pos + drift_distance
+	var peak_duration: float = maxf(0.01, total * enter_peak_phase_ratio)
+	var hold_duration: float = minf(maxf(0.0, enter_peak_hold_duration), maxf(0.0, total - peak_duration - 0.01))
+	var settle_duration: float = maxf(0.01, total - peak_duration - hold_duration)
+	var fade_duration: float = _fade_duration(total, enter_fade_ratio)
+	var fade: Tween = create_tween()
+	fade.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	fade.tween_property(target, "modulate:a", base_modulate.a, fade_duration)
+	var tween: Tween = create_tween()
+	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(target, "scale", base_scale * peak_scale_multiplier, peak_duration)
+	if hold_duration > 0.0:
+		tween.tween_interval(hold_duration)
+	tween.tween_property(target, "scale", base_scale, settle_duration)
+	if allow_drift:
+		tween.parallel().tween_property(target, "position", base_pos, settle_duration)
+
 
 ## 把「占总时长比例」换算成秒（至少一帧）。
 func _fade_duration(total_duration: float, ratio: float) -> float:
@@ -351,7 +359,8 @@ func _apply_transition_enter_start_state() -> void:
 		var target: CanvasItem = _targets[i]
 		var base_color: Color = _init_modulates[i]
 		target.modulate = Color(base_color.r, base_color.g, base_color.b, 0.0)
-		target.position = _init_positions[i] + drift_distance
+		if _target_allows_drift[i]:
+			target.position = _init_positions[i] + drift_distance
 		# 入场从「零缩放」长到峰值（与退场严格对称）
 		target.scale = Vector2.ZERO
 
@@ -369,9 +378,9 @@ func _cache_targets() -> void:
 		_init_modulates.append(target.modulate)
 		_init_positions.append(target.position)
 		_init_scales.append(target.scale)
-		# 常见坑：目标是 Container 的子节点时，容器重排会覆盖本轨道写入的 position。
-		if target is Control and target.get_parent() is Container:
-			push_warning("UIFxDirector: 过渡目标「%s」的父节点是 Container（%s）——容器重排会覆盖位移补间，建议只让它参与淡化/缩放。" % [target.name, target.get_parent().name])
+		# 父节点是 Container 的目标只做淡化/缩放：容器重排会覆盖 position，
+		# 而且对容器子节点写 position 会被 Godot 直接报错。
+		_target_allows_drift.append(not (target is Control and target.get_parent() is Container))
 
 
 func _resolve_target(path: NodePath) -> CanvasItem:
@@ -403,6 +412,8 @@ func _fire_components(comps: Array[Node], kind: String) -> float:
 		var comp_duration: float = 0.0
 		if comp.has_method("get_fx_duration"):
 			comp_duration = float(comp.call("get_fx_duration", kind))
+		if debug_log:
+			print("    · %s 延时 %.3fs 时长 %.3fs" % [comp.name, delay, comp_duration])
 		total = maxf(total, delay + comp_duration)
 	if debug_log:
 		print("[UIFxDirector] %s：%d 个组件，总时长 %.3fs" % [kind, ordered.size(), total])
@@ -412,23 +423,10 @@ func _fire_components(comps: Array[Node], kind: String) -> float:
 ## 触发过渡轨道并返回它的时长。
 ## 不 await Tween.finished：被 kill 的 Tween 不发 finished，中途一旦有人 reset_state()
 ## 就会永久卡住（这正是过去「按钮点不动」的根因之一）。
-func _fire_transition(root: Node, kind: String) -> float:
-	var delay: float = transition_enter_delay if kind == "enter" else transition_exit_delay
-	# 兼容：场景里还留着旧的 UITransitionAnimator 节点时，优先交给它驱动。
-	var legacy: Node = find_transition(root)
-	if legacy != null:
-		var method: String = "play_enter_transition" if kind == "enter" else "play_exit_transition"
-		if legacy.has_method(method):
-			legacy.call(method, delay)
-		var legacy_duration: float = 0.0
-		var legacy_value: Variant = legacy.get("enter_duration" if kind == "enter" else "exit_duration")
-		if _is_number(legacy_value):
-			legacy_duration = float(legacy_value)
-		if debug_log:
-			print("[UIFxDirector] 过渡轨道（旧节点 %s）%s：延时 %.3fs 时长 %.3fs" % [legacy.name, kind, delay, legacy_duration])
-		return delay + legacy_duration
+func _fire_transition(_root: Node, kind: String) -> float:
 	if _targets.is_empty():
 		return 0.0
+	var delay: float = transition_enter_delay if kind == "enter" else transition_exit_delay
 	if kind == "enter":
 		play_enter_transition(delay)
 	else:
@@ -461,24 +459,11 @@ func _compute_total(kind: String, comps: Array[Node]) -> float:
 		if comp.has_method("get_fx_duration"):
 			duration = float(comp.call("get_fx_duration", kind))
 		longest = maxf(longest, first_delay + float(i) * stagger + duration)
-	if drive_transition:
-		var transition: Node = find_transition()
-		if transition != null:
-			var value: Variant = transition.get("enter_duration" if kind == "enter" else "exit_duration")
-			if _is_number(value):
-				var transition_delay: float = transition_enter_delay if kind == "enter" else transition_exit_delay
-				longest = maxf(longest, float(value) + transition_delay)
-		elif not _targets.is_empty():
-			var own: float = enter_duration if kind == "enter" else exit_duration
-			var own_delay: float = transition_enter_delay if kind == "enter" else transition_exit_delay
-			longest = maxf(longest, own + own_delay)
+	if drive_transition and not _targets.is_empty():
+		var own: float = enter_duration if kind == "enter" else exit_duration
+		var own_delay: float = transition_enter_delay if kind == "enter" else transition_exit_delay
+		longest = maxf(longest, own + own_delay)
 	return longest
-
-
-## Variant 是否为数字（属性存在性未知时用它代替 `x is float`，避免类型判断失效）。
-func _is_number(value: Variant) -> bool:
-	var t: int = typeof(value)
-	return t == TYPE_FLOAT or t == TYPE_INT
 
 
 func _collect_recursive(node: Node, acc: Array[Node]) -> void:
@@ -509,20 +494,3 @@ func _is_fx_component(node: Node) -> bool:
 	if managed != null and not bool(managed):
 		return false
 	return true
-
-
-func _find_by_method(node: Node, methods: Array) -> Node:
-	for child in node.get_children():
-		if child == self:
-			continue
-		var all_present: bool = true
-		for m in methods:
-			if not child.has_method(m):
-				all_present = false
-				break
-		if all_present:
-			return child
-		var found: Node = _find_by_method(child, methods)
-		if found != null:
-			return found
-	return null

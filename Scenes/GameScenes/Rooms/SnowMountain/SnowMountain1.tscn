@@ -134,7 +134,7 @@ target_room_id = "Room1"
 [node name="4sm1" parent="Doors" instance=ExtResource("12_yffrf")]
 position = Vector2(-1320, 544)
 door_id = "4sm1"
-target_room_id = "Room4"
+target_room_id = "SuperMario2"
 
 [node name="sm1sm2" parent="Doors" instance=ExtResource("12_yffrf")]
 position = Vector2(1320, -160)

@@ -1,0 +1,65 @@
+[gd_scene load_steps=9 format=3 uid="uid://bywk00ct1ifc2"]
+
+[ext_resource type="Script" path="res://Scripts/Instances/Props/MechanismPlatform.gd" id="1_gate"]
+[ext_resource type="Texture2D" uid="uid://ce1ofa5fn1tnl" path="res://Assets/Textures/Instances/GrassLand/石块.png" id="2_txfwg"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_imi58"]
+atlas = ExtResource("2_txfwg")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ey7l8"]
+atlas = ExtResource("2_txfwg")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gp3a8"]
+atlas = ExtResource("2_txfwg")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ng0ap"]
+atlas = ExtResource("2_txfwg")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bxywi"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_imi58")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ey7l8")
+}],
+"loop": false,
+"name": &"OFF",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gp3a8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ng0ap")
+}],
+"loop": true,
+"name": &"ON",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate"]
+size = Vector2(28, 28)
+
+[node name="MechanismPlatform" type="Node2D"]
+script = ExtResource("1_gate")
+open_offset = Vector2(256, 0)
+move_speed = 120.0
+disable_collision_when_open = false
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_bxywi")
+animation = &"OFF"
+
+[node name="Body" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body"]
+shape = SubResource("RectangleShape2D_gate")

@@ -7,6 +7,8 @@ signal player_health_changed(new_health)
 signal player_max_health_changed(new_max_health)
 signal coins_changed(new_amount)
 signal coins_changing(old_amount, new_amount, duration)  # 钱币变化动画信号
+## 开关存档状态变化（存档加载后通知场景内已有开关刷新）
+signal switch_states_changed()
 
 ## 玩家数据
 var player_max_health: int = 3
@@ -38,6 +40,9 @@ var destructible_walls_destroyed: Array = []
 # 已被永久触发的“隐藏房间/隐藏背景”记录（元素为 region_id，形如 room_id::层名 或自定义 save_id）
 # 仅 permanent_hide=true 的 HiddenRegionFade 在完成淡出后登记，随存档读写。
 var hidden_rooms_activated: Array = []
+
+# 机关开关持久化状态（switch_id -> bool），随存档读写
+var switch_states: Dictionary = {}
 
 ## 疯子挑战状态记录
 
@@ -109,7 +114,7 @@ var played_cinematic_flags: Dictionary = {}
 var total_play_time_seconds: int = 0
 var _play_time_session_start_ms: int = -1
 
-var last_save_room: String = "Room1"  # 最后存档的房间
+var last_save_room: String = "GrassLand1"  # 最后存档的房间
 
 # 初始化新游戏（创建新存档时调用）
 func initialize_new_game():
@@ -118,7 +123,7 @@ func initialize_new_game():
 	player_max_health = 3
 	player_current_health = 3
 	player_coins = 0
-	last_save_room = "Room1"
+	last_save_room = "GrassLand1"
 	total_play_time_seconds = 0
 	_play_time_session_start_ms = -1
 	played_cinematic_flags = {}
@@ -164,6 +169,10 @@ func initialize_new_game():
 	last_checkpoint_type = "static"
 	hidden_rooms_activated = []
 	
+	# 清空地图探索状态（已绘制 / 待绘制房间）
+	if MapManager and MapManager.has_method("reset_state"):
+		MapManager.reset_state()
+	
 	var task_manager = get_node_or_null("/root/TaskManager")
 	if task_manager:
 		task_manager.npc_interactions.clear()
@@ -196,6 +205,23 @@ func consume_boot_cinematic_request() -> Dictionary:
 func clear_boot_cinematic_request() -> void:
 	pending_boot_cinematic_id = &""
 	pending_boot_cinematic_payload = {}
+
+## 记录一个开关的持久状态（供 Switch 调用）
+func set_switch_state(id: String, value: bool) -> void:
+	if id == "":
+		return
+	switch_states[id] = value
+
+
+## 是否存在该开关的存档状态
+func has_switch_state(id: String) -> bool:
+	return switch_states.has(id)
+
+
+## 读取开关存档状态（不存在返回 false）
+func get_switch_state(id: String) -> bool:
+	return bool(switch_states.get(id, false))
+
 
 # 保存游戏数据
 func get_save_data() -> Dictionary:
@@ -252,7 +278,9 @@ func get_save_data() -> Dictionary:
 		
 		"destructible_walls_destroyed": destructible_walls_destroyed.duplicate(true),
 		"hidden_rooms_activated": hidden_rooms_activated.duplicate(),
-		"discovered_rooms": MapManager.discovered_rooms.duplicate() if MapManager else [],
+		"switch_states": switch_states.duplicate(true),
+		"painted_rooms": MapManager.painted_rooms.duplicate() if MapManager else [],
+		"pending_rooms": MapManager.pending_rooms.duplicate() if MapManager else [],
 		"activated_teleports": TeleportManager.activated.duplicate() if TeleportManager else [],
 		"tp_coords": TeleportManager.get_save_coords() if TeleportManager and TeleportManager.has_method("get_save_coords") else {},
 		"played_cinematic_flags": played_cinematic_flags.duplicate(true),
@@ -411,7 +439,15 @@ func load_save_data(data: Dictionary):
 		hidden_rooms_activated = data["hidden_rooms_activated"].duplicate()
 	else:
 		hidden_rooms_activated = []
-	
+
+	# 机关开关持久化状态（switch_id -> bool）
+	if data.has("switch_states") and typeof(data["switch_states"]) == TYPE_DICTIONARY:
+		switch_states = data["switch_states"].duplicate(true)
+	else:
+		switch_states = {}
+	# 通知场景内已存在的开关立即刷新状态
+	switch_states_changed.emit()
+
 	print("Global: 存档数据加载完成")
 
 

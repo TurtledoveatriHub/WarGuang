@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://8fgwvc0o8k5q"]
+[gd_scene load_steps=13 format=3 uid="uid://8fgwvc0o8k5q"]
 
 [ext_resource type="Script" uid="uid://jolprxfg3rym" path="res://Scripts/UI/BootCutscene.gd" id="1_2u0jc"]
 [ext_resource type="Texture2D" uid="uid://c06cr3f3ip0ci" path="res://Assets/Textures/开场动画测试.png" id="2_bh5cf"]
@@ -39,22 +39,6 @@ region = Rect2(256, 144, 256, 144)
 atlas = ExtResource("2_bh5cf")
 region = Rect2(512, 144, 256, 144)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_k3p4t"]
-atlas = ExtResource("2_bh5cf")
-region = Rect2(1024, 144, 256, 144)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_l43bc"]
-atlas = ExtResource("2_bh5cf")
-region = Rect2(1280, 144, 256, 144)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_uqqy2"]
-atlas = ExtResource("2_bh5cf")
-region = Rect2(0, 288, 256, 144)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2nmb3"]
-atlas = ExtResource("2_bh5cf")
-region = Rect2(256, 288, 256, 144)
-
 [sub_resource type="SpriteFrames" id="SpriteFrames_bh5cf"]
 animations = [{
 "frames": [{
@@ -84,25 +68,10 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_6jk8g")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_k3p4t")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_k3p4t")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_l43bc")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_uqqy2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_2nmb3")
 }],
 "loop": false,
 "name": &"intro",
-"speed": 12.0
+"speed": 6.0
 }]
 
 [node name="BootCutscene" type="CanvasLayer"]
@@ -116,7 +85,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(1, 1, 1, 0)
+color = Color(0, 0, 0, 1)
 
 [node name="CutsceneSprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(640, 360)

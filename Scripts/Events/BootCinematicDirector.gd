@@ -15,6 +15,17 @@ enum IntroStepType {
 	BLACK_HOLD
 }
 
+# 调试：逐帧打印掉落期间的玩家/相机位置与缩放（定位突然位移来源；默认关闭）。
+@export var debug_drop_camera: bool = false
+# 掉落期间被接管的 PhantomCameraHost（相机改由本导演直接控制）。
+var _drop_camera_host: Node = null
+# 接管前 PhantomCameraHost 是否处于 process。
+var _drop_host_process_backup: bool = false
+# 接管前 PhantomCameraHost 是否处于 physics_process。
+var _drop_host_physics_backup: bool = false
+# 是否已接管相机。
+var _drop_camera_taken_over: bool = false
+
 @export_category("Unified Event Timing")
 ## 所有事件步骤（TEXT/VISUAL/BLACK_HOLD）的统一淡入淡出时长（秒）。
 @export var unified_step_fade_duration: float = 0.3
@@ -310,7 +321,15 @@ func _run_drop_motion_flow() -> void:
 			break
 		if is_instance_valid(_camera_controller) and _camera_controller.has_method("physics_process"):
 			_camera_controller.physics_process(1.0 / maxf(float(Engine.physics_ticks_per_second), 30.0))
-		if _manual_drop_step(drop_speed):
+		var drop_stepped: bool = _manual_drop_step(drop_speed)
+		# 接管期间由本导演逐帧直接写相机位置（与玩家中心对齐）。
+		# 写在本帧推进之后，避免相机固定滞后一帧（下落速度 6px/帧）。
+		# PhantomCameraHost 已停用，这里写入的位置不会再被覆盖。
+		if _drop_camera_taken_over and is_instance_valid(_camera_2d) and is_instance_valid(_player):
+			_camera_2d.global_position = _player.global_position
+		if debug_drop_camera:
+			_debug_print_drop_frame()
+		if drop_stepped:
 			landed = true
 			break
 		if drop_elapsed >= DROP_FLOW_TIMEOUT_SECONDS:
@@ -491,6 +510,40 @@ func _enter_cinematic_control_mode() -> void:
 		# 维持较小 dead-zone 以保证掉落中相机持续跟随玩家中心附近。
 		_phantom_camera.dead_zone_width = 0.05
 		_phantom_camera.dead_zone_height = 0.05
+	# 接管相机：掉落期间停用 PhantomCameraHost，由本导演逐帧直接写相机位置。
+	# 原因（日志已证实）：PCam2D 的跟随阻尼在匀速下落中会累积出固定滞后
+	# （实测 cam 比 phantom 落后 33px），阻尼状态一旦被重置，它会在单帧内把滞后量全部吐出 ——
+	# 这就是“下落期间相机突然位移”的来源。相机改由导演直接写位置后，不再有滞后与重置。
+	_take_over_camera_host()
+
+## 接管相机：停用 PhantomCameraHost，改由本导演逐帧写相机位置。
+func _take_over_camera_host() -> void:
+	if _drop_camera_taken_over or not is_instance_valid(_camera_2d):
+		return
+	_drop_camera_host = _camera_2d.get_node_or_null("PhantomCameraHost")
+	if not is_instance_valid(_drop_camera_host):
+		return
+	_drop_host_process_backup = _drop_camera_host.is_processing()
+	_drop_host_physics_backup = _drop_camera_host.is_physics_processing()
+	_drop_camera_host.set_process(false)
+	_drop_camera_host.set_physics_process(false)
+	# 清掉噪声等残留偏移，避免导演写入的位置被叠加偏移
+	_camera_2d.offset = Vector2.ZERO
+	_drop_camera_taken_over = true
+
+## 交还相机：恢复 PhantomCameraHost，并让它瞬间对齐到当前跟随目标（跳过阻尼）。
+func _release_camera_host() -> void:
+	if not _drop_camera_taken_over:
+		return
+	if is_instance_valid(_drop_camera_host):
+		_drop_camera_host.set_process(_drop_host_process_backup)
+		_drop_camera_host.set_physics_process(_drop_host_physics_backup)
+	_drop_camera_host = null
+	_drop_camera_taken_over = false
+	# teleport_position() 会清空阻尼速度与 framed 偏移量并把相机瞬间对齐，
+	# 避免接管结束那一帧被残留的阻尼/偏移推一下。
+	if is_instance_valid(_phantom_camera) and _phantom_camera.has_method("teleport_position"):
+		_phantom_camera.teleport_position()
 
 ## 恢复玩家运行态开关。
 func _restore_player_runtime_switches() -> void:
@@ -508,6 +561,24 @@ func _restore_camera_behavior() -> void:
 		_phantom_camera.dead_zone_width = _drop_dead_zone_backup.x
 		_phantom_camera.dead_zone_height = _drop_dead_zone_backup.y
 	_drop_dead_zone_backup_valid = false
+	# 交还相机控制权（恢复 PhantomCameraHost 并瞬间对齐）
+	_release_camera_host()
+
+## 调试：逐帧打印“掉落 + 缩放”期间的玩家/相机位置与缩放，用于定位突然位移到底来自谁。
+func _debug_print_drop_frame() -> void:
+	var player_pos: Vector2 = _player.global_position if is_instance_valid(_player) else Vector2.ZERO
+	var phantom_pos: Vector2 = _phantom_camera.global_position if is_instance_valid(_phantom_camera) else Vector2.ZERO
+	var cam_pos: Vector2 = _camera_2d.global_position if is_instance_valid(_camera_2d) else Vector2.ZERO
+	var cam_zoom: Vector2 = _camera_2d.zoom if is_instance_valid(_camera_2d) else Vector2.ZERO
+	var limit_info: String = ""
+	if is_instance_valid(_camera_2d):
+		limit_info = "limit_on=%s L=%s T=%s R=%s B=%s" % [
+			_camera_2d.limit_enabled, _camera_2d.limit_left, _camera_2d.limit_top,
+			_camera_2d.limit_right, _camera_2d.limit_bottom
+		]
+	print("[DropCam] player=", player_pos, " phantom=", phantom_pos, " cam=", cam_pos,
+		" zoom=", cam_zoom, " host_taken_over=", _drop_camera_taken_over, " ", limit_info)
+
 
 ## 设置相机缩放。
 func _set_camera_zoom(zoom_value: float) -> void:

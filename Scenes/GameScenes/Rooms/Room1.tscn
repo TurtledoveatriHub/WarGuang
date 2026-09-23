@@ -20,9 +20,9 @@
 [ext_resource type="PackedScene" uid="uid://ch51hg2xln7gy" path="res://Scenes/Instances/Environments/DestructibleWall.tscn" id="16_5m2yc"]
 [ext_resource type="PackedScene" uid="uid://dhvpsakgvr6v5" path="res://Scenes/Instances/Environments/CameraFocusBeacon.tscn" id="18_focus"]
 [ext_resource type="Script" uid="uid://cmr8exyv7c35t" path="res://Scripts/Tools/ChallengeController.gd" id="18_nwqed"]
-[ext_resource type="PackedScene" uid="uid://bv4un04ljd8ix" path="res://Scenes/Enemys/Snowman.tscn" id="19_v08q0"]
+[ext_resource type="PackedScene" uid="uid://bv4un04ljd8ix" path="res://Scenes/Entities/Enemys/Snowman.tscn" id="19_v08q0"]
 [ext_resource type="Script" uid="uid://cjrjaqyt0i28c" path="res://Scripts/Resources/ChallengeConfig.gd" id="19_vic2u"]
-[ext_resource type="PackedScene" uid="uid://dlv8b3hprlwy" path="res://Scenes/Enemys/SnowBird.tscn" id="20_luhc6"]
+[ext_resource type="PackedScene" uid="uid://dlv8b3hprlwy" path="res://Scenes/Entities/Enemys/SnowBird.tscn" id="20_luhc6"]
 [ext_resource type="Resource" uid="uid://bxd34rllgoej0" path="res://Assets/Configs/ManiacStage1Config.tres" id="20_ukips"]
 [ext_resource type="Resource" uid="uid://dy6aoo3vv8biq" path="res://Assets/Configs/ManiacStage2Config.tres" id="21_xngfo"]
 [ext_resource type="Resource" uid="uid://du82tvnhv0588" path="res://Assets/Configs/ManiacStage3Config.tres" id="22_dqr3q"]
@@ -42,7 +42,7 @@
 [node name="Room1" type="Node2D" node_paths=PackedStringArray("room_bounds")]
 script = ExtResource("1_am8bf")
 room_bgm_stream = ExtResource("2_vxj13")
-adjacent_rooms = Array[String](["Room2", "Room3", "RoomDream10", "SnowMountain1"])
+adjacent_rooms = Array[String](["GrassLand1", "GrassLand3", "RoomDream10", "SnowMountain1"])
 room_color = Color(0.6872149, 0.68721503, 0.68721485, 1)
 room_bounds = NodePath("RoomBounds1")
 
@@ -542,12 +542,12 @@ teleport_id = "Room1-1"
 [node name="Door1-2" parent="Doors" instance=ExtResource("4_37qyv")]
 position = Vector2(1000, -224)
 door_id = "1-2"
-target_room_id = "Room2"
+target_room_id = "GrassLand1"
 
 [node name="Door1-3" parent="Doors" instance=ExtResource("4_37qyv")]
 position = Vector2(1000, -352)
 door_id = "1-3"
-target_room_id = "Room3"
+target_room_id = "GrassLand3"
 
 [node name="Door1-10" parent="Doors" instance=ExtResource("4_37qyv")]
 position = Vector2(1000, -608)

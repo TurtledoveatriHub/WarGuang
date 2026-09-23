@@ -21,7 +21,7 @@
 script = ExtResource("1_1luaf")
 room_id = "Room39"
 room_bgm_stream = ExtResource("2_6fusy")
-adjacent_rooms = Array[String](["Room4", "Room61"])
+adjacent_rooms = Array[String](["SuperMario2", "GrassLand7"])
 room_color = Color(0.6872149, 0.68721503, 0.68721485, 1)
 room_bounds = NodePath("RoomBounds39")
 
@@ -95,12 +95,12 @@ position = Vector2(0, 55)
 [node name="Door4-39" parent="Doors" instance=ExtResource("8_bsd7i")]
 position = Vector2(-1320, 608)
 door_id = "4-39"
-target_room_id = "Room4"
+target_room_id = "SuperMario2"
 
 [node name="Door39-61" parent="Doors" instance=ExtResource("8_bsd7i")]
 position = Vector2(1320, 0)
 door_id = "39-61"
-target_room_id = "Room61"
+target_room_id = "GrassLand7"
 
 [node name="Coins" type="Node2D" parent="."]
 

@@ -1,0 +1,45 @@
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://dxhvxoxaobqjj"]
+
+[ext_resource type="Texture2D" uid="uid://6c0i1f45ykms" path="res://Assets/Textures/Tiles/SuperMario/马里奥物块瓦片集.png" id="1_mktdq"]
+[ext_resource type="Texture2D" uid="uid://drgj6542y7rac" path="res://Assets/Textures/Tiles/SuperMario/水管.png" id="2_teacy"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mktdq"]
+texture = ExtResource("1_mktdq")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+4:0/0 = 0
+4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:2/0 = 0
+0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:2/0 = 0
+2:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+4:2/0 = 0
+4:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0ybm5"]
+texture = ExtResource("2_teacy")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-6, -6, 8, -6, 8, 8, -6, 8)
+1:0/0 = 0
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(6, -6, -8, -6, -8, 8, 6, 8)
+0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -8, 8, -8, 8, 8, -4, 8)
+1:1/0 = 0
+2:1/0 = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, -8, -8, -8, -8, 8, 4, 8)
+0:2/0 = 0
+0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -8, 8, -8, 8, 8, -4, 8)
+1:2/0 = 0
+2:2/0 = 0
+2:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, -8, -8, -8, -8, 8, 4, 8)
+
+[resource]
+physics_layer_0/collision_layer = 6
+terrain_set_0/mode = 0
+terrain_set_0/terrain_0/name = "3x3"
+terrain_set_0/terrain_0/color = Color(0.49925888, 0.35298988, 0.17260501, 1)
+sources/0 = SubResource("TileSetAtlasSource_mktdq")
+sources/1 = SubResource("TileSetAtlasSource_0ybm5")

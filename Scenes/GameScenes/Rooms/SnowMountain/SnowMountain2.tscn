@@ -22,8 +22,8 @@
 [ext_resource type="PackedScene" uid="uid://ba0eej1ktxrbm" path="res://Scenes/Instances/HurtBoxs/IceSpike.tscn" id="14_mxpr2"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="15_bhb32"]
 [ext_resource type="PackedScene" uid="uid://djjlaharmqnms" path="res://Scenes/Instances/Platforms/BreakableIcePlatform.tscn" id="17_t35eu"]
-[ext_resource type="PackedScene" uid="uid://dlv8b3hprlwy" path="res://Scenes/Enemys/SnowBird.tscn" id="19_lkfjd"]
-[ext_resource type="PackedScene" uid="uid://bv4un04ljd8ix" path="res://Scenes/Enemys/Snowman.tscn" id="20_dg6y5"]
+[ext_resource type="PackedScene" uid="uid://dlv8b3hprlwy" path="res://Scenes/Entities/Enemys/SnowBird.tscn" id="19_lkfjd"]
+[ext_resource type="PackedScene" uid="uid://bv4un04ljd8ix" path="res://Scenes/Entities/Enemys/Snowman.tscn" id="20_dg6y5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 
@@ -180,22 +180,16 @@ position = Vector2(-152, 392)
 
 [node name="IcePlatform1" parent="Platforms" instance=ExtResource("13_xkl56")]
 position = Vector2(-736, 473)
-movement_mode = 1
-move_speed = 120.0
 end_offset = Vector2(500, 0)
 wait_time = 0.5
 deceleration_time = 0.5
-sprite_effect = 0
 
 [node name="IcePlatform2" parent="Platforms" instance=ExtResource("13_xkl56")]
 position = Vector2(680, 456)
-movement_mode = 1
-move_speed = 120.0
 end_offset = Vector2(700, 0)
 wait_time = 0.5
 acceleration_time = 2.0
 deceleration_time = 0.5
-sprite_effect = 0
 
 [node name="NPCs" type="Node2D" parent="."]
 
