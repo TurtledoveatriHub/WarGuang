@@ -108,20 +108,14 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 空中无输入时 JUMP 状态的基础衰减倍率（越大停得越快）
 @export var air_no_input_deceleration_multiplier_jump: float = 0.2
 ## 空中无输入时 DOWN 状态的基础衰减倍率（越大停得越快）
-@export var air_no_input_deceleration_multiplier_down: float = 0.4
+@export var air_no_input_deceleration_multiplier_down: float = 0.3
 
-## 卡死脱困（被碰撞体挤压时向上脱困）
-@export_category("卡死脱困")
-## 是否启用“被挤压卡死时自动向上脱困”
-@export var crush_escape_enabled: bool = true
-## 判定为卡死的连续物理帧数（越小越灵敏，越大越不易误触）
-@export var crush_detect_frames: int = 8
-## 脱困上推速度（像素/秒，60 时约 1 像素/帧）
-@export var crush_escape_speed: float = 60.0
-## 单帧脱困最大上推距离（像素，限制它可避免瞬间穿墙）
-@export var crush_escape_max_step: float = 4.0
-## 判定“有实体正在挤过来”的单帧位移阈值（像素，机关平台/门等移动碰撞体）
-@export var crush_mover_min_delta: float = 1.0
+## 受伤击退
+@export_category("受伤击退")
+## 受伤击退冲量的水平上限（像素/秒）
+@export var hurt_impulse_max_x: float = 240.0
+## 受伤击退冲量的垂直上限（像素/秒）
+@export var hurt_impulse_max_y: float = 240.0
 
 ## 跳跃设置
 @export_category("跳跃设置")
@@ -130,7 +124,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 一段跳初始速度
 @export var jump_velocity: float = -90.0
 ## 二段跳初始速度
-@export var double_jump_velocity: float = -40.0
+@export var double_jump_velocity: float = -30.0
 ## 最大跳跃按住时间（秒）
 @export var max_jump_hold_time: float = 0.2
 ## 跳跃额外速度（长按期间每帧增加）
@@ -153,19 +147,19 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 进入滑翔的初始水平速度
 @export var glide_init_h_speed: float = 60.0
 ## 滑翔目标水平速度
-@export var glide_target_h_speed: float = 120.0
+@export var glide_target_h_speed: float = 180.0
 ## 滑翔水平加速度（按住方向键时每秒逼近目标水平速度的最大变化率）
 @export var glide_horizontal_acceleration: float = 300.0
 ## 滑翔松开方向键时的水平减速
 @export var glide_release_deceleration: float = 180.0
 ## 滑翔最大下落速度乘数
-@export var glide_max_fall_multiplier: float = 0.25
+@export var glide_max_fall_multiplier: float = 0.2
 ## 进入滑翔后的滞空时间（秒）
 @export var glide_hover_time: float = 0.1
 ## 滑翔下落倍率过渡时间（秒）
-@export var glide_fall_accel_time: float = 1.2
+@export var glide_fall_accel_time: float = 0.8
 ## 滑翔输入冷却：松开跳跃键退出滑翔后，此时间内再次按下跳跃不会重新进入滑翔（秒）
-@export var glide_input_cooldown: float = 0.25
+@export var glide_input_cooldown: float = 0.3
 
 ## 受伤设置
 @export_category("受伤设置")
@@ -174,7 +168,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 受伤僵直时间（秒）
 @export var hurt_stun_time: float = 0.3
 ## 受伤无敌时间（秒）
-@export var hurt_invincible_time: float = 0.4
+@export var hurt_invincible_time: float = 0.5
 ## 传送伤害飞行峰值速度（像素/秒）
 @export var warp_flight_peak_speed: float = 720.0
 ## 传送伤害飞行最低速度（像素/秒）
@@ -184,9 +178,9 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 传送伤害飞行第一段上升速度（像素/秒）
 @export var warp_flight_lift_speed: float = 120.0
 ## 传送伤害分段停滞时间（秒）
-@export var warp_flight_phase_pause_time: float = 0.4
+@export var warp_flight_phase_pause_time: float = 0.2
 ## 传送伤害飞行目标点向上偏移（像素）
-@export var warp_flight_target_height_offset: float = 32.0
+@export var warp_flight_target_height_offset: float = 8.0
 ## 传送伤害飞行抵达判定距离（像素）
 @export var warp_flight_arrive_epsilon: float = 2.0
 
@@ -216,15 +210,15 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 冲刺冷却时间（秒）
 @export var dash_cooldown: float = 0.6
 ## 冲刺后惯性初速度
-@export var dash_inertia_speed: float = 240.0
+@export var dash_inertia_speed: float = 180.0
 
 @export_category("冲刺减速设置")
 ## 地面水平冲刺结束后的水平减速度
-@export var ground_dash_deceleration: float = 0.4
+@export var ground_dash_deceleration: float = 0.2
 ## 空中水平冲刺结束后的水平减速度
 @export var air_dash_deceleration: float = 0.2
 ## 上冲刺结束后的垂直减速度
-@export var up_dash_deceleration: float = 0.9
+@export var up_dash_deceleration: float = 1.9
 ## 下冲刺结束后的垂直减速度
 @export var down_dash_deceleration: float = 0.1
 
@@ -250,24 +244,25 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 超级冲刺目标速度
 @export var super_dash_speed: float = 420
 ## 超级冲刺加速时间（秒）
-@export var super_dash_accel_time: float = 0.4
+@export var super_dash_accel_time: float = 0.3
 ## 超级冲刺减速时间（秒）
 @export var super_dash_deceleration_time: float = 0.6
 ## 超级冲刺输入锁定时间（秒）
 @export var super_dash_input_lock_time: float = 0.2
 ## 超级冲刺开始后允许生成残影的延迟时间（秒）
-@export var super_dash_afterimage_start_delay: float = 0.2
+@export var super_dash_afterimage_start_delay: float = 0.1
 ## 超级冲刺最大持续时间（秒）
-@export var super_dash_max_duration: float = 1.6
+@export var super_dash_max_duration: float = 2.5
 
 ## 奔跑设置
 @export_category("奔跑设置")
 ## 快速按键时间窗口（秒）
 @export var quick_tap_time_window: float = 0.25
 ## 奔跑撞墙后的操控禁用时间（秒）
-@export var run_wall_bump_control_lock_time: float = 0.5
-## 奔跑保持判定所需的最小正向水平速度（像素/秒），必须大于该值才算有效
-@export var run_jump_keep_min_horizontal_speed: float = 10.0
+@export var run_wall_bump_control_lock_time: float = 0.4
+## 台阶修正最多向上抬多少像素（奔跑撞到矮障碍时把它抬上去，而不是吃撞墙僵直）。
+## 判据是「玩家是否在奔跑」；高过这个值的墙照样撞。
+@export var run_off_ledge_step_up_height: float = 4.0
 ## 撞墙反弹的X轴速度
 @export var wall_bump_rebound_x: float = 180.0
 ## 撞墙反弹的Y轴速度  
@@ -276,11 +271,11 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 奔跑跳跃设置
 @export_category("奔跑跳跃设置")
 ## 奔跑跳跃水平速度加成
-@export var run_jump_boost_speed: float = 120.0
+@export var run_jump_boost_speed: float = 90.0
 ## 奔跑跳跃加成持续时间（秒）
 @export var run_jump_boost_duration: float = 0.2
 ## 奔跑跳跃衰减时间（秒）
-@export var run_jump_decay_time: float = 0.4
+@export var run_jump_decay_time: float = 0.6
 
 ## 二段跳旋转设置
 @export_category("二段跳旋转设置")
@@ -299,7 +294,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## JumpBox 重新触发锁定时间（毫秒）
 @export var jumpbox_retrigger_lock_ms: int = 120
 ## JumpBox 单次触发的最大上抛力（像素/秒）
-@export var jumpbox_max_vertical_force: float = 480.0
+@export var jumpbox_max_vertical_force: float = 640.0
 ## JumpBox 水平速度上限（像素/秒）
 @export var jumpbox_max_horizontal_speed: float = 420.0
 
@@ -433,6 +428,10 @@ var compensation_jump_used: bool = false        # 标记是否已经使用了补
 var coyote_time_active: bool = false            # 标记土狼时间是否激活（离开平台后仍可跳跃的时间）
 var was_on_floor: bool = true                   # 上一帧是否在地面上，用于检测地面状态变化
 
+## 跑出边缘「台阶修正」相关
+var run_off_ledge_assist_speed: float = 0.0     # 跑出边缘瞬间的水平速度（绝对值），修正后用它还原速度
+var run_off_ledge_assist_direction: int = 0     # 跑出边缘瞬间的水平方向（-1 / 1）
+
 ## 滑翔相关
 var is_gliding: bool = false                    # 标记是否正在滑翔
 var glide_timer: float = 0.0                    # 滑翔计时器，用于控制滑翔速度变化
@@ -484,6 +483,7 @@ var door_autowalk_active: bool = false          # Door 传送后的自动走位�
 var door_autowalk_target_position: Vector2 = Vector2.ZERO  # Door 自动走位目标点
 var door_autowalk_timeout: float = 0.0          # Door 自动走位超时时间
 var door_autowalk_facing_right: bool = true     # 进入 Door 时的朝向
+var door_autowalk_running: bool = false         # 进房间前是否在奔跑（奔跑进房 → 自动走位也保持奔跑）
 var door_autowalk_jump_used: bool = false       # Door 自动走位过程中是否已触发跳跃
 var door_autowalk_jump_phase: int = 0           # Door 自动走位跳跃阶段（0=接近，1=垂直起跳，2=抛物线）
 var door_autowalk_jump_velocity: Vector2 = Vector2.ZERO # Door 自动走位跳跃初速度
@@ -670,8 +670,6 @@ var horizontal_input_priority: int = 0
 ## 场景初始化，设置玩家节点、能力状态、计时器和各种效果引用
 func _ready():
 	PlayerBootstrapServiceScript.initialize_on_ready(self)
-	## 卡死脱困：记录初始位置，避免首帧把“未移动”误判为卡死
-	crush_escape_last_pos = global_position
 	## ★ 连接精灵动画结束信号，用于 JUMP1START→JUMP1LOOP 切换
 	if animated_sprite:
 		animated_sprite.animation_finished.connect(_on_sprite_anim_finished)
@@ -791,7 +789,7 @@ func _physics_process(delta):
 	## 应用重力（除了冲刺和受伤状态）
 	if current_state != PlayerState.DASH and current_state != PlayerState.HURT:
 		apply_gravity(fixed_delta)
-	## 应用跳跃和冲刺边缘校正
+	## 应用跳跃、冲刺与「跑出边缘台阶修正」的边缘校正
 	PlayerEdgeCorrectionServiceScript.apply_edge_correction(self, fixed_delta)
 	## 移动玩家
 	var counter_move_scale: float = 1.0
@@ -802,8 +800,6 @@ func _physics_process(delta):
 	move_and_slide()
 	if counter_move_scale != 1.0:
 		velocity /= counter_move_scale
-	## 被碰撞体挤压卡死时向上脱困（在物理步之后处理，不影响正常移动）
-	_apply_crush_escape(fixed_delta)
 	_apply_ground_motion_pixel_residual()
 	PlayerRuntimeFlowServiceScript.finalize_post_physics(self, fixed_delta, move_input, previous_was_on_floor)
 
@@ -913,131 +909,6 @@ func _is_one_way_collision(col: KinematicCollision2D) -> bool:
 	return false
 
 
-## 卡死脱困：上一物理帧的位置（用于判断本帧是否真的移动了）
-var crush_escape_last_pos: Vector2 = Vector2.ZERO
-## 卡死脱困：连续“疑似卡死”的帧计数
-var crush_escape_frames: int = 0
-## 卡死脱困：上一帧各碰撞体的位置（instance_id -> 位置），用于识别“有实体正挤过来”
-var crush_mover_last_pos: Dictionary = {}
-## 卡死脱困候选方向（按优先级：上 → 左 → 右 → 下）
-const CRUSH_ESCAPE_DIRS: PackedVector2Array = [Vector2.UP, Vector2.LEFT, Vector2.RIGHT, Vector2.DOWN]
-
-## 被碰撞体挤压卡死时的自动脱困
-## 满足以下任一条件即视为被挤压：
-##   条件A（空中卡死）：未落地、重力无法生效（|velocity.y| < 5）、位置几乎不变、且本帧被实体阻挡
-##   条件B（被挤压）：有碰撞体从侧面/下方挤过来（单帧位移 ≥ crush_mover_min_delta，
-##                    且接触法线不是向上，避免把“站在移动平台/缆车上”误判为挤压），
-##                    同时自己被墙卡住或完全无法移动
-## 连续满足 crush_detect_frames 帧后，每帧按以下优先级尝试挤出：
-##   上 → 左 → 右 → 下（完全畅通的方向优先）；
-##   若四个方向都被挡，则选“被非地形碰撞体挡住”的方向（机关/移动平台可推动）；
-##   全被地形（TileMapLayers）挡住时不做任何强制移动，避免被挤进关卡几何里。
-## 移动使用 move_and_collide，由物理引擎自行解决碰撞，因此不会穿墙。
-func _apply_crush_escape(delta: float) -> void:
-	if not crush_escape_enabled:
-		return
-	if is_game_paused:
-		return
-	if current_state == PlayerState.HURT or current_state == PlayerState.DIE:
-		return
-	if current_state == PlayerState.RIDECART:
-		return
-	var moved: float = global_position.distance_to(crush_escape_last_pos)
-	crush_escape_last_pos = global_position
-	var contacts: Array[Dictionary] = _collect_slide_contacts()
-	var mover_incoming: bool = _has_incoming_side_mover(contacts)
-	## 条件A：空中被卡住
-	var jammed_air: bool = (not is_on_floor()) \
-		and absf(velocity.y) < 5.0 \
-		and moved < 0.2 \
-		and contacts.size() > 0
-	## 条件B：有实体从侧面/下方挤过来，且自己被卡住（贴墙或完全无法移动）
-	var jammed_by_mover: bool = mover_incoming and (is_on_wall() or moved < 0.2)
-	if not (jammed_air or jammed_by_mover):
-		crush_escape_frames = 0
-		return
-	crush_escape_frames += 1
-	if crush_escape_frames < maxi(crush_detect_frames, 1):
-		return
-	var dir: Vector2 = _pick_escape_direction()
-	if dir == Vector2.ZERO:
-		return
-	var step: float = minf(crush_escape_speed * delta, maxf(crush_escape_max_step, 0.1))
-	var before: Vector2 = global_position
-	move_and_collide(dir * step)
-	if global_position.distance_to(before) > 0.001:
-		# 成功挤出：清掉与脱困方向对抗的速度分量，避免和挤压互相抵消
-		velocity -= dir * velocity.dot(dir)
-
-
-## 选择一个可脱困的方向
-## 1) 优先完全畅通的方向；
-## 2) 其次选“被非地形碰撞体（机关/移动平台等）挡住”的方向——地形不可移动，挤不出去；
-## 3) 四个方向全被地形挡住时返回 ZERO（不强行挤）。
-func _pick_escape_direction() -> Vector2:
-	var probe: float = maxf(crush_escape_max_step, 1.0)
-	var fallback: Vector2 = Vector2.ZERO
-	for d in CRUSH_ESCAPE_DIRS:
-		var hit: KinematicCollision2D = move_and_collide(d * probe, true)
-		if hit == null:
-			return d
-		if fallback == Vector2.ZERO:
-			if not _is_world_tile_blocker(hit.get_collider()):
-				fallback = d
-	return fallback
-
-
-## 该碰撞体是否属于“地形/关卡碰撞”（TileMap 层）
-## 脱困时尽量避开，避免把玩家挤进不可移动的关卡几何
-func _is_world_tile_blocker(node: Object) -> bool:
-	if node == null:
-		return false
-	if not (node is Node):
-		return false
-	var n: Node = node
-	if n is TileMapLayer or n.is_class("TileMapLayer") or n.is_class("TileMap"):
-		return true
-	var parent: Node = n.get_parent()
-	if parent == null:
-		return false
-	return parent is TileMapLayer or parent.is_class("TileMapLayer") or parent.is_class("TileMap")
-
-
-## 收集本帧 move_and_slide 的接触信息（碰撞体 + 接触法线）
-func _collect_slide_contacts() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	for i in range(get_slide_collision_count()):
-		var col: KinematicCollision2D = get_slide_collision(i)
-		if col == null:
-			continue
-		var body: Object = col.get_collider()
-		if body is Node2D:
-			result.append({"body": body as Node2D, "normal": col.get_normal()})
-	return result
-
-
-## 本帧是否存在“从侧面/下方挤过来”的移动碰撞体
-##（法线向上的接触视为“站上去”，不算挤压，避免误判乘坐移动平台）
-func _has_incoming_side_mover(contacts: Array[Dictionary]) -> bool:
-	if contacts.is_empty():
-		crush_mover_last_pos.clear()
-		return false
-	var min_delta: float = maxf(crush_mover_min_delta, 0.01)
-	var incoming: bool = false
-	for c in contacts:
-		var body: Node2D = c["body"]
-		var normal: Vector2 = c["normal"]
-		var id: int = body.get_instance_id()
-		var pos: Vector2 = body.global_position
-		var is_side_or_below: bool = normal.y > -0.5
-		if crush_mover_last_pos.has(id) and is_side_or_below:
-			var prev: Vector2 = crush_mover_last_pos[id]
-			if pos.distance_to(prev) >= min_delta:
-				incoming = true
-		crush_mover_last_pos[id] = pos
-	return incoming
-
-
 ## 检测游戏暂停状态
 func _check_game_pause_state():
 	return PlayerMovementServiceScript._check_game_pause_state(self)
@@ -1129,6 +1000,7 @@ func handle_wall_bump():
 func handle_wall_bump_stun(fixed_delta):
 	PlayerMovementServiceScript.handle_wall_bump_stun(self, fixed_delta)
 
+## 处理奔跑跳跃
 func handle_run_jump(fixed_delta):
 	PlayerMovementServiceScript.handle_run_jump(self, fixed_delta)
 
@@ -1193,6 +1065,10 @@ func _apply_jumpbox_horizontal_speed(base_speed: float, direction: int) -> void:
 ## 由JumpBox触发的弹跳，进入持续二段跳状态并获得水平速度加成
 func start_jumpbox_bounce(vertical_force: float, trigger_grade: String = "normal", effect_overrides: Dictionary = {}):
 	PlayerAirAbilityServiceScript.start_jumpbox_bounce(self, vertical_force, trigger_grade, effect_overrides)
+## 由蹦床（TrampolineBug / 平台弹跳模式）触发的弹跳，力度不受 JumpBox 上限约束；
+## 返回 true 表示弹跳已生效（受伤/死亡/传送飞行期间返回 false）
+func start_trampoline_bounce(force: float) -> void:
+	PlayerAirAbilityServiceScript.start_trampoline_bounce(self, force)
 ## 处理JumpBox触发的二段跳水平速度加成，包括持续和衰减阶段
 func handle_jump2_boost(fixed_delta):
 	PlayerAirAbilityServiceScript.handle_jump2_boost(self, fixed_delta)

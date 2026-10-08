@@ -1,7 +1,0 @@
-[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://cwx51h7fx1i7g"]
-
-[ext_resource type="Texture2D" uid="uid://cjwrsdge5lawp" path="res://Assets/Textures/UIs/SceneUIs/按钮纹理集.png" id="1_femc8"]
-
-[resource]
-atlas = ExtResource("1_femc8")
-region = Rect2(240, 0, 80, 32)

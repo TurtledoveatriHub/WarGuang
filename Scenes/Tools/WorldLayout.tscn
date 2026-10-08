@@ -1,22 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://n4pfeg6i2pi6"]
+[gd_scene load_steps=4 format=3 uid="uid://n4pfeg6i2pi6"]
 
 [ext_resource type="Script" uid="uid://d4l242ea00dop" path="res://Scripts/Tools/WorldLayoutBoard.gd" id="1_board"]
 [ext_resource type="Script" uid="uid://6tfvad0vd6vs" path="res://Scripts/Tools/RoomLayoutSlot.gd" id="2_slot"]
+[ext_resource type="Resource" uid="uid://dcf02f4mmx5bo" path="res://Assets/Configs/RoomLayoutData.tres" id="3_data"]
 
 [node name="WorldLayout" type="Node2D"]
 script = ExtResource("1_board")
+layout_data = ExtResource("3_data")
 
 [node name="Rooms" type="Node2D" parent="."]
-
-[node name="Room1" type="Node2D" parent="Rooms"]
-position = Vector2(0, 5000)
-script = ExtResource("2_slot")
-room_id = "Room1"
-
-[node name="RoomDream10" type="Node2D" parent="Rooms"]
-position = Vector2(-192, 3128)
-script = ExtResource("2_slot")
-room_id = "RoomDream10"
 
 [node name="GrassLand1" type="Node2D" parent="Rooms"]
 script = ExtResource("2_slot")
@@ -28,106 +20,101 @@ script = ExtResource("2_slot")
 room_id = "GrassLand2"
 
 [node name="GrassLand3" type="Node2D" parent="Rooms"]
-position = Vector2(4480, 448)
+position = Vector2(4480, 464)
 script = ExtResource("2_slot")
 room_id = "GrassLand3"
 
 [node name="GrassLand4" type="Node2D" parent="Rooms"]
-position = Vector2(4416, 2688)
+position = Vector2(4480, 2688)
 script = ExtResource("2_slot")
 room_id = "GrassLand4"
 
 [node name="GrassLand5" type="Node2D" parent="Rooms"]
-position = Vector2(7744, 2496)
+position = Vector2(6336, 3008)
 script = ExtResource("2_slot")
 room_id = "GrassLand5"
 
 [node name="GrassLand6" type="Node2D" parent="Rooms"]
-position = Vector2(4944, 5496)
+position = Vector2(1216, 2912)
 script = ExtResource("2_slot")
 room_id = "GrassLand6"
 
 [node name="GrassLand7" type="Node2D" parent="Rooms"]
-position = Vector2(10552, 5224)
+position = Vector2(-1664, 3968)
 script = ExtResource("2_slot")
 room_id = "GrassLand7"
 
 [node name="GrassLand8" type="Node2D" parent="Rooms"]
-position = Vector2(14296, 2672)
+position = Vector2(3008, 4800)
 script = ExtResource("2_slot")
 room_id = "GrassLand8"
 
 [node name="GrassLand9" type="Node2D" parent="Rooms"]
-position = Vector2(8208, 7040)
+position = Vector2(-3264, 4640)
 script = ExtResource("2_slot")
 room_id = "GrassLand9"
 
 [node name="GrassLand10" type="Node2D" parent="Rooms"]
-position = Vector2(-6352, 4240)
+position = Vector2(-2240, 64)
 script = ExtResource("2_slot")
 room_id = "GrassLand10"
 
 [node name="GrassLand11" type="Node2D" parent="Rooms"]
-position = Vector2(-5680, 6672)
+position = Vector2(6400, -16)
 script = ExtResource("2_slot")
 room_id = "GrassLand11"
 
 [node name="GrassLand12" type="Node2D" parent="Rooms"]
-position = Vector2(-4880, 1104)
+position = Vector2(8960, -560)
 script = ExtResource("2_slot")
 room_id = "GrassLand12"
 
 [node name="GrassLand13" type="Node2D" parent="Rooms"]
-position = Vector2(-4624, 3504)
+position = Vector2(11584, -872)
 script = ExtResource("2_slot")
 room_id = "GrassLand13"
 
 [node name="GrassLand14" type="Node2D" parent="Rooms"]
-position = Vector2(-3696, 6416)
+position = Vector2(13496, -208)
 script = ExtResource("2_slot")
 room_id = "GrassLand14"
 
 [node name="GrassLand15" type="Node2D" parent="Rooms"]
-position = Vector2(-2896, -816)
+position = Vector2(15320, -1312)
 script = ExtResource("2_slot")
 room_id = "GrassLand15"
 
-[node name="Room39" type="Node2D" parent="Rooms"]
-position = Vector2(9667, -288)
-script = ExtResource("2_slot")
-room_id = "Room39"
-
 [node name="SuperMario2" type="Node2D" parent="Rooms"]
-position = Vector2(6736, -624)
+position = Vector2(31248, 808)
 script = ExtResource("2_slot")
 room_id = "SuperMario2"
 
 [node name="SnowMountain1" type="Node2D" parent="Rooms"]
-position = Vector2(19520, 0)
+position = Vector2(17536, 0)
 script = ExtResource("2_slot")
 room_id = "SnowMountain1"
 
 [node name="SnowMountain2" type="Node2D" parent="Rooms"]
-position = Vector2(23040, -320)
+position = Vector2(21056, -416)
 script = ExtResource("2_slot")
 room_id = "SnowMountain2"
 
 [node name="SnowMountain3" type="Node2D" parent="Rooms"]
-position = Vector2(25920, 704)
+position = Vector2(23936, 800)
 script = ExtResource("2_slot")
 room_id = "SnowMountain3"
 
 [node name="SnowMountain4" type="Node2D" parent="Rooms"]
-position = Vector2(27520, -896)
+position = Vector2(25536, -800)
 script = ExtResource("2_slot")
 room_id = "SnowMountain4"
 
 [node name="SnowMountain5" type="Node2D" parent="Rooms"]
-position = Vector2(25600, -5056)
+position = Vector2(23664, -4992)
 script = ExtResource("2_slot")
 room_id = "SnowMountain5"
 
 [node name="SnowMountain6" type="Node2D" parent="Rooms"]
-position = Vector2(28800, -3712)
+position = Vector2(26816, -2768)
 script = ExtResource("2_slot")
 room_id = "SnowMountain6"

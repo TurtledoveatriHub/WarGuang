@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_2gh8a"]
 [ext_resource type="AudioStream" uid="uid://bjv3hvygk0135" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_5v8dg"]
-[ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="3_8voo8"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_8voo8"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_5v8dg"]
 [ext_resource type="Texture2D" uid="uid://dwpgj2yjqy8oc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景2.png" id="5_8voo8"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="5_sb4gf"]
@@ -33,7 +33,7 @@ room_bounds = NodePath("sm3Bounds")
 scale = Vector2(4, 6)
 script = ExtResource("3_8voo8")
 debug_color = Color(0, 0.824, 0.588, 0.235)
-metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
+metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
 
 [node name="RoomTrigger" type="Area2D" parent="."]
 visible = false

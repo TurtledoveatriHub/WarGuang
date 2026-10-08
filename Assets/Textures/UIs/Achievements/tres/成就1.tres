@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://dv4kl620cus2y"]
+
+[ext_resource type="Texture2D" uid="uid://be7yjcpymbxw5" path="res://Assets/Textures/UIs/Achievements/成就1-14.png" id="1_j3nol"]
+
+[resource]
+atlas = ExtResource("1_j3nol")
+region = Rect2(2, 2, 16, 16)

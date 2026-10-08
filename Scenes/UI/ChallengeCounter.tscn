@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bhrttajxebk6v" path="res://Scripts/UI/ChallengeCounter.gd" id="1_i3pks"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="2_i3pks"]
-[ext_resource type="Texture2D" uid="uid://norhspdvctlf" path="res://Assets/Textures/UIs/SceneUIs/tres/按钮纹理.tres" id="2_j65sp"]
+[ext_resource type="Texture2D" uid="uid://bflntllsubejm" path="res://Assets/Textures/UIs/ButtonUIs/按钮默认纹理.png" id="2_j65sp"]
 
 [node name="ChallengeCounter" type="CanvasLayer"]
 layer = 50
@@ -21,12 +21,13 @@ alignment = 1
 [node name="TextureRect" type="TextureRect" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 texture = ExtResource("2_j65sp")
+expand_mode = 3
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/TextureRect"]
 layout_mode = 0
-offset_left = 18.0
+offset_left = 41.0
 offset_top = 15.0
-offset_right = 63.0
+offset_right = 86.0
 offset_bottom = 26.0
 theme = ExtResource("2_i3pks")
 text = "99/99"

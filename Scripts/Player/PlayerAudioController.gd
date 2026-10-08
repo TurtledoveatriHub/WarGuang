@@ -49,6 +49,8 @@ class_name PlayerAudioController
 @export_category("受伤死亡音效")
 ## 受伤音效 — 受到伤害时播放（不分普通/传送，伤害方块音效由方块自身触发）
 @export var hurt_sfx: AudioStream
+## 受伤音效候选二：与 hurt_sfx 组成候选
+@export var hurt_sfx_alt: AudioStream
 ## 死亡音效 — 玩家死亡时播放
 @export var die_sfx: AudioStream
 
@@ -321,7 +323,7 @@ func _on_state_changed(payload: Dictionary) -> void:
 			_play_one_shot(wall_jump_sfx)
 
 		player.PlayerState.HURT:
-			_play_one_shot(hurt_sfx)
+			_play_one_shot(_pick_hurt_sfx())
 
 		player.PlayerState.DIE:
 			_play_one_shot(die_sfx)
@@ -365,6 +367,15 @@ func _on_wall_bump(_payload: Dictionary) -> void:
 	_play_one_shot(wall_bump_sfx)
 
 ## 受伤事件 — 触发 BGM 闪避（空洞骑士式效果）
+## 受伤音效有两个候选时随机选一个：连续受伤听起来不会完全一样。
+func _pick_hurt_sfx() -> AudioStream:
+	if hurt_sfx == null:
+		return hurt_sfx_alt
+	if hurt_sfx_alt == null:
+		return hurt_sfx
+	return hurt_sfx if randf() < 0.5 else hurt_sfx_alt
+
+
 func _on_damage_taken(_payload: Dictionary) -> void:
 	if not is_instance_valid(player):
 		return

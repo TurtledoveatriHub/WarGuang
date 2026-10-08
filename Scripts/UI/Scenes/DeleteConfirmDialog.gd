@@ -5,6 +5,8 @@ extends CanvasLayer
 @onready var cancel_button = $Background/ButtonContainer/CancelButton
 
 var confirm_callback: Callable
+## 已进入「退场动画 + 销毁」流程，防止重复触发。
+var _closing: bool = false
 
 func _ready():
 	confirm_button.pressed.connect(_on_confirm_pressed)
@@ -24,9 +26,25 @@ func _on_confirm_pressed():
 	
 	if confirm_callback:
 		confirm_callback.call()
-	queue_free()
+	close()
 
 func _on_cancel_pressed():
+	close()
+
+## 关闭弹窗：**先播退场动画，播完再销毁**（否则面板是「啪一下直接消失」）。
+## 退场时长用总线自己的估算值（已含按钮组件的错开时长）；
+## 不 await Tween 信号 —— Tween 被 kill 时不会发 finished，等信号会直接卡死。
+func close() -> void:
+	if _closing:
+		return
+	_closing = true
+	var seconds: float = 0.0
+	var bus: Node = get_node_or_null("UIFxDirector")
+	if bus != null:
+		seconds = float(bus.call("estimate_duration", "exit"))
+		bus.call("play_exit")
+	if seconds > 0.0:
+		await get_tree().create_timer(seconds).timeout
 	queue_free()
 
 # 添加ESC键处理函数

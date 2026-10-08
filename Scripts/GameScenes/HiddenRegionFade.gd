@@ -15,12 +15,12 @@ extends TileMapLayer
 ## 若设为 false：首次触发淡出后，每次 Player 离开本层瓦片时再淡入渐显（可再次触发淡出）。
 @export var permanent_hide: bool = true
 ## 淡出时长（秒）
-@export var fade_out_duration: float = 0.5
+@export var fade_out_duration: float = 0.4
 ## 淡入时长（秒，仅 permanent_hide=false 时用到）
-@export var fade_in_duration: float = 0.5
+@export var fade_in_duration: float = 0.4
 ## 触发淡出前，Player 需“持续踩在本层任意瓦片上”的时长（秒）。
 ## 中途离开本层瓦片会清零计时，不会触发淡出。
-@export var trigger_hold_time: float = 1.0
+@export var trigger_hold_time: float = 0.5
 ## 首次激活（淡出开始）时播放的音效（走 AudioManager 的 SFX 总线）
 @export var reveal_sfx: AudioStream = null
 ## 存档标识（用于跨存档记录“本层已永久淡出”）。留空时自动使用 room_id::本层节点名。

@@ -279,8 +279,9 @@ func get_save_data() -> Dictionary:
 		"destructible_walls_destroyed": destructible_walls_destroyed.duplicate(true),
 		"hidden_rooms_activated": hidden_rooms_activated.duplicate(),
 		"switch_states": switch_states.duplicate(true),
-		"painted_rooms": MapManager.painted_rooms.duplicate() if MapManager else [],
-		"pending_rooms": MapManager.pending_rooms.duplicate() if MapManager else [],
+		"visited_rooms": MapManager.visited_rooms.duplicate() if MapManager else [],
+		"used_map_doors": MapManager.get_used_doors() if MapManager and MapManager.has_method("get_used_doors") else {},
+		"map_reveal_mask": MapManager.get_reveal_mask_base64() if MapManager and MapManager.has_method("get_reveal_mask_base64") else "",
 		"activated_teleports": TeleportManager.activated.duplicate() if TeleportManager else [],
 		"tp_coords": TeleportManager.get_save_coords() if TeleportManager and TeleportManager.has_method("get_save_coords") else {},
 		"played_cinematic_flags": played_cinematic_flags.duplicate(true),
@@ -293,7 +294,7 @@ func load_save_data(data: Dictionary):
 	print("Global: 开始加载存档数据")
 
 	# 关键：先重置关键落地字段，避免“缺字段时继承旧运行态”
-	last_save_room = "Room1"
+	last_save_room = "GrassLand1"
 	last_save_point = {"position": Vector2(0, 0), "scene_path": "", "save_point_id": ""}
 	
 	if data.has("player_max_health"):
@@ -520,7 +521,8 @@ func add_coins(amount: int):
 	# 发射钱币变化信号
 	coins_changed.emit(player_coins)
 	if current_save_slot >= 0:
-		SaveManager.save_game(current_save_slot, get_save_data())
+		# 钱币变动频繁：保存但不弹「存档已更新」提示
+		SaveManager.save_game(current_save_slot, get_save_data(), false)
 
 ## 花费钱币（带动画效果）- 关键修复：只发射 coins_changing 信号
 func spend_coins(amount: int) -> bool:
@@ -532,7 +534,8 @@ func spend_coins(amount: int) -> bool:
 		# PlayerUI 会在动画完成后自己更新显示
 		coins_changing.emit(old_coins, player_coins, 0.1)
 		if current_save_slot >= 0:
-			SaveManager.save_game(current_save_slot, get_save_data())
+			# 钱币变动频繁：保存但不弹「存档已更新」提示
+			SaveManager.save_game(current_save_slot, get_save_data(), false)
 		return true
 	else:
 		print("DEBUG: 钱币不足，需要", amount, "当前:", player_coins)

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_yav0u"]
 [ext_resource type="AudioStream" uid="uid://bjv3hvygk0135" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_cvf74"]
-[ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="3_m4myo"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_m4myo"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_x1b5c"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="5_7kgu1"]
 [ext_resource type="Texture2D" uid="uid://dwpgj2yjqy8oc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景2.png" id="5_8ssuy"]
@@ -16,7 +16,7 @@
 [ext_resource type="Script" uid="uid://ky86na7armsv" path="res://Scripts/GameScenes/HiddenRegionFade.gd" id="10_jang7"]
 [ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/IceCrystal.tscn" id="10_q4kib"]
 [ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="11_jxq8l"]
-[ext_resource type="AudioStream" uid="uid://cqyyvp8hc55ot" path="res://Assets/Audios/SFX/Instances/存档点交互音效.mp3" id="11_x1b5c"]
+[ext_resource type="AudioStream" path="res://Assets/Audios/SFX/Instances/存档点交互.wav" id="11_x1b5c"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="13_nuo8m"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="14_on2j3"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="15_nouxh"]
@@ -40,8 +40,7 @@ room_bounds = NodePath("sm4Bounds")
 [node name="sm4Bounds" type="Node2D" parent="."]
 scale = Vector2(4, 16)
 script = ExtResource("3_m4myo")
-debug_color = Color(0, 0.824, 0.588, 0.235)
-metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
+metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
 
 [node name="RoomTrigger" type="Area2D" parent="."]
 
@@ -128,48 +127,36 @@ wall_id = ""
 
 [node name="IcePlatform1" parent="Platforms" instance=ExtResource("10_cvf74")]
 position = Vector2(-152, 2312)
-movement_mode = 1
 move_speed = 160.0
 end_offset = Vector2(0, -256)
 wait_time = 0.5
 deceleration_time = 0.5
-sprite_effect = 0
 
 [node name="IcePlatform2" parent="Platforms" instance=ExtResource("10_cvf74")]
 position = Vector2(-416, -712)
 movement_mode = 2
-move_speed = 120.0
 end_offset = Vector2(256, 0)
 wait_time = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
-sprite_effect = 0
 
 [node name="IcePlatform5" parent="Platforms" instance=ExtResource("10_cvf74")]
 position = Vector2(32, -904)
 movement_mode = 2
-move_speed = 120.0
 end_offset = Vector2(256, 0)
 wait_time = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
-sprite_effect = 0
 
 [node name="IcePlatform3" parent="Platforms" instance=ExtResource("10_cvf74")]
 position = Vector2(-64, -1024)
-movement_mode = 1
-move_speed = 120.0
 end_offset = Vector2(0, -256)
 wait_time = 0.5
-sprite_effect = 0
 
 [node name="IcePlatform4" parent="Platforms" instance=ExtResource("10_cvf74")]
 position = Vector2(-64, -960)
-movement_mode = 1
-move_speed = 120.0
 end_offset = Vector2(0, 256)
 wait_time = 0.5
-sprite_effect = 0
 
 [node name="BreakableIcePlatform" parent="Platforms" instance=ExtResource("16_nuo8m")]
 position = Vector2(424, -872)
@@ -344,7 +331,7 @@ position = Vector2(0, -672)
 
 [node name="TeleportPoint" parent="TeleportPoints" instance=ExtResource("23_q1rpw")]
 position = Vector2(392, 1368)
-teleport_id = "SnowMountain4-1"
+teleport_id = "SnowMountain4"
 
 [node name="Doors" type="Node2D" parent="."]
 

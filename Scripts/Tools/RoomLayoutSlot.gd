@@ -3,6 +3,7 @@
 ## 只在 Scenes/Tools/WorldLayout.tscn 中作为房间的可拖动代表使用，不参与游戏运行时。
 ## 槽位自身的 position 就是该房间根节点在世界空间中的原点。
 @tool
+class_name RoomLayoutSlot
 extends Node2D
 
 ## 该槽位代表的房间 ID（需与房间场景的 room_id 一致）
@@ -19,6 +20,16 @@ var is_overlapping: bool = false
 
 ## 是否正在被拖动
 var is_being_dragged: bool = false
+
+## 门的显示数据（由 WorldLayoutBoard 同步）：
+## 每项 { "pos": Vector2(房间本地), "door_id": String, "target_room": String,
+##        "target_pos": Vector2(Rooms 容器本地), "has_target": bool }
+var door_links: Array = []
+
+## 门方块的颜色
+const COLOR_DOOR := Color(1.0, 0.55, 0.25)
+## 门方块的半边长（世界像素）
+const DOOR_HALF_SIZE := 26.0
 
 ## 拖动中的状态颜色
 const COLOR_DRAGGING := Color(0.45, 1.0, 0.55)
@@ -62,12 +73,37 @@ func _draw() -> void:
 		state_color = COLOR_OVERLAP
 	if bounds_local.size.x <= 0.0 or bounds_local.size.y <= 0.0:
 		_draw_origin_marker(state_color)
+		_draw_doors()
 		return
 	# 房间矩形填充与描边
 	draw_rect(bounds_local, Color(state_color.r, state_color.g, state_color.b, 0.14), true)
 	draw_rect(bounds_local, Color(state_color.r, state_color.g, state_color.b, 0.85), false, 6.0)
 	_draw_origin_marker(state_color)
+	_draw_doors()
 	_draw_labels(state_color)
+
+## 绘制本房间的所有门 + 指向目标房间槽位的对齐引线
+## 两个相邻房间的门摆对位置时，两条引线会正好接上 —— 这就是摆放时对齐的判据。
+func _draw_doors() -> void:
+	if door_links.is_empty():
+		return
+	var font: Font = ThemeDB.fallback_font
+	for link: Variant in door_links:
+		var entry: Dictionary = link
+		var door_pos: Vector2 = entry.get("pos", Vector2.ZERO)
+		var block := Rect2(
+			door_pos - Vector2(DOOR_HALF_SIZE, DOOR_HALF_SIZE),
+			Vector2(DOOR_HALF_SIZE * 2.0, DOOR_HALF_SIZE * 2.0)
+		)
+		# 引线先画（画在方块下面，方块才盖得住线头）
+		if bool(entry.get("has_target", false)):
+			draw_line(door_pos, entry.get("target_pos", Vector2.ZERO), Color(COLOR_DOOR.r, COLOR_DOOR.g, COLOR_DOOR.b, 0.3), 3.0)
+		draw_rect(block, Color(COLOR_DOOR.r, COLOR_DOOR.g, COLOR_DOOR.b, 0.85), true)
+		draw_rect(block, Color(1.0, 1.0, 1.0, 0.9), false, 2.0)
+		var label: String = str(entry.get("target_room", ""))
+		if label != "":
+			draw_string(font, door_pos + Vector2(DOOR_HALF_SIZE * 1.4, DOOR_HALF_SIZE * 0.8), label,
+				HORIZONTAL_ALIGNMENT_LEFT, -1.0, 30, Color(1.0, 0.85, 0.7, 0.9))
 
 ## 绘制房间根节点原点十字（槽位 position 即房间根原点）
 func _draw_origin_marker(state_color: Color) -> void:

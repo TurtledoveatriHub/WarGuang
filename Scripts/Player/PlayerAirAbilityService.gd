@@ -116,8 +116,12 @@ static func handle_landing(player: Node) -> void:
 			player.velocity.x = 0.0
 			land_shake_triggered = true
 		# ★ DOWN 态着陆：标记DOWNEND待播并停留DOWN态，不切地面态
+		# ★ 这里**绝对不能**清空 airborne_run_keep：
+		#   落地瞬间玩家就在 DOWN 态（DOWN 就是下落态），所以奔跑跳落地必然走这条分支；
+		#   真正的 IDLE/RUN/MOVE 切换被推迟到 DOWNEND 播完后的 apply_ground_transition()，
+		#   而那一步还要靠 airborne_run_keep_* 判断是否恢复 RUN。
+		#   之前在这里 clear 掉了，导致奔跑落地永远退化成 MOVE（奔跑保持失效）。
 		player._landing_downend_active = true
-		PlayerRuntimeFlowServiceScript.clear_airborne_run_keep_tracking(player)
 		return  # 跳过下方 IDLE/RUN/MOVE 切换
 
 	# 非 DOWN 态（JUMP/GLIDE 等落地）→ 直接切换地面态
@@ -300,6 +304,30 @@ static func start_jumpbox_bounce(player: Node, vertical_force: float, trigger_gr
 		_apply_jumpbox_horizontal_speed(player, player.jump_move_speed + boosted, player.jump2_boost_direction)
 
 	player.has_jumpbox_afterimage = true
+	player.change_state(player.PlayerState.JUMP)
+
+# 由蹦床（TrampolineBug / 平台弹跳模式）触发弹跳。
+# 与 JumpBox 的区别：力度只由蹦床自身配置决定，不受 jumpbox_max_vertical_force 限制；
+# 不进入 JumpBox 的“按住持续二段跳”流程，弹跳后空中跳跃/冲刺恢复可用。
+static func start_trampoline_bounce(player: Node, force: float) -> void:
+	player.velocity.y = -maxf(force, 0.0)
+	player.jump_hold_timer = player.max_jump_hold_time
+
+	# 恢复空中能力：弹跳后还能再二段跳 / 冲刺一次
+	player.is_jumping = true
+	player.jump_count = 1
+	player.has_double_jumped = false
+	player.can_double_jump = true
+	player.has_dashed_in_air = false
+	player.can_dash = true
+
+	# 清掉可能残留在身上的 JumpBox 持续跳状态，避免两套弹跳效果互相干扰
+	player.is_jumpbox_continuous_jump = false
+	player.is_jump_interrupt_decaying = false
+	player.is_jump2_boost_active = false
+	player.jump2_boost_timer = 0.0
+	player.has_jumpbox_afterimage = false
+
 	player.change_state(player.PlayerState.JUMP)
 
 # 处理 JumpBox 触发期间的水平速度加成。

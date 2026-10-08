@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_dbsp6"]
 [ext_resource type="AudioStream" uid="uid://bjv3hvygk0135" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_orx6g"]
-[ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="3_xkl56"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_xkl56"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_orx6g"]
 [ext_resource type="Texture2D" uid="uid://dwpgj2yjqy8oc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景2.png" id="5_xkl56"]
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="5_yxtg7"]
@@ -16,7 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="12_dg6y5"]
 [ext_resource type="Script" uid="uid://ky86na7armsv" path="res://Scripts/GameScenes/HiddenRegionFade.gd" id="12_yxtg7"]
 [ext_resource type="PackedScene" uid="uid://dvyyx1gsopmfx" path="res://Scenes/Instances/Items/Coin.tscn" id="13_88p46"]
-[ext_resource type="AudioStream" uid="uid://cqyyvp8hc55ot" path="res://Assets/Audios/SFX/Instances/存档点交互音效.mp3" id="13_vokt0"]
+[ext_resource type="AudioStream" path="res://Assets/Audios/SFX/Instances/存档点交互.wav" id="13_vokt0"]
 [ext_resource type="PackedScene" uid="uid://b0if0hxe7q3dw" path="res://Scenes/Instances/Platforms/IcePlatform.tscn" id="13_xkl56"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="14_2uqvq"]
 [ext_resource type="PackedScene" uid="uid://ba0eej1ktxrbm" path="res://Scenes/Instances/HurtBoxs/IceSpike.tscn" id="14_mxpr2"]
@@ -38,8 +38,7 @@ room_bounds = NodePath("sm2Bounds")
 [node name="sm2Bounds" type="Node2D" parent="."]
 scale = Vector2(12, 4)
 script = ExtResource("3_xkl56")
-debug_color = Color(0, 0.824, 0.588, 0.235)
-metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
+metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
 
 [node name="RoomTrigger" type="Area2D" parent="."]
 

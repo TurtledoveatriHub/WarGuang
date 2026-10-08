@@ -8,6 +8,9 @@ var resource: DialogueResource
 var temporary_game_states: Array = []
 var is_waiting_for_input: bool = false
 var is_blocking_input: bool = false  # 是否正在阻断输入（转场时）
+var _closing: bool = false           # 已经进入「退场动画 + 销毁」流程
+var _fx_enter_played: bool = false   # 本次对话的文本框入场动画是否已播过（整段对话只播一次）
+var _advancing_response: bool = false # 选项选定后正在播退场动画（期间忽略重复点击）
 
 var dialogue_line: DialogueLine:
 	set(value):
@@ -16,7 +19,7 @@ var dialogue_line: DialogueLine:
 			apply_dialogue_line()
 		else:
 			DialogueSystem.end_dialogue()
-			queue_free()
+			_close_balloon()
 	get:
 		return dialogue_line
 
@@ -31,6 +34,9 @@ var dialogue_line: DialogueLine:
 var fade_manager: Node = null
 
 func _ready() -> void:
+	# 对话面板随时都该能用：即使树被暂停（例如游戏内设置/传送面板打开着），
+	# 空格推进与 ESC 跳过也不应该跟着冻住。
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	balloon.hide()
 	# 设置层级比设置界面低
 	layer = 90  # 设置界面是 100，对话框设为 90
@@ -70,6 +76,21 @@ func _ready() -> void:
 		if dialogue_label.custom_minimum_size.y < 80.0:
 			dialogue_label.custom_minimum_size.y = 120.0
 
+## 对话结束时先播退场动画，播完再销毁自己（否则文本框是「啪一下直接消失」）。
+func _close_balloon() -> void:
+	if _closing:
+		return
+	_closing = true
+	var seconds: float = 0.0
+	if fx_bus != null and is_instance_valid(fx_bus):
+		fx_bus.call("play_exit")
+		seconds = float(fx_bus.get("exit_duration")) + float(fx_bus.get("transition_exit_delay"))
+	if seconds > 0.0:
+		# 用「时长」等待：绝不 await Tween 信号（被 kill 的 Tween 不会发 finished）
+		await get_tree().create_timer(seconds).timeout
+	queue_free()
+
+
 ## 等 UIFxDirector 的过渡入场播完（用「时长」等待，绝不 await Tween 信号：
 ## 被 kill 的 Tween 不会发 finished，等信号会直接卡死）。
 func _wait_fx_enter() -> void:
@@ -97,14 +118,22 @@ func apply_dialogue_line() -> void:
 	character_label.text = tr(dialogue_line.character, "dialogue") if character_label.visible else ""
 
 	dialogue_label.dialogue_line = dialogue_line
+	# 赋值后 Label 会立刻显示整句话 —— 打字前绝不能让它露出来，
+	# 先归零可见字符（type_out() 会从头开始逐字显示）。
+	dialogue_label.visible_characters = 0
 
 	# 显示/隐藏弹框
+	var first_line: bool = not _fx_enter_played
 	if not is_blocking_input:
 		balloon.show()
-		# 文本框入场动画（由总线驱动；目标在 MyBalloon.tscn 的 UIFxDirector 里配）
-		fx_bus.call("play_enter")
+		if first_line:
+			# 入场动画整段对话只播一次：换句只更新文本，不再重播入场（否则每句都弹一下）。
+			_fx_enter_played = true
+			# 文本框入场动画（由总线驱动；目标在 MyBalloon.tscn 的 UIFxDirector 里配）
+			fx_bus.call("play_enter")
 	else:
 		balloon.hide()
+		_fx_enter_played = false
 
 	# 确保正确设置焦点模式
 	balloon.focus_mode = Control.FOCUS_ALL
@@ -124,11 +153,11 @@ func apply_dialogue_line() -> void:
 		
 	# 转场后不显示文字
 	if not is_blocking_input:
-		dialogue_label.show()
-		
 		if not dialogue_line.text.is_empty():
-			# 等入场动画播完再开始打字：否则文字会在框体还没出现时就开始输出
-			await _wait_fx_enter()
+			if first_line:
+				# 只有首句需要等入场动画：后续句子文本框已经在场上了，再等就是白卡一秒。
+				await _wait_fx_enter()
+			dialogue_label.show()
 			dialogue_label.type_out()
 			await dialogue_label.finished_typing
 
@@ -195,8 +224,8 @@ func _on_click_area_input(event):
 			get_viewport().set_input_as_handled()
 
 func _unhandled_input(event):
-	# 如果正在阻断输入（转场中），不处理任何输入
-	if is_blocking_input:
+	# 如果正在阻断输入（转场中）或已经在退场销毁流程里，不处理任何输入
+	if is_blocking_input or _closing:
 		return
 	
 	# 修复：检查 dialogue_line 是否为 null
@@ -216,7 +245,6 @@ func _unhandled_input(event):
 		elif event is InputEventScreenTouch and event.pressed:
 			next(dialogue_line.next_id)
 			get_viewport().set_input_as_handled()
-	
 	# 处理选项选择 - 允许在选项显示时使用 A/D 键和空格键
 	if dialogue_line.responses.size() > 0 and responses_menu and responses_menu.visible:
 		# 处理 A/D 键导航（左右切换）
@@ -232,6 +260,18 @@ func _unhandled_input(event):
 		get_viewport().set_input_as_handled()
 
 func _on_response_selected(response: DialogueResponse):
+	# ★ 选项选定后不再「啪」地消失：先让选项菜单播一遍退场动画，再继续对话。
+	#   用「时长」等待（绝不 await Tween 信号：被 kill 的 Tween 不会发 finished）。
+	if _advancing_response:
+		return
+	_advancing_response = true
+	var seconds: float = 0.0
+	if fx_bus != null and is_instance_valid(fx_bus) and responses_menu != null:
+		if fx_bus.has_method("play_single_exit"):
+			seconds = float(fx_bus.call("play_single_exit", responses_menu))
+	if seconds > 0.0:
+		await get_tree().create_timer(seconds).timeout
+	_advancing_response = false
 	next(response.next_id)
 
 # 关键修复：恢复气球 GUI 输入处理，但正确判断是否应该处理

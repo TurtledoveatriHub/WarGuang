@@ -1,0 +1,118 @@
+[gd_resource type="Resource" script_class="AchievementCatalog" load_steps=31 format=3 uid="uid://bwam35xi0qi4n"]
+
+[ext_resource type="Script" uid="uid://bcir405pldm6i" path="res://Scripts/Resources/AchievementCatalog.gd" id="1_catalog"]
+[ext_resource type="Texture2D" uid="uid://dv4kl620cus2y" path="res://Assets/Textures/UIs/Achievements/tres/成就1.tres" id="1_qd7rv"]
+[ext_resource type="Script" uid="uid://cl6au4seo0hu6" path="res://Scripts/Resources/AchievementData.gd" id="2_data"]
+[ext_resource type="Texture2D" uid="uid://1oumdpsjod2l" path="res://Assets/Textures/UIs/Achievements/tres/成就2.tres" id="3_cer33"]
+[ext_resource type="Texture2D" uid="uid://bd2h58b25f2bm" path="res://Assets/Textures/UIs/Achievements/tres/成就3.tres" id="4_hp8fk"]
+[ext_resource type="Texture2D" uid="uid://beg84uely8fl3" path="res://Assets/Textures/UIs/Achievements/tres/成就4.tres" id="5_x8uo7"]
+[ext_resource type="Texture2D" uid="uid://d22wofgre7dbl" path="res://Assets/Textures/UIs/Achievements/tres/成就5.tres" id="6_e8102"]
+[ext_resource type="Texture2D" uid="uid://dahcoejejn656" path="res://Assets/Textures/UIs/Achievements/tres/成就6.tres" id="7_2bt0f"]
+[ext_resource type="Texture2D" uid="uid://dsqc7r3e7kvhf" path="res://Assets/Textures/UIs/Achievements/tres/成就7.tres" id="8_60idy"]
+[ext_resource type="Texture2D" uid="uid://doulnpxl4re62" path="res://Assets/Textures/UIs/Achievements/tres/成就8.tres" id="9_ytt38"]
+[ext_resource type="Texture2D" uid="uid://covsvwmcv00qf" path="res://Assets/Textures/UIs/Achievements/tres/成就9.tres" id="10_ujty2"]
+[ext_resource type="Texture2D" uid="uid://pwasuw7qptc0" path="res://Assets/Textures/UIs/Achievements/tres/成就10.tres" id="11_wqvkp"]
+[ext_resource type="Texture2D" uid="uid://bbrefdicrmplg" path="res://Assets/Textures/UIs/Achievements/tres/成就11.tres" id="12_vor4g"]
+[ext_resource type="Texture2D" uid="uid://cddls75ccnouy" path="res://Assets/Textures/UIs/Achievements/tres/成就12.tres" id="13_wr0pc"]
+[ext_resource type="Texture2D" uid="uid://c57cecmm2fuvc" path="res://Assets/Textures/UIs/Achievements/tres/成就13.tres" id="14_60wo0"]
+[ext_resource type="Texture2D" uid="uid://dimh05id45ve7" path="res://Assets/Textures/UIs/Achievements/tres/成就14.tres" id="15_mf31y"]
+
+[sub_resource type="Resource" id="AchievementData_example1"]
+script = ExtResource("2_data")
+id = &"ACH1"
+description = "空中翻滚！"
+icon = ExtResource("1_qd7rv")
+
+[sub_resource type="Resource" id="AchievementData_example2"]
+script = ExtResource("2_data")
+id = &"ACH2"
+description = "向前冲锋！"
+icon = ExtResource("3_cer33")
+
+[sub_resource type="Resource" id="Resource_n38sj"]
+script = ExtResource("2_data")
+id = &"ACH3"
+description = "粘在墙上！"
+icon = ExtResource("4_hp8fk")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_ifjs1"]
+script = ExtResource("2_data")
+id = &"ACH4"
+description = "热气球模式！"
+icon = ExtResource("5_x8uo7")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_kcb4g"]
+script = ExtResource("2_data")
+id = &"ACH5"
+description = "向更高冲锋！"
+icon = ExtResource("6_e8102")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_dan2f"]
+script = ExtResource("2_data")
+id = &"ACH6"
+description = "与阴暗共生！"
+icon = ExtResource("7_2bt0f")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_cc2u3"]
+script = ExtResource("2_data")
+id = &"ACH7"
+description = "火箭发射！"
+icon = ExtResource("8_60idy")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_pjehj"]
+script = ExtResource("2_data")
+id = &"ACH8"
+description = "温软之心！"
+icon = ExtResource("9_ytt38")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_wftis"]
+script = ExtResource("2_data")
+id = &"ACH9"
+description = "温软之人！"
+icon = ExtResource("10_ujty2")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_fcqy6"]
+script = ExtResource("2_data")
+id = &"ACH10"
+description = "温软宇宙！"
+icon = ExtResource("11_wqvkp")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_q5ndn"]
+script = ExtResource("2_data")
+id = &"ACH11"
+description = "记录世界！"
+icon = ExtResource("12_vor4g")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_0d77v"]
+script = ExtResource("2_data")
+id = &"ACH12"
+description = "草原地带！"
+icon = ExtResource("13_wr0pc")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_yx07d"]
+script = ExtResource("2_data")
+id = &"ACH13"
+description = "风之谷！"
+icon = ExtResource("14_60wo0")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[sub_resource type="Resource" id="Resource_c03w6"]
+script = ExtResource("2_data")
+id = &"ACH14"
+description = "白色山峰！"
+icon = ExtResource("15_mf31y")
+metadata/_custom_type_script = "uid://cl6au4seo0hu6"
+
+[resource]
+script = ExtResource("1_catalog")
+achievements = Array[Resource]([SubResource("AchievementData_example1"), SubResource("AchievementData_example2"), SubResource("Resource_n38sj"), SubResource("Resource_ifjs1"), SubResource("Resource_kcb4g"), SubResource("Resource_dan2f"), SubResource("Resource_cc2u3"), SubResource("Resource_pjehj"), SubResource("Resource_wftis"), SubResource("Resource_fcqy6"), SubResource("Resource_q5ndn"), SubResource("Resource_0d77v"), SubResource("Resource_yx07d"), SubResource("Resource_c03w6")])

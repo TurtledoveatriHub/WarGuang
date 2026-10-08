@@ -16,7 +16,7 @@ const ROOM_DREAM10_BLACK_HOLD_TAG: String = "room_dream10_first_enter"
 ## 是否启用 RoomDream10 首次进入事件。
 @export var roomdream10_first_enter_enabled: bool = true
 ## 首次进入事件的目标房间 ID。
-@export var roomdream10_event_room_id: String = "RoomDream10"
+@export var roomdream10_event_room_id: String
 ## 事件接管前的短黑幕缓冲时长，用于衔接正常切房黑屏与事件动画。
 @export var roomdream10_pre_event_black_hold_duration: float = 0.35
 

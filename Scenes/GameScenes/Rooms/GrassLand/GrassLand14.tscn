@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=4 uid="uid://caxgqkrmva710"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_y5pb6"]
-[ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="2_p666d"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_p666d"]
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="3_kum0g"]
 [ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地物块瓦片集.tres" id="4_o7qnr"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="5_kyar7"]
@@ -25,7 +25,7 @@ room_bounds = NodePath("RoomBounds68")
 scale = Vector2(4, 8)
 script = ExtResource("2_p666d")
 debug_color = Color(0, 0.824, 0.588, 0.235)
-metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
+metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
 
 [node name="RoomTrigger" type="Area2D" parent="."]
 

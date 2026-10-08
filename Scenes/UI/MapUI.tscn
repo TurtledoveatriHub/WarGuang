@@ -1,15 +1,22 @@
-[gd_scene load_steps=8 format=3 uid="uid://b5jls6ojf2s46"]
+[gd_scene load_steps=6 format=3 uid="uid://b5jls6ojf2s46"]
 
-[ext_resource type="Script" uid="uid://bjrd5th63r0w" path="res://Scripts/UI/MapUI.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆1.tres" id="3_1artu"]
-[ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="4_1artu"]
-[ext_resource type="Texture2D" uid="uid://ilccd3mmcucq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置按下纹理.tres" id="5_i1hk5"]
-[ext_resource type="Texture2D" uid="uid://dul5pjyqmngpq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置悬停纹理.tres" id="6_1mtfi"]
-[ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="7_1artu"]
-[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="8_1artu"]
+[ext_resource type="Script" uid="uid://dqe1fpd8vpobx" path="res://Scripts/UI/MapUI.gd" id="1_mapui"]
+[ext_resource type="Texture2D" uid="uid://doogm7aww61n3" path="res://Assets/Textures/UIs/InstanceUIs/特殊标志.png" id="3_legend"]
+[ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="4_frame"]
+[ext_resource type="Texture2D" uid="uid://daixedsvp128g" path="res://Assets/Textures/UIs/SceneUIs/地图角色图标.png" id="5_53eeq"]
+[ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="6_fx"]
 
 [node name="MapUI" type="CanvasLayer"]
-script = ExtResource("1")
+script = ExtResource("1_mapui")
+
+[node name="UIFxDirector" type="Node" parent="."]
+script = ExtResource("6_fx")
+transition_enter_delay = 0.0
+drive_components = false
+drive_loop = false
+target_paths = Array[NodePath]([NodePath("../ContentRoot")])
+drift_distance = Vector2(0, 16)
+exit_duration = 0.45
 
 [node name="Background" type="ColorRect" parent="."]
 anchors_preset = 15
@@ -25,33 +32,45 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+pivot_offset = Vector2(640, 360)
 mouse_filter = 2
 
-[node name="MapContainer" type="Node2D" parent="ContentRoot"]
+[node name="FrameSprite" type="Sprite2D" parent="ContentRoot"]
+position = Vector2(640, 360)
+scale = Vector2(4.125, 4.2222)
+texture = ExtResource("4_frame")
 
-[node name="PlayerIcon" type="Sprite2D" parent="ContentRoot/MapContainer"]
-position = Vector2(478, 343)
-texture = ExtResource("3_1artu")
+[node name="LegendSprite" type="Sprite2D" parent="ContentRoot"]
+z_index = 20
+position = Vector2(1020, 633)
+texture = ExtResource("3_legend")
 
-[node name="CloseBtn" type="TextureButton" parent="ContentRoot"]
-layout_mode = 0
-offset_left = 837.0
-offset_top = 143.0
-offset_right = 869.0
-offset_bottom = 175.0
-texture_normal = ExtResource("4_1artu")
-texture_pressed = ExtResource("5_i1hk5")
-texture_hover = ExtResource("6_1mtfi")
-script = ExtResource("7_1artu")
+[node name="MapWindow" type="Control" parent="ContentRoot"]
+clip_contents = true
+anchors_preset = 0
+offset_left = 128.0
+offset_top = 72.0
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
 
-[node name="Label" type="Label" parent="ContentRoot/CloseBtn"]
-layout_mode = 0
+[node name="Backdrop" type="ColorRect" parent="ContentRoot/MapWindow"]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("8_1artu")
-theme_override_font_sizes/font_size = 10
-text = " X"
-horizontal_alignment = 1
-vertical_alignment = 1
+mouse_filter = 2
+color = Color(0.047557652, 0.047557652, 0.04755763, 1)
+
+[node name="MapContainer" type="Node2D" parent="ContentRoot/MapWindow"]
+
+[node name="MapSprite" type="Sprite2D" parent="ContentRoot/MapWindow/MapContainer"]
+position = Vector2(512, 288)
+
+[node name="QuestMarkerLayer" type="Node2D" parent="ContentRoot/MapWindow/MapContainer"]
+
+[node name="PlayerIcon" type="Sprite2D" parent="ContentRoot/MapWindow/MapContainer"]
+position = Vector2(512, 288)
+texture = ExtResource("5_53eeq")

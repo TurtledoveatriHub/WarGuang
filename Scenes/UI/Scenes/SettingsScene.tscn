@@ -1,42 +1,39 @@
-[gd_scene load_steps=64 format=3 uid="uid://8vv4frjt0qmt"]
+[gd_scene load_steps=61 format=3 uid="uid://8vv4frjt0qmt"]
 
 [ext_resource type="Script" uid="uid://b8qfrtedcjp8w" path="res://Scripts/UI/Scenes/SettingsScene.gd" id="1_kwsuw"]
 [ext_resource type="Texture2D" uid="uid://tjem5txgtco5" path="res://Assets/Textures/UIs/SceneUIs/设置.png" id="3_kwbpc"]
-[ext_resource type="Texture2D" uid="uid://c83r16knvve2y" path="res://Assets/Textures/UIs/SceneUIs/pp.png" id="4_em6rb"]
-[ext_resource type="Texture2D" uid="uid://norhspdvctlf" path="res://Assets/Textures/UIs/SceneUIs/tres/按钮纹理.tres" id="5_5n358"]
+[ext_resource type="Texture2D" uid="uid://cb8u4001tl525" path="res://Assets/Textures/UIs/SceneUIs/设置闪光粒子.png" id="4_em6rb"]
 [ext_resource type="Material" uid="uid://car7bvmbkqur7" path="res://Assets/Instances/SettingsSceneParticle.tres" id="5_em6rb"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="5_wi6u5"]
 [ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="7_22g1o"]
-[ext_resource type="Texture2D" uid="uid://bya0ry00l0453" path="res://Assets/Textures/UIs/SceneUIs/tres/设置按下按钮.tres" id="10_jygah"]
-[ext_resource type="Texture2D" uid="uid://b2rsxkcc1s4o2" path="res://Assets/Textures/UIs/SceneUIs/1f.png" id="10_leam6"]
+[ext_resource type="Texture2D" uid="uid://b2rsxkcc1s4o2" path="res://Assets/Textures/UIs/ButtonUIs/翻转大按钮默认纹理.png" id="10_leam6"]
 [ext_resource type="Script" uid="uid://b5ruuqcdndtr1" path="res://Scripts/UI/Scenes/PCControlsPage.gd" id="10_oi1yp"]
-[ext_resource type="Texture2D" uid="uid://c77lqu43iaxkb" path="res://Assets/Textures/UIs/SceneUIs/3f.png" id="11_ihv7n"]
-[ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="11_leam6"]
-[ext_resource type="Texture2D" uid="uid://cwx51h7fx1i7g" path="res://Assets/Textures/UIs/SceneUIs/tres/设置悬停按钮.tres" id="11_qlvnk"]
-[ext_resource type="Texture2D" uid="uid://b6ji0vannv3pj" path="res://Assets/Textures/UIs/SceneUIs/2x.png" id="12_ihv7n"]
-[ext_resource type="Texture2D" uid="uid://boxb0bg1nuw8x" path="res://Assets/Textures/UIs/SceneUIs/2f.png" id="12_plmvg"]
-[ext_resource type="Texture2D" uid="uid://c3fxh3guo8uut" path="res://Assets/Textures/UIs/SceneUIs/3x.png" id="13_plmvg"]
+[ext_resource type="Texture2D" uid="uid://c77lqu43iaxkb" path="res://Assets/Textures/UIs/ButtonUIs/翻转大按钮按下纹理.png" id="11_ihv7n"]
+[ext_resource type="Texture2D" uid="uid://bflntllsubejm" path="res://Assets/Textures/UIs/ButtonUIs/按钮默认纹理.png" id="11_leam6"]
+[ext_resource type="Texture2D" uid="uid://cbxu06v4xk2lp" path="res://Assets/Textures/UIs/ButtonUIs/按钮悬停纹理.png" id="12_ihv7n"]
+[ext_resource type="Texture2D" uid="uid://boxb0bg1nuw8x" path="res://Assets/Textures/UIs/ButtonUIs/翻转大按钮悬停纹理.png" id="12_plmvg"]
+[ext_resource type="Texture2D" uid="uid://dh7lqkmf1t51n" path="res://Assets/Textures/UIs/ButtonUIs/按钮按下纹理.png" id="13_plmvg"]
 [ext_resource type="Texture2D" uid="uid://bxip4ialo0qsl" path="res://Assets/Textures/UIs/SceneUIs/tres/音量滑块1.tres" id="24_houfj"]
 [ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/WindValley/2.png" id="25_fw62u"]
 [ext_resource type="Texture2D" uid="uid://dolaxw8vcjj6y" path="res://Assets/Textures/UIs/SceneUIs/tres/音量滑块2.tres" id="25_ppuk0"]
-[ext_resource type="Texture2D" uid="uid://dim2f13dvnmib" path="res://Assets/Textures/UIs/MobieControlsUI/地图1.tres" id="28_em6rb"]
-[ext_resource type="Texture2D" uid="uid://d25qqy4l3uw55" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆2.tres" id="29_0j7py"]
-[ext_resource type="Texture2D" uid="uid://do2prxybw8u4p" path="res://Assets/Textures/UIs/MobieControlsUI/上1.tres" id="29_c30sq"]
-[ext_resource type="Texture2D" uid="uid://bxbloyj8ao1wb" path="res://Assets/Textures/UIs/MobieControlsUI/地图2.tres" id="29_kwbpc"]
-[ext_resource type="Texture2D" uid="uid://dh5g11jj5tlf2" path="res://Assets/Textures/UIs/MobieControlsUI/上2.tres" id="30_em6rb"]
-[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆1.tres" id="30_sqcj2"]
-[ext_resource type="Texture2D" uid="uid://bn2av7db8mp0" path="res://Assets/Textures/UIs/MobieControlsUI/跳跃1.tres" id="31_kmmkq"]
-[ext_resource type="Texture2D" uid="uid://bjcpxqw8ibgeu" path="res://Assets/Textures/UIs/MobieControlsUI/下1.tres" id="31_kwbpc"]
-[ext_resource type="Texture2D" uid="uid://cksjlbcb0nd60" path="res://Assets/Textures/UIs/MobieControlsUI/下2.tres" id="32_d8wvb"]
-[ext_resource type="Texture2D" uid="uid://b5vkltukes5xx" path="res://Assets/Textures/UIs/MobieControlsUI/左1.tres" id="33_22g1o"]
-[ext_resource type="Texture2D" uid="uid://cilxl6s3ql74f" path="res://Assets/Textures/UIs/MobieControlsUI/冲刺1.tres" id="33_kamy2"]
-[ext_resource type="Texture2D" uid="uid://8gokk5ebfx3" path="res://Assets/Textures/UIs/MobieControlsUI/左2.tres" id="34_fw62u"]
-[ext_resource type="Texture2D" uid="uid://cvkliuiwv654w" path="res://Assets/Textures/UIs/MobieControlsUI/右1.tres" id="35_p6lbb"]
-[ext_resource type="Texture2D" uid="uid://bw8x5folvwdp1" path="res://Assets/Textures/UIs/MobieControlsUI/交互1.tres" id="35_t8pih"]
-[ext_resource type="Texture2D" uid="uid://bsbtq67i0lbc6" path="res://Assets/Textures/UIs/MobieControlsUI/右2.tres" id="36_u5jm1"]
-[ext_resource type="Texture2D" uid="uid://dpose46mf52q0" path="res://Assets/Textures/UIs/MobieControlsUI/超级冲刺1.tres" id="37_ynhls"]
+[ext_resource type="Texture2D" uid="uid://dim2f13dvnmib" path="res://Assets/Textures/UIs/MobieControlsUIs/地图1.tres" id="28_em6rb"]
+[ext_resource type="Texture2D" uid="uid://d25qqy4l3uw55" path="res://Assets/Textures/UIs/MobieControlsUIs/摇杆2.tres" id="29_0j7py"]
+[ext_resource type="Texture2D" uid="uid://do2prxybw8u4p" path="res://Assets/Textures/UIs/MobieControlsUIs/上1.tres" id="29_c30sq"]
+[ext_resource type="Texture2D" uid="uid://bxbloyj8ao1wb" path="res://Assets/Textures/UIs/MobieControlsUIs/地图2.tres" id="29_kwbpc"]
+[ext_resource type="Texture2D" uid="uid://dh5g11jj5tlf2" path="res://Assets/Textures/UIs/MobieControlsUIs/上2.tres" id="30_em6rb"]
+[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUIs/摇杆杆1.tres" id="30_sqcj2"]
+[ext_resource type="Texture2D" uid="uid://bn2av7db8mp0" path="res://Assets/Textures/UIs/MobieControlsUIs/跳跃1.tres" id="31_kmmkq"]
+[ext_resource type="Texture2D" uid="uid://bjcpxqw8ibgeu" path="res://Assets/Textures/UIs/MobieControlsUIs/下1.tres" id="31_kwbpc"]
+[ext_resource type="Texture2D" uid="uid://cksjlbcb0nd60" path="res://Assets/Textures/UIs/MobieControlsUIs/下2.tres" id="32_d8wvb"]
+[ext_resource type="Texture2D" uid="uid://b5vkltukes5xx" path="res://Assets/Textures/UIs/MobieControlsUIs/左1.tres" id="33_22g1o"]
+[ext_resource type="Texture2D" uid="uid://cilxl6s3ql74f" path="res://Assets/Textures/UIs/MobieControlsUIs/冲刺1.tres" id="33_kamy2"]
+[ext_resource type="Texture2D" uid="uid://8gokk5ebfx3" path="res://Assets/Textures/UIs/MobieControlsUIs/左2.tres" id="34_fw62u"]
+[ext_resource type="Texture2D" uid="uid://cvkliuiwv654w" path="res://Assets/Textures/UIs/MobieControlsUIs/右1.tres" id="35_p6lbb"]
+[ext_resource type="Texture2D" uid="uid://bw8x5folvwdp1" path="res://Assets/Textures/UIs/MobieControlsUIs/交互1.tres" id="35_t8pih"]
+[ext_resource type="Texture2D" uid="uid://bsbtq67i0lbc6" path="res://Assets/Textures/UIs/MobieControlsUIs/右2.tres" id="36_u5jm1"]
+[ext_resource type="Texture2D" uid="uid://dpose46mf52q0" path="res://Assets/Textures/UIs/MobieControlsUIs/超级冲刺1.tres" id="37_ynhls"]
 [ext_resource type="Script" uid="uid://dloxn5pxm2x3q" path="res://Scripts/UI/UILoopAnimator.gd" id="39_em6rb"]
-[ext_resource type="Texture2D" uid="uid://d3gavddfgdl2a" path="res://Assets/Textures/Warmas/wmn.png" id="39_kwbpc"]
+[ext_resource type="Texture2D" uid="uid://d3gavddfgdl2a" path="res://Assets/Textures/Warmas/沃玛1.png" id="39_kwbpc"]
 [ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="42_fw62u"]
 [ext_resource type="Script" uid="uid://buwtlyhwawd2q" path="res://Scripts/UI/Scenes/MobieControlsPage.gd" id="mobie_controls_script"]
 
@@ -72,13 +69,13 @@ thickness = 3
 [sub_resource type="ImageTexture" id="ImageTexture_em6rb"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_houfj"]
-texture = ExtResource("5_5n358")
+texture = ExtResource("11_leam6")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ppuk0"]
-texture = ExtResource("10_jygah")
+texture = ExtResource("13_plmvg")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_leam6"]
-texture = ExtResource("11_qlvnk")
+texture = ExtResource("12_ihv7n")
 
 [sub_resource type="ImageTexture" id="ImageTexture_ihv7n"]
 
@@ -224,43 +221,14 @@ region_rect = Rect2(256, 0, 256, 144)
 [node name="MeteorFx" type="GPUParticles2D" parent="."]
 material = SubResource("CanvasItemMaterial_jygah")
 position = Vector2(768, 384)
-amount = 12
+amount = 18
 texture = ExtResource("4_em6rb")
-lifetime = 3.0
+lifetime = 2.5
 preprocess = 1.0
 speed_scale = 1.2
 randomness = 0.5
 visibility_rect = Rect2(-2500, -400, 4200, 750)
 process_material = ExtResource("5_em6rb")
-
-[node name="BackButton" type="TextureButton" parent="."]
-z_index = 10
-offset_left = 58.0
-offset_top = 608.0
-offset_right = 234.0
-offset_bottom = 640.0
-scale = Vector2(2.5, 2.5)
-pivot_offset = Vector2(88, 16)
-texture_normal = ExtResource("10_leam6")
-texture_pressed = ExtResource("11_ihv7n")
-texture_hover = ExtResource("12_plmvg")
-script = ExtResource("7_22g1o")
-hover_offset = Vector2(48, 0)
-enter_drift_distance = Vector2(-360, 0)
-exit_drift_distance = Vector2(-360, 0)
-
-[node name="Label" type="Label" parent="BackButton"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-pivot_offset = Vector2(88, 16)
-theme = ExtResource("5_wi6u5")
-text = "  退出设置"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="SettingsRoot" type="Node2D" parent="."]
 
@@ -1104,7 +1072,6 @@ texture_pressed = ExtResource("36_u5jm1")
 stretch_mode = 3
 
 [node name="AudioPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
-visible = false
 
 [node name="VolumeContainer" type="Node2D" parent="SettingsRoot/PagesRoot/AudioPage"]
 position = Vector2(447, 80)
@@ -1221,7 +1188,37 @@ text = "低: 仅基础表现
 中: 默认  
 高: 增强演出"
 
+[node name="BackButton" type="TextureButton" parent="."]
+z_index = 10
+offset_left = 58.0
+offset_top = 608.0
+offset_right = 234.0
+offset_bottom = 640.0
+scale = Vector2(2.5, 2.5)
+pivot_offset = Vector2(88, 16)
+texture_normal = ExtResource("10_leam6")
+texture_pressed = ExtResource("11_ihv7n")
+texture_hover = ExtResource("12_plmvg")
+script = ExtResource("7_22g1o")
+hover_offset = Vector2(48, 0)
+enter_drift_distance = Vector2(-360, 0)
+exit_drift_distance = Vector2(-360, 0)
+
+[node name="Label" type="Label" parent="BackButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(88, 16)
+theme = ExtResource("5_wi6u5")
+text = "  退出设置"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="UILoopAnimator" type="AnimatedSprite2D" parent="." groups=["ui_loop_animator"]]
+visible = false
 z_index = 204
 texture_filter = 1
 position = Vector2(1131, 584)

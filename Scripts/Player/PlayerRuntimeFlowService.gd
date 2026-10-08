@@ -109,14 +109,12 @@ static func start_airborne_run_keep_tracking(player: Node, direction: int) -> vo
 	player.airborne_run_keep_direction = direction
 
 # 更新奔跑离地保持链路。
+# ★ 唯一失效条件就是「主动松开方向键」或「按了反方向键」。
+#   速度完全不参与判定：墙跳瞬间的反向速度、冲刺的加减速、碰撞后降到多低都不算放弃奔跑。
 static func update_airborne_run_keep_tracking(player: Node, move_input: float) -> void:
 	if not player.airborne_run_keep_active or not player.airborne_run_keep_valid:
 		return
 	if move_input == 0 or sign(move_input) != player.airborne_run_keep_direction:
-		player.airborne_run_keep_valid = false
-		return
-	var keep_speed_threshold: float = maxf(player.run_jump_keep_min_horizontal_speed, 0.0)
-	if player.velocity.x * player.airborne_run_keep_direction <= keep_speed_threshold:
 		player.airborne_run_keep_valid = false
 
 # 处理物理后阶段（地面状态、土狼时间、视觉与朝向）。
@@ -140,9 +138,25 @@ static func finalize_post_physics(player: Node, fixed_delta: float, move_input: 
 	# 奔跑离地连续性跟踪：仅在“奔跑离地”时启动；空中每帧验证“同向按住 + 同向非零速度”。
 	if previous_was_on_floor and not player.was_on_floor:
 		var leave_direction: int = sign(move_input)
-		var from_running_ground: bool = player.current_state == player.PlayerState.RUN or player.is_run_jumping or player.was_running_before_coyote
+		# 任一成立即算「奔跑中离地」：正在 RUN / 奔跑跳 / 土狼时间前在跑 / 本帧仍在奔跑
+		# （最后一条专门覆盖「奔跑中冲刺离地」：那一帧状态已是 DASH，而 is_running 还是 true）
+		var from_running_ground: bool = (
+			player.current_state == player.PlayerState.RUN
+			or player.is_run_jumping
+			or player.was_running_before_coyote
+			or player.is_running
+		)
 		if from_running_ground and leave_direction != 0:
 			start_airborne_run_keep_tracking(player, leave_direction)
+			# ★ 奔跑状态下「跑出边缘」离地（不是跳跃）同样吃「奔跑跳跃水平速度加成」：
+			#   离地瞬间就把加成状态打开，剩下的交给 handle_run_jump 逐帧衰减。
+			if not player.is_jumping:
+				player.is_run_jumping = true
+				player.run_jump_timer = player.run_jump_boost_duration
+				player.run_jump_original_direction = leave_direction
+				# ★ 记住离地瞬间的速度与方向：台阶修正抬升后用它还原水平速度（撞墙会清速）。
+				player.run_off_ledge_assist_speed = absf(player.velocity.x)
+				player.run_off_ledge_assist_direction = leave_direction
 		else:
 			clear_airborne_run_keep_tracking(player)
 

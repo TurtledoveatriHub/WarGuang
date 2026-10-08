@@ -2,11 +2,14 @@
 ## 蹦床虫：行为继承 NeutralBug（地面跟随玩家），顶部可弹起任意物理体（Player / StoneBug 等）。
 ##  - 弹跳力度随“下落速度”增大：force = clamp(base_bounce_force + 下落速度*fall_speed_factor,
 ##    base_bounce_force, max_bounce_force)（base 即最小力，无需额外下限）
-##  - 踩踏检测：每物理帧扫描 BounceArea 内的物理体，按“下落速度>阈值 且 从上方接触”判定，
-##    每个物理体各自有重触发冷却，避免“进入过一次后不再触发”的问题
-##  - 可用 bounce_while_moving 控制“移动（Move）状态下是否也会触发弹跳”（默认关）
+##  - 踩踏检测：每物理帧扫描 BounceArea 内的物理体，按“下落速度≥阈值 且 从上方接触”判定，
+##    移动中同样会触发弹跳（蹦床不受自身移动影响），不设重触发冷却
+##  - 玩家走专用弹跳入口（Player.start_trampoline_bounce），力度只受本虫 max_bounce_force 约束，
+##    不受 JumpBox 的 jumpbox_max_vertical_force 限制
+##  - Trigger 动画结束时把 Idle/Move 恢复到弹跳前的进度（不从头重播）
 ##  - 悬崖检测与“遇悬崖停止前进”由基类 NeutralBug 提供（stop_at_cliff）
-##  - 自带碰撞体不可删（重力/站立需要），但设为不与 Player 等交互：collision_layer=0、mask=6(地面/墙)
+##  - 碰撞层只含 NeutralBug（同类互检用），Player 的碰撞掩码不含该层 → 玩家可以穿过本虫，
+##    只由顶部 BounceArea 弹起，不会与玩家产生碰撞体交互
 ##  - 加入 ignore_switch_press 组：不触发按压式开关
 extends "res://Scripts/Entities/Neutrals/NeutralBug.gd"
 class_name TrampolineBug
@@ -14,22 +17,18 @@ class_name TrampolineBug
 ## ── 弹跳 ──
 @export_category("弹跳")
 ## 基础弹跳力（像素/秒，也等于最小弹跳力）
-@export var base_bounce_force: float = 120.0
+@export var base_bounce_force: float = 160.0
 ## 下落速度对弹跳力的加成系数（落下越快弹得越高）
 @export var fall_speed_factor: float = 0.8
 ## 弹跳力上限（像素/秒）
-@export var max_bounce_force: float = 960.0
-## 最小下落速度阈值（低于它不触发弹跳，避免平移/静止误触）
-@export var min_fall_speed: float = 20.0
-## 同一物理体的重触发冷却（秒）
-@export var retrigger_lock: float = 0.16
-## Move（移动）状态下是否也会触发弹跳（默认关：移动中不触发）
-@export var bounce_while_moving: bool = false
+@export var max_bounce_force: float = 1080.0
+## 最小下落速度阈值（低于它不触发弹跳，避免上升/平移中误触）
+@export var min_fall_speed: float = 5.0
 
 ## ── 表现 ──
 @export_category("表现")
 ## Trigger 最长占用时间（秒，无动画/循环动画时的兜底）
-@export var trigger_time: float = 0.25
+@export var trigger_time: float = 0.2
 
 ## ── 动画（内部固定，不导出）──
 ## 弹跳动画名枚举
@@ -46,8 +45,12 @@ const BOUNCE_ANIM_NAMES: PackedStringArray = ["Trigger"]
 var _triggering: bool = false
 ## Trigger 兜底计时
 var _trigger_timer: float = 0.0
-## 每个物理体的上次弹跳时间戳（instance_id -> 毫秒）
-var _last_bounce_ms: Dictionary = {}
+## Trigger 播放前正在播的动画名（弹跳结束后原样恢复，避免 Idle/Move 从头重播）
+var _resume_anim: String = ""
+## Trigger 播放前的动画帧序号（恢复用）
+var _resume_frame: int = 0
+## Trigger 播放前的帧内进度（恢复用，保留动画节奏）
+var _resume_frame_progress: float = 0.0
 
 
 func _ready() -> void:
@@ -62,7 +65,7 @@ func _physics_process(delta: float) -> void:
 	if _triggering:
 		_trigger_timer -= delta
 		if _trigger_timer <= 0.0:
-			_triggering = false
+			_end_trigger()
 	# 每物理帧扫描弹跳区（比只靠 body_entered 可靠：可处理“进入后速度才变大/静止在上方”等情况）
 	_poll_bounce()
 	super._physics_process(delta)
@@ -76,11 +79,6 @@ func _is_anim_locked() -> bool:
 func _poll_bounce() -> void:
 	if _bounce_area == null or not _bounce_area.monitoring:
 		return
-	# 移动状态下默认不触发弹跳（可用 bounce_while_moving 打开）
-	if not bounce_while_moving and absf(velocity.x) > 5.0:
-		return
-	var now_ms: int = Time.get_ticks_msec()
-	var lock_ms: int = int(maxf(retrigger_lock, 0.0) * 1000.0)
 	for body in _bounce_area.get_overlapping_bodies():
 		if body == null or body == self:
 			continue
@@ -92,33 +90,56 @@ func _poll_bounce() -> void:
 		# 只响应从上方接触（身体中心不应低于弹跳面太多）
 		if body.global_position.y > global_position.y + 6.0:
 			continue
-		var bid: int = body.get_instance_id()
-		if _last_bounce_ms.has(bid) and now_ms - int(_last_bounce_ms[bid]) < lock_ms:
-			continue
-		_last_bounce_ms[bid] = now_ms
 		_bounce(body, fall_speed)
 
 
-## 对物理体施加弹跳力（玩家走 JumpBox 弹跳手感，其它物理体直接设向上速度）
+## 对物理体施加弹跳力：
+##   - 玩家走专用蹦床弹跳入口（力度只受本虫上限约束，弹跳后空中能力恢复可用）
+##   - 其它物理体（石头虫等）直接给一个向上速度
 func _bounce(body: Node, fall_speed: float) -> void:
 	var force: float = clampf(base_bounce_force + fall_speed * fall_speed_factor, base_bounce_force, max_bounce_force)
-	if body.has_method("start_jumpbox_bounce"):
-		body.start_jumpbox_bounce(force)
+	if body.has_method("start_trampoline_bounce"):
+		body.start_trampoline_bounce(force)
 	else:
 		body.velocity.y = -force
 	_play_trigger()
 
 
 ## 播放一次 Trigger 动画（有帧才播；同时用计时兜底，避免循环动画卡住）
+## 注意：会记录播放前的动画进度，结束后由 _end_trigger() 原样恢复
 func _play_trigger() -> void:
+	var trigger_name: String = BOUNCE_ANIM_NAMES[BounceAnim.TRIGGER]
+	if _triggering:
+		# 已在 Trigger 中：只重置计时并重播，不覆盖“恢复点”
+		_trigger_timer = maxf(trigger_time, 0.01)
+		if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation(trigger_name) \
+		and sprite.sprite_frames.get_frame_count(trigger_name) > 0:
+			sprite.play(trigger_name)
+		return
+	# 记录 Trigger 之前的动画进度，避免结束后 Idle/Move 从第 0 帧重播
+	if sprite:
+		_resume_anim = sprite.animation
+		_resume_frame = sprite.frame
+		_resume_frame_progress = sprite.frame_progress
 	_triggering = true
 	_trigger_timer = maxf(trigger_time, 0.01)
-	var trigger_name: String = BOUNCE_ANIM_NAMES[BounceAnim.TRIGGER]
 	if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation(trigger_name) \
 	and sprite.sprite_frames.get_frame_count(trigger_name) > 0:
 		sprite.play(trigger_name)
 
 
+## 结束 Trigger 占用：把动画恢复到弹跳前的进度（不从头重播）
+func _end_trigger() -> void:
+	_triggering = false
+	if sprite == null or _resume_anim == "":
+		return
+	if sprite.sprite_frames == null or not sprite.sprite_frames.has_animation(_resume_anim):
+		return
+	sprite.play(_resume_anim)
+	sprite.frame = _resume_frame
+	sprite.frame_progress = _resume_frame_progress
+
+
 func _on_sprite_anim_finished() -> void:
 	if sprite and sprite.animation == BOUNCE_ANIM_NAMES[BounceAnim.TRIGGER]:
-		_triggering = false
+		_end_trigger()

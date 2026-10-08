@@ -1,7 +1,7 @@
 [gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://1xy7xygxqlmf"]
 
-[ext_resource type="Texture2D" uid="uid://cifyc7xcp8n3v" path="res://Assets/Textures/UIs/SceneUIs/title沃光标题集.png" id="1_wyqy2"]
+[ext_resource type="Texture2D" uid="uid://bktfojk5rlixv" path="res://Assets/Textures/UIs/SceneUIs/沃光标题.png" id="1_qmmnc"]
 
 [resource]
-atlas = ExtResource("1_wyqy2")
-region = Rect2(208, 192, 144, 64)
+atlas = ExtResource("1_qmmnc")
+region = Rect2(0, 64, 144, 64)

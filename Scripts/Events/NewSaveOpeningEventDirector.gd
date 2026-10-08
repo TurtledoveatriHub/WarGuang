@@ -3,7 +3,7 @@ class_name NewSaveOpeningEventDirector
 
 @export_category("Binding")
 ## 新存档开场对应的初始房间 ID。
-@export var opening_room_id: String = "Room1"
+@export var opening_room_id: String
 ## Player 节点路径（相对本节点）。
 @export var player_path: NodePath = NodePath("../../Player")
 ## BootCinematicDirector 节点路径（相对本节点）。
@@ -44,13 +44,12 @@ var intro_visual_enabled: bool = true
 @export var gameplay_camera_start_zoom: float = 6.0
 ## 掉落演出目标镜头缩放值。
 @export var gameplay_camera_target_zoom: float = 2.0
-#后续改为曲线放大
 ## 掉落镜头缩放过渡时长（秒）。
 @export var gameplay_camera_zoom_duration: float = 2.0
 ## 掉落速度（像素/秒）。
 @export var gameplay_drop_speed: float = 360.0
 ## 落地停留时长（秒）。
-@export var gameplay_landing_settle_time: float = 5.0
+@export var gameplay_landing_settle_time: float = 4.0
 ## 掉落阶段动画名。
 var gameplay_drop_animation_name: StringName = &"DOWN"
 ## 落地阶段动画名。

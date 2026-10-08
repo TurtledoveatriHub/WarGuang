@@ -74,10 +74,10 @@ extends TextureButton
 @export_category("音效")
 ## 是否启用本组件的悬停 / 按下音效。
 @export var enable_sfx: bool = true
-## 悬停音效。默认已指向 a.wav；要换就直接在 Inspector 里替换这个引用。
-@export var hover_sfx_stream: AudioStream = preload("res://Assets/Audios/SFX/UI/a.wav")
-## 按下音效。默认已指向 鼠标点击音效.wav；要换就直接在 Inspector 里替换这个引用。
-@export var press_sfx_stream: AudioStream = preload("res://Assets/Audios/SFX/UI/鼠标点击音效.wav")
+## 悬停音效。
+@export var hover_sfx_stream: AudioStream = preload("res://Assets/Audios/SFX/Box/短促挥舞.wav")
+## 按下音效。
+@export var press_sfx_stream: AudioStream = preload("res://Assets/Audios/SFX/UI/鼠标点击.wav")
 
 @export_category("退场")
 ## 退场前是否先把「悬停/按下」的像素位移与缩放按「鼠标移出」的方式平滑收回去。

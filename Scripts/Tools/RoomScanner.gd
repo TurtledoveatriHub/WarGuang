@@ -69,6 +69,49 @@ static func _parse_vector2(text: String) -> Variant:
 		return null
 	return Vector2(float(parts[0].strip_edges()), float(parts[1].strip_edges()))
 
+## 从场景文本中解析所有门（Doors 容器的直接子节点）的位置与目标房间
+## 返回 [{ "position": Vector2, "door_id": String, "target": String }]
+static func scan_doors(scene_path: String) -> Array:
+	var result: Array = []
+	if not FileAccess.file_exists(scene_path):
+		return result
+	var file: FileAccess = FileAccess.open(scene_path, FileAccess.READ)
+	if file == null:
+		return result
+	var scene_text: String = file.get_as_text()
+	file.close()
+	const MARKER := "[node name=\""
+	var search_index: int = 0
+	while true:
+		var header_index: int = scene_text.find(MARKER, search_index)
+		if header_index < 0:
+			break
+		var block_end: int = scene_text.find("\n[", header_index)
+		var block: String = scene_text.substr(header_index, block_end - header_index) if block_end > header_index else scene_text.substr(header_index)
+		search_index = header_index + MARKER.length()
+		if not block.contains("parent=\"Doors\""):
+			continue
+		var properties: Dictionary = {}
+		for line in block.split("\n"):
+			var trimmed: String = line.strip_edges()
+			var eq_index: int = trimmed.find("=")
+			if eq_index <= 0:
+				continue
+			properties[trimmed.substr(0, eq_index).strip_edges()] = trimmed.substr(eq_index + 1).strip_edges()
+		var target: String = str(properties.get("target_room_id", "")).replace("\"", "")
+		if target == "":
+			continue
+		var door_position: Vector2 = Vector2.ZERO
+		var parsed: Variant = _parse_vector2(str(properties.get("position", "")))
+		if parsed is Vector2:
+			door_position = parsed
+		result.append({
+			"position": door_position,
+			"door_id": str(properties.get("door_id", "")).replace("\"", ""),
+			"target": target,
+		})
+	return result
+
 ## 扫描单个房间场景，返回其 room_bounds 的本地矩形；失败返回空矩形
 ## TextArea 以自身 position 为矩形中心，故左上角 = position - 实际尺寸 * 0.5。
 static func scan_room(scene_path: String) -> Rect2:
@@ -119,12 +162,19 @@ static func scan_all(data: RoomLayoutData) -> Dictionary:
 		"scanned": [],           # 成功扫描到边界的房间
 		"failed": [],            # 扫描失败（无场景 / 无 room_bounds）的房间
 		"missing_position": [],  # 已扫描到尺寸但还没有位置偏移的房间
+		"doors": 0,              # 一共记下了多少扇门
 	}
 	if data == null:
 		report["error"] = "RoomLayoutData 为空"
 		return report
+	# 兜底：编辑器里缓存的旧资源实例可能没有 room_doors 字段（新建字段时为 null）
+	if not (data.room_doors is Dictionary):
+		data.room_doors = {}
 	var registry: Dictionary = get_room_registry()
 	for room_id in registry.keys():
+		var doors: Array = scan_doors(str(registry[room_id]))
+		data.room_doors[room_id] = doors
+		report["doors"] = int(report["doors"]) + doors.size()
 		var rect: Rect2 = scan_room(str(registry[room_id]))
 		if rect.size.x <= 0.0 or rect.size.y <= 0.0:
 			report["failed"].append(room_id)
@@ -140,7 +190,7 @@ static func format_report(report: Dictionary) -> String:
 	var scanned: Array = report.get("scanned", [])
 	var failed: Array = report.get("failed", [])
 	var missing: Array = report.get("missing_position", [])
-	var text := "扫描完成：成功 %d，失败 %d，缺位置 %d" % [scanned.size(), failed.size(), missing.size()]
+	var text := "扫描完成：成功 %d，失败 %d，缺位置 %d，记下门 %d 扇" % [scanned.size(), failed.size(), missing.size(), int(report.get("doors", 0))]
 	if not failed.is_empty():
 		text += "\n  扫描失败：" + ", ".join(failed)
 	if not missing.is_empty():

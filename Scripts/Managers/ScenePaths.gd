@@ -28,7 +28,7 @@ const PLAYER_AFTERIMAGE = "res://Scenes/Instances/ObjectPools/Afterimage.tscn"
 # NPC 场景
 # ============================================
 const NPC_MANIAC = "res://Scenes/Entities/NPCs/ManiacNPC.tscn"
-const NPC_MERCHANT = "res://Scenes/Entities/NPCs/MerchantNPC.tscn"
+const NPC_MERCHANT = "res://Scenes/Entities/NPCs/Salesclerk.tscn"
 const NPC_MASTER = "res://Scenes/Entities/NPCs/MasterNPC.tscn"
 
 # ============================================
@@ -89,8 +89,6 @@ static func load_main_game() -> PackedScene:
 # ============================================
 const ROOMS_DIR = "res://Scenes/GameScenes/Rooms/"
 const ROOM_PATHS = {
-	"Room1": ROOMS_DIR + "Room1.tscn",
-	"Room39": ROOMS_DIR + "Room39.tscn",
 	"GrassLand1": ROOMS_DIR + "GrassLand/GrassLand1.tscn",
 	"GrassLand2": ROOMS_DIR + "GrassLand/GrassLand2.tscn",
 	"GrassLand3": ROOMS_DIR + "GrassLand/GrassLand3.tscn",
@@ -106,7 +104,6 @@ const ROOM_PATHS = {
 	"GrassLand13": ROOMS_DIR + "GrassLand/GrassLand13.tscn",
 	"GrassLand14": ROOMS_DIR + "GrassLand/GrassLand14.tscn",
 	"GrassLand15": ROOMS_DIR + "GrassLand/GrassLand15.tscn",
-	"RoomDream10": ROOMS_DIR + "RoomDream10.tscn",
 	
 	"SnowMountain1": ROOMS_DIR + "SnowMountain/SnowMountain1.tscn",
 	"SnowMountain2": ROOMS_DIR + "SnowMountain/SnowMountain2.tscn",

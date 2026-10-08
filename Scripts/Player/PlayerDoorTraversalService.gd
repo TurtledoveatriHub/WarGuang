@@ -32,7 +32,9 @@ static func begin_autowalk(player: Node, room_id: String, door_position: Vector2
 	player.velocity = Vector2.ZERO
 	player.is_facing_right = resolved_facing_right
 	player.animated_sprite.flip_h = not resolved_facing_right
-	player.change_state(player.PlayerState.IDLE)
+	# ★ 进房间前在奔跑的话，自动走位也保持奔跑（速度 + RUN 动画），不要掉成走路/待机
+	player.door_autowalk_running = bool(player.is_running) or player.current_state == player.PlayerState.RUN
+	player.change_state(player.PlayerState.RUN if player.door_autowalk_running else player.PlayerState.IDLE)
 	player.control_lock_timer = player.door_autowalk_timeout + 0.2
 	player.is_control_locked = true
 	player.set_process_input(false)
@@ -64,8 +66,12 @@ static func update_autowalk(player: Node, fixed_delta: float) -> bool:
 
 	var previous_position: Vector2 = player.global_position
 	var previous_delta_x: float = target.x - previous_position.x
-	var target_speed: float = player.run_move_speed * 0.85
-	var acceleration: float = player.ground_acceleration * player.run_move_speed * 1.2
+	# ★ 自动走位速度直接跟着玩家自己的移动速度走（不再用 0.85 这种魔法系数）：
+	#   普通走位 = base_move_speed，奔跑进门 = run_move_speed，和玩家手动移动完全一致，
+	#   所以调 player 脚本里的这两个速度就能同时调自动走位。
+	var auto_walk_base_speed: float = player.run_move_speed if player.door_autowalk_running else player.base_move_speed
+	var target_speed: float = auto_walk_base_speed * player.effective_horizontal_multiplier
+	var acceleration: float = player.ground_acceleration * auto_walk_base_speed * 1.2
 	if player.door_autowalk_jump_used:
 		if player.door_autowalk_jump_phase == 1:
 			if not player.door_autowalk_jump_velocity_ready:
@@ -110,7 +116,7 @@ static func update_autowalk(player: Node, fixed_delta: float) -> bool:
 
 	if player.is_on_floor():
 		if absf(player.velocity.x) > 8.0:
-			player.change_state(player.PlayerState.MOVE)
+			player.change_state(player.PlayerState.RUN if player.door_autowalk_running else player.PlayerState.MOVE)
 		else:
 			player.change_state(player.PlayerState.IDLE)
 	else:
@@ -161,7 +167,10 @@ static func finish_autowalk(player: Node) -> void:
 	player.control_lock_timer = 0.0
 	player.is_control_locked = false
 	player.set_process_input(true)
+	# 奔跑进门的话，自动走位结束也停在 RUN 上，与随后的玩家输入无缝衔接
+	var was_running: bool = player.door_autowalk_running
+	player.door_autowalk_running = false
 	if player.is_on_floor():
-		player.change_state(player.PlayerState.IDLE)
+		player.change_state(player.PlayerState.RUN if was_running else player.PlayerState.IDLE)
 	else:
 		player.change_state(player.PlayerState.DOWN)

@@ -1,19 +1,25 @@
-[gd_scene load_steps=12 format=3 uid="uid://diylsfmb0ckg5"]
+[gd_scene load_steps=9 format=3 uid="uid://diylsfmb0ckg5"]
 
 [ext_resource type="Script" uid="uid://x3hbxtwnrr30" path="res://Scripts/UI/TeleportPanel.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/WindValley/2.png" id="2_juc85"]
-[ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="3_juc85"]
-[ext_resource type="Texture2D" uid="uid://ilccd3mmcucq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置按下纹理.tres" id="4_q6nrd"]
-[ext_resource type="Texture2D" uid="uid://dul5pjyqmngpq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置悬停纹理.tres" id="5_7prjw"]
-[ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="6_ex6nn"]
+[ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="3_juc85"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="7_ex6nn"]
-[ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="8_ex6nn"]
-[ext_resource type="Texture2D" uid="uid://b6ji0vannv3pj" path="res://Assets/Textures/UIs/SceneUIs/2x.png" id="9_7alhu"]
+[ext_resource type="Texture2D" uid="uid://bflntllsubejm" path="res://Assets/Textures/UIs/ButtonUIs/按钮默认纹理.png" id="8_ex6nn"]
+[ext_resource type="Texture2D" uid="uid://cbxu06v4xk2lp" path="res://Assets/Textures/UIs/ButtonUIs/按钮悬停纹理.png" id="9_7alhu"]
 [ext_resource type="Script" uid="uid://dw76ryy8ii6g7" path="res://Scripts/UI/TeleportPanelButton.gd" id="9_l5e8y"]
-[ext_resource type="Texture2D" uid="uid://c3fxh3guo8uut" path="res://Assets/Textures/UIs/SceneUIs/3x.png" id="10_pq6s8"]
+[ext_resource type="Texture2D" uid="uid://dh7lqkmf1t51n" path="res://Assets/Textures/UIs/ButtonUIs/按钮按下纹理.png" id="10_pq6s8"]
+[ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="11_fxbus"]
 
 [node name="TeleportPanel" type="CanvasLayer"]
 script = ExtResource("1")
+
+[node name="UIFxDirector" type="Node" parent="."]
+script = ExtResource("11_fxbus")
+transition_enter_delay = 0.0
+drive_components = false
+drive_loop = false
+target_paths = Array[NodePath]([NodePath("../PanelRoot")])
+drift_distance = Vector2(0, 16)
+exit_duration = 0.45
 
 [node name="Background" type="ColorRect" parent="."]
 anchors_preset = 15
@@ -26,44 +32,22 @@ color = Color(0, 0, 0, 0)
 position = Vector2(618, 330)
 
 [node name="Sprite2D" type="Sprite2D" parent="PanelRoot"]
-texture = ExtResource("2_juc85")
+scale = Vector2(4, 4)
+texture = ExtResource("3_juc85")
 
-[node name="CloseBtn" type="TextureButton" parent="PanelRoot"]
-offset_left = 228.0
-offset_top = -148.0
-offset_right = 260.0
-offset_bottom = -116.0
-texture_normal = ExtResource("3_juc85")
-texture_pressed = ExtResource("4_q6nrd")
-texture_hover = ExtResource("5_7prjw")
-stretch_mode = 0
-script = ExtResource("6_ex6nn")
-
-[node name="Label" type="Label" parent="PanelRoot/CloseBtn"]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("7_ex6nn")
-theme_override_font_sizes/font_size = 10
-text = "X"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Btn1" type="TextureButton" parent="PanelRoot"]
-offset_left = -164.0
-offset_top = -28.0
-offset_right = -96.0
-offset_bottom = -6.0
+[node name="GrassLand1" type="TextureButton" parent="PanelRoot"]
+offset_left = -234.0
+offset_top = 21.0
+offset_right = -166.0
+offset_bottom = 43.0
 texture_normal = ExtResource("8_ex6nn")
 texture_pressed = ExtResource("9_7alhu")
 texture_hover = ExtResource("10_pq6s8")
 stretch_mode = 0
 script = ExtResource("9_l5e8y")
-target_teleport_id = "Room1-1"
+target_teleport_id = "GrassLand1"
 
-[node name="Label" type="Label" parent="PanelRoot/Btn1"]
+[node name="Label" type="Label" parent="PanelRoot/GrassLand1"]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -71,23 +55,23 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("7_ex6nn")
 theme_override_font_sizes/font_size = 10
-text = "X"
+text = "初始草原"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Btn3" type="TextureButton" parent="PanelRoot"]
-offset_left = -86.0
-offset_top = -29.0
-offset_right = -18.0
-offset_bottom = -7.0
+[node name="GrassLand7" type="TextureButton" parent="PanelRoot"]
+offset_left = -317.0
+offset_top = 76.0
+offset_right = -249.0
+offset_bottom = 98.0
 texture_normal = ExtResource("8_ex6nn")
 texture_pressed = ExtResource("9_7alhu")
 texture_hover = ExtResource("10_pq6s8")
 stretch_mode = 0
 script = ExtResource("9_l5e8y")
-target_teleport_id = "Room2-1"
+target_teleport_id = "GrassLand7"
 
-[node name="Label" type="Label" parent="PanelRoot/Btn3"]
+[node name="Label" type="Label" parent="PanelRoot/GrassLand7"]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -95,23 +79,23 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("7_ex6nn")
 theme_override_font_sizes/font_size = 10
-text = "X"
+text = "草原地下"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Btn4" type="TextureButton" parent="PanelRoot"]
-offset_left = -240.0
-offset_top = -9.0
-offset_right = -172.0
-offset_bottom = 13.0
+[node name="GrassLand12" type="TextureButton" parent="PanelRoot"]
+offset_left = -122.0
+offset_top = 15.0
+offset_right = -54.0
+offset_bottom = 37.0
 texture_normal = ExtResource("8_ex6nn")
 texture_pressed = ExtResource("9_7alhu")
 texture_hover = ExtResource("10_pq6s8")
 stretch_mode = 0
 script = ExtResource("9_l5e8y")
-target_teleport_id = "Room3-1"
+target_teleport_id = "GrassLand12"
 
-[node name="Label" type="Label" parent="PanelRoot/Btn4"]
+[node name="Label" type="Label" parent="PanelRoot/GrassLand12"]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -119,23 +103,23 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("7_ex6nn")
 theme_override_font_sizes/font_size = 10
-text = "X"
+text = "草原城镇"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Btn5" type="TextureButton" parent="PanelRoot"]
-offset_left = 26.0
-offset_top = -5.0
-offset_right = 94.0
-offset_bottom = 17.0
+[node name="SnowMountain4" type="TextureButton" parent="PanelRoot"]
+offset_left = 88.0
+offset_top = 13.0
+offset_right = 156.0
+offset_bottom = 35.0
 texture_normal = ExtResource("8_ex6nn")
 texture_pressed = ExtResource("9_7alhu")
 texture_hover = ExtResource("10_pq6s8")
 stretch_mode = 0
 script = ExtResource("9_l5e8y")
-target_teleport_id = "SnowMountain4-1"
+target_teleport_id = "SnowMountain4"
 
-[node name="Label" type="Label" parent="PanelRoot/Btn5"]
+[node name="Label" type="Label" parent="PanelRoot/SnowMountain4"]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -143,6 +127,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("7_ex6nn")
 theme_override_font_sizes/font_size = 10
-text = "X"
+text = "雪山山洞"
 horizontal_alignment = 1
 vertical_alignment = 1

@@ -3,6 +3,8 @@ class_name PlayerMovementService
 
 # 复用空气能力服务，避免移动状态和跳跃状态各自写一套切换逻辑。
 const PlayerAirAbilityServiceScript = preload("res://Scripts/Player/PlayerAirAbilityService.gd")
+## 台阶修正入口（跑出边缘撞到矮障碍时把它抬上去，而不是走撞墙僵直）
+const PlayerEdgeCorrectionServiceScript = preload("res://Scripts/Player/PlayerEdgeCorrectionService.gd")
 
 # 处理地面快速双击奔跑检测。
 static func detect_run_input(player: Node, move_input: float) -> void:
@@ -95,6 +97,9 @@ static func handle_dash_timers(player: Node, fixed_delta: float) -> void:
 				var move_input = player.get_resolved_horizontal_input() if player.has_method("get_resolved_horizontal_input") else Input.get_axis("left", "right")
 				if move_input == 0:
 					player.change_state(player.PlayerState.IDLE)
+				elif player.is_running:
+					# 地面冲刺结束：仍在奔跑就回 RUN —— 冲刺不应该打断奔跑状态
+					player.change_state(player.PlayerState.RUN)
 				else:
 					player.change_state(player.PlayerState.MOVE)
 			else:
@@ -268,7 +273,7 @@ static func handle_idle_state(player: Node, _delta: float, move_input: float, ju
 		player.velocity.x = move_toward(player.velocity.x, target_speed, player.ground_acceleration * player.base_move_speed * player.effective_horizontal_multiplier)
 
 # 处理普通移动状态的地面逻辑。
-static func handle_move_state(player: Node, _delta: float, move_input: float, jump_just_pressed: bool, dash_just_pressed: bool) -> void:
+static func handle_move_state(player: Node, delta: float, move_input: float, jump_just_pressed: bool, dash_just_pressed: bool) -> void:
 	if not player.is_on_floor() and not player.coyote_time_active:
 		if player.velocity.y < 0:
 			player.change_state(player.PlayerState.JUMP)
@@ -293,8 +298,11 @@ static func handle_move_state(player: Node, _delta: float, move_input: float, ju
 	if player.current_state == player.PlayerState.RUN and player.is_on_wall():
 		var wall_normal = player.get_wall_normal()
 		if wall_normal.dot(Vector2(move_input, 0)) < 0:
-			handle_wall_bump(player)
-			return
+			# ★ 先试「跑出边缘台阶修正」：断口对面那块同高度地形的侧面会被当成墙，
+			#   修正成功就把玩家抬到它顶面继续跑，而不是吃撞墙僵直 + 反弹。
+			if not PlayerEdgeCorrectionServiceScript.try_run_off_ledge_step_up(player, delta):
+				handle_wall_bump(player)
+				return
 
 	if move_input == 0:
 		player.change_state(player.PlayerState.IDLE)
@@ -306,7 +314,7 @@ static func handle_move_state(player: Node, _delta: float, move_input: float, ju
 		player.velocity.x = move_toward(player.velocity.x, target_speed, player.ground_acceleration * player.base_move_speed * player.effective_horizontal_multiplier)
 
 # 处理跑步状态的地面逻辑。
-static func handle_run_state(player: Node, _delta: float, move_input: float, jump_just_pressed: bool, dash_just_pressed: bool) -> void:
+static func handle_run_state(player: Node, delta: float, move_input: float, jump_just_pressed: bool, dash_just_pressed: bool) -> void:
 	if not player.is_on_floor() and not player.coyote_time_active:
 		if player.velocity.y < 0:
 			player.change_state(player.PlayerState.JUMP)
@@ -331,8 +339,10 @@ static func handle_run_state(player: Node, _delta: float, move_input: float, jum
 	if player.current_state == player.PlayerState.RUN and player.is_on_wall():
 		var wall_normal = player.get_wall_normal()
 		if wall_normal.dot(Vector2(move_input, 0)) < 0:
-			handle_wall_bump(player)
-			return
+			# ★ 同上：撞墙前先给「跑出边缘台阶修正」一次机会（这就是跨越一格断口的关键）
+			if not PlayerEdgeCorrectionServiceScript.try_run_off_ledge_step_up(player, delta):
+				handle_wall_bump(player)
+				return
 
 	if move_input == 0:
 		player.change_state(player.PlayerState.IDLE)

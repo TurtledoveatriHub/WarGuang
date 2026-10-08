@@ -2,6 +2,10 @@ extends UIScene  # UI 页面统一基类（生命周期 / 输入锁 / 动效总�
 
 ## 设置界面场景（在 Inspector 中拖拽 SettingsScene.tscn）
 @export var settings_scene_resource: PackedScene
+## 三个信息弹窗（在 Inspector 中拖拽对应 .tscn）
+@export var about_author_scene: PackedScene
+@export var update_notes_scene: PackedScene
+@export var achievement_scene: PackedScene
 ## 标题画面 BGM（在 Inspector 中拖拽 .ogg 或 .mp3 文件）
 @export var title_bgm_stream: AudioStream
 
@@ -9,6 +13,11 @@ extends UIScene  # UI 页面统一基类（生命周期 / 输入锁 / 动效总�
 @onready var start_button = $StartButton
 @onready var settings_button = $SettingsButton
 @onready var quit_button = $QuitButton
+@onready var ach_button: TextureButton = $ACHButton
+@onready var about_author_button: TextureButton = $AboutAuthor
+@onready var update_notes_button: TextureButton = $UpdateNotes
+## 当前打开的弹窗（同一时刻只允许一个）
+var _active_popup: Node = null
 ## 过渡轨道已并入 UIFxDirector（动效总线）：这里保留旧名字指向总线，业务代码无需改动。
 @onready var ui_transition_animator: Node = _get_fx_bus()
 @onready var title_sprite_a: Sprite2D = $Title
@@ -54,6 +63,9 @@ func _ready():
 	start_button.pressed.connect(_on_start_button_pressed)
 	settings_button.pressed.connect(_on_settings_button_pressed)
 	quit_button.pressed.connect(_on_quit_button_pressed)
+	ach_button.pressed.connect(_on_achievement_button_pressed)
+	about_author_button.pressed.connect(_on_about_author_button_pressed)
+	update_notes_button.pressed.connect(_on_update_notes_button_pressed)
 	if title_click_area_a:
 		title_click_area_a.pressed.connect(_on_title_area_a_pressed)
 	if title_click_area_b:
@@ -156,6 +168,52 @@ func _on_input_lock_applied(locked: bool) -> void:
 	start_button.disabled = locked
 	settings_button.disabled = locked
 	quit_button.disabled = locked
+	# 两个角落里的小按钮与成就按钮也一起失活：
+	# 弹窗打开期间它们不仅点不动，也不再播悬停动画（UIButtonFx 会忽略 disabled 按钮的悬停）。
+	ach_button.disabled = locked
+	about_author_button.disabled = locked
+	update_notes_button.disabled = locked
+
+
+## ------------------------------------------------------------------
+## 信息弹窗（关于作者 / 游戏公告 / 游戏成就）
+## ------------------------------------------------------------------
+
+func _on_about_author_button_pressed() -> void:
+	_open_popup(about_author_scene, "AboutAuthor")
+
+
+func _on_update_notes_button_pressed() -> void:
+	_open_popup(update_notes_scene, "UpdateNotes")
+
+
+func _on_achievement_button_pressed() -> void:
+	_open_popup(achievement_scene, "AchievementScene")
+
+
+## 打开一个信息弹窗。与「设置界面」不同：这三个弹窗**不换场景、也不播标题页的退场**，
+## 只是叠一层遮罩 + 把标题页整层失活：
+##   * set_overlay_active(true) → 本页按钮全部禁用：点不动、也不再播悬停动画；
+##   * 因为 overlay_pass_through_input = true，本页不会吞事件，弹窗自己的 ContinueButton / ESC
+##     才收得到（否则会出现「弹窗盖在上面但按钮点不动」）。
+func _open_popup(scene: PackedScene, tag: String) -> void:
+	if scene == null:
+		push_error("TitleScene: %s 弹窗未配置！请在 Inspector 中拖拽对应的 .tscn" % tag)
+		return
+	if is_input_locked() or _active_popup != null or UIRouter.is_busy():
+		return
+	_reset_title_click_state()
+	_active_popup = scene.instantiate()
+	set_overlay_active(true)
+	add_child(_active_popup)
+	_active_popup.tree_exited.connect(_on_popup_closed)
+
+
+## 弹窗自行销毁后（ContinueButton / ESC）解除失活，标题页重新可用。
+func _on_popup_closed() -> void:
+	_active_popup = null
+	set_overlay_active(false)
+	set_input_locked(false)
 
 ## 覆盖基类：本页面入场时的额外表现（灯光呼吸重建）。
 ## 注意：这里**不能 await 帧**，否则入场动画会晚一帧才开始，

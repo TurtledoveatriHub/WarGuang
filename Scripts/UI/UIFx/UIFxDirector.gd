@@ -3,7 +3,7 @@ extends Node
 ## UI 动效总线（UI 架构重做第 2 层：表现层调度）。
 ##
 ## 它把原先互不相干的三套机制收敛成**一条总线 + 一个状态**：
-##   * 过渡轨道：`UITransitionAnimator`（页面整体 / 标题的开合）—— 鸭子类型发现，不依赖具体类
+##   * 过渡轨道：本页面的整体开合（目标在 target_paths 里配）
 ##   * 循环轨道：`UILoopAnimator`（常态循环动画，进入即开始、退场即结束，不参与等待）
 ##   * 组件轨道：任何具备 `play_enter` / `play_exit` / `get_fx_duration` 的节点（按钮等），按树序错开
 ##
@@ -42,14 +42,11 @@ extends Node
 @export_category("收集规则")
 ## 只处理 is_visible_in_tree() 为 true 的组件：隐藏页面里的按钮不参与错开。
 @export var only_visible_components: bool = true
-## 是否打印调度信息（排查时序问题时打开）。
-@export var debug_log: bool = false
 
 # ════════════════════════════════════════════════════════════
 # 过渡轨道（原本的 UITransitionAnimator，现已并入总线）
 # ════════════════════════════════════════════════════════════
-# 「哪些节点参与页面整体开合」现在只在本节点上配置一处，不再有两份目标列表。
-# 兼容：若场景里还留着旧的 UITransitionAnimator 节点，仍然优先交给它驱动。
+# 「哪些节点参与页面整体开合」只在本节点上配置一处，不再有两份目标列表。
 
 @export_category("过渡轨道（页面整体开合）")
 ## 参与过渡动画的节点路径（相对本节点，例如 "../Background"）。只接受 CanvasItem。
@@ -57,17 +54,17 @@ extends Node
 ## 漂移距离（像素，Vector2）。例如 (0, -12) = 入场从上方归位、退场收向上方；(-48, 0) = 左右漂移。
 @export var drift_distance: Vector2 = Vector2(0.0, 12.0)
 ## 入场动画总时长（秒）。
-@export var enter_duration: float = 0.8
+@export var enter_duration: float = 0.5
 ## 退场动画总时长（秒）。
-@export var exit_duration: float = 0.6
+@export var exit_duration: float = 0.5
 ## 入场：从 0 放大到峰值阶段的占比（与 exit_peak_phase_ratio 对称）。
 @export_range(0.1, 0.8, 0.05) var enter_peak_phase_ratio: float = 0.2
 ## 入场峰值停顿时长（秒）。
-@export var enter_peak_hold_duration: float = 0.28
+@export var enter_peak_hold_duration: float = 0.2
 ## 退场：放大到峰值阶段的占比。
 @export_range(0.1, 0.8, 0.05) var exit_peak_phase_ratio: float = 0.2
 ## 退场峰值停顿时长（秒）。
-@export var exit_peak_hold_duration: float = 0.24
+@export var exit_peak_hold_duration: float = 0.2
 ## 放大峰值倍率。
 @export var peak_scale_multiplier: float = 1.2
 ## 入场淡化占总时长的比例（从 0 开始：前 35% 内完成 透明→不透明）。
@@ -187,10 +184,7 @@ func collect_components(root: Node = null) -> Array[Node]:
 	# 两套 Tween 同时写 scale/position/modulate 会互相覆盖（表现为抖动、位移叠加）。
 	# 这类节点默认交给过渡轨道，从组件列表里移除。
 	for t in _targets:
-		if found.has(t):
-			found.erase(t)
-			if debug_log:
-				print("[UIFxDirector] 跳过同时参与过渡轨道的组件：%s" % t.name)
+		found.erase(t)
 	return found
 
 
@@ -340,6 +334,47 @@ func play_single_enter(target: CanvasItem, duration: float = -1.0) -> void:
 		tween.parallel().tween_property(target, "position", base_pos, settle_duration)
 
 
+## 让单个节点单独播一次退场（play_single_enter 的反向），返回总时长（秒）供调用方等待。
+## 用途：选项菜单选定后不该「啪」地消失。
+## ★ 播完后会把缩放 / 透明度还原回起始值：节点会被重复使用，
+##   留着 scale=0 / alpha=0 会让下一次 play_single_enter 从 0 长到 0（看起来没动画）。
+func play_single_exit(target: CanvasItem, duration: float = -1.0) -> float:
+	if target == null or not is_instance_valid(target):
+		return 0.0
+	var total: float = duration if duration > 0.0 else exit_duration
+	var base_modulate: Color = target.modulate
+	var base_scale: Vector2 = target.scale
+	var base_pos: Vector2 = target.position
+	var allow_drift: bool = not (target is Control and target.get_parent() is Container)
+	var peak_duration: float = maxf(0.01, total * exit_peak_phase_ratio)
+	var settle_duration: float = maxf(0.01, total - peak_duration)
+	var fade_duration: float = _fade_duration(total, exit_fade_ratio)
+	var fade: Tween = create_tween()
+	fade.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	fade.tween_property(target, "modulate:a", 0.0, fade_duration)
+	var tween: Tween = create_tween()
+	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	# 先冲到峰值再落回 0 缩放（与入场严格对称）
+	tween.tween_property(target, "scale", base_scale * peak_scale_multiplier, peak_duration)
+	tween.tween_property(target, "scale", Vector2.ZERO, settle_duration)
+	if allow_drift:
+		tween.parallel().tween_property(target, "position", base_pos + drift_distance, settle_duration)
+	tween.tween_callback(_restore_single_exit_state.bind(target, base_scale, base_modulate, base_pos))
+	return total
+
+
+## 退场播完后把节点摆回起始位姿，并隐藏。
+## ★ 必须隐藏：不隐藏的话，还原位姿的那一帧（以及等下一句对话的这几帧）
+##   玩家会看到「退场动画播完又闪出一帧旧选项」。
+func _restore_single_exit_state(target: CanvasItem, base_scale: Vector2, base_modulate: Color, base_pos: Vector2) -> void:
+	if target == null or not is_instance_valid(target):
+		return
+	target.scale = base_scale
+	target.modulate = base_modulate
+	target.position = base_pos
+	target.visible = false
+
+
 ## 把「占总时长比例」换算成秒（至少一帧）。
 func _fade_duration(total_duration: float, ratio: float) -> float:
 	return clampf(total_duration * ratio, 0.01, maxf(total_duration, 0.01))
@@ -412,11 +447,7 @@ func _fire_components(comps: Array[Node], kind: String) -> float:
 		var comp_duration: float = 0.0
 		if comp.has_method("get_fx_duration"):
 			comp_duration = float(comp.call("get_fx_duration", kind))
-		if debug_log:
-			print("    · %s 延时 %.3fs 时长 %.3fs" % [comp.name, delay, comp_duration])
 		total = maxf(total, delay + comp_duration)
-	if debug_log:
-		print("[UIFxDirector] %s：%d 个组件，总时长 %.3fs" % [kind, ordered.size(), total])
 	return total
 
 
@@ -432,8 +463,6 @@ func _fire_transition(_root: Node, kind: String) -> float:
 	else:
 		play_exit_transition(delay)
 	var duration: float = enter_duration if kind == "enter" else exit_duration
-	if debug_log:
-		print("[UIFxDirector] 过渡轨道 %s：%d 个目标，延时 %.3fs 时长 %.3fs" % [kind, _targets.size(), delay, duration])
 	return delay + duration
 
 

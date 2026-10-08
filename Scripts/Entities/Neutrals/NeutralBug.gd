@@ -2,11 +2,18 @@
 ## 中立小虫基类（StoneBug / TrampolineBug 共用）
 ## 行为：
 ##   - 子节点 PlayerDetector 检测玩家进入/离开范围。
-##   - 玩家在范围内且“在地面”时：以玩家当前位置为水平目标持续跟随。
-##   - 玩家离地时：保持“离地前最后一次地面位置”为目标，走到后切回 Idle 静止。
+##   - 玩家进入范围时如果在空中：先不跟随，等玩家落地后才开始跟随。
+##   - 玩家站在地面时：实时跟随其水平位置。
+##   - 玩家离地后：目标冻结在“离地那一刻”的水平位置，走到后停下。
+##   - 玩家全程未落地就离开范围：目标以“离开范围那一刻”的水平位置为准。
+##   - 与目标的水平距离小于 follow_dead_zone 时停下，避免在目标附近反复微调。
+##   - 玩家站在自己身上时不移动（确保石头虫能当“垫脚石”）。
 ## 说明：只做地面水平跟随（受重力、被地形阻挡），不做跳跃/寻路。
-## 额外：可选“遇到悬崖停止前进”（stop_at_cliff，默认开启），避免走到悬崖边掉下去。
-## 碰撞建议：collision_layer=32(Good，Player 会碰撞→可踩)，collision_mask=6(Ground|Wall)。
+## 额外（同类互斥）：
+##   - 可选“遇到悬崖停止前进”（stop_at_cliff，默认开启），避免走到悬崖边掉下去。
+##   - 探测框（BugDetector）里出现同类虫子时，不与之重叠，改为往反方向退避；
+##     只有两侧都被同类夹住、或退避方向是悬崖时才停在原地。
+## 碰撞建议：collision_layer=32(Good，Player 会碰撞→可踩)+256(NeutralBug，同类互检)，collision_mask=6(Ground|Wall)。
 extends CharacterBody2D
 class_name NeutralBug
 
@@ -18,16 +25,13 @@ class_name NeutralBug
 @export var gravity: float = 720.0
 ## 水平加速度（像素/秒²）
 @export var acceleration: float = 120.0
-## 到达目标的判定距离（像素）
-@export var arrive_distance: float = 20.0
-## 决策/检测间隔（秒，低频省性能）
-@export var detect_interval: float = 0.15
+## 跟随死区（像素）：与目标的水平距离小于它就不再移动，避免在目标附近反复微调
+@export var follow_dead_zone: float = 12.0
 ## 遇到悬崖时是否停止前进（默认开启）
 @export var stop_at_cliff: bool = true
 ## 悬崖检测射线节点（与敌人同一套设置：RayCast2D 子节点，朝“前方偏下”）
 @export var cliff_detector_path: NodePath = NodePath("CliffDetector")
-## 同类虫子检测节点（Area2D 前方探测框）。它自身处在 NeutralBug 层，
-## 因此“别的虫子的同名探测框”就是它的同类标记。
+## 同类虫子探测框节点（Area2D，掩码 = NeutralBug 层，能看见 StoneBug / TrampolineBug 的躯体）
 @export var bug_detector_path: NodePath = NodePath("BugDetector")
 
 ## ── 动画（内部固定，不导出）──
@@ -48,20 +52,22 @@ const ANIM_NAMES: PackedStringArray = ["Idle", "Move"]
 ## 同类虫子探测框（BugDetector）
 @onready var bug_detector: Area2D = get_node_or_null(bug_detector_path) as Area2D
 
-## 当前追踪的玩家
+## 跟随状态机
+##   INACTIVE：玩家在探测范围内但**从未落地** → 不跟随（只记录其水平位置，等离开范围时以那一刻为准）
+##   LIVE：玩家正站在地面 → 实时跟随其水平位置
+##   FROZEN：玩家已离地 → 目标冻结在“离地那一刻”的水平位置，不再更新
+enum FollowState { INACTIVE, LIVE, FROZEN }
+
+## 当前追踪的玩家（在探测范围内时才有效）
 var _player: Node = null
 ## 目标 X（水平）
 var _target_x: float = 0.0
-## 是否处于“跟随中”
-var _following: bool = false
-## 决策计时
-var _tick: float = 0.0
+## 当前跟随状态（见 FollowState）
+var _follow_state: FollowState = FollowState.INACTIVE
 ## 贴图基准 scale.x（用于左右翻转）
 var _base_scale_x: float = 1.0
 ## 悬崖射线基准 target_position（左右镜像时使用）
 var _cliff_base_target: Vector2 = Vector2.ZERO
-## 同类检测探测框的基准位置（左右镜像时使用）
-var _bug_base_position: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -73,31 +79,34 @@ func _ready() -> void:
 		player_detector.body_exited.connect(_on_detector_body_exited)
 	if cliff_detector:
 		_cliff_base_target = cliff_detector.target_position
-	if bug_detector:
-		_bug_base_position = bug_detector.position
 	_play_anim(Anim.IDLE)
 
 
 func _physics_process(delta: float) -> void:
-	_tick += delta
-	if _tick >= detect_interval:
-		_tick = 0.0
-		_update_target()
+	_update_target()
 	_apply_gravity(delta)
 	_move(delta)
 
 
-## 低频决策：是否更新追踪目标
+## 更新跟随目标：
+##   - 玩家刚进入范围时如果在空中（未落地）→ 不跟随，只记录其水平位置；
+##   - 玩家站在地面 → 实时跟随（LIVE）；
+##   - 玩家离地 → 目标冻结在“离地那一刻”的位置（FROZEN）；
+##   - 离开范围后不再更新：以当前保留的目标为准（即上面两种情况各自的位置）。
 func _update_target() -> void:
 	if _player == null or not is_instance_valid(_player):
 		return
-	if _player.has_method("is_on_floor") and _player.is_on_floor():
-		# 玩家在地面：持续跟随玩家当前位置
+	var player_on_floor: bool = _player.has_method("is_on_floor") and _player.is_on_floor()
+	if player_on_floor:
 		_target_x = _player.global_position.x
-		_following = true
-	else:
-		# 玩家离地：保持最后一次“地面位置”为目标，走过去后停下
-		_following = true
+		_follow_state = FollowState.LIVE
+		return
+	if _follow_state == FollowState.INACTIVE:
+		# 全程未落地：持续记录玩家水平位置，保证“离开范围那一刻”的位置被保留下来
+		_target_x = _player.global_position.x
+	elif _follow_state == FollowState.LIVE:
+		# 刚离地：目标就此冻结在离地那一刻的位置
+		_follow_state = FollowState.FROZEN
 
 
 func _apply_gravity(delta: float) -> void:
@@ -108,27 +117,28 @@ func _apply_gravity(delta: float) -> void:
 func _move(delta: float) -> void:
 	var dx: float = _target_x - global_position.x
 	var want_x: float = 0.0
-	if _following and absf(dx) > arrive_distance:
+	if _is_player_on_top():
+		# 玩家站在自己身上：不移动，保证“垫脚石”可用（否则会拖者玩家跑，玩家直接滑下去）
+		want_x = 0.0
+	elif _follow_state != FollowState.INACTIVE and absf(dx) > follow_dead_zone:
 		var dir: float = signf(dx)
-		if _is_cliff_ahead(dir):
+		if _is_bug_ahead(dir):
+			# 前方有同类虫子：不与同类重叠，改为往反方向退避
+			var away_dir: float = -dir
+			if _is_bug_ahead(away_dir) or _is_cliff_ahead(away_dir):
+				# 两侧都被同类虫子夹住，或退避方向是悬崖：放弃退避，停在原地
+				want_x = 0.0
+			else:
+				want_x = away_dir * move_speed
+		elif _is_cliff_ahead(dir):
 			# 前方是悬崖：停在边缘（速度会自然衰减到 0）
-			_following = false
 			want_x = 0.0
-		elif _is_bug_ahead(dir):
-			# 前方是同类虫子：互斥，立即停住
-			# （必须硬停：若只把目标速度设为 0 让加速度自然减速，还会继续滑行约 15px，
-			#   实测两只会互相钻进对方身体里）
-			_following = false
-			want_x = 0.0
-			velocity.x = 0.0
 		else:
 			want_x = dir * move_speed
 	velocity.x = move_toward(velocity.x, want_x, acceleration * delta)
 	if absf(velocity.x) > 1.0:
 		_set_facing(velocity.x > 0.0)
 	move_and_slide()
-	if _following and absf(dx) <= arrive_distance and absf(velocity.x) < 1.0:
-		_following = false
 	_update_anim()
 
 
@@ -174,22 +184,22 @@ func _is_cliff_ahead(dir: float) -> bool:
 	return not cliff_detector.is_colliding()
 
 
-## 前方是否有同类虫子（同类互斥：检测到就不再前进）
-## 实现：BugDetector 是前方的 Area2D 探测框，它自身就在 NeutralBug 层（项目物理层 9），
-## 因此直接用“区域互检”找同类：别的虫子的 BugDetector 就是同类标记。
-## 不用物理体互检的原因：虫子场景的 collision_layer 会被房间实例覆盖
-## （TrampolineBug 在房间里就是 0，故意不与 Player 交互），一旦依赖物理体所在层，
-## 同类互检会直接失效；用 Area2D 层则不受房间覆盖影响。
-## 用框而不是射线：两只虫子高度略有差异（跳跃/被弹起）时水平射线会漏检。
-## 注：Area2D 不会把自己算进 overlapping_areas，因此无需手动排除自己。
+## dir 一侧（左/右）是否有同类虫子（同类互斥：检测到就往反方向退避）
+## 说明：BugDetector 是 Area2D 探测框，碰撞掩码设为 NeutralBug 层（项目物理层 9），
+## 所以只看得见同类虫子，不会把地形/玩家当成障碍；用框而不是射线，
+## 避免两只虫子高度略有差异（跳跃/被弹起）时水平射线漏检。
+## 探测框以自身为中心、左右对称，因此直接按“对方在自己哪一侧”判定方向；
+## 不能逐帧挪动探测框：物理重叠数据在物理步末尾才刷新，同帧挪动后会读到上一帧的
+## 旧数据，导致“前方有虫子”与“身后有虫子”交替为真，退避会不停抖动。
+## 注意：探测框包含自己的身体，必须排除自己。
 func _is_bug_ahead(dir: float) -> bool:
 	if dir == 0.0 or bug_detector == null:
 		return false
 	var side: float = 1.0 if dir > 0.0 else -1.0
-	var target_x: float = absf(_bug_base_position.x) * side
-	if not is_equal_approx(bug_detector.position.x, target_x):
-		bug_detector.position = Vector2(target_x, _bug_base_position.y)
-	return not bug_detector.get_overlapping_areas().is_empty()
+	for body in bug_detector.get_overlapping_bodies():
+		if body != self and signf(body.global_position.x - global_position.x) == side:
+			return true
+	return false
 
 
 ## 把悬崖射线镜像到移动方向一侧
@@ -219,10 +229,27 @@ func _set_facing(face_right: bool) -> void:
 
 func _on_detector_body_entered(body: Node) -> void:
 	if body != null and body.is_in_group("player"):
+		if _player != body:
+			# 新一次进入范围：重新判定（先按“未落地”处理，落地后再转为跟随）
+			_follow_state = FollowState.INACTIVE
 		_player = body
 
 
 func _on_detector_body_exited(body: Node) -> void:
 	if body == _player:
+		# 玩家离开探测范围：不再更新目标，但保留“走到目标”的 FROZEN 状态
+		# 这样“全程未落地”的情况也会走到“离开范围那一刻”记录的位置
 		_player = null
-		_following = false
+		_follow_state = FollowState.FROZEN
+
+
+## 玩家是否正站在自己身上（依据本帧 move_and_slide 的接触法线：朝上说明对方在上方）
+func _is_player_on_top() -> bool:
+	for i in range(get_slide_collision_count()):
+		var col: KinematicCollision2D = get_slide_collision(i)
+		if col == null:
+			continue
+		var body: Node = col.get_collider() as Node
+		if body != null and body.is_in_group("player") and col.get_normal().y < -0.5:
+			return true
+	return false

@@ -5,18 +5,22 @@
 ## 修复：Player 在平台上受伤时不会与平台物理冲突导致"消失"。
 ##
 ## 动画状态机：
-##   ON（静止）←→ ONMOVE（移动）
+##   ON（开启，静止/移动共用，不再区分 ONMOVE）
+##   ON →（弹跳模式触发）→ 播一遍 TRIGGER（不改状态，播完回 ON）
 ##   ON →（player 站上且 brittle）→ CLOSE（非循环，播完→OFF）
 ##   OFF →（recover_time 后）→ OPEN（非循环，播完→ON）
 ##
-## 碰撞体规则：ON / ONMOVE / CLOSE →启用，OFF / OPEN →禁用
+## 碰撞体规则：ON / CLOSE →启用，OFF / OPEN →禁用
 ## 移动规则：OFF / CLOSE / OPEN →不移动
 extends Node2D
 class_name Platform
 
 enum MovementMode { STATIC, LINEAR, CIRCULAR }
-enum PlatformAnim { ON, ONMOVE, OFF, CLOSE, OPEN }
+enum PlatformAnim { ON, OFF, CLOSE, OPEN }
 enum SpriteEffect { NONE, FLIP }
+
+## 弹跳模式触发时播放一遍的动画名
+const TRIGGER_ANIM_NAME: String = "TRIGGER"
 
 ## ── 移动设置（严格匹配 HurtBox）──
 @export_category("移动设置")
@@ -60,6 +64,21 @@ enum SpriteEffect { NONE, FLIP }
 ## 破碎后恢复等待时间（秒）
 @export var recover_time: float = 2.5
 
+## ── 弹跳（可选）──
+@export_category("弹跳")
+## 开启后玩家从上方落到平台会触发弹跳（效果与蹦床虫一致，需要场景里有 BounceArea 节点）
+@export var bounce_enabled: bool = false
+## 基础弹跳力（像素/秒）
+@export var bounce_force: float = 320.0
+## 下落速度对弹跳力的加成系数（落下越快弹得越高）
+@export var bounce_fall_speed_factor: float = 0.8
+## 弹跳力上限（像素/秒）
+@export var bounce_max_force: float = 960.0
+## 最小下落速度阈值（低于它不触发弹跳，避免站在平台上反复触发）
+@export var bounce_min_fall_speed: float = 20.0
+## TRIGGER 动画最长占用时间（秒，无动画/循环动画时的兜底）
+@export var trigger_time: float = 0.2
+
 # ── 移动状态（HurtBox 同款）──
 var _start_pos: Vector2
 var _end_pos: Vector2
@@ -78,6 +97,10 @@ var _anim_state: PlatformAnim = PlatformAnim.ON
 var _player_on: bool = false
 #var _last_position: Vector2
 var _platform_velocity: Vector2 = Vector2.ZERO
+## TRIGGER 动画是否正在占用
+var _triggering: bool = false
+## TRIGGER 兜底计时
+var _trigger_timer: float = 0.0
 
 # ── 破碎状态 ──
 var _brittle_active: bool = false
@@ -88,6 +111,7 @@ var _recover_timer: float = 0.0
 @onready var _collision_body: StaticBody2D = $Body
 @onready var collision_shape: CollisionShape2D = $Body/CollisionShape2D
 @onready var _detect_area: Area2D = $Body/Area2D
+@onready var _bounce_area: Area2D = get_node_or_null("BounceArea") as Area2D
 
 # 保存在 Inspector 中设置的 collision_layer（含 Wall 等自定义层），不被 _set_collision_deferred 覆盖
 var _base_collision_layer: int = 2
@@ -121,6 +145,12 @@ func _physics_process(delta: float) -> void:
 	
 	_platform_velocity = (global_position - _prev_position) / maxf(fd, 0.001)
 	_prev_position = global_position
+	
+	# TRIGGER 动画占用计时
+	if _triggering:
+		_trigger_timer -= fd
+		if _trigger_timer <= 0.0:
+			_triggering = false
 	
 	# ── 移动冻结诊断（设备用，不修改逻辑）──
 	if movement_mode != MovementMode.STATIC and not _is_waiting and not _brittle_active:
@@ -168,8 +198,11 @@ func _physics_process(delta: float) -> void:
 		_play_anim(PlatformAnim.ON)
 		return
 	
-	if _anim_state != PlatformAnim.ON and _anim_state != PlatformAnim.ONMOVE:
+	if _anim_state != PlatformAnim.ON:
 		return
+	
+	if bounce_enabled:
+		_poll_bounce()
 	
 	if movement_mode == MovementMode.STATIC:
 		_play_anim(PlatformAnim.ON)
@@ -250,7 +283,7 @@ func handle_movement(delta: float) -> void:
 	
 	_progress = clampf(_progress, 0.0, 1.0)
 	_update_position()
-	_play_anim(PlatformAnim.ONMOVE)
+	_play_anim(PlatformAnim.ON)
 
 
 ## 位置插值（HurtBox 同款：_update_position）
@@ -291,7 +324,7 @@ func _on_player_stood() -> void:
 
 ## 倒计时结束后启动 CLOSE（由 _physics_process 调用）
 func _on_player_stood_impl() -> void:
-	if _anim_state != PlatformAnim.ON and _anim_state != PlatformAnim.ONMOVE:
+	if _anim_state != PlatformAnim.ON:
 		return
 	_set_collision_deferred(true)
 	_play_anim(PlatformAnim.CLOSE)
@@ -312,6 +345,8 @@ func _on_anim_finished() -> void:
 		_anim_state = PlatformAnim.ON
 		_set_collision_deferred(true)
 		_play_anim(PlatformAnim.ON)
+	elif current == TRIGGER_ANIM_NAME:
+		_triggering = false
 
 
 ## ── 碰撞体控制（在子 StaticBody2D 上操作）──
@@ -323,16 +358,55 @@ func _set_collision_deferred(enabled: bool) -> void:
 
 ## ── 动画播放 ──
 func _play_anim(anim: PlatformAnim) -> void:
+	# TRIGGER 播放期间不被 ON 覆盖（由计时/播放结束解除）
+	if _triggering and anim == PlatformAnim.ON:
+		return
 	_anim_state = anim
 	var anim_name := ""
 	match anim:
 		PlatformAnim.ON: anim_name = "ON"
-		PlatformAnim.ONMOVE: anim_name = "ONMOVE"
 		PlatformAnim.OFF: anim_name = "OFF"
 		PlatformAnim.CLOSE: anim_name = "CLOSE"
 		PlatformAnim.OPEN: anim_name = "OPEN"
 	if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation(anim_name):
 		animated_sprite.play(anim_name)
+
+
+## ── 弹跳（可选）──
+## 扫描平台上方的弹跳区（BounceArea），对“从上方落下”的物理体施加弹跳（与蹦床虫同一套效果）。
+func _poll_bounce() -> void:
+	if _bounce_area == null or not _bounce_area.monitoring:
+		return
+	for body in _bounce_area.get_overlapping_bodies():
+		if not (body is CharacterBody2D or body is RigidBody2D):
+			continue
+		var fall_speed: float = maxf(float(body.velocity.y), 0.0)
+		if fall_speed < bounce_min_fall_speed:
+			continue
+		# 只响应从上方接触
+		if body.global_position.y > global_position.y - 4.0:
+			continue
+		_bounce(body, fall_speed)
+
+
+## 对物理体施加弹跳力
+func _bounce(body: Node, fall_speed: float) -> void:
+	var force: float = clampf(bounce_force + fall_speed * bounce_fall_speed_factor, bounce_force, bounce_max_force)
+	if body.has_method("start_trampoline_bounce"):
+		body.start_trampoline_bounce(force)
+	else:
+		body.velocity.y = -force
+	_play_trigger()
+
+
+## 播放一次 TRIGGER 动画（有帧才播；同时用计时兜底，避免循环动画卡住）
+func _play_trigger() -> void:
+	_triggering = true
+	_trigger_timer = maxf(trigger_time, 0.01)
+	if animated_sprite and animated_sprite.sprite_frames \
+	and animated_sprite.sprite_frames.has_animation(TRIGGER_ANIM_NAME) \
+	and animated_sprite.sprite_frames.get_frame_count(TRIGGER_ANIM_NAME) > 0:
+		animated_sprite.play(TRIGGER_ANIM_NAME)
 
 
 ## ── 对外接口 ──

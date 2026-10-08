@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://biex1ykpn1qgq"]
+
+[ext_resource type="Texture2D" uid="uid://b25qysoqabkuu" path="res://Assets/Textures/UIs/MobieControlsUIs/操作按键图.png" id="1_rqyoc"]
+
+[resource]
+atlas = ExtResource("1_rqyoc")
+region = Rect2(78, 0, 26, 26)

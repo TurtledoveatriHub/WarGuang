@@ -4,7 +4,7 @@ extends CanvasLayer
 
 @export_category("UI 场景切换参数（普通）")
 ## 普通 UI 切场：淡出时长（秒）
-@export var ui_switch_fade_out_duration: float = 0.4
+@export var ui_switch_fade_out_duration: float = 0.3
 ## 普通 UI 切场：全黑保持时长（秒）
 @export var ui_switch_black_hold_duration: float = 0.2
 ## 普通 UI 切场：淡入时长（秒）
@@ -13,11 +13,11 @@ extends CanvasLayer
 @export_category("UI 场景切换参数（SaveSelect 进入游戏）")
 ## SaveSelect -> Game：淡出时长（秒）
 ## 注意：实际使用 FadeManager.force_black() 瞬间全黑（因切场时场景正在加载，fade_out 会被截断）
-@export var ui_save_to_game_fade_out_duration: float = 0.2
+@export var ui_save_to_game_fade_out_duration: float = 0.6
 ## SaveSelect -> Game：全黑保持时长（秒）
-@export var ui_save_to_game_black_hold_duration: float = 1.8
+@export var ui_save_to_game_black_hold_duration: float = 0.6
 ## SaveSelect -> Game：淡入时长（秒）
-@export var ui_save_to_game_fade_in_duration: float = 0.6
+@export var ui_save_to_game_fade_in_duration: float = 2.6
 
 ## ── 注意 ──
 ## 所有 UI 页面内过渡（Title→Settings 等非切场覆盖层）统一使用上方

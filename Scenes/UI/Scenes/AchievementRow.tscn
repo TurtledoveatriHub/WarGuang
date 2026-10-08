@@ -1,0 +1,43 @@
+[gd_scene load_steps=6 format=3 uid="uid://bir04jshy4nr4"]
+
+[ext_resource type="Script" uid="uid://c7wl6k3ncwxtg" path="res://Scripts/UI/Scenes/AchievementRow.gd" id="1_row"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://dv4kl620cus2y" path="res://Assets/Textures/UIs/Achievements/tres/成就1.tres" id="3_2vt4x"]
+[ext_resource type="Shader" uid="uid://cg5n2g3fo7irj" path="res://Assets/Shaders/AchievementIcon.gdshader" id="3_icon"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_icon"]
+shader = ExtResource("3_icon")
+shader_parameter/unlocked = 0.0
+shader_parameter/locked_brightness = 0.7
+
+[node name="AchievementRow" type="Control"]
+custom_minimum_size = Vector2(520, 50)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 520.0
+offset_bottom = 50.0
+script = ExtResource("1_row")
+
+[node name="Icon" type="TextureRect" parent="."]
+texture_filter = 1
+material = SubResource("ShaderMaterial_icon")
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 48.0
+offset_bottom = 48.0
+texture = ExtResource("3_2vt4x")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Description" type="Label" parent="."]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 3.0
+offset_right = 550.0
+offset_bottom = 47.0
+theme = ExtResource("2_theme")
+theme_override_font_sizes/font_size = 20
+text = "成就描述"
+vertical_alignment = 1
+autowrap_mode = 3

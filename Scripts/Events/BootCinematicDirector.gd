@@ -15,8 +15,6 @@ enum IntroStepType {
 	BLACK_HOLD
 }
 
-# 调试：逐帧打印掉落期间的玩家/相机位置与缩放（定位突然位移来源；默认关闭）。
-@export var debug_drop_camera: bool = false
 # 掉落期间被接管的 PhantomCameraHost（相机改由本导演直接控制）。
 var _drop_camera_host: Node = null
 # 接管前 PhantomCameraHost 是否处于 process。
@@ -65,10 +63,6 @@ var _camera_controller: PlayerCameraController = null
 var _phantom_camera: Node = null
 # 当前主 Camera2D 引用。
 var _camera_2d: Camera2D = null
-# 掉落期间 dead zone 备份值。
-var _drop_dead_zone_backup: Vector2 = Vector2.ZERO
-# 掉落期间 dead zone 备份有效标记。
-var _drop_dead_zone_backup_valid: bool = false
 
 # 演出覆盖层根节点。
 var _overlay_root: Control = null
@@ -327,8 +321,6 @@ func _run_drop_motion_flow() -> void:
 		# PhantomCameraHost 已停用，这里写入的位置不会再被覆盖。
 		if _drop_camera_taken_over and is_instance_valid(_camera_2d) and is_instance_valid(_player):
 			_camera_2d.global_position = _player.global_position
-		if debug_drop_camera:
-			_debug_print_drop_frame()
 		if drop_stepped:
 			landed = true
 			break
@@ -504,12 +496,6 @@ func _enter_cinematic_control_mode() -> void:
 		_player.set_player_control(false)
 	_player.set_physics_process(false)
 	_player.velocity = Vector2.ZERO
-	if is_instance_valid(_phantom_camera):
-		_drop_dead_zone_backup = Vector2(_phantom_camera.dead_zone_width, _phantom_camera.dead_zone_height)
-		_drop_dead_zone_backup_valid = true
-		# 维持较小 dead-zone 以保证掉落中相机持续跟随玩家中心附近。
-		_phantom_camera.dead_zone_width = 0.05
-		_phantom_camera.dead_zone_height = 0.05
 	# 接管相机：掉落期间停用 PhantomCameraHost，由本导演逐帧直接写相机位置。
 	# 原因（日志已证实）：PCam2D 的跟随阻尼在匀速下落中会累积出固定滞后
 	# （实测 cam 比 phantom 落后 33px），阻尼状态一旦被重置，它会在单帧内把滞后量全部吐出 ——
@@ -531,24 +517,37 @@ func _take_over_camera_host() -> void:
 	_camera_2d.offset = Vector2.ZERO
 	_drop_camera_taken_over = true
 
-## 交还相机：恢复 PhantomCameraHost，并让它瞬间对齐到当前跟随目标（跳过阻尼）。
+## 交还相机：**先让 PhantomCamera 对齐跟随目标，再恢复 PhantomCameraHost**。
+## ★ 顺序很关键（这就是新存档「禁控结束闪一帧」的根因）：
+##   实证日志里 settle_end 时 camera2d 在 y=645，恢复 Host 后的下一帧相机被写成 y=-640（旧位置），
+##   再下一帧才回到 645 —— 中间那一帧画面完全不在玩家所在区域，看起来就是「闪」。
+##   把对齐放在恢复之前，Host 一起手拿到的就已经是正确位置，没有这个空档。
 func _release_camera_host() -> void:
 	if not _drop_camera_taken_over:
 		return
+	# 1) 先把 PhantomCamera 本体搬到玩家身上（光调 teleport_position 不够：
+	#    实测日志里它一直停在天空 y=-640，恢复 Host 后相机就被拉到那里去了）
+	if is_instance_valid(_phantom_camera) and _phantom_camera is Node2D and is_instance_valid(_player):
+		(_phantom_camera as Node2D).global_position = (_player as Node2D).global_position
+	if is_instance_valid(_phantom_camera) and _phantom_camera.has_method("teleport_position"):
+		_phantom_camera.teleport_position()
+	# 2) 再把当前真实位置直接写进 Camera2D，避免恢复 Host 后的第一帧还没被更新
+	if is_instance_valid(_camera_2d) and is_instance_valid(_player):
+		_camera_2d.global_position = (_player as Node2D).global_position
+	# 3) 最后才恢复 Host
 	if is_instance_valid(_drop_camera_host):
 		_drop_camera_host.set_process(_drop_host_process_backup)
 		_drop_camera_host.set_physics_process(_drop_host_physics_backup)
 	_drop_camera_host = null
 	_drop_camera_taken_over = false
-	# teleport_position() 会清空阻尼速度与 framed 偏移量并把相机瞬间对齐，
-	# 避免接管结束那一帧被残留的阻尼/偏移推一下。
-	if is_instance_valid(_phantom_camera) and _phantom_camera.has_method("teleport_position"):
-		_phantom_camera.teleport_position()
 
 ## 恢复玩家运行态开关。
 func _restore_player_runtime_switches() -> void:
 	if not is_instance_valid(_player):
 		return
+	# ★ 演出期间玩家自己的 _physics_process 是关掉的，was_on_floor 会停在演出前那一帧的旧值。
+	#   不同步的话，恢复物理的第一帧会被判成「刚刚落地」→ 再触发一次 landed（落地特效闪一下）。
+	_player.was_on_floor = _player.is_on_floor()
 	_player.set_physics_process(_player_physics_process_backup)
 	_player.set_process_input(_player_input_process_backup)
 	_player.current_animation = _player_current_animation_backup
@@ -557,28 +556,8 @@ func _restore_player_runtime_switches() -> void:
 func _restore_camera_behavior() -> void:
 	if _camera_controller and _camera_controller.has_method("set"):
 		_camera_controller.set("focus_capture_enabled", _focus_capture_backup)
-	if is_instance_valid(_phantom_camera) and _drop_dead_zone_backup_valid:
-		_phantom_camera.dead_zone_width = _drop_dead_zone_backup.x
-		_phantom_camera.dead_zone_height = _drop_dead_zone_backup.y
-	_drop_dead_zone_backup_valid = false
 	# 交还相机控制权（恢复 PhantomCameraHost 并瞬间对齐）
 	_release_camera_host()
-
-## 调试：逐帧打印“掉落 + 缩放”期间的玩家/相机位置与缩放，用于定位突然位移到底来自谁。
-func _debug_print_drop_frame() -> void:
-	var player_pos: Vector2 = _player.global_position if is_instance_valid(_player) else Vector2.ZERO
-	var phantom_pos: Vector2 = _phantom_camera.global_position if is_instance_valid(_phantom_camera) else Vector2.ZERO
-	var cam_pos: Vector2 = _camera_2d.global_position if is_instance_valid(_camera_2d) else Vector2.ZERO
-	var cam_zoom: Vector2 = _camera_2d.zoom if is_instance_valid(_camera_2d) else Vector2.ZERO
-	var limit_info: String = ""
-	if is_instance_valid(_camera_2d):
-		limit_info = "limit_on=%s L=%s T=%s R=%s B=%s" % [
-			_camera_2d.limit_enabled, _camera_2d.limit_left, _camera_2d.limit_top,
-			_camera_2d.limit_right, _camera_2d.limit_bottom
-		]
-	print("[DropCam] player=", player_pos, " phantom=", phantom_pos, " cam=", cam_pos,
-		" zoom=", cam_zoom, " host_taken_over=", _drop_camera_taken_over, " ", limit_info)
-
 
 ## 设置相机缩放。
 func _set_camera_zoom(zoom_value: float) -> void:

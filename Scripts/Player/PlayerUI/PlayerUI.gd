@@ -26,9 +26,8 @@ signal player_died()
 @onready var coin_container = $CoinContainer
 @onready var coin_label = $CoinContainer/CoinLabel
 @onready var coin_change_label = $CoinContainer/CoinChangeLabel
-@onready var game_setting_button = $GameSettingButton
-@onready var save_label = $SaveLabeI
-@onready var player_icon = $PlayerIcon  # 添加玩家头像引用
+@onready var game_setting_button = $PlayerIcon
+@onready var player_icon = $x # 添加玩家头像引用
 
 ## 游戏设置按钮的独立 CanvasLayer
 var game_setting_button_layer: CanvasLayer
@@ -61,15 +60,6 @@ var game_setting_instance: Node = null
 ## 钱币动画变化间隔时间（>100 个时的间隔）
 @export var coin_change_interval_fast: float = 0.02
 
-@export_category("存档标签设置")
-## 存档标签显示持续时间（秒）
-@export var save_label_show_duration: float = 2.0
-## 存档标签淡入淡出时间（秒）
-@export var save_label_fade_duration: float = 0.5
-
-# 在类的变量声明部分添加
-var save_label_tween: Tween
-
 ## 钱币系统相关变量
 var current_display_coins: int = 0
 var coin_change_amount: int = 0
@@ -85,11 +75,6 @@ func _ready():
 	initialize_health_display()
 	initialize_coin_display()
 	add_to_group("player_ui")
-	
-	# 初始化存档标签
-	if save_label:
-		save_label.visible = false
-		save_label.modulate.a = 0.0
 	
 	# 关键修复：创建独立的 CanvasLayer 包裹 GameSettingButton
 	_create_game_setting_button_layer()
@@ -444,24 +429,6 @@ func hide_coin_ui():
 	coin_tween = create_tween()
 	coin_tween.tween_property(coin_container, "modulate:a", 0.0, coin_fade_duration)
 
-func show_save_label():
-	if not save_label:
-		return
-	
-	if save_label_tween:
-		save_label_tween.kill()
-	
-	# 关键修复：强制重置状态，确保每次都从透明开始
-	save_label.visible = true
-	save_label.modulate.a = 0.0
-	
-	# 使用 Tween 序列实现完整动画
-	save_label_tween = create_tween()
-	save_label_tween.tween_property(save_label, "modulate:a", 1.0, save_label_fade_duration)
-	save_label_tween.tween_interval(save_label_show_duration)
-	save_label_tween.tween_property(save_label, "modulate:a", 0.0, save_label_fade_duration)
-	save_label_tween.tween_callback(func(): save_label.visible = false)
-
 # 游戏设置相关函数
 func _on_game_setting_button_pressed():
 	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
@@ -470,6 +437,11 @@ func _on_game_setting_button_pressed():
 
 func _open_game_setting_menu():
 	if game_setting_instance != null:
+		return
+	# 切场过渡期间（例如从存档进入游戏的黑屏/淡入阶段）不打开设置面板：
+	# 此时 SceneManager 的切场锁尚未释放，面板里的「返回主菜单」会被拒绝，
+	# 表现为「面板能打开、但按钮点了没反应」。直接不让打开，语义更干净。
+	if SceneManager and SceneManager.has_method("is_scene_switch_in_progress") and SceneManager.is_scene_switch_in_progress():
 		return
 	
 	if not game_setting_scene:
@@ -487,7 +459,9 @@ func _open_game_setting_menu():
 	
 	# 确保游戏暂停 - 关键修复
 	get_tree().paused = true
-	
+
+	# TODO 定位后连同其它 [UIIN] 打印一起删除。
+	print("[UIIN][PlayerUI] 挂载游戏内设置面板并暂停游戏（paused=true）")
 	get_tree().root.add_child(game_setting_instance)
 
 func _on_game_setting_closed():
@@ -508,12 +482,21 @@ func _input(event):
 		return
 	## Esc：地图打开时关闭地图，否则打开设置
 	if event.is_action_pressed("ui_cancel"):
+		# TODO 定位「ESC 关不掉游戏内设置」后连同其它 [UIIN] 打印一起删除。
+		print("[UIIN][PlayerUI] ESC：map_open=%s setting_open=%s setting_instance=%s paused=%s" % [
+			(MapManager != null and MapManager.is_map_open), game_setting_instance != null,
+			is_instance_valid(game_setting_instance), get_tree().paused
+		])
 		if MapManager and MapManager.is_map_open:
+			print("[UIIN][PlayerUI] → 地图打开中：关闭地图并吞掉 ESC")
 			MapManager.close_map()
 			get_viewport().set_input_as_handled()
 			return
 		if game_setting_instance == null:
+			print("[UIIN][PlayerUI] → 打开游戏内设置面板")
 			_open_game_setting_menu()
+		else:
+			print("[UIIN][PlayerUI] → 设置已打开，PlayerUI 不处理（交给面板自己的 _input）")
 
 func _on_map_visibility_changed(map_visible: bool) -> void:
 	## 地图打开时禁用 GameSettingButton
@@ -555,8 +538,6 @@ func hide_ui_except_settings():
 	coin_container.visible = false
 	if player_icon:
 		player_icon.visible = false
-	if save_label:
-		save_label.visible = false
 
 ## 带淡出效果隐藏 UI（忽略钱币，因为挑战开始时钱币已经是隐藏的）
 func fade_out_ui_no_coin(duration: float):
@@ -564,14 +545,10 @@ func fade_out_ui_no_coin(duration: float):
 	tween.tween_property(health_container, "modulate:a", 0.0, duration)
 	if player_icon:
 		tween.parallel().tween_property(player_icon, "modulate:a", 0.0, duration)
-	if save_label:
-		tween.parallel().tween_property(save_label, "modulate:a", 0.0, duration)
 	tween.tween_callback(func():
 		health_container.visible = false
 		if player_icon:
 			player_icon.visible = false
-		if save_label:
-			save_label.visible = false
 	)
 
 ## 显示 UI
@@ -583,9 +560,6 @@ func show_ui():
 	if player_icon:
 		player_icon.visible = true
 		player_icon.modulate.a = 1.0
-	if save_label:
-		save_label.visible = true
-		save_label.modulate.a = 1.0
 
 ## 带淡入效果显示 UI（忽略钱币，因为挑战结束时钱币不需要自动显示）
 func fade_in_ui_no_coin(_duration: float):
@@ -594,7 +568,4 @@ func fade_in_ui_no_coin(_duration: float):
 	if player_icon:
 		player_icon.visible = true
 		player_icon.modulate.a = 1.0
-	if save_label:
-		save_label.visible = true
-		save_label.modulate.a = 1.0
 	# 注意：不显示 coin_container，保持隐藏状态

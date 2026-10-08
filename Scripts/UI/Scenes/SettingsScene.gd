@@ -398,6 +398,9 @@ func _on_ui_cancel() -> void:
 	if not esc_enabled:
 		return
 	if InputMapManager.is_remapping():
+		# 重新映射中：不能直接关页面，但必须先取消映射再返回 ——
+		# 否则一旦重新映射状态卡住，ESC 会永久失效（只能鼠标点击）。
+		InputMapManager.cancel_remap()
 		return
 	_close_settings()
 

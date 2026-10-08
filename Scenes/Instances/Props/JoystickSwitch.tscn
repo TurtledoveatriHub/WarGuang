@@ -1,8 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://dekrt2dtacnvc"]
+[gd_scene load_steps=7 format=3 uid="uid://dekrt2dtacnvc"]
 
 [ext_resource type="Script" uid="uid://0f0qymy75vah" path="res://Scripts/Instances/Props/Switch.gd" id="1_hk478"]
 [ext_resource type="Texture2D" uid="uid://cy2gwpiimwxb0" path="res://Assets/Textures/Instances/GrassLand/开关.png" id="2_d0waj"]
-[ext_resource type="Texture2D" uid="uid://xygjp77wxevl" path="res://Assets/Textures/UIs/SceneUIs/tres/回退1.tres" id="3_st2e8"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_st2e8"]
 atlas = ExtResource("2_d0waj")
@@ -44,8 +43,7 @@ animation = &"OFF"
 
 [node name="InteractionPrompt" type="Sprite2D" parent="."]
 visible = false
-position = Vector2(0, -20)
-texture = ExtResource("3_st2e8")
+position = Vector2(0, -24)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -4)

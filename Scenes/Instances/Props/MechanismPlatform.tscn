@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://bywk00ct1ifc2"]
 
-[ext_resource type="Script" path="res://Scripts/Instances/Props/MechanismPlatform.gd" id="1_gate"]
+[ext_resource type="Script" uid="uid://dwjlh2x7ggryd" path="res://Scripts/Instances/Props/MechanismPlatform.gd" id="1_gate"]
 [ext_resource type="Texture2D" uid="uid://ce1ofa5fn1tnl" path="res://Assets/Textures/Instances/GrassLand/石块.png" id="2_txfwg"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_imi58"]
@@ -51,6 +51,8 @@ size = Vector2(28, 28)
 script = ExtResource("1_gate")
 open_offset = Vector2(256, 0)
 move_speed = 120.0
+acceleration_time = 0.5
+deceleration_time = 0.5
 disable_collision_when_open = false
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

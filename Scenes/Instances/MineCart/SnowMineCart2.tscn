@@ -1,14 +1,13 @@
-[gd_scene load_steps=12 format=3 uid="uid://dw28jmn0x6xdr"]
+[gd_scene load_steps=11 format=3 uid="uid://dw28jmn0x6xdr"]
 
 [ext_resource type="Script" uid="uid://0mjagkn16vdd" path="res://Scripts/Instances/MineCart/MineCart.gd" id="1_qlrtd"]
-[ext_resource type="AudioStream" uid="uid://cqqlb62bedu8f" path="res://Assets/Audios/SFX/UI/鼠标点击音效.wav" id="2_lhmg1"]
-[ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/a.wav" id="3_bnfh8"]
+[ext_resource type="AudioStream" uid="uid://cqqlb62bedu8f" path="res://Assets/Audios/SFX/UI/鼠标点击.wav" id="2_lhmg1"]
+[ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/鼠标悬停.wav" id="3_bnfh8"]
 [ext_resource type="SpriteFrames" uid="uid://bo6tmy6ys866l" path="res://Assets/Textures/FXs/InstanceFXs/MineCartFX.tres" id="4_qlrtd"]
 [ext_resource type="Script" uid="uid://3sc2mg6jcng3" path="res://Scripts/Instances/MineCart/MineCartTrack.gd" id="5_t3e13"]
 [ext_resource type="Texture2D" uid="uid://c1jrdgisl8krh" path="res://Assets/Textures/Instances/MineCart/轨道.png" id="6_12b4c"]
 [ext_resource type="Texture2D" uid="uid://bwh35fdj2awsl" path="res://Assets/Textures/Instances/MineCart/缆车.png" id="7_gvxsf"]
 [ext_resource type="Texture2D" uid="uid://dejbumaq8x8hm" path="res://Assets/Textures/Instances/MineCart/轮子_rot24.png" id="8_qlrtd"]
-[ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="9_qlrtd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_st"]
 size = Vector2(160, 80)
@@ -92,8 +91,7 @@ shape = SubResource("RectangleShape2D_st")
 
 [node name="InteractionPrompt" type="Sprite2D" parent="AreaA"]
 visible = false
-position = Vector2(0, -46)
-texture = ExtResource("9_qlrtd")
+position = Vector2(0, -48)
 
 [node name="ExitA" type="Marker2D" parent="."]
 position = Vector2(2312, -816)
@@ -107,8 +105,7 @@ shape = SubResource("RectangleShape2D_en")
 
 [node name="InteractionPrompt" type="Sprite2D" parent="AreaB"]
 visible = false
-position = Vector2(0, -46)
-texture = ExtResource("9_qlrtd")
+position = Vector2(0, -48)
 
 [node name="ExitB" type="Marker2D" parent="."]
 position = Vector2(-2168, -800)

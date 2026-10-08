@@ -3,6 +3,9 @@ extends CanvasLayer
 ## 传送面板（参考 MapUI 模式，Esc 关闭，互斥打开）
 ## 层级：99（MapUI=98 之上，GameSetting=100 之下）
 
+## 覆盖层暗化规范（黑幕 alpha / 世界亮度 / 黑幕过渡时长）—— 全项目唯一来源
+const OverlaySpec := preload("res://Scripts/UI/DarkOverlay.gd")
+
 signal menu_closed
 
 var source_teleport_id: String = ""
@@ -18,52 +21,24 @@ var source_teleport_id: String = ""
 
 @onready var background: ColorRect = $Background
 @onready var panel_root: Node2D = $PanelRoot
-@onready var close_btn: TextureButton = $PanelRoot/CloseBtn
+## 动效总线（开合动画由它驱动）
+@onready var fx_director: Node = $UIFxDirector
 
 @onready var teleport_buttons: Array[TextureButton] = [
-	$PanelRoot/Btn1,
-	$PanelRoot/Btn3,
-	$PanelRoot/Btn4,
-	$PanelRoot/Btn5,
+	$PanelRoot/GrassLand1,
+	$PanelRoot/GrassLand7,
+	$PanelRoot/GrassLand12,
+	$PanelRoot/SnowMountain4
 ]
 
 var _original_modulate: Color
 var _canvas_modulate: CanvasModulate
 var _owns_pause: bool = false
 
-## 参与开关动画的视觉节点键。注意：Background(ColorRect 暗化层) 不参与动画——
-## 打开/关闭时它立即全量出现/消失；只对内容整体 PanelRoot（含面板图、CloseBtn、传送按钮）做缩放/淡入淡出。
-const VISUAL_KEYS: Array[String] = ["PanelRoot"]
-
-@export_category("TeleportPanel 开关动画")
-## 入场峰值缩放倍率
-@export var open_peak_scale_multiplier: float = 1.2
-## 入场放大阶段时长（秒）
-@export var open_peak_duration: float = 0.2
-## 入场峰值停顿时长（秒）
-@export var open_peak_hold_duration: float = 0.15
-## 入场回落阶段时长（秒）
-@export var open_settle_duration: float = 0.18
-## 关闭峰值缩放倍率
-@export var close_peak_scale_multiplier: float = 1.2
-## 关闭放大阶段时长（秒）
-@export var close_peak_duration: float = 0.14
-## 关闭峰值停顿时长（秒）
-@export var close_peak_hold_duration: float = 0.1
-## 关闭消失阶段时长（秒）
-@export var close_vanish_duration: float = 0.22
-## 关闭最小缩放倍率
-@export var close_min_scale_multiplier: float = 0.02
-## 入场位移距离（像素）
-@export var open_drift_distance: float = 16.0
-## 退场位移距离（像素）
-@export var close_drift_distance: float = 16.0
-
-var _base_visual_scales: Dictionary = {}
-var _base_visual_positions: Dictionary = {}
-var _base_visual_modulates: Dictionary = {}
-var _open_tween: Tween = null
-var _close_tween: Tween = null
+## 开合动画统一交给 UIFxDirector（动效总线）驱动 PanelRoot，本脚本只负责收尾逻辑。
+## 注意：Background(ColorRect 暗化层) 不能放进总线目标列表（总线只写 modulate，
+## 而 ColorRect 的暗化靠 color.a）。
+var _open_fallback_timer: SceneTreeTimer = null
 var _close_fallback_timer: SceneTreeTimer = null
 var _closing_started: bool = false
 var _closing_finished: bool = false
@@ -74,15 +49,16 @@ var _btn_original_normal: Dictionary = {}
 
 func _ready() -> void:
 	layer = 99
-	# TeleportPanel 打开时会把游戏置为暂停（见下方 get_tree().paused = true），
-	# 因此用 WHEN_PAUSED 是正确的：暂停期间本节点仍会处理，自身补间也能推进。
-	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	# 打开时会把游戏置为暂停，关闭时又要在「按下关闭按钮的那一刻」就立刻恢复运行 ——
+	# 所以必须用 ALWAYS：用 WHEN_PAUSED 的话，一旦取消暂停本节点的补间与黑幕渐变就会停住。
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = true
 	panel_root.visible = true
-	background.color = Color(0, 0, 0, 0.85)
+	# 黑幕从全透明开始，立即开始渐暗（约 1 秒）；数值取自 DarkOverlay 的统一规范，
+	# 不再在本文件里写死（之前写死 0.85 + ×0.3，比地图界面明显偏暗）。
+	background.color = Color(0, 0, 0, 0)
+	OverlaySpec.fade_rect_alpha(background, OverlaySpec.OVERLAY_ALPHA, self)
 	
-	close_btn.pressed.connect(_close_panel)
-	_btn_original_normal[close_btn.get_instance_id()] = close_btn.texture_normal
 	for btn in teleport_buttons:
 		_btn_original_normal[btn.get_instance_id()] = btn.texture_normal
 	_adjust_lighting()
@@ -92,9 +68,7 @@ func _ready() -> void:
 	get_tree().paused = true
 	_owns_pause = true
 	
-	# 开关动画：先在最终可见状态上缓存基准，再播放入场动画（初始帧→放大→停顿→回落）
-	_cache_visual_base_states()
-	_play_open_animation()
+	_play_fx_enter()
 
 
 func _input(event: InputEvent) -> void:
@@ -102,14 +76,20 @@ func _input(event: InputEvent) -> void:
 		_close_panel()
 		get_viewport().set_input_as_handled()
 		return
+	# Tab（map 动作）不再是关闭键，但仍要吞掉：否则事件会落到 PlayerUI 把地图弹出来盖住本面板
 	if event.is_action_pressed("map"):
+		get_viewport().set_input_as_handled()
+		return
+	# U（交互键）：面板打开期间的关闭键（原来是 Tab，已改为 U）
+	if event.is_action_pressed("interactive"):
+		_close_panel()
 		get_viewport().set_input_as_handled()
 		return
 	# 兜底命中：按钮是 Node2D(PanelRoot) 的子级 Control，某些情况下鼠标路由不可靠。
 	# 在 _input 阶段手动命中（_input 先于 GUI 处理，set_input_as_handled 可避免与 pressed 重复触发）。
 	_handle_pointer_release(event)
 
-## 鼠标左键 / 触摸释放时，若命中 CloseBtn 或某个可用传送按钮则触发对应逻辑。
+## 鼠标左键 / 触摸释放时，若命中某个可用传送按钮则触发传送逻辑。
 func _handle_pointer_release(event: InputEvent) -> void:
 	var is_release := false
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -119,10 +99,6 @@ func _handle_pointer_release(event: InputEvent) -> void:
 	if not is_release:
 		return
 	var mouse_pos := get_viewport().get_mouse_position()
-	if close_btn.get_global_rect().has_point(mouse_pos):
-		_close_panel()
-		get_viewport().set_input_as_handled()
-		return
 	for btn in teleport_buttons:
 		if btn.visible and not btn.disabled and btn.get_global_rect().has_point(mouse_pos):
 			var tid: String = String(btn.get("target_teleport_id"))
@@ -148,7 +124,6 @@ func _process(_delta: float) -> void:
 func _update_button_pointer_visuals() -> void:
 	var mouse_pos := get_viewport().get_mouse_position()
 	var pointer_down: bool = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
-	_set_button_pointer_state(close_btn, close_btn.get_global_rect().has_point(mouse_pos), pointer_down)
 	for btn in teleport_buttons:
 		_set_button_pointer_state(
 			btn,
@@ -279,151 +254,55 @@ func _start_teleport(target_id: String) -> void:
 
 
 func _close_panel() -> void:
-	# 播放退场动画；动画结束（或兜底计时器）后由 _finish_close_panel 统一收尾。
+	# 点了关闭就**立刻**恢复暂停与暗化，不等动画 / 黑幕渐变播完：
+	# 暗化消失与组件退场动画同时开始，而不是等动画播完才开始。
 	if _closing_started:
 		return
 	_closing_started = true
-	_play_close_animation()
+	_resume_game()
+	_restore_lighting()
+	OverlaySpec.fade_rect_alpha(background, 0.0, self)
+	_play_fx_exit()
+
+
+## 立刻恢复暂停。退场动画与黑幕渐变继续推进（本节点是 PROCESS_MODE_ALWAYS）。
+func _resume_game() -> void:
+	if get_tree() != null and get_tree().paused:
+		get_tree().paused = false
+	_owns_pause = false
+
 
 func _finish_close_panel() -> void:
 	if _closing_finished:
 		return
 	_closing_finished = true
-	_restore_lighting()
-	get_tree().paused = false
-	_owns_pause = false
 	_set_game_setting_btn_visible(true)
 	menu_closed.emit()
 	queue_free()
 
-func _visual_node(visual_name: String) -> CanvasItem:
-	match visual_name:
-		"Background":
-			return background
-		"PanelRoot":
-			return panel_root
-	return null
+## 入场动画：交给 UIFxDirector；另设兜底计时器，补间异常时把面板拉回基准状态
+func _play_fx_enter() -> void:
+	if fx_director == null:
+		return
+	fx_director.call("play_enter")
+	var duration: float = float(fx_director.call("estimate_duration", "enter"))
+	_open_fallback_timer = get_tree().create_timer(duration + 0.2)
+	_open_fallback_timer.timeout.connect(_fx_open_fallback)
 
-func _for_each_visual_node(callback: Callable) -> void:
-	for node_name: String in VISUAL_KEYS:
-		var node := _visual_node(node_name)
-		if node and is_instance_valid(node):
-			callback.call(node_name, node)
+## 入场兜底：仍在打开状态时，把面板恢复到基准可见状态
+func _fx_open_fallback() -> void:
+	if not _closing_started and fx_director != null:
+		fx_director.call("reset_state")
 
-func _cache_visual_base_states() -> void:
-	# 记录每个视觉节点的基准位姿/透明度，动画以它们为最终落点。
-	_base_visual_scales.clear()
-	_base_visual_positions.clear()
-	_base_visual_modulates.clear()
-	for node_name: String in VISUAL_KEYS:
-		var node := _visual_node(node_name)
-		if node == null:
-			continue
-		_base_visual_scales[node_name] = node.scale
-		_base_visual_positions[node_name] = node.position
-		_base_visual_modulates[node_name] = node.modulate
-
-func _set_node_alpha(node: CanvasItem, alpha: float) -> void:
-	# ColorRect 改 color.a，其余 CanvasItem 改 modulate.a。
-	if node is ColorRect:
-		node.color = Color(node.color.r, node.color.g, node.color.b, alpha)
-	else:
-		node.modulate = Color(node.modulate.r, node.modulate.g, node.modulate.b, alpha)
-
-func _tween_node_alpha(tween: Tween, node: CanvasItem, alpha: float, duration: float) -> PropertyTweener:
-	if node is ColorRect:
-		return tween.tween_property(node, "color:a", alpha, duration)
-	return tween.tween_property(node, "modulate:a", alpha, duration)
-
-## 动画目标透明度：PanelRoot 回到其基准透明度（不透明）。
-func _get_target_alpha(visual_name: String) -> float:
-	return _base_visual_modulates.get(visual_name, Color(1, 1, 1, 1)).a
-
-func _kill_open_close_tweens() -> void:
-	if _open_tween and _open_tween.is_valid():
-		_open_tween.kill()
-		_open_tween = null
-	if _close_tween and _close_tween.is_valid():
-		_close_tween.kill()
-		_close_tween = null
-
-func _open_total_duration() -> float:
-	return open_peak_duration + maxf(open_peak_hold_duration, 0.0) + open_settle_duration
-
-func _close_total_duration() -> float:
-	return close_peak_duration + maxf(close_peak_hold_duration, 0.0) + close_vanish_duration
-
-## 入场动画：小尺寸+下方漂移+透明 → 放大到峰值并淡入 → 停顿 → 回落到基准（与 GameSettingScene/MapUI 一致）
-func _play_open_animation() -> void:
-	_kill_open_close_tweens()
-	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_CUBIC)
-	tween.set_ease(Tween.EASE_OUT)
-	# 初始帧
-	for node_name: String in VISUAL_KEYS:
-		var node := _visual_node(node_name)
-		if node == null:
-			continue
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		var base_position: Vector2 = _base_visual_positions.get(node_name, node.position)
-		node.scale = base_scale * close_min_scale_multiplier
-		node.position = Vector2(base_position.x, base_position.y + open_drift_distance)
-		_set_node_alpha(node, 0.0)
-	# 阶段一：放大到峰值并淡入
-	for node_name: String in VISUAL_KEYS:
-		var node := _visual_node(node_name)
-		if node == null:
-			continue
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		tween.parallel().tween_property(node, "scale", base_scale * open_peak_scale_multiplier, open_peak_duration)
-		_tween_node_alpha(tween.parallel(), node, _get_target_alpha(node_name), open_peak_duration)
-	# 峰值停顿
-	if open_peak_hold_duration > 0.0:
-		tween.chain().tween_interval(open_peak_hold_duration)
-	tween.chain()
-	# 阶段二：回落到基准
-	for node_name: String in VISUAL_KEYS:
-		var node := _visual_node(node_name)
-		if node == null:
-			continue
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		var base_position: Vector2 = _base_visual_positions.get(node_name, node.position)
-		tween.parallel().tween_property(node, "scale", base_scale, open_settle_duration)
-		tween.parallel().tween_property(node, "position:y", base_position.y, open_settle_duration)
-		_tween_node_alpha(tween.parallel(), node, _get_target_alpha(node_name), open_settle_duration)
-	_open_tween = tween
-
-## 退场动画：放大到峰值 → 停顿 → 缩小消失并淡出（结束时/兜底后收尾）
-func _play_close_animation() -> void:
-	_kill_open_close_tweens()
-	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_CUBIC)
-	tween.set_ease(Tween.EASE_IN)
-	# 阶段一：放大到峰值
-	for node_name: String in VISUAL_KEYS:
-		var node := _visual_node(node_name)
-		if node == null:
-			continue
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		tween.parallel().tween_property(node, "scale", base_scale * close_peak_scale_multiplier, close_peak_duration)
-	# 峰值停顿
-	if close_peak_hold_duration > 0.0:
-		tween.chain().tween_interval(close_peak_hold_duration)
-	tween.chain()
-	# 阶段二：缩小消失并淡出
-	for node_name: String in VISUAL_KEYS:
-		var node := _visual_node(node_name)
-		if node == null:
-			continue
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		var base_position: Vector2 = _base_visual_positions.get(node_name, node.position)
-		tween.parallel().tween_property(node, "scale", base_scale * close_min_scale_multiplier, close_vanish_duration)
-		tween.parallel().tween_property(node, "position:y", base_position.y + close_drift_distance, close_vanish_duration)
-		_tween_node_alpha(tween.parallel(), node, 0.0, close_vanish_duration)
-	tween.finished.connect(_finish_close_panel)
-	_close_tween = tween
-	# 兜底：即使补间异常不推进，总时长后也强制完成关闭。
-	_close_fallback_timer = get_tree().create_timer(_close_total_duration() + 0.1)
+## 退场动画：交给 UIFxDirector；结束时（或兜底超时）执行关闭收尾
+## 收尾必须等【内容退场】与【黑幕渐亮】都完成，否则黑幕会被瞬间切掉、看不到渐亮过程。
+func _play_fx_exit() -> void:
+	var fx_duration: float = 0.0
+	if fx_director != null:
+		fx_director.call("play_exit")
+		fx_duration = float(fx_director.call("estimate_duration", "exit"))
+	var total: float = maxf(fx_duration, OverlaySpec.OVERLAY_FADE_DURATION) + 0.2
+	_close_fallback_timer = get_tree().create_timer(total)
 	_close_fallback_timer.timeout.connect(_finish_close_panel)
 
 func _exit_tree() -> void:
@@ -435,15 +314,17 @@ func _exit_tree() -> void:
 
 
 func _adjust_lighting() -> void:
-	if RoomManager and RoomManager.global_canvas_modulate:
-		_canvas_modulate = RoomManager.global_canvas_modulate
-		_original_modulate = _canvas_modulate.color
-		_canvas_modulate.color = Color(
-			_original_modulate.r * 0.3,
-			_original_modulate.g * 0.3,
-			_original_modulate.b * 0.3,
-			1.0
-		)
+	if RoomManager == null or RoomManager.global_canvas_modulate == null:
+		return
+	_canvas_modulate = RoomManager.global_canvas_modulate
+	_original_modulate = _canvas_modulate.color
+	var factor: float = OverlaySpec.WORLD_DARKEN_MULTIPLIER
+	_canvas_modulate.color = Color(
+		_original_modulate.r * factor,
+		_original_modulate.g * factor,
+		_original_modulate.b * factor,
+		1.0
+	)
 
 
 func _restore_lighting() -> void:

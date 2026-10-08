@@ -28,7 +28,7 @@ const MAX_SFX_PER_PRIORITY: Dictionary = {1: 3, 5: 5, 8: 8, 10: 16}
 ## 旧版兼容：BGM 名称 → 文件路径映射
 ## 仅保留用于 SceneManager.return_to_title 等少数场景中临时获取 BGM 流。
 var bgm_paths = {
-	"BGM0": "res://Assets/Audios/BGM/BGM0荒凉无边.mp3",
+	"BGM0": "res://Assets/Audios/BGM/探险.ogg",
 }
 
 # ----- BGM 系统（新版流式） -----
@@ -71,9 +71,9 @@ const _SFX_POOL_SIZE: int = 12
 
 ## 全局统一点击音效（所有 UI 场景共用）。默认直接指向资源；要换改这里的 preload 路径即可。
 ## （本脚本是 autoload 脚本而非场景，因此 @export 在这里无法在 Inspector 编辑。）
-var button_click_sfx: AudioStream = preload("res://Assets/Audios/SFX/UI/鼠标点击音效.wav")
+var button_click_sfx: AudioStream
 ## 全局统一悬停音效（所有 UI 场景共用）。
-var button_hover_sfx: AudioStream = preload("res://Assets/Audios/SFX/UI/a.wav")
+var button_hover_sfx: AudioStream
 ## 悬停音效最小触发间隔（秒）：鼠标快速扫过一排按钮时不至于叠成一团噪音
 const HOVER_SFX_MIN_INTERVAL: float = 0.035
 ## 上一次悬停音效的时间戳（毫秒）
@@ -81,8 +81,23 @@ var _last_hover_sfx_ms: int = -100000
 ## 音频闪避 Tween
 var audio_duck_tween: Tween
 
+# ============================================================
+# 🎚 音效增益表（方案 A）
+# ============================================================
+## 资源路径 → 增益（dB）。想单独调某个音效的音量，在这里加一行即可：
+##   sfx_gain_db["res://Assets/Audios/SFX/UI/鼠标点击.wav"] = -6.0   # 太响 → 衰减 6dB
+##   sfx_gain_db["res://Assets/Audios/SFX/Player/landing.wav"] = 4.0  # 太轻 → 提升 4dB
+## 播放时自动套用（只改播放音量，不动素材文件、不用重新导入）；表里没写的按 0dB 处理。
+var sfx_gain_db: Dictionary = {}
+
+## 音频设置存档路径（音量是全局设置，不属于某个存档）
+const AUDIO_SETTINGS_PATH: String = "user://audio_settings.cfg"
+## 需要持久化的总线（改动后写盘、启动时读回）
+const PERSISTED_BUSES: Array[String] = [MASTER_BUS, BGM_BUS, SFX_BUS, VOICE_BUS]
+## 已有待写的设置存档，避免拖动滑条时每帧都写文件
+var _settings_save_pending: bool = false
+
 func _ready():
-	print("AudioManager: 初始化完成（SFX对象池+优先级排队+事件BGM恢复）")
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	# 预创建 SFX 对象池
 	for i in range(_SFX_POOL_SIZE):
@@ -92,6 +107,41 @@ func _ready():
 		add_child(p)
 		_sfx_pool.append(p)
 	# 音效资源已在变量声明处用 preload 指向默认值（不在函数里写硬编码加载）
+	# ★ 读回上次保存的音量设置：以前只改 AudioServer 而不落盘，重启就全部回到项目默认值
+	_load_audio_settings()
+
+
+## 读回音频设置（没有存档文件时保持项目默认的 bus layout 不变）
+func _load_audio_settings() -> void:
+	var config := ConfigFile.new()
+	if config.load(AUDIO_SETTINGS_PATH) != OK:
+		return
+	for bus_name: String in PERSISTED_BUSES:
+		if not config.has_section_key("volume", bus_name):
+			continue
+		var bus_index: int = AudioServer.get_bus_index(bus_name)
+		if bus_index < 0:
+			continue
+		var percent: float = clampf(float(config.get_value("volume", bus_name)), 0.0, 100.0)
+		AudioServer.set_bus_volume_db(bus_index, linear_to_db(percent / 100.0))
+
+
+## 音量改动后延迟一帧写盘（拖动滑条会连续触发，合并成一次）
+func _schedule_audio_settings_save() -> void:
+	if _settings_save_pending:
+		return
+	_settings_save_pending = true
+	call_deferred("_save_audio_settings")
+
+
+## 把四条总线的当前音量写进 user://audio_settings.cfg
+func _save_audio_settings() -> void:
+	_settings_save_pending = false
+	var config := ConfigFile.new()
+	config.load(AUDIO_SETTINGS_PATH)
+	for bus_name: String in PERSISTED_BUSES:
+		config.set_value("volume", bus_name, get_bus_volume_percent(bus_name))
+	config.save(AUDIO_SETTINGS_PATH)
 
 # ============================================================
 # 🎵 BGM 流式接口（场景通过拖拽传入 AudioStream）
@@ -241,6 +291,16 @@ func stop_bgm(_fade_duration: float = BGM_FADE_OUT_DURATION):
 # 🎵 SFX 流式接口（含优先级排队）
 # ============================================================
 
+## 取某个音效的增益（dB）：查 sfx_gain_db，表里没有就返回 0
+func get_sfx_gain_db(stream: AudioStream) -> float:
+	if stream == null:
+		return 0.0
+	var path: String = stream.resource_path
+	if path == "":
+		return 0.0
+	return float(sfx_gain_db.get(path, 0.0))
+
+
 ## 播放一次性音效（默认优先级 NORMAL）
 func play_stream_sfx(stream: AudioStream, bus: String = SFX_BUS) -> void:
 	play_stream_sfx_prioritized(stream, SFX_PRIORITY_NORMAL, bus)
@@ -302,6 +362,8 @@ func play_stream_sfx_prioritized(stream: AudioStream, priority: int = SFX_PRIORI
 	player.stop()
 	player.stream = stream.duplicate() if stream is AudioStream else stream
 	player.bus = bus
+	# ★ 套用「音效增益表」：按素材路径查 dB（查的是原始 stream，duplicate 后路径会丢）
+	player.volume_db = get_sfx_gain_db(stream)
 	player.play()
 
 func _count_at_or_below(threshold: int) -> int:
@@ -338,6 +400,8 @@ func play_stream_looped(key: String, stream: AudioStream, bus: String = SFX_BUS)
 	add_child(sfx_player)
 	sfx_player.stream = instance
 	sfx_player.bus = bus
+	# ★ 循环音效同样套用增益表
+	sfx_player.volume_db = get_sfx_gain_db(stream)
 	sfx_player.finished.connect(_on_looped_sfx_finished.bind(key))
 	sfx_player.play()
 	_looped_players[key] = sfx_player
@@ -372,6 +436,8 @@ func set_bus_volume_percent(bus_name: String, value: float):
 	var bus_index = AudioServer.get_bus_index(bus_name)
 	if bus_index != -1:
 		AudioServer.set_bus_volume_db(bus_index, linear_to_db(value / 100.0))
+		# ★ 改完就安排写盘：否则下次启动音量会回到项目默认值
+		_schedule_audio_settings_save()
 
 func set_master_volume(value: float):
 	set_bus_volume_percent("Master", value * 100.0)

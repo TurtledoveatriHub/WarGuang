@@ -62,7 +62,7 @@ func _ready():
 	else:
 		if get_tree() == null:
 			return
-		RoomManager.load_room("Room1")
+		RoomManager.load_room("GrassLand1")
 	
 	# 连接玩家死亡信号
 	if not is_inside_tree() or get_tree() == null:
@@ -86,7 +86,7 @@ func _play_new_game_opening_sequence() -> void:
 	else:
 		await FadeManager.fade_out(0.0)
 	if RoomManager:
-		RoomManager.load_room("Room1")
+		RoomManager.load_room("GrassLand1")
 	await get_tree().process_frame
 	if FadeManager and FadeManager.has_method("force_black"):
 		FadeManager.force_black()

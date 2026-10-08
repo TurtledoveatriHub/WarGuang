@@ -52,9 +52,6 @@ func _interact_with_chair():
 	# 记录当前房间到全局数据（需要扩展Global）
 	Global.last_save_room = current_room_id
 	
-	# 已走过的房间在此刻正式绘制到地图上（参考空洞骑士：在存档点才更新地图）
-	if MapManager and MapManager.has_method("commit_pending_rooms"):
-		MapManager.commit_pending_rooms()
 	
 	# 播放存档音效
 	AudioManager.play_stream_sfx(save_interact_sfx)
@@ -71,10 +68,8 @@ func _interact_with_chair():
 		player.lock_control(interaction_lock_duration)
 		print("存档点: 玩家进入睡眠状态，控制锁定", interaction_lock_duration, "秒")
 	
-	# 显示存档成功标签
-	var player_ui = get_tree().get_first_node_in_group("player_ui")
-	if player_ui and player_ui.has_method("show_save_label"):
-		player_ui.show_save_label()
+	# 显示存档成功提示（文字提示统一由 AchievementToast 层负责）
+	AchievementToast.show_save_hint()
 	
 	# 显示存档成功提示
 	_show_save_success()

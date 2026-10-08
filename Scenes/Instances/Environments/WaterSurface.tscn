@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://drdd4c0liia8h" path="res://Scripts/Instances/Environments/WaterSurface.gd" id="1_kmn52"]
 [ext_resource type="Shader" uid="uid://m6jvbmcbnxuu" path="res://Assets/Shaders/water_wave.gdshader" id="2_pmksv"]
-[ext_resource type="Script" uid="uid://bnu2kwe1y26uk" path="res://Scripts/UI/TextArea.gd" id="2_textarea"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_textarea"]
 [ext_resource type="Texture2D" uid="uid://b6n4ws6g4gyf6" path="res://Assets/Textures/Instances/pp.png" id="3_pmksv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kmn52"]
@@ -56,7 +56,7 @@ visible = false
 script = ExtResource("2_textarea")
 size = Vector2(200, 100)
 debug_color = Color(0.3, 0.6, 1, 0.2)
-metadata/_custom_type_script = "uid://bnu2kwe1y26uk"
+metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="body_exited" from="." to="." method="_on_body_exited"]

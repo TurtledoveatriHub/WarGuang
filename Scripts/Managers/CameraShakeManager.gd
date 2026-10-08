@@ -14,7 +14,6 @@ extends Node
 ## - Player.gd: 撞墙（x_strong）、落地（y_strong）、受伤（general_weak/general_moderate）
 ## - JumpBox.gd: JumpBox 触发（y_weak）
 ## - MovingJumpBox.gd: 移动 JumpBox 触发（y_weak）
-## - JumpPlatform.gd: 弹跳平台触发（y_weak）
 ## - ChallengeJumpBox.gd: 挑战 JumpBox 触发（y_weak）
 
 ## ==================== 预设配置（在 Inspector 中修改）====================
@@ -45,13 +44,13 @@ extends Node
 
 @export_category("X 轴强抖动（水平方向）")
 ## X 轴强抖动 - X 轴抖动强度（像素）
-@export var shake_x_strong_intensity: float = 40.0
+@export var shake_x_strong_intensity: float = 20.0
 ## X 轴强抖动 - Y 轴抖动强度（像素）
-@export var shake_x_strong_y_intensity: float = 10.0
+@export var shake_x_strong_y_intensity: float = 4.0
 ## X 轴强抖动 - 持续时间（秒）
-@export var shake_x_strong_duration: float = 0.6
+@export var shake_x_strong_duration: float = 0.3
 ## X 轴强抖动 - 抖动速度（Hz，越高越密集）
-@export var shake_x_strong_speed: float = 8.0
+@export var shake_x_strong_speed: float = 6.0
 ## X 轴强抖动 - 衰减类型：0=线性，1=快速，2=缓慢
 @export var shake_x_strong_falloff: int = 2
 

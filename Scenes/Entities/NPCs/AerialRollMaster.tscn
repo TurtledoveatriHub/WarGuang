@@ -1,0 +1,113 @@
+[gd_scene load_steps=15 format=3 uid="uid://dwy6nckbuirsr"]
+
+[ext_resource type="Script" uid="uid://02u643fdl1od" path="res://Scripts/Entities/NPCs/AerialRollMaster.gd" id="1_hb26k"]
+[ext_resource type="Resource" uid="uid://cvoy8lw41mkmu" path="res://Assets/Dialogues/NPCs/AerialRollMaster.dialogue" id="2_uxue2"]
+[ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="3_h2my0"]
+[ext_resource type="Texture2D" uid="uid://d2esp1mx0142k" path="res://Assets/Textures/Entities/NPCs/白毛.png" id="4_uxue2"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ecyv1"]
+atlas = ExtResource("4_uxue2")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h2my0"]
+atlas = ExtResource("4_uxue2")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tklk2"]
+atlas = ExtResource("4_uxue2")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_liswx"]
+atlas = ExtResource("4_uxue2")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tyrdt"]
+atlas = ExtResource("4_uxue2")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c0v7y"]
+atlas = ExtResource("4_uxue2")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dbk1b"]
+atlas = ExtResource("4_uxue2")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_taq67"]
+atlas = ExtResource("4_uxue2")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fvu2l"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"AerialRoll",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ecyv1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h2my0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tklk2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_liswx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tyrdt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c0v7y")
+}],
+"loop": true,
+"name": &"IDLE",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dbk1b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_taq67")
+}],
+"loop": true,
+"name": &"TALK",
+"speed": 4.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g62kn"]
+size = Vector2(42, 36)
+
+[node name="AerialRollMaster" type="Area2D"]
+collision_layer = 64
+script = ExtResource("1_hb26k")
+dialogue_resource = ExtResource("2_uxue2")
+balloon_scene = ExtResource("3_h2my0")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_fvu2l")
+animation = &"IDLE"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 33
+shape = SubResource("RectangleShape2D_g62kn")
+
+[node name="InteractionPrompt" type="Sprite2D" parent="."]
+position = Vector2(0, -24)
+region_rect = Rect2(96, 144, 17, 11)

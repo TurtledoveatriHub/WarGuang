@@ -14,15 +14,15 @@ extends Area2D
 ## 传送效果设置
 @export_category("传送效果设置")
 ## 渐入时间（秒）
-@export var fade_in_duration: float = 0.4
+@export var fade_in_duration: float = 0.3
 ## 黑屏时间（秒）
-@export var black_screen_duration: float = 0.4
+@export var black_screen_duration: float = 0.2
 ## 淡出时间（秒）
-@export var fade_out_duration: float = 0.4
+@export var fade_out_duration: float = 0.3
 ## Door 非瞬移追镜时长（秒）
 @export var door_camera_catchup_duration: float = 0.20
 ## Door 传送后临时放开相机限制时长（秒）
-@export var door_camera_limit_unlock_duration: float = 0.32
+@export var door_camera_limit_unlock_duration: float = 0.26
 
 # 内部变量
 var can_teleport: bool = true
@@ -138,7 +138,7 @@ func _input(event):
 		elif player.has_method("interrupt_hurt_visual_effect"):
 			player.interrupt_hurt_visual_effect()
 		# 和 body_entered 一样：先黑屏再传送
-		await FadeManager.fade_out(fade_in_duration)
+		await FadeManager.fade_out(fade_out_duration)
 		await _teleport_player(player)
 
 func _show_interaction_prompt() -> void:
@@ -154,7 +154,7 @@ func _deferred_start_teleport(body: Node) -> void:
 	if not is_instance_valid(body) or not is_instance_valid(self):
 		return
 	# 先黑屏，再加载房间（避免闪现目标房间一帧）
-	await FadeManager.fade_out(fade_in_duration)
+	await FadeManager.fade_out(fade_out_duration)
 	await _teleport_player(body)
 
 ## 黑屏阶段执行传送（此时屏幕已全黑，操作场景树安全）
@@ -209,6 +209,9 @@ func _teleport_player(player: Node) -> void:
 		RoomManager.prepare_room_background_for_entry(door_target_room, target_position)
 	
 	RoomManager.load_room(door_target_room, true)
+	# 登记「玩家真的走过了这对门」（两端坐标一起记）：地图上的门连线只认实际走过的门对
+	if MapManager and MapManager.has_method("mark_door_used"):
+		MapManager.mark_door_used(get_room_id(), door_target_room, global_position, target_position)
 	print("[Door] room_loaded: ", door_target_room, " t=", Time.get_ticks_msec())
 	
 	player.global_position = target_position
@@ -235,7 +238,7 @@ func _teleport_player(player: Node) -> void:
 	await get_tree().create_timer(black_screen_duration).timeout
 	
 	# 4. 淡出（恢复）
-	await FadeManager.fade_in(fade_out_duration)
+	await FadeManager.fade_in(fade_in_duration)
 	
 	other_door.is_player_inside = true
 

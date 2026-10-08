@@ -1,6 +1,24 @@
-[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://ddmqsmr1batw4"]
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://ddmqsmr1batw4"]
 
-[ext_resource type="Texture2D" uid="uid://bc8nqg77t3n3i" path="res://Assets/Textures/Tiles/GrassLand/草原背景瓦片.png" id="1_x8l7a"]
+[ext_resource type="Texture2D" uid="uid://du4irlupfq1ub" path="res://Assets/Textures/Tiles/GrassLand/草原背景动画瓦片.png" id="1_riody"]
+[ext_resource type="Texture2D" uid="uid://ceqwxrgm4opd2" path="res://Assets/Textures/Tiles/GrassLand/草原背景瓦片.png" id="1_x8l7a"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jit6o"]
+texture = ExtResource("1_riody")
+0:1/animation_speed = 2.0
+0:1/animation_mode = 1
+0:1/0 = 0
+0:2/animation_mode = 1
+0:2/0 = 0
+0:0/animation_speed = 2.0
+0:0/animation_mode = 1
+0:0/0 = 0
+1:0/0 = 0
+1:1/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+2:1/0 = 0
+2:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nrlf5"]
 texture = ExtResource("1_x8l7a")
@@ -214,3 +232,4 @@ terrain_set_0/mode = 2
 terrain_set_0/terrain_0/name = "Terrain 1"
 terrain_set_0/terrain_0/color = Color(0.32288247, 0.546616, 0.63722485, 1)
 sources/1 = SubResource("TileSetAtlasSource_nrlf5")
+sources/0 = SubResource("TileSetAtlasSource_jit6o")

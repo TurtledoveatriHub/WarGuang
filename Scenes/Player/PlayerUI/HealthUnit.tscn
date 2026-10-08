@@ -1,7 +1,7 @@
 [gd_scene load_steps=28 format=3 uid="uid://h0kyvxadfyys"]
 
 [ext_resource type="Script" uid="uid://dlnhn12wstg44" path="res://Scripts/Player/PlayerUI/HealthUnit.gd" id="1_ddyvn"]
-[ext_resource type="Texture2D" uid="uid://ypfo1vnuw3oq" path="res://Assets/Textures/UIs/PlayerUIs/HP_UI.png" id="2_y6v8x"]
+[ext_resource type="Texture2D" uid="uid://vo7em3mhhofs" path="res://Assets/Textures/UIs/PlayerUIs/血量UI纹理.png" id="2_y6v8x"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5k5n3"]
 atlas = ExtResource("2_y6v8x")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://ctgxsaoq0vrlk"]
+[gd_scene load_steps=9 format=3 uid="uid://ctgxsaoq0vrlk"]
 
 [ext_resource type="Script" uid="uid://b02s23wuh8fbt" path="res://Scripts/Instances/Platforms/Platform.gd" id="1_ldtsg"]
 [ext_resource type="Texture2D" uid="uid://b6kkci1fhcbkw" path="res://Assets/Textures/Instances/GrassLand/移动平台.png" id="2_ldtsg"]
@@ -7,7 +7,7 @@
 atlas = ExtResource("2_ldtsg")
 region = Rect2(0, 0, 48, 16)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_4alrk"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_ldtsg"]
 atlas = ExtResource("2_ldtsg")
 region = Rect2(0, 16, 48, 16)
 
@@ -39,18 +39,27 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_4alrk")
-}],
-"loop": true,
-"name": &"ONMOVE",
-"speed": 6.0
-}, {
-"frames": [{
-"duration": 1.0,
 "texture": null
 }],
 "loop": false,
 "name": &"OPEN",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ldtsg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ldtsg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ldtsg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ldtsg")
+}],
+"loop": false,
+"name": &"TRIGGER",
 "speed": 12.0
 }]
 
@@ -60,14 +69,20 @@ size = Vector2(38, 10)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iyine"]
 size = Vector2(54, 16)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bounce"]
+size = Vector2(48, 24)
+
 [node name="Platform" type="Node2D"]
 script = ExtResource("1_ldtsg")
 movement_mode = 1
 end_offset = Vector2(240, 0)
+wait_time = 0.5
+acceleration_time = 0.3
+deceleration_time = 0.2
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_8jvs6")
-animation = &"ON"
+animation = &"TRIGGER"
 
 [node name="Body" type="StaticBody2D" parent="."]
 collision_layer = 6
@@ -83,3 +98,10 @@ collision_layer = 0
 [node name="DetectShape" type="CollisionShape2D" parent="Body/Area2D"]
 position = Vector2(0, -2)
 shape = SubResource("RectangleShape2D_iyine")
+
+[node name="BounceArea" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BounceArea"]
+position = Vector2(0, -19)
+shape = SubResource("RectangleShape2D_bounce")

@@ -1,0 +1,13 @@
+~ first_meeting
+"空中翻滚大师": ！
+沃玛: ！你好？
+"空中翻滚大师": 翻滚！！
+沃玛: 请问...
+"空中翻滚大师": 空中翻滚！！！
+沃玛: 竟然是...！
+do EventBus.emit_signal("double_jump_unlocked")
+=> END
+
+~ no_more_teachings
+"空中翻滚大师": 翻滚起来！！
+=> END

@@ -2,7 +2,7 @@ extends Node
 
 const SAVE_PATH = "user://saves/"
 
-func save_game(slot_index: int, data: Dictionary):
+func save_game(slot_index: int, data: Dictionary, notify: bool = true):
 	var file_path = SAVE_PATH + "save_" + str(slot_index) + ".dat"
 	var tmp_path = file_path + ".tmp"
 	
@@ -49,15 +49,16 @@ func save_game(slot_index: int, data: Dictionary):
 	
 	print("存档成功：", file_path)
 	
-	# 修复：存档成功后显示"存档已更新"提示
-	call_deferred("_show_save_notification")
+	if notify:
+		call_deferred("_show_save_notification")
 	
 	return true
 
+## 弹「存档已更新 . . .」提示。
+## 全项目的右下角文字提示统一由 AchievementToast 层负责（不会和成就提示抢位置，
+## 也不会再被 HUD 显隐影响）。调用方传 notify = false 时（例如钱币增减）不弹。
 func _show_save_notification():
-	var player_ui = get_tree().get_first_node_in_group("player_ui")
-	if player_ui and player_ui.has_method("show_save_label"):
-		player_ui.show_save_label()
+	AchievementToast.show_save_hint()
 
 func load_game(slot_index: int) -> Dictionary:
 	var file_path = SAVE_PATH + "save_" + str(slot_index) + ".dat"

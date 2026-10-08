@@ -54,8 +54,8 @@ static func take_damage_with_type(player: Node, damage_source_position: Vector2,
 			player.velocity -= kb_dir * along
 	var impulse: Vector2 = knockback_force * 0.7
 	var clamped_impulse: Vector2 = Vector2(
-		clamp(impulse.x, -220.0, 220.0),
-		clamp(impulse.y, -260.0, 260.0)
+		clampf(impulse.x, -player.hurt_impulse_max_x, player.hurt_impulse_max_x),
+		clampf(impulse.y, -player.hurt_impulse_max_y, player.hurt_impulse_max_y)
 	)
 	player.velocity += clamped_impulse
 

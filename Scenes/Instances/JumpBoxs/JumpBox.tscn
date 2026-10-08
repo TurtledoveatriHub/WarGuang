@@ -1,6 +1,7 @@
-[gd_scene load_steps=35 format=3 uid="uid://cm3h413lvuans"]
+[gd_scene load_steps=36 format=3 uid="uid://cm3h413lvuans"]
 
 [ext_resource type="Script" uid="uid://dq0rdjsxrddg6" path="res://Scripts/Instances/JumpBoxs/JumpBox.gd" id="1_ol2j8"]
+[ext_resource type="AudioStream" uid="uid://c1rbd42778cdi" path="res://Assets/Audios/SFX/Instances/JumpBox.wav" id="2_kowqp"]
 [ext_resource type="Texture2D" uid="uid://chl3o3i5chgjf" path="res://Assets/Textures/Instances/雪地JumpBox.png" id="4_jb1q7"]
 [ext_resource type="Texture2D" uid="uid://n6vhw43ywjid" path="res://Assets/Textures/Instances/1.png" id="5_b1ty5"]
 
@@ -254,6 +255,8 @@ radius = 9.0
 
 [node name="JumpBox" type="Area2D"]
 script = ExtResource("1_ol2j8")
+normal_trigger_sfx = ExtResource("2_kowqp")
+perfect_trigger_sfx = ExtResource("2_kowqp")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_t0krv")

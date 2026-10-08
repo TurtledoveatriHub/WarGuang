@@ -8,7 +8,7 @@ class SaveData:
 	var exists: bool = false
 	var player_max_health: int = 3
 	var coins: int = 0
-	var last_save_room: String = "Room1"
+	var last_save_room: String = "GrassLand1"
 	var play_time_seconds: int = 0
 	var timestamp: String = ""
 
@@ -16,6 +16,8 @@ var save_slots = []  ## 存档槽数据数组，存储每个槽位的存档信�
 var is_dialog_open: bool = false  ## 删除确认对话框是否打开状态
 ## 当前选中的存档槽（-1 = 未选中）。选中后才会出现「进入存档 / 清空存档」两个按钮。
 var _selected_slot: int = -1
+## 存档槽当前是否可点（= 输入锁状态）。选中的那个槽不接收鼠标，用它与输入锁区分开。
+var _slot_buttons_interactive: bool = true
 ## 两个操作按钮当前是否显示中。
 var _action_buttons_shown: bool = false
 ## 操作按钮动画的代次号：连点存档槽时只让最后一次生效。
@@ -60,6 +62,7 @@ func _ready():
 	$BackButton.pressed.connect(_on_back_button_pressed)
 	# 两个操作按钮默认不显示，选中存档槽后才进入场动画出现。
 	_set_action_buttons_visible(false)
+	_apply_slot_selection_visual()
 	# 黑屏场景切换时由 SceneManager / UIRouter 显式调用 ui_enter()；
 	# 非黑屏（编辑器直接运行本场景）时自行入场。
 	auto_enter_unless_black()
@@ -80,7 +83,7 @@ func _load_save_data():
 		if save_data.exists:
 			save_data.player_max_health = save_info.get("player_max_health", 3)
 			save_data.coins = save_info.get("player_coins", 0)
-			save_data.last_save_room = save_info.get("last_save_room", "Room1")
+			save_data.last_save_room = save_info.get("last_save_room", "GrassLand1")
 			save_data.play_time_seconds = int(save_info.get("play_time_seconds", 0))
 			save_data.timestamp = save_info.get("timestamp", "")
 		save_slots.append(save_data)
@@ -130,7 +133,9 @@ func _on_save_slot_pressed(slot_index: int):
 	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
 	if slot_index == _selected_slot and _action_buttons_shown:
 		return
+	# 旧槽会在这一句里自己把「按下态」收回去，新槽保持按下态。
 	_selected_slot = slot_index
+	_apply_slot_selection_visual()
 	_refresh_action_buttons()
 
 ## 重建房间纹理映射缓存（运行时只做字典查询）
@@ -240,8 +245,12 @@ func _on_clear_save_pressed():
 		push_error("SaveSelectScene: delete_confirm_scene 未配置！请在 Inspector 中拖拽 DeleteConfirmDialog.tscn")
 		return
 	
-	# 对话框期间标记为打开：避免玩家在弹窗后面还能点到存档槽
+	# 对话框期间标记为打开，并让本页面整层「失活」：
+	# 按钮既点不动、也不再播悬停动画，ESC 也交给对话框处理 —— 也就是完全无视本层内容。
+	# 因为 UIScene.overlay_pass_through_input = true，本页不会吞掉事件，
+	# 所以对话框自己的按钮照常可点。
 	is_dialog_open = true
+	set_overlay_active(true)
 	LightingManager.dim_lights(0.0, 0.5)
 	
 	var confirm_dialog = delete_confirm_scene.instantiate()
@@ -250,19 +259,44 @@ func _on_clear_save_pressed():
 	confirm_dialog.tree_exited.connect(_on_dialog_closed)
 
 ## 设置所有按钮的启用状态
-## 设置所有按钮的启用状态
 func _set_buttons_enabled(enabled: bool):
-	for slot_button in save_slot_buttons:
-		slot_button.disabled = !enabled
+	_slot_buttons_interactive = enabled
+	for i in save_slot_buttons.size():
+		_apply_slot_button_selected(save_slot_buttons[i], i == _selected_slot)
 	$BackButton.disabled = !enabled
 	enter_save_button.disabled = !enabled
 	clear_save_button.disabled = !enabled
+
+
+## 把「哪个槽被选中」应用到三个存档按钮上。
+func _apply_slot_selection_visual() -> void:
+	for i in save_slot_buttons.size():
+		_apply_slot_button_selected(save_slot_buttons[i], i == _selected_slot)
+
+
+## 被选中的存档槽保持「按下」外观（与 SettingsScene 的分类按钮同一套做法）：
+##   * button_pressed → 画 texture_pressed（槽位当前没配贴图，配了就自动生效）；
+##   * set_locked_visual(true) → 保持按下时的缩放 + 像素位移 + 文本提亮，
+##     切换到其它槽时传 false，它会自己播一遍「取消选中」的回收动画；
+##   * 不用 disabled 表现选中：disabled 会画 texture_disabled，那不是按下态。
+func _apply_slot_button_selected(button: TextureButton, selected: bool) -> void:
+	if button == null:
+		return
+	button.disabled = false
+	button.toggle_mode = true
+	button.button_pressed = selected
+	var interactive: bool = _slot_buttons_interactive and not selected
+	button.mouse_filter = Control.MOUSE_FILTER_STOP if interactive else Control.MOUSE_FILTER_IGNORE
+	if button.has_method("set_locked_visual"):
+		button.call("set_locked_visual", selected)
 
 ## 处理对话框关闭
 ## 处理删除确认对话框关闭
 func _on_dialog_closed():
 	is_dialog_open = false
-	_set_buttons_enabled(true)
+	# 解除「被覆盖」状态：恢复按钮启用（含选中态的按下外观）
+	set_overlay_active(false)
+	set_input_locked(false)
 	LightingManager.restore_lights(0.5)
 	
 	## 重新启用ESC键处理
@@ -274,9 +308,10 @@ func _on_confirm_delete(slot_index: int):
 	if SaveManager.delete_save(slot_index):
 		save_slots[slot_index].exists = false
 		_update_slot_display()
-		# 槽位已空：收起两个操作按钮并清除选中
+		# 槽位已空：收起两个操作按钮并清除选中（贴图与锁定视觉一并收回去）
 		_selected_slot = -1
 		_set_action_buttons_visible(false)
+		_apply_slot_selection_visual()
 		
 		# 关键修复：如果删除的是当前存档，需要清空 Global 数据
 		if slot_index == Global.current_save_slot:

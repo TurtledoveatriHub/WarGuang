@@ -54,10 +54,45 @@ func return_to_title_from_game_setting(already_black: bool = false) -> bool:
 			FadeManager.ui_switch_fade_in_duration,
 			""  # BGM 由 TitleScene._ready() 通过 @export title_bgm_stream 播放
 		)
-	get_tree().paused = false
-	
+	# 暂停已在 _do_scene_transition() 换场后统一解除，这里不再重复。
+
 	_end_scene_switch()
 	return true
+
+## 等主场景真正有画面可看（房间已加载 + 视口又渲染了几帧）再淡入。
+## 最长等 2 秒，超时就照常淡入，绝不把玩家卡在黑幕里。
+func _wait_room_ready_for_reveal() -> void:
+	var deadline_ms: int = Time.get_ticks_msec() + 2000
+	while Time.get_ticks_msec() < deadline_ms:
+		var room_manager: Node = get_node_or_null("/root/RoomManager")
+		if room_manager == null or str(room_manager.get("current_room")) != "":
+			break
+		await get_tree().process_frame
+	# 再多等两帧，确保这一帧的画面已经真的画出来
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+
+## 把 PhantomCamera 瞬间对齐到玩家（跳过跟随阻尼），避免进场时先看到相机「飞过去」。
+## 优先用 PhantomCamera2D.teleport_position()；没有 PCam 时退回直接摆 Camera2D。
+func _snap_phantom_camera_to_player() -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	var player: Node = tree.get_first_node_in_group("player")
+	if player == null or not is_instance_valid(player) or not (player is Node2D):
+		return
+	var phantom: Node = player.get_node_or_null("PhantomCamera2D")
+	if phantom != null and phantom.has_method("teleport_position"):
+		phantom.call("teleport_position")
+		return
+	var viewport: Viewport = player.get_viewport()
+	if viewport == null:
+		return
+	var camera: Camera2D = viewport.get_camera_2d()
+	if camera != null:
+		camera.global_position = (player as Node2D).global_position
+
 
 # 从存档进入游戏
 func start_game_from_save(slot_index: int):
@@ -100,10 +135,12 @@ func start_game_from_save(slot_index: int):
 	
 	# 存档进游戏采用专用流程：淡出 -> 全黑保持 -> 切场并等待主场景可视准备 -> 淡入。
 	var black_start_ms: int = Time.get_ticks_msec()
-	if FadeManager and FadeManager.has_method("force_black"):
-		FadeManager.force_black()
-	else:
-		await FadeManager.fade_out(0.0)
+	# ★ 这里用真正的淡出（时长 = ui_save_to_game_fade_out_duration）。
+	#   之前写的是 force_black()（瞬间全黑）→ 那个导出参数成了死参数，怎么改都没效果。
+	#   淡出发生在 change_scene 之前，此时 SaveSelect 场景还活着，Tween 不会被切场截断。
+	await FadeManager.fade_out(FadeManager.ui_save_to_game_fade_out_duration)
+	# 以「刚刚全黑」为起点重新计时，这样 ui_save_to_game_black_hold_duration 就是真实的全黑时长
+	black_start_ms = Time.get_ticks_msec()
 	# 新存档入场动画期间抑制 BGM，并停止当前标题 BGM
 	if is_new_save_opening:
 		AudioManager.stop_bgm_stream()
@@ -126,6 +163,8 @@ func start_game_from_save(slot_index: int):
 		# （FadeManager 是 autoload，hold_black 标签可能从之前游戏会话残留）
 		if FadeManager and FadeManager.has_method("clear_black_holds"):
 			FadeManager.clear_black_holds()
+		# 注：相机对齐由 MainGameScene 自己负责（它在 boot_visual_ready 之前调
+		# sync_camera_to_player_center(true)），这里不要再插手，否则会打乱跟随。
 		await FadeManager.fade_in(FadeManager.ui_save_to_game_fade_in_duration)
 	if Global:
 		Global.start_play_time_session()
@@ -193,6 +232,12 @@ func _do_scene_transition(scene_path: String, fade_out_duration: float, black_ho
 
 	get_tree().change_scene_to_file(scene_path)
 	await get_tree().process_frame
+	# 新场景的入场动画 / Tween / 粒子 / 灯光都靠 _process 推进：
+	# 若树还停在暂停态（典型的：从游戏内设置页返回标题，那个页面会 paused = true），
+	# 它们会整段冻住 —— 表现就是「卡一下、粒子要等一秒才开始动」。
+	# 此时旧场景已经被换掉，立刻解除暂停是安全的。
+	if get_tree().paused:
+		get_tree().paused = false
 
 	if black_hold_duration > 0.0:
 		var elapsed_black: float = float(Time.get_ticks_msec() - black_start_ms) / 1000.0
@@ -238,3 +283,9 @@ func _begin_scene_switch(tag: String) -> bool:
 func _end_scene_switch() -> void:
 	_scene_switch_in_progress = false
 	_scene_switch_started_ms = -1
+
+## 当前是否正在切场（含从存档进入游戏的整个过渡期）。
+## 供外部在过渡期间屏蔽交互：过渡期间调用切场 API 会被 _begin_scene_switch() 拒绝，
+## 若此时允许玩家打开菜单，菜单里的「返回主菜单 / 退回标题」按钮就会点了没反应。
+func is_scene_switch_in_progress() -> bool:
+	return _scene_switch_in_progress

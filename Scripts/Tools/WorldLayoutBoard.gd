@@ -10,18 +10,21 @@
 @tool
 extends Node2D
 
-## 布局数据资源路径
-const LAYOUT_DATA_PATH := "res://Assets/Configs/RoomLayoutData.tres"
-## 槽位脚本路径
-const SLOT_SCRIPT_PATH := "res://Scripts/Tools/RoomLayoutSlot.gd"
-## 房间扫描器脚本（本会话新建，用 preload 而非 class_name 引用，避免全局类名注册延迟）
-const RoomScannerScript := preload("res://Scripts/Tools/RoomScanner.gd")
-
 ## 槽位容器节点名
 const ROOMS_ROOT_NAME := "Rooms"
 
-## 打开场景时，如果布局数据还没有房间尺寸，是否自动扫描一次补全
-@export var auto_scan_when_bounds_missing: bool = true
+## 打开场景时是否自动重算房间尺寸与地图画布
+## （这两项都是派生数据，房间改过 room_bounds 尺寸后无需手工同步）
+@export var auto_refresh_on_ready: bool = true
+
+## 重算时是否连地图画布原点一起重算
+## 若你手工微调过 RoomLayoutData.map_world_origin（让美术贴图对齐），把它关掉就不会被覆盖
+## 注意：居中模式下（center_texture_on_world_origin = true）原点由纹理尺寸推导，通常无需手调。
+@export var auto_refresh_map_origin: bool = true
+
+## 布局数据资源（把 res://Assets/Configs/RoomLayoutData.tres 拖到这里）
+## 不再硬编码路径：资源换了位置只要重新拖一下就行，保存也写回它自己的路径。
+@export var layout_data: RoomLayoutData = null
 
 ## 是否允许在 2D 视口中直接拖动房间矩形
 @export var enable_viewport_drag: bool = true
@@ -63,24 +66,46 @@ func _ready() -> void:
 	_load_layout_data()
 	if _layout_data == null:
 		return
-	var need_scan: bool = auto_scan_when_bounds_missing and _layout_data.room_bounds_rects.is_empty()
-	if need_scan:
-		scan_rooms()
+	if auto_refresh_on_ready:
+		refresh_derived_data()
 	_ensure_slots()
 	apply_data_to_slots()
 	refresh_slot_states()
 
-## 加载（或新建）布局数据资源
-func _load_layout_data() -> void:
-	if ResourceLoader.exists(LAYOUT_DATA_PATH):
-		var loaded: Resource = load(LAYOUT_DATA_PATH)
-		if loaded is RoomLayoutData:
-			_layout_data = loaded
-			return
-		push_error("WorldLayoutBoard: " + LAYOUT_DATA_PATH + " 不是 RoomLayoutData")
+## 重算派生数据：各房间真实尺寸 + 地图画布原点，并落盘
+## 房间改了 room_bounds 尺寸、或新增/移动了房间，都只需重新打开本场景。
+func refresh_derived_data() -> void:
+	if _layout_data == null:
 		return
-	_layout_data = RoomLayoutData.new()
-	_layout_data.resource_path = LAYOUT_DATA_PATH
+	var report: Dictionary = RoomScanner.scan_all(_layout_data)
+	# 贴图尺寸与画布原点都从「当前房间包围盒」推导（见 RoomLayoutData.sync_generated_canvas）
+	if auto_refresh_map_origin:
+		_layout_data.sync_generated_canvas()
+	ResourceSaver.save(_layout_data)
+	print(RoomScanner.format_report(report))
+	print("地图纹理尺寸 = %s｜地图画布原点 = %s｜画布尺寸 = %s 像素（1 像素 = %d 世界像素）" % [
+		str(_layout_data.map_texture_size),
+		str(_layout_data.map_world_origin),
+		str(_layout_data.get_map_canvas_size()),
+		int(_layout_data.world_units_per_map_pixel),
+	])
+	if _layout_data.center_texture_on_world_origin:
+		var required: Vector2i = _layout_data.get_required_texture_size_centered()
+		print("居中模式：纹理中心 = 世界 (0,0)。至少要 %d × %d 像素才能盖住全部房间，当前 %d × %d → %s" % [
+			required.x, required.y,
+			_layout_data.map_texture_size.x, _layout_data.map_texture_size.y,
+			"足够" if _layout_data.is_texture_size_sufficient() else "不足！超出部分的地图不会被显示"
+		])
+	else:
+		print("（自动模式：如需与美术贴图对齐，可手改 RoomLayoutData.map_world_origin，并把本节点的 auto_refresh_map_origin 关掉）")
+	queue_redraw()
+
+## 取布局数据：直接用 Inspector 上拖进来的引用（不再硬编码路径）
+func _load_layout_data() -> void:
+	if layout_data == null:
+		push_error("WorldLayoutBoard: 请把 Assets/Configs/RoomLayoutData.tres 拖到本节点的 layout_data 上")
+		return
+	_layout_data = layout_data
 
 ## 确保存在槽位容器
 func _ensure_rooms_root() -> Node2D:
@@ -95,7 +120,7 @@ func _ensure_rooms_root() -> Node2D:
 
 ## 为注册表中缺失的房间补建槽位
 func _ensure_slots() -> void:
-	var registry: Dictionary = RoomScannerScript.get_room_registry()
+	var registry: Dictionary = RoomScanner.get_room_registry()
 	var created_any: bool = false
 	for room_id in registry.keys():
 		if _find_slot(room_id) != null:
@@ -107,10 +132,8 @@ func _ensure_slots() -> void:
 
 ## 新建一个房间槽位
 func _create_slot(room_id: String) -> Node2D:
-	var slot_script: GDScript = load(SLOT_SCRIPT_PATH)
-	var slot := Node2D.new()
+	var slot: Node2D = RoomLayoutSlot.new()
 	slot.name = room_id
-	slot.set_script(slot_script)
 	slot.set("room_id", room_id)
 	slot.position = _layout_data.get_room_offset(room_id) if _layout_data != null else Vector2.ZERO
 	_rooms_root.add_child(slot)
@@ -146,9 +169,7 @@ func scan_rooms() -> void:
 	if _layout_data == null:
 		push_error("WorldLayoutBoard: 布局数据未加载")
 		return
-	var report: Dictionary = RoomScannerScript.scan_all(_layout_data)
-	ResourceSaver.save(_layout_data, LAYOUT_DATA_PATH)
-	print(RoomScannerScript.format_report(report))
+	refresh_derived_data()
 	_ensure_slots()
 	refresh_slot_states()
 
@@ -163,7 +184,7 @@ func apply_data_to_slots() -> void:
 		slot.position = _layout_data.get_room_offset(_slot_room_id(slot))
 	refresh_slot_states()
 
-## 把槽位当前位置写入布局数据并保存
+## 记录槽位位置到数据并保存后，刷新显示
 func record_slots_to_data() -> void:
 	if _layout_data == null or _rooms_root == null:
 		return
@@ -172,9 +193,36 @@ func record_slots_to_data() -> void:
 			continue
 		var slot: Node2D = child
 		_layout_data.set_room_position(_slot_room_id(slot), slot.position)
-	ResourceSaver.save(_layout_data, LAYOUT_DATA_PATH)
+	ResourceSaver.save(_layout_data)
 	refresh_slot_states()
-	print("WorldLayoutBoard: 已记录 %d 个房间位置到 %s" % [_rooms_root.get_child_count(), LAYOUT_DATA_PATH])
+	queue_redraw()
+	print("WorldLayoutBoard: 已记录 %d 个房间位置到 %s" % [_rooms_root.get_child_count(), str(_layout_data.resource_path)])
+
+## 绘制地图画布范围（美术需要画的整图所对应的世界矩形）
+func _draw() -> void:
+	if _layout_data == null:
+		return
+	var canvas_size_px: Vector2 = _layout_data.get_map_canvas_size()
+	if canvas_size_px.x <= 0.0 or canvas_size_px.y <= 0.0:
+		return
+	var ratio: float = maxf(_layout_data.world_units_per_map_pixel, 1.0)
+	var canvas_rect := Rect2(_layout_data.map_world_origin, canvas_size_px * ratio)
+	var sufficient: bool = _layout_data.is_texture_size_sufficient()
+	# 纹理不足时用红色警示（超出纹理范围的房间在地图上会直接消失）
+	var canvas_color := Color(1.0, 0.85, 0.3, 0.75) if sufficient else Color(1.0, 0.3, 0.3, 0.9)
+	draw_rect(canvas_rect, canvas_color, false, 24.0)
+	var font: Font = ThemeDB.fallback_font
+	var label := "地图纹理：%d × %d 像素" % [int(canvas_size_px.x), int(canvas_size_px.y)]
+	draw_string(font, canvas_rect.position + Vector2(24.0, -40.0), label,
+		HORIZONTAL_ALIGNMENT_LEFT, -1.0, 96, canvas_color)
+	# 居中模式下额外画出「覆盖全部房间所需的最小纹理范围」，方便美术判断还要画多大
+	if _layout_data.center_texture_on_world_origin:
+		var required: Vector2i = _layout_data.get_required_texture_size_centered()
+		var required_rect := Rect2(-Vector2(required) * 0.5 * ratio, Vector2(required) * ratio)
+		draw_rect(required_rect, Color(0.4, 1.0, 0.6, 0.8), false, 12.0)
+		draw_string(font, required_rect.position + Vector2(24.0, required_rect.size.y + 96.0),
+			"至少需要：%d × %d 像素" % [required.x, required.y],
+			HORIZONTAL_ALIGNMENT_LEFT, -1.0, 72, Color(0.5, 1.0, 0.7, 0.95))
 
 ## 请求一次延迟的槽位状态刷新（同一帧内多次请求只会执行一次）
 func request_refresh() -> void:
@@ -201,7 +249,31 @@ func refresh_slot_states() -> void:
 		slot.set("bounds_local", _layout_data.get_room_bounds_local(room_id))
 		slot.set("is_data_missing", not (_layout_data.has_room(room_id) and _layout_data.has_room_bounds(room_id)))
 		slot.set("is_overlapping", _overlapping_ids.has(room_id))
+		slot.set("door_links", _collect_door_links(room_id))
 		slot.call("refresh")
+
+
+## 把一个房间的门整理成槽位绘图需要的形式：
+## pos = 门在房间本地坐标系里的位置；target_pos = 目标房间槽位的位置（用于画对齐引线）
+func _collect_door_links(room_id: String) -> Array:
+	var links: Array = []
+	if _layout_data == null:
+		return links
+	var doors_raw: Variant = _layout_data.room_doors.get(room_id, [])
+	if not (doors_raw is Array):
+		return links
+	for door: Variant in doors_raw:
+		var entry: Dictionary = door
+		var target_room: String = str(entry.get("target", ""))
+		var target_slot: Node2D = _find_slot(target_room)
+		links.append({
+			"pos": entry.get("position", Vector2.ZERO),
+			"door_id": str(entry.get("door_id", "")),
+			"target_room": target_room,
+			"target_pos": target_slot.position if target_slot != null else Vector2.ZERO,
+			"has_target": target_slot != null,
+		})
+	return links
 
 ## 找出世界矩形互相重叠的房间（尺寸为空的房间不参与判定）
 func _compute_overlapping_ids() -> Dictionary:
@@ -233,7 +305,7 @@ func print_validation() -> void:
 	if _layout_data == null:
 		push_error("WorldLayoutBoard: 布局数据未加载")
 		return
-	var registry: Dictionary = RoomScannerScript.get_room_registry()
+	var registry: Dictionary = RoomScanner.get_room_registry()
 	var missing_position: Array = []
 	var missing_bounds: Array = []
 	var no_slot: Array = []

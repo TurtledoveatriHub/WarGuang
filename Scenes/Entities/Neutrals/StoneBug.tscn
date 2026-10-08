@@ -59,17 +59,17 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
-size = Vector2(18, 14)
+size = Vector2(20, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bugdetect"]
-size = Vector2(60, 20)
+size = Vector2(60, 30)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_detect"]
-size = Vector2(180, 80)
+size = Vector2(180, 220)
 
 [node name="StoneBug" type="CharacterBody2D"]
 z_index = 30
-collision_layer = 256
+collision_layer = 288
 collision_mask = 359
 script = ExtResource("1_stonebug")
 
@@ -80,7 +80,7 @@ frame = 1
 frame_progress = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 6)
+position = Vector2(0, 5)
 shape = SubResource("RectangleShape2D_body")
 
 [node name="CliffDetector" type="RayCast2D" parent="."]
@@ -88,12 +88,11 @@ target_position = Vector2(20, 18)
 collision_mask = 6
 
 [node name="BugDetector" type="Area2D" parent="."]
-position = Vector2(19, 4)
-collision_layer = 256
+visible = false
+collision_layer = 0
 collision_mask = 256
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BugDetector"]
-position = Vector2(-5, -1)
 shape = SubResource("RectangleShape2D_bugdetect")
 
 [node name="PlayerDetector" type="Area2D" parent="."]

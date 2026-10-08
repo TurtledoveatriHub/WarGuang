@@ -1,88 +1,33 @@
-[gd_scene load_steps=37 format=3 uid="uid://cnx8rqa13bm26"]
+[gd_scene load_steps=27 format=3 uid="uid://cnx8rqa13bm26"]
 
 [ext_resource type="Script" uid="uid://2jv58grmryqa" path="res://Scripts/UI/Scenes/TitleScene.gd" id="1_25ulu"]
 [ext_resource type="PackedScene" uid="uid://8vv4frjt0qmt" path="res://Scenes/UI/Scenes/SettingsScene.tscn" id="2_fkiff"]
-[ext_resource type="AudioStream" uid="uid://cs31nir8y35de" path="res://Assets/Audios/BGM/探险.ogg" id="3_1p8n3"]
-[ext_resource type="Texture2D" uid="uid://d3gavddfgdl2a" path="res://Assets/Textures/Warmas/wmn.png" id="5_u4xyb"]
+[ext_resource type="AudioStream" uid="uid://cs31nir8y35de" path="res://Assets/Audios/BGM/探险.ogg" id="6_1qwxo"]
 [ext_resource type="Texture2D" uid="uid://1xy7xygxqlmf" path="res://Assets/Textures/UIs/SceneUIs/tres/title沃光标题01.tres" id="6_iwgkb"]
 [ext_resource type="Texture2D" uid="uid://dosd0gvafei6y" path="res://Assets/Textures/UIs/SceneUIs/tres/title沃光标题02.tres" id="7_syapl"]
 [ext_resource type="Texture2D" uid="uid://do3a77icxxaeg" path="res://Assets/Textures/UIs/SceneUIs/标题.png" id="8_mmaj1"]
 [ext_resource type="Texture2D" uid="uid://brcf0udadvrxa" path="res://Assets/Textures/UIs/SceneUIs/黑板.png" id="9_lnewd"]
-[ext_resource type="Texture2D" uid="uid://dj5otapvnobfv" path="res://Assets/Textures/UIs/SceneUIs/cc.png" id="9_mmaj1"]
+[ext_resource type="Texture2D" uid="uid://dj5otapvnobfv" path="res://Assets/Textures/UIs/SceneUIs/标题光线粒子.png" id="9_mmaj1"]
 [ext_resource type="Material" uid="uid://phy0qo6fkhl8" path="res://Assets/Instances/TitleSceneParticle.tres" id="10_mjphl"]
-[ext_resource type="Texture2D" uid="uid://bfxe5gkbkkx8r" path="res://Assets/Textures/UIs/SceneUIs/1.png" id="11_lnewd"]
-[ext_resource type="Texture2D" uid="uid://dpdyrq21bh47g" path="res://Assets/Textures/UIs/SceneUIs/3.png" id="12_m3y5q"]
+[ext_resource type="Texture2D" uid="uid://bfxe5gkbkkx8r" path="res://Assets/Textures/UIs/ButtonUIs/大按钮默认纹理.png" id="11_lnewd"]
+[ext_resource type="Texture2D" uid="uid://dpdyrq21bh47g" path="res://Assets/Textures/UIs/ButtonUIs/大按钮按下纹理.png" id="12_m3y5q"]
 [ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="13_m3y5q"]
-[ext_resource type="Texture2D" uid="uid://dk2iy0xo6ucju" path="res://Assets/Textures/UIs/SceneUIs/2.png" id="13_mmaj1"]
+[ext_resource type="Texture2D" uid="uid://dk2iy0xo6ucju" path="res://Assets/Textures/UIs/ButtonUIs/大按钮悬停纹理.png" id="13_mmaj1"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="14_mmaj1"]
 [ext_resource type="Script" uid="uid://dloxn5pxm2x3q" path="res://Scripts/UI/UILoopAnimator.gd" id="17_1p8n3"]
-[ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="17_m3y5q"]
-[ext_resource type="Texture2D" uid="uid://c3fxh3guo8uut" path="res://Assets/Textures/UIs/SceneUIs/3x.png" id="18_mmaj1"]
-[ext_resource type="Texture2D" uid="uid://b6ji0vannv3pj" path="res://Assets/Textures/UIs/SceneUIs/2x.png" id="19_mjphl"]
+[ext_resource type="Texture2D" uid="uid://bflntllsubejm" path="res://Assets/Textures/UIs/ButtonUIs/按钮默认纹理.png" id="17_m3y5q"]
+[ext_resource type="Texture2D" uid="uid://dh7lqkmf1t51n" path="res://Assets/Textures/UIs/ButtonUIs/按钮按下纹理.png" id="18_mmaj1"]
+[ext_resource type="Texture2D" uid="uid://cbxu06v4xk2lp" path="res://Assets/Textures/UIs/ButtonUIs/按钮悬停纹理.png" id="19_mjphl"]
 [ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="20_mmaj1"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_lnewd"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(0, 128, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_m3y5q"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(32, 128, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_mmaj1"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(64, 128, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_mjphl"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(96, 128, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_1qwxo"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(0, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_w1u23"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(32, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_474rh"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(64, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_10xgk"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(96, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ea5f5"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(128, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_5vedy"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(160, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_r57i0"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(192, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_p25vh"]
-atlas = ExtResource("5_u4xyb")
-region = Rect2(224, 0, 32, 32)
+[ext_resource type="PackedScene" uid="uid://bcyd555abjoy5" path="res://Scenes/UI/Scenes/AboutAuthor.tscn" id="21_about"]
+[ext_resource type="PackedScene" uid="uid://djladah2cc3ru" path="res://Scenes/UI/Scenes/UpdateNotes.tscn" id="22_notes"]
+[ext_resource type="PackedScene" uid="uid://g75qcmf25i5t" path="res://Scenes/UI/Scenes/AchievementScene.tscn" id="23_ach"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_u4xyb"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_lnewd")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_m3y5q")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_mmaj1")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_mjphl")
+"texture": null
 }],
 "loop": false,
 "name": &"end",
@@ -90,16 +35,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_1qwxo")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_w1u23")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_474rh")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_10xgk")
+"texture": null
 }],
 "loop": true,
 "name": &"loop",
@@ -107,28 +43,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ea5f5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_5vedy")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_r57i0")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_p25vh")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ea5f5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_5vedy")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_r57i0")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_p25vh")
+"texture": null
 }],
 "loop": false,
 "name": &"start",
@@ -153,21 +68,24 @@ particles_anim_loop = true
 [node name="TitleScene" type="CanvasLayer"]
 script = ExtResource("1_25ulu")
 settings_scene_resource = ExtResource("2_fkiff")
-title_bgm_stream = ExtResource("3_1p8n3")
+about_author_scene = ExtResource("21_about")
+update_notes_scene = ExtResource("22_notes")
+achievement_scene = ExtResource("23_ach")
+title_bgm_stream = ExtResource("6_1qwxo")
 
 [node name="UIFxDirector" type="Node" parent="."]
 script = ExtResource("20_mmaj1")
-debug_log = true
 target_paths = Array[NodePath]([NodePath("../BG"), NodePath("../Title"), NodePath("../TitleB")])
 drift_distance = Vector2(0, -192)
 
 [node name="UILoopAnimator" type="AnimatedSprite2D" parent="." groups=["ui_loop_animator"]]
+visible = false
 z_index = 950
 texture_filter = 1
 position = Vector2(1190, 639)
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_u4xyb")
-animation = &"end"
+animation = &"start"
 script = ExtResource("17_1p8n3")
 autoplay_on_ready = false
 
@@ -343,10 +261,10 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AboutAuthor" type="TextureButton" parent="."]
-offset_left = 63.0
-offset_top = 274.0
-offset_right = 131.0
-offset_bottom = 296.0
+offset_left = 66.0
+offset_top = 275.0
+offset_right = 134.0
+offset_bottom = 297.0
 scale = Vector2(2, 2)
 pivot_offset = Vector2(34, 11)
 texture_normal = ExtResource("17_m3y5q")
@@ -366,10 +284,10 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="UpdateNotes" type="TextureButton" parent="."]
-offset_left = 230.0
-offset_top = 274.0
-offset_right = 298.0
-offset_bottom = 296.0
+offset_left = 233.0
+offset_top = 275.0
+offset_right = 301.0
+offset_bottom = 297.0
 scale = Vector2(2, 2)
 pivot_offset = Vector2(34, 11)
 texture_normal = ExtResource("17_m3y5q")

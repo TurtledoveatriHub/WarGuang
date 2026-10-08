@@ -1,8 +1,8 @@
 [gd_scene load_steps=16 format=3 uid="uid://dvyyx1gsopmfx"]
 
-[ext_resource type="Script" uid="uid://d2jvn2sq2nkpk" path="res://Scripts/Instances/Coins/Coin.gd" id="1_58uoq"]
-[ext_resource type="Texture2D" uid="uid://dohto6nf1nd73" path="res://Assets/Textures/UIs/旧版UI2.png" id="2_6w1vh"]
-[ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/a.wav" id="2_tekmk"]
+[ext_resource type="Script" uid="uid://d2jvn2sq2nkpk" path="res://Scripts/Instances/Items/Coin.gd" id="1_58uoq"]
+[ext_resource type="Texture2D" uid="uid://dohto6nf1nd73" path="res://Assets/Textures/UIs/InstanceUIs/旧版UI2.png" id="2_6w1vh"]
+[ext_resource type="AudioStream" uid="uid://7xh1f147eci0" path="res://Assets/Audios/SFX/Instances/拾取钱币.wav" id="2_nwgl6"]
 [ext_resource type="Texture2D" uid="uid://n6vhw43ywjid" path="res://Assets/Textures/Instances/1.png" id="3_nwgl6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6w1vh"]
@@ -86,7 +86,8 @@ animations = [{
 
 [node name="Coin" type="Area2D"]
 script = ExtResource("1_58uoq")
-coin_collect_sfx = ExtResource("2_tekmk")
+coin_collect_sfx = ExtResource("2_nwgl6")
+coin_value = 50
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 32

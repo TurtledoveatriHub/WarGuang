@@ -2,13 +2,13 @@
 
 [ext_resource type="Script" uid="uid://bs7ste1w61ecf" path="res://Scripts/Player/PlayerUI/PlayerUI.gd" id="1_uyejk"]
 [ext_resource type="PackedScene" uid="uid://ti5ndmbw2337" path="res://Scenes/UI/Scenes/GameSettingScene.tscn" id="3_dk7d2"]
-[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUI/摇杆杆1.tres" id="4_iuhd6"]
+[ext_resource type="Texture2D" uid="uid://68wv3ix4j3pn" path="res://Assets/Textures/UIs/MobieControlsUIs/摇杆杆1.tres" id="4_iuhd6"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="4_ruvwe"]
 [ext_resource type="PackedScene" uid="uid://h0kyvxadfyys" path="res://Scenes/Player/PlayerUI/HealthUnit.tscn" id="5_27bup"]
-[ext_resource type="Texture2D" uid="uid://dh3o6v2fippdq" path="res://Assets/Textures/UIs/MobieControlsUI/超级冲刺2.tres" id="5_iuhd6"]
-[ext_resource type="Texture2D" uid="uid://wv8bi25ut6a" path="res://Assets/Textures/UIs/SceneUIs/tres/小按钮纹理.tres" id="7_iuhd6"]
-[ext_resource type="Texture2D" uid="uid://ilccd3mmcucq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置按下纹理.tres" id="8_xnmtl"]
-[ext_resource type="Texture2D" uid="uid://dul5pjyqmngpq" path="res://Assets/Textures/UIs/SceneUIs/tres/小设置悬停纹理.tres" id="9_1awys"]
+[ext_resource type="Texture2D" uid="uid://dh3o6v2fippdq" path="res://Assets/Textures/UIs/MobieControlsUIs/超级冲刺2.tres" id="5_iuhd6"]
+[ext_resource type="Texture2D" uid="uid://2pql5myg1w4a" path="res://Assets/Textures/UIs/PlayerUIs/头像默认纹理.png" id="7_iuhd6"]
+[ext_resource type="Texture2D" uid="uid://diqb61qc3dfhr" path="res://Assets/Textures/UIs/PlayerUIs/头像按下纹理.png" id="8_xnmtl"]
+[ext_resource type="Texture2D" uid="uid://danajqpm5j33e" path="res://Assets/Textures/UIs/PlayerUIs/头像悬停纹理.png" id="9_1awys"]
 [ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="10_xnmtl"]
 
 [node name="PlayerUI" type="CanvasLayer"]
@@ -16,7 +16,8 @@ script = ExtResource("1_uyejk")
 health_unit_scene = ExtResource("5_27bup")
 game_setting_scene = ExtResource("3_dk7d2")
 
-[node name="PlayerIcon" type="TextureRect" parent="."]
+[node name="x" type="TextureRect" parent="."]
+visible = false
 offset_left = 26.0
 offset_top = 23.0
 offset_right = 58.0
@@ -25,8 +26,20 @@ scale = Vector2(2, 2)
 pivot_offset = Vector2(16, 16)
 texture = ExtResource("4_iuhd6")
 
+[node name="PlayerIcon" type="TextureButton" parent="."]
+offset_left = 26.0
+offset_top = 23.0
+offset_right = 52.0
+offset_bottom = 49.0
+scale = Vector2(2, 2)
+pivot_offset = Vector2(13, 13)
+texture_normal = ExtResource("7_iuhd6")
+texture_pressed = ExtResource("8_xnmtl")
+texture_hover = ExtResource("9_1awys")
+script = ExtResource("10_xnmtl")
+
 [node name="HealthContainer" type="Node2D" parent="."]
-position = Vector2(18, 19)
+position = Vector2(84, 37)
 
 [node name="CoinContainer" type="HBoxContainer" parent="."]
 offset_left = 4.0
@@ -52,36 +65,3 @@ layout_mode = 2
 theme = ExtResource("4_ruvwe")
 theme_override_font_sizes/font_size = 10
 text = "+00"
-
-[node name="SaveLabeI" type="Label" parent="."]
-offset_left = 1100.0
-offset_top = 680.0
-offset_right = 1178.0
-offset_bottom = 691.0
-scale = Vector2(2, 2)
-theme = ExtResource("4_ruvwe")
-theme_override_font_sizes/font_size = 10
-text = "存档已更新 . . . "
-
-[node name="GameSettingButton" type="TextureButton" parent="."]
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 33.0
-offset_bottom = 33.0
-pivot_offset = Vector2(8, 8)
-texture_normal = ExtResource("7_iuhd6")
-texture_pressed = ExtResource("8_xnmtl")
-texture_hover = ExtResource("9_1awys")
-script = ExtResource("10_xnmtl")
-
-[node name="Label" type="Label" parent="GameSettingButton"]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("4_ruvwe")
-theme_override_font_sizes/font_size = 10
-text = "X"
-horizontal_alignment = 1
-vertical_alignment = 1

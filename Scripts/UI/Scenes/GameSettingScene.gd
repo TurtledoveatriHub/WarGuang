@@ -8,49 +8,25 @@ extends UIScene  # UI 页面统一基类（生命周期 / 输入锁 / 动效总�
 
 signal menu_closed
 
-@export var darken_multiplier: float = 0.3
 @export var transition_duration: float = 0.1
 
-@export_category("GameSetting 开关动画")
-## 入场峰值缩放倍率
-@export var open_peak_scale_multiplier: float = 1.2
-## 入场放大阶段时长（秒）
-@export var open_peak_duration: float = 0.2
-## 入场峰值停顿时长（秒）
-@export var open_peak_hold_duration: float = 0.15
-## 入场回落阶段时长（秒）
-@export var open_settle_duration: float = 0.18
-## 关闭峰值缩放倍率
-@export var close_peak_scale_multiplier: float = 1.2
-## 关闭放大阶段时长（秒）
-@export var close_peak_duration: float = 0.14
-## 关闭峰值停顿时长（秒）
-@export var close_peak_hold_duration: float = 0.1
-## 关闭消失阶段时长（秒）
-@export var close_vanish_duration: float = 0.22
-## 关闭最小缩放倍率
-@export var close_min_scale_multiplier: float = 0.02
-## 入场位移距离（像素）
-@export var open_drift_distance: float = 16.0
-## 退场位移距离（像素）
-@export var close_drift_distance: float = 16.0
+## 覆盖层暗化规范（黑幕 alpha / 世界亮度 / 黑幕过渡时长）—— 全项目唯一来源
+const OverlaySpec := preload("res://Scripts/UI/DarkOverlay.gd")
 
 var original_modulate_color: Color
 var game_canvas_modulate: CanvasModulate
 var is_open: bool = false
-## 本页面的开合动画自己包办（按钮的缩放也是它驱动的），因此不走动效总线，
-## 避免总线的按钮错开缩放与自己的开合动画同时写 scale 而打架。
-var _base_visual_scales: Dictionary = {}
-var _base_visual_positions: Dictionary = {}
-var _base_visual_modulates: Dictionary = {}
 var _is_closing: bool = false
 var _is_game_lighting_dimmed: bool = false
 
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	# 本页面自带整体开合动画，且自己管理按钮启用状态：不动效总线、不吞事件。
-	use_fx_bus = false
+	# 开合动画改为交给动效总线（UIFxDirector）：
+	# 「哪些节点参与开合」只在场景里的 UIFxDirector 上配一处（Background + 三个按钮），
+	# 持续时间/峰值倍率/漂移距离也都在那里调，本脚本不再复制一份时长参数。
+	# 仍设 drive_components = false：这三个按钮用 UIButtonFx，
+	# 组件轨道会给它们再叠一层错开缩放，与页面开合动画抢 scale。
 	lock_swallows_mouse = false
 	
 	continue_button.pressed.connect(_on_continue_button_pressed)
@@ -64,10 +40,11 @@ func _ready():
 	if Global:
 		Global.pause_play_time_session()
 	
-	# 关键修复：显示黑色遮罩层，并强制重置旧状态，避免重复打开 SettingsScene 时造成遮罩叠加。
+	# 关键修复：显示黑色遮罩层 —— 从全透明立即开始渐暗（约 1 秒），
+	# 不再“啵”地一下整块盖上；fade_in_overlay 内部会强制重置旧状态，
+	# 避免重复打开 SettingsScene 时造成遮罩叠加。
 	if DarkOverlay and is_instance_valid(DarkOverlay):
-		DarkOverlay.reset_overlay()
-		DarkOverlay.show_overlay()
+		DarkOverlay.fade_in_overlay(self, OverlaySpec.OVERLAY_FADE_DURATION)
 	# 关键修复：如果对话框存在，暂时隐藏它
 	var balloon = get_node_or_null("/root/MyBalloon")
 	if balloon:
@@ -76,11 +53,15 @@ func _ready():
 	if continue_button is Control:
 		continue_button.grab_focus()
 
-	_cache_visual_base_scales()
 	_set_menu_buttons_enabled(false)
-	await _play_open_animation()
-	# 解锁 = 启用三个按钮 + 允许 ESC / 返回键
-	set_input_locked(false)
+	# 统一暗化：与世界亮度系数、黑幕透明度都由 DarkOverlay 定义，
+	# 本页面不再自己写死数字（_adjust_game_lighting 之前定义了却从未被调用）。
+	_adjust_game_lighting()
+	# 入场：总线摆起始态 → 播动画 → 等播完 → 解锁输入（含兜底超时）。
+	# 本面板是 PlayerUI 直接 add_child() 上来的（不经过 UIRouter / SceneManager），
+	# 这里显式走一遍基类入场流程，否则基类的 ESC 门禁会一直是关闭的。
+	await ui_enter()
+	print("[UIIN][GameSetting] 面板打开完成，_enter_done=%s locked=%s" % [_enter_done, is_input_locked()])
 
 ## 覆盖基类：把输入锁应用到本页面的按钮上。
 func _on_input_lock_applied(locked: bool) -> void:
@@ -88,6 +69,8 @@ func _on_input_lock_applied(locked: bool) -> void:
 
 ## 覆盖基类：ESC 关闭本面板（设置覆盖层开着时不关）。
 func _on_ui_cancel() -> void:
+	# TODO 定位后连同其它 [UIIN] 打印一起删除。
+	print("[UIIN][GameSetting] ESC 送达 _on_ui_cancel：is_open=%s closing=%s has_overlay=%s" % [is_open, _is_closing, UIRouter.has_overlay()])
 	if not is_open:
 		return
 	if UIRouter.has_overlay():
@@ -124,10 +107,13 @@ func _adjust_game_lighting():
 	if RoomManager and RoomManager.global_canvas_modulate:
 		game_canvas_modulate = RoomManager.global_canvas_modulate
 		original_modulate_color = game_canvas_modulate.color
+		# 世界亮度系数取自 DarkOverlay 的统一规范，不再由本页面自己写死：
+		# 地图 / 传送面板 / 本页面三个覆盖层必须用同一个数字。
+		var factor: float = OverlaySpec.WORLD_DARKEN_MULTIPLIER
 		var target_color = Color(
-			original_modulate_color.r * darken_multiplier,
-			original_modulate_color.g * darken_multiplier,
-			original_modulate_color.b * darken_multiplier,
+			original_modulate_color.r * factor,
+			original_modulate_color.g * factor,
+			original_modulate_color.b * factor,
 			1.0
 		)
 		game_canvas_modulate.color = target_color
@@ -153,7 +139,20 @@ func _close_game_setting():
 	_is_closing = true
 	is_open = false
 	set_input_locked(true)
-	await _play_close_animation()
+	# 点了关闭按钮就**立刻**恢复暂停与游戏计时，不等退场动画 / 黑幕渐变播完。
+	# 本页面是 PROCESS_MODE_ALWAYS，所以取消暂停后动画与补间照常推进。
+	_resume_game_now()
+	# 记下黑幕渐亮起始时间戳
+	var fade_started_ms: int = Time.get_ticks_msec()
+	if DarkOverlay and is_instance_valid(DarkOverlay):
+		DarkOverlay.fade_out_overlay(self, OverlaySpec.OVERLAY_FADE_DURATION)
+	# 世界亮度与黑幕同时恢复，避免黑幕散尽之后画面再“啪”地亮一下。
+	# 这里不 await：本函数末尾还会 await 一次，保证 queue_free() 之前补间已经落定。
+	_restore_game_lighting()
+	# 退场动画交给动效总线；ui_exit() 内部会等动画播完（含兜底超时）。
+	await ui_exit()
+	# 等黑幕也渐亮完，否则黑幕会被瞬间切掉、看不到渐亮过程
+	await _wait_overlay_fade(fade_started_ms)
 	if DarkOverlay and is_instance_valid(DarkOverlay):
 		DarkOverlay.reset_overlay()
 		DarkOverlay.hide_overlay()
@@ -161,13 +160,21 @@ func _close_game_setting():
 	# 之前未 await，queue_free() 会杀掉绑定在本节点上的补间，
 	# 导致 CanvasModulate 永远停在暗色，出现“只消失一层”的残留。
 	await _restore_game_lighting()
-	get_tree().paused = false
-	if Global:
-		Global.resume_play_time_session()
 	menu_closed.emit()
 	queue_free()
 
+
+## 立刻恢复暂停 + 游戏计时（不等退场动画）。本页面是 PROCESS_MODE_ALWAYS，
+## 因此取消暂停后它自己的退场动画、黑幕渐变与亮度补间都会继续推进。
+func _resume_game_now() -> void:
+	if get_tree() != null and get_tree().paused:
+		get_tree().paused = false
+	if Global:
+		Global.resume_play_time_session()
+
 func _on_continue_button_pressed():
+	# TODO 定位后连同其它 [UIIN] 打印一起删除。
+	print("[UIIN][GameSetting] 鼠标点击“继续游戏”（对照组：这条能出现就说明鼠标路径正常）")
 	if not continue_button or continue_button.disabled:
 		return
 	await _close_game_setting()
@@ -218,13 +225,29 @@ func _on_main_menu_button_pressed():
 		SaveManager.save_game(Global.current_save_slot, Global.get_save_data())
 
 	set_input_locked(true)
-	await _play_close_animation()
+	# 点了关闭按钮就**立刻**恢复暂停与游戏计时，不等退场动画 / 黑幕渐变播完。
+	_resume_game_now()
+	# 记下黑幕渐亮起始时间戳
+	var fade_started_ms: int = Time.get_ticks_msec()
+	if DarkOverlay and is_instance_valid(DarkOverlay):
+		DarkOverlay.fade_out_overlay(self, OverlaySpec.OVERLAY_FADE_DURATION)
+	# 世界亮度与黑幕同时恢复
+	_restore_game_lighting()
+	# 退场动画交给动效总线
+	await ui_exit()
+	# 等黑幕渐亮完再关掉遮罩
+	await _wait_overlay_fade(fade_started_ms)
 	if DarkOverlay and is_instance_valid(DarkOverlay):
 		DarkOverlay.hide_overlay()
 	# 关键修正：等待亮度恢复完成后再切换场景，避免补间随场景销毁而中断。
 	await _restore_game_lighting()
 	var switched: bool = await SceneManager.return_to_title_from_game_setting(false)
-	if not switched:
+	if switched:
+		# 本面板是挂在 /root 上的（不属于任何场景），换场景不会把它带走 ——
+		# 必须显式销毁，否则它会留在 /root 里继续吞掉所有按键：
+		# 表现就是「从游戏内设置返回标题、再开新游戏后，空格推不动对话」。
+		queue_free()
+	else:
 		_is_closing = false
 		is_open = true
 		set_input_locked(false)
@@ -236,6 +259,15 @@ func _exit_tree():
 		# 节点即将销毁，补间无法完成，必须立即恢复亮度。
 		_restore_game_lighting_immediate()
 
+## 等黑幕渐亮剩余的时间（started_ms 是开始渐亮时记下的 Time.get_ticks_msec()）
+## 黑幕由 DarkOverlay 持有，计时必须按真实时间算 —— 页面自己的退场动画时长与它无关。
+func _wait_overlay_fade(started_ms: int) -> void:
+	var elapsed: float = float(Time.get_ticks_msec() - started_ms) / 1000.0
+	var remaining: float = OverlaySpec.OVERLAY_FADE_DURATION - elapsed
+	if remaining > 0.0:
+		await wait_seconds(remaining)
+
+
 ## 立即恢复全局亮度（无补间）——用于节点即将被销毁的情况。
 func _restore_game_lighting_immediate() -> void:
 	if not _is_game_lighting_dimmed:
@@ -244,89 +276,7 @@ func _restore_game_lighting_immediate() -> void:
 		game_canvas_modulate.color = original_modulate_color
 		_is_game_lighting_dimmed = false
 
-func _cache_visual_base_scales() -> void:
-	_base_visual_scales.clear()
-	_base_visual_positions.clear()
-	_base_visual_modulates.clear()
-	_base_visual_scales["Background"] = $Background.scale
-	_base_visual_scales["ContinueButton"] = $ContinueButton.scale
-	_base_visual_scales["SettingsButton"] = $SettingsButton.scale
-	_base_visual_scales["MainMenuButton"] = $MainMenuButton.scale
-	_base_visual_positions["Background"] = $Background.position
-	_base_visual_positions["ContinueButton"] = $ContinueButton.position
-	_base_visual_positions["SettingsButton"] = $SettingsButton.position
-	_base_visual_positions["MainMenuButton"] = $MainMenuButton.position
-	_base_visual_modulates["Background"] = $Background.modulate
-	_base_visual_modulates["ContinueButton"] = $ContinueButton.modulate
-	_base_visual_modulates["SettingsButton"] = $SettingsButton.modulate
-	_base_visual_modulates["MainMenuButton"] = $MainMenuButton.modulate
-
 func _set_menu_buttons_enabled(enabled: bool) -> void:
 	continue_button.disabled = not enabled
 	settings_button.disabled = not enabled
 	main_menu_button.disabled = not enabled
-
-func _for_each_visual_node(callback: Callable) -> void:
-	for node_name in ["Background", "ContinueButton", "SettingsButton", "MainMenuButton"]:
-		var node = get_node_or_null(node_name)
-		if node and node is CanvasItem:
-			callback.call(node_name, node)
-
-func _play_open_animation():
-	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_CUBIC)
-	tween.set_ease(Tween.EASE_OUT)
-	_for_each_visual_node(func(node_name: String, node: CanvasItem):
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		var base_position: Vector2 = _base_visual_positions.get(node_name, node.position)
-		var base_modulate: Color = _base_visual_modulates.get(node_name, node.modulate)
-		node.scale = base_scale * close_min_scale_multiplier
-		node.position = Vector2(base_position.x, base_position.y + open_drift_distance)
-		node.modulate = Color(base_modulate.r, base_modulate.g, base_modulate.b, 0.0)
-	)
-
-	_for_each_visual_node(func(node_name: String, node: CanvasItem):
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		var base_modulate: Color = _base_visual_modulates.get(node_name, node.modulate)
-		tween.parallel().tween_property(node, "scale", base_scale * open_peak_scale_multiplier, open_peak_duration)
-		tween.parallel().tween_property(node, "modulate:a", base_modulate.a, open_peak_duration)
-	)
-
-	if open_peak_hold_duration > 0.0:
-		tween.chain().tween_interval(open_peak_hold_duration)
-
-	tween.chain()
-	_for_each_visual_node(func(node_name: String, node: CanvasItem):
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		var base_position: Vector2 = _base_visual_positions.get(node_name, node.position)
-		var base_modulate: Color = _base_visual_modulates.get(node_name, node.modulate)
-		tween.parallel().tween_property(node, "scale", base_scale, open_settle_duration)
-		tween.parallel().tween_property(node, "position:y", base_position.y, open_settle_duration)
-		tween.parallel().tween_property(node, "modulate:a", base_modulate.a, open_settle_duration)
-	)
-
-	await tween.finished
-
-func _play_close_animation():
-	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_CUBIC)
-	tween.set_ease(Tween.EASE_IN)
-
-	_for_each_visual_node(func(node_name: String, node: CanvasItem):
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		tween.parallel().tween_property(node, "scale", base_scale * close_peak_scale_multiplier, close_peak_duration)
-	)
-
-	if close_peak_hold_duration > 0.0:
-		tween.chain().tween_interval(close_peak_hold_duration)
-
-	tween.chain()
-	_for_each_visual_node(func(node_name: String, node: CanvasItem):
-		var base_scale: Vector2 = _base_visual_scales.get(node_name, node.scale)
-		var base_position: Vector2 = _base_visual_positions.get(node_name, node.position)
-		tween.parallel().tween_property(node, "scale", base_scale * close_min_scale_multiplier, close_vanish_duration)
-		tween.parallel().tween_property(node, "position:y", base_position.y + close_drift_distance, close_vanish_duration)
-		tween.parallel().tween_property(node, "modulate:a", 0.0, close_vanish_duration)
-	)
-
-	await tween.finished

@@ -28,7 +28,7 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 ## 伤害冷却时间（秒）
 @export var damage_cooldown_time: float = 0.1
 ## 持续伤害间隔（秒，0=每次冷却后立即触发）
-@export var continuous_damage_interval: float = 0.4
+@export var continuous_damage_interval: float = 0.2
 
 ## 对 Layer8 敌人的伤害值（不区分伤害类型）
 @export var enemy_damage: int = 1
@@ -118,6 +118,10 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 @export var enable_precise_collision: bool = true
 ## 调试输出
 @export var enable_debug: bool = false
+
+@export_category("音效")
+## 切换到 OPEN 动画时播放一遍（为空则静音；不同 HurtBox 含义不同，按需在 Inspector 指定）
+@export var open_sfx: AudioStream
 
 # 节点引用
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -551,6 +555,14 @@ func _for_each_shape(action: Callable) -> void:
 # ── 动画周期 ──────────────────────────────────────
 
 ## 把“只播放一遍”的过渡动画强制为不循环（仅在 sprite_frames 被设成循环时才修改）
+## 切到 OPEN 动画并播放 OPEN 音效。
+## 所有「切到 OPEN」的地方都走这里，避免以后新增分支时漏播音效。
+func _play_open_animation() -> void:
+	animated_sprite.play("OPEN")
+	if open_sfx != null:
+		AudioManager.play_stream_sfx(open_sfx)
+
+
 ## 仅用于逻辑上必须播完就停的过渡动画（OPEN/CLOSE），ON/OFF 不做强制。
 func _force_once_animation(anim_name: String) -> void:
 	if not is_instance_valid(animated_sprite) or animated_sprite.sprite_frames == null:
@@ -602,7 +614,7 @@ func update_anim_cycle(delta: float) -> void:
 			if _phase_timer >= inactive_time:
 				_anim_phase = AnimPhase.OPENING
 				_phase_timer = 0.0
-				animated_sprite.play("OPEN")
+				_play_open_animation()
 		AnimPhase.OPENING:
 			_damage_allowed = false
 			if not animated_sprite.is_playing():
@@ -619,7 +631,7 @@ func _update_launcher(delta: float) -> void:
 			# 起点静止：播 OPEN（不伤），等 wait_time 且 OPEN 播完才切换。
 			_damage_allowed = false
 			if animated_sprite.animation != "OPEN":
-				animated_sprite.play("OPEN")
+				_play_open_animation()
 			_launcher_timer += delta
 			if _launcher_timer >= wait_time and not animated_sprite.is_playing():
 				_launcher_timer = 0.0
@@ -711,7 +723,7 @@ func _reset_to_start_for_next_round() -> void:
 	_moving_to_end = true
 	_launcher_state = LauncherState.LOAD_OPEN
 	_damage_allowed = false
-	animated_sprite.play("OPEN")
+	_play_open_animation()
 
 ## 玩家是否位于“起点→终点”直线走廊（宽度 player_detect_width）内。
 ## 按 player_detect_interval 间隔轮询，不做逐帧检测。
@@ -750,7 +762,7 @@ func _update_trigger_mode(delta: float) -> void:
 		TriggerState.OPENING:
 			_damage_allowed = false
 			if animated_sprite.animation != "OPEN":
-				animated_sprite.play("OPEN")
+				_play_open_animation()
 			if not animated_sprite.is_playing():
 				# OPEN 播完 → ON 循环并激活伤害
 				_trigger_state = TriggerState.ON_ACTIVE
@@ -798,7 +810,7 @@ func _begin_trigger_open() -> void:
 	_trigger_state = TriggerState.OPENING
 	_trigger_hold_timer = 0.0
 	_damage_allowed = false
-	animated_sprite.play("OPEN")
+	_play_open_animation()
 
 
 ## 开始“离开→CLOSE 一次”→ 之后切 OFF。

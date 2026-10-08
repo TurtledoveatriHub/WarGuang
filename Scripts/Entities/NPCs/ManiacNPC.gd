@@ -104,11 +104,11 @@ func _update_idle_state(delta):
 			position.x = move_toward(position.x, initial_position.x + off, move_speed * delta)
 		IdleState.GOFANATICAL:
 			play_animation(go_fanatical_animation)
-			# 修复：狂热状态立即隐藏交互提示
+			# 狂热状态立即隐藏交互提示
 			if interaction_prompt:
 				interaction_prompt.visible = false
 
-## 修复：根据当前状态更新交互提示可见性
+## 根据当前状态更新交互提示可见性
 func _update_interaction_prompt_visibility():
 	if not player_in_range:
 		if interaction_prompt:
@@ -166,7 +166,6 @@ func _start_interaction():
 		push_error("ManiacNPC: 没有配置对话资源！请在检查器中指定")
 		return
 	
-	# 修复：使用继承的 balloon_scene
 	if not balloon_scene:
 		push_error("ManiacNPC: balloon_scene 未配置！请在 Inspector 中拖拽 MyBalloon.tscn")
 		return
@@ -277,8 +276,9 @@ func _on_challenge_completed():
 	var s = current_challenge_stage
 	if s == 1:
 		Global.maniac_challenge_completed = true
-		if not Global.unlocked_abilities.has("double_jump"):
-			Global.unlocked_abilities["double_jump"] = true
+		# 走统一解锁入口：会广播 EventBus 信号（成就 ACH1 由它触发）并写入存档，
+		# 已解锁时自身就是空操作。直接写 Global.unlocked_abilities 会绕过这些。
+		Global.unlock_ability("double_jump")
 	elif s == 2:
 		Global.maniac_stage2_challenge_completed = true
 	elif s == 3:

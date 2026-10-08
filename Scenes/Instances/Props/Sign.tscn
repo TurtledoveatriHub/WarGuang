@@ -1,13 +1,12 @@
-[gd_scene load_steps=7 format=3 uid="uid://oorimac8h2bw"]
+[gd_scene load_steps=6 format=3 uid="uid://oorimac8h2bw"]
 
 [ext_resource type="Script" uid="uid://bddr22siejtsl" path="res://Scripts/Instances/Props/Sign.gd" id="1_sign"]
 [ext_resource type="Resource" uid="uid://cqr4jqatybhw0" path="res://Assets/Dialogues/Signs/Sign1.dialogue" id="2_j07et"]
-[ext_resource type="Texture2D" uid="uid://dohto6nf1nd73" path="res://Assets/Textures/UIs/旧版UI2.png" id="2_prompt"]
-[ext_resource type="Texture2D" uid="uid://y8ag5ujo83si" path="res://Assets/Textures/UIs/SceneUIs/1x.png" id="2_rxyix"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="3_hmlcg"]
+[ext_resource type="Texture2D" uid="uid://okn4ishga2vw" path="res://Assets/Textures/Instances/GrassLand/告示牌.png" id="4_j07et"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sign"]
-size = Vector2(40, 40)
+size = Vector2(40, 32)
 
 [node name="Sign" type="Area2D"]
 collision_layer = 64
@@ -16,15 +15,11 @@ dialogue_resource = ExtResource("2_j07et")
 balloon_scene = ExtResource("3_hmlcg")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_rxyix")
+texture = ExtResource("4_j07et")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_sign")
 
 [node name="InteractionPrompt" type="Sprite2D" parent="."]
-visible = false
-position = Vector2(0, -20)
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_prompt")
-region_enabled = true
+position = Vector2(0, -24)
 region_rect = Rect2(96, 144, 17, 11)

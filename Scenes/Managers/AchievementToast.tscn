@@ -1,0 +1,45 @@
+[gd_scene load_steps=3 format=3 uid="uid://bb48d1caigudj"]
+
+[ext_resource type="Script" uid="uid://cr44uuw0m5cpp" path="res://Scripts/Managers/AchievementToast.gd" id="1_toast"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="2_theme"]
+
+[node name="AchievementToast" type="CanvasLayer"]
+layer = 88
+script = ExtResource("1_toast")
+
+[node name="Toast" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ToastText" type="Label" parent="Toast"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -256.0
+offset_top = -44.0
+offset_right = -40.0
+offset_bottom = -22.0
+grow_horizontal = 0
+grow_vertical = 0
+theme = ExtResource("2_theme")
+theme_override_font_sizes/font_size = 20
+text = "成就达成：二段跳！"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SaveHint" type="Label" parent="."]
+offset_left = 1024.0
+offset_top = 676.0
+offset_right = 1203.0
+offset_bottom = 698.0
+theme = ExtResource("2_theme")
+theme_override_font_sizes/font_size = 20
+text = "存档已更新 . . . "

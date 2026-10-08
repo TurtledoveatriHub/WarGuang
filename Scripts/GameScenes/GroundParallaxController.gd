@@ -25,7 +25,7 @@ extends Node2D
 @export var source_background: Sprite2D = null
 
 ## 视差系数（X 水平、Y 垂直）。
-@export var parallax_ratio: Vector2 = Vector2(0.2, 0.05)
+@export var parallax_ratio: Vector2 = Vector2(1, 1)
 
 ## 图案相位偏移（像素）：用于给不同房间/图层微调背景落点。
 @export var pattern_offset: Vector2 = Vector2.ZERO
@@ -258,7 +258,8 @@ func _resolve_target_room_id() -> String:
 ## 注意 1：必须用“本帧渲染所用”的位置（物理插值开启时为插值后的变换），
 ##         否则背景会比画面上的相机/角色滞后最多一个物理步 → 表现为随机的错位帧。
 ## 注意 2：不再做“相机离玩家过远就改用玩家坐标”的回退 —— 那个回退会让参考点来回跳变，
-##         也是 Y 轴跟随频繁出现错位帧的根源。仅在死亡演出（相机被刻意冻结）时改用玩家坐标。
+##         也是 Y 轴跟随频繁出现错位帧的根源。死亡演出期间相机被冻结，但背景仍以相机为参考，
+##         保证“死亡→完全黑屏”之前背景不跟着下坠的玩家跑。
 func _get_reference_position() -> Vector2:
 	if not RoomManager:
 		return Vector2.ZERO
@@ -267,10 +268,6 @@ func _get_reference_position() -> Vector2:
 		return Vector2.ZERO
 	if player is Node2D:
 		var player_node: Node2D = player as Node2D
-		## 死亡演出期间（HP 归零→黑屏前）相机会被冻结以配合死亡流程，
-		## 此窗口改以玩家位置跟随，让下坠/滑落动画期间背景也持续响应。
-		if player.has_method("is_in_death_state") and player.is_in_death_state():
-			return _render_position(player_node)
 		if use_camera_center and player.get_viewport():
 			var camera := player.get_viewport().get_camera_2d()
 			if is_instance_valid(camera):
