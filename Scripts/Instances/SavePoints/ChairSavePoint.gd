@@ -66,7 +66,6 @@ func _interact_with_chair():
 	if player:
 		player.set_player_state(player.PlayerState.SLEEP)
 		player.lock_control(interaction_lock_duration)
-		print("存档点: 玩家进入睡眠状态，控制锁定", interaction_lock_duration, "秒")
 	
 	# 显示存档成功提示（文字提示统一由 AchievementToast 层负责）
 	AchievementToast.show_save_hint()

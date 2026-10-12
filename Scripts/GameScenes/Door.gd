@@ -16,13 +16,17 @@ extends Area2D
 ## 渐入时间（秒）
 @export var fade_in_duration: float = 0.3
 ## 黑屏时间（秒）
-@export var black_screen_duration: float = 0.2
+@export var black_screen_duration: float = 0.1
 ## 淡出时间（秒）
-@export var fade_out_duration: float = 0.3
+@export var fade_out_duration: float = 0.2
 ## Door 非瞬移追镜时长（秒）
-@export var door_camera_catchup_duration: float = 0.20
+@export var door_camera_catchup_duration: float = 0.16
 ## Door 传送后临时放开相机限制时长（秒）
-@export var door_camera_limit_unlock_duration: float = 0.26
+@export var door_camera_limit_unlock_duration: float = 0.20
+## 门与门距离超过这个值时**不做追镜**，直接把相机居中到玩家（世界单位）。
+## 原因：追镜期间会临时放开相机限制，距离远时相机会短暂停在房间限制框外，
+## 黑屏渐亮时表现为「一帧错误位置再复原」。
+@export var door_camera_catchup_max_distance: float = 640.0
 
 # 内部变量
 var can_teleport: bool = true
@@ -99,7 +103,6 @@ func _on_body_entered(body):
 		if body.has_method("is_in_death_state") and body.is_in_death_state():
 			return
 		is_player_inside = true
-		print("[Door] body_entered: id=", door_id, " target=", target_room_id, " can_tp=", can_teleport)
 		if use_interaction_mode:
 			_show_interaction_prompt()
 		elif can_teleport:
@@ -195,7 +198,6 @@ func _teleport_player(player: Node) -> void:
 	
 	can_teleport = false
 	other_door.can_teleport = false
-	print("[Door] 找到配对门: id=", door_id, " 目标房间=", other_door.get_room_id())
 	
 	# 黑屏期间切换房间和传送玩家
 	var door_target_room = other_door.get_room_id()
@@ -212,21 +214,28 @@ func _teleport_player(player: Node) -> void:
 	# 登记「玩家真的走过了这对门」（两端坐标一起记）：地图上的门连线只认实际走过的门对
 	if MapManager and MapManager.has_method("mark_door_used"):
 		MapManager.mark_door_used(get_room_id(), door_target_room, global_position, target_position)
-	print("[Door] room_loaded: ", door_target_room, " t=", Time.get_ticks_msec())
 	
 	player.global_position = target_position
 	player.velocity = Vector2.ZERO
+	# 门与门之间的距离（远距离传送不走追镜，直接落相机）
+	var teleport_distance: float = global_position.distance_to(target_position)
 	RoomManager.update_camera_limits()
 	await get_tree().process_frame
 	await get_tree().physics_frame
 	RoomManager.update_camera_limits()
 	if player.has_method("sync_camera_after_room_teleport"):
 		player.sync_camera_after_room_teleport()
-		if player.has_method("start_door_camera_catchup_after_teleport"):
+		if teleport_distance > door_camera_catchup_max_distance:
+			# 远距离：直接居中相机，避免黑屏渐亮期间出现限制框外的错位帧
+			if player.has_method("sync_camera_to_player_center"):
+				player.sync_camera_to_player_center(true)
+		elif player.has_method("start_door_camera_catchup_after_teleport"):
 			player.start_door_camera_catchup_after_teleport(
 				door_camera_catchup_duration,
 				door_camera_limit_unlock_duration
 			)
+	# 相机在大位移后立刻重排背景九宫格：避免背景相位还停在旧位置，出现“偏移重影”
+	get_tree().call_group("ground_parallax", "force_realign_now")
 	await get_tree().create_timer(0.1).timeout
 	if player.has_method("start_door_autowalk_to_dynamic_checkpoint"):
 		var autowalk_started: bool = player.start_door_autowalk_to_dynamic_checkpoint(door_target_room, target_position, player.is_facing_right)
@@ -267,4 +276,3 @@ func get_room_id() -> String:
 ## 禁用传送功能
 func disable_teleport():
 	is_enabled = false
-	print("门 ID='", door_id, "'的传送功能已禁用")

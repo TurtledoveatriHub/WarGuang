@@ -30,14 +30,16 @@ static func detect_run_input(player: Node, move_input: float) -> void:
 				player.was_running_before_coyote = true
 		else:
 			player.is_running = false
+			player.run_speed_ramp_timer = 0.0
 	else:
 		player.is_running = false
 		player.is_run_ready = false
+		player.run_speed_ramp_timer = 0.0
 
 	if player.is_on_floor():
 		player.was_running_before_coyote = player.is_running
 
-# 处理奔跑跳速度窗口。
+# 处理奔跑跳速度窗口（只负责计时，不再直接赋水平速度）。
 static func handle_run_jump(player: Node, fixed_delta: float) -> void:
 	if player.current_state == player.PlayerState.DASH or player.current_state == player.PlayerState.SUPERDASH or player.current_state == player.PlayerState.SUPERDASHSTART:
 		return
@@ -46,20 +48,14 @@ static func handle_run_jump(player: Node, fixed_delta: float) -> void:
 
 	player.run_jump_timer -= fixed_delta
 	var move_input: float = player.get_resolved_horizontal_input() if player.has_method("get_resolved_horizontal_input") else Input.get_axis("left", "right")
-	if move_input == 0:
-		player.is_run_jumping = false
-		return
-	if sign(move_input) != player.run_jump_original_direction:
+	## 松开方向键 / 按反方向 → 立即结束跑跳加成
+	if move_input == 0 or sign(move_input) != player.run_jump_original_direction:
 		player.is_run_jumping = false
 		return
 
-	if player.run_jump_timer > 0:
-		player.velocity.x = player.run_jump_original_direction * (player.base_move_speed + player.run_jump_boost_speed) * player.effective_horizontal_multiplier
-		return
-
-	var target_speed: float = player.run_jump_original_direction * player.base_move_speed
-	player.velocity.x = move_toward(player.velocity.x, target_speed, player.run_jump_boost_speed * fixed_delta / player.run_jump_decay_time)
-	if abs(player.velocity.x) <= player.base_move_speed:
+	## 跑跳的“爬升 → 保持 → 衰减”全部由「空中速度上限」完成（见 PlayerAirMotionService），
+	## 这里只负责窗口计时：超过保持时长后，再给 run_jump_decay_time 秒把上限降回普通值。
+	if player.run_jump_timer <= -maxf(player.run_jump_decay_time, 0.0):
 		player.is_run_jumping = false
 
 # 进入超级冲刺状态。
@@ -185,7 +181,9 @@ static func try_dash(player: Node, dash_just_pressed: bool) -> bool:
 		# 检测冲刺方向：垂直输入优先于水平（同时按住时优先垂直），地面禁止下冲刺。
 		var v_input := Input.get_axis("up", "down")
 		var h_input := Input.get_axis("left", "right")
-		if player.vertical_dash_unlocked and v_input != 0 and not (player.is_on_floor() and v_input > 0):
+		# 虚拟摇杆处于斜向区时优先判为左右冲刺（PC 键盘不受影响）。
+		var stick_diagonal: bool = Global != null and Global.joystick_diagonal_horizontal_bias
+		if player.vertical_dash_unlocked and v_input != 0 and not stick_diagonal and not (player.is_on_floor() and v_input > 0):
 			player.dash_locked_vector = Vector2(0, -1 if v_input < 0 else 1)
 		else:
 			var h_dir: int = 1 if player.is_facing_right else -1
@@ -270,7 +268,7 @@ static func handle_idle_state(player: Node, _delta: float, move_input: float, ju
 			player.change_state(player.PlayerState.MOVE)
 	else:
 		var target_speed = move_input * player.base_move_speed * player.effective_horizontal_multiplier
-		player.velocity.x = move_toward(player.velocity.x, target_speed, player.ground_acceleration * player.base_move_speed * player.effective_horizontal_multiplier)
+		player.velocity.x = move_toward(player.velocity.x, target_speed, player.ground_acceleration * player.base_move_speed * player.effective_horizontal_multiplier * player.get_accel_step_scale())
 
 # 处理普通移动状态的地面逻辑。
 static func handle_move_state(player: Node, delta: float, move_input: float, jump_just_pressed: bool, dash_just_pressed: bool) -> void:
@@ -311,7 +309,7 @@ static func handle_move_state(player: Node, delta: float, move_input: float, jum
 			player.change_state(player.PlayerState.RUN)
 
 		var target_speed = move_input * player.base_move_speed * player.effective_horizontal_multiplier
-		player.velocity.x = move_toward(player.velocity.x, target_speed, player.ground_acceleration * player.base_move_speed * player.effective_horizontal_multiplier)
+		player.velocity.x = move_toward(player.velocity.x, target_speed, player.ground_acceleration * player.base_move_speed * player.effective_horizontal_multiplier * player.get_accel_step_scale())
 
 # 处理跑步状态的地面逻辑。
 static func handle_run_state(player: Node, delta: float, move_input: float, jump_just_pressed: bool, dash_just_pressed: bool) -> void:
@@ -350,8 +348,15 @@ static func handle_run_state(player: Node, delta: float, move_input: float, jump
 		if not player.is_running:
 			player.change_state(player.PlayerState.MOVE)
 		else:
-			var target_speed = move_input * player.run_move_speed * player.effective_horizontal_multiplier
-			player.velocity.x = move_toward(player.velocity.x, target_speed, player.ground_acceleration * player.run_move_speed * player.effective_horizontal_multiplier)
+			## 奔跑起步过渡：从 base_move_speed 在 run_speed_transition_time 秒内渐升到 run_move_speed
+			## （过渡期间速度仍在增长，避免从走路直接跳到全速造成“忽快忽慢”的起始手感）
+			player.run_speed_ramp_timer = minf(player.run_speed_ramp_timer + delta, maxf(player.run_speed_transition_time, 0.0))
+			var run_ramp_ratio: float = 1.0
+			if player.run_speed_transition_time > 0.0:
+				run_ramp_ratio = clampf(player.run_speed_ramp_timer / player.run_speed_transition_time, 0.0, 1.0)
+			var current_run_speed: float = lerpf(player.base_move_speed, player.run_move_speed, run_ramp_ratio)
+			var target_speed = move_input * current_run_speed * player.effective_horizontal_multiplier
+			player.velocity.x = move_toward(player.velocity.x, target_speed, player.ground_acceleration * current_run_speed * player.effective_horizontal_multiplier * player.get_accel_step_scale())
 
 static func start_backstep(player: Node, facing_dir: int) -> void:
 	player.backstep_direction = -facing_dir
@@ -420,8 +425,11 @@ static func handle_dash_state(player: Node) -> void:
 				player.animated_sprite.flip_h = not player.is_facing_right
 		else:
 			# 垂直冲刺：转向阶段按反方向键直接打断冲刺。
+			# 守卫原因同冲刺进入处：摇杆斜向区会同时驱动上下与左右（并置
+			# Global.joystick_diagonal_horizontal_bias），没有这道守卫时，斜推摇杆会被误读成
+			# 「按了反方向」而把垂直冲刺直接中断。键盘不会出现这种歧义。
 			var v_input := Input.get_axis("up", "down")
-			if v_input != 0:
+			if v_input != 0 and not (Global != null and Global.joystick_diagonal_horizontal_bias):
 				if sign(v_input) == -player.dash_locked_vector.y:
 					# 按住反方向 → 直接退出冲刺状态
 					player.dash_duration_timer = 0
@@ -498,7 +506,7 @@ static func handle_wallgrip_state(player: Node, fixed_delta: float, move_input: 
 		return
 
 # 处理墙跳后的过渡加速和重新附着判定。
-static func handle_walljump_state(player: Node, fixed_delta: float, move_input: float, jump_just_pressed: bool, jump_pressed: bool, _jump_just_released: bool, dash_just_pressed: bool) -> void:
+static func handle_walljump_state(player: Node, fixed_delta: float, move_input: float, jump_just_pressed: bool, jump_pressed: bool, jump_just_released: bool, dash_just_pressed: bool) -> void:
 	if try_dash(player, dash_just_pressed):
 		return
 
@@ -514,10 +522,13 @@ static func handle_walljump_state(player: Node, fixed_delta: float, move_input: 
 	else:
 		if move_input != 0:
 			var target_speed = move_input * player.base_move_speed
-			player.velocity.x = move_toward(player.velocity.x, target_speed, player.air_control * player.ground_acceleration * player.base_move_speed * player.effective_acceleration_multiplier)
+			player.velocity.x = move_toward(player.velocity.x, target_speed, player.air_control * player.ground_acceleration * player.base_move_speed * player.effective_acceleration_multiplier * player.get_accel_step_scale())
 
+	## 松开跳跃即作废“墙跳按住加成窗口”（与普通跳跃同一规则，避免反复点击累加）
+	if jump_just_released:
+		player.wall_jump_hold_timer = player.wall_jump_max_hold_time
 	if jump_pressed and player.wall_jump_hold_timer < player.wall_jump_max_hold_time:
-		player.velocity.y += player.wall_jump_hold_boost
+		player.velocity.y += player.wall_jump_hold_boost * player.get_accel_step_scale()
 		player.wall_jump_hold_timer += fixed_delta
 
 	player.apply_gravity(fixed_delta)
@@ -533,17 +544,39 @@ static func handle_walljump_state(player: Node, fixed_delta: float, move_input: 
 static func handle_wall_bump(player: Node) -> void:
 	CameraShakeManager.shake("x_strong", player.phantom_camera)
 	player.trigger_feedback_event(&"wall_bump", {})
-	player.velocity.x = player.wall_bump_rebound_x * (-1 if player.is_facing_right else 1)
+	## 撞墙立即取消奔跑状态：否则撞墙后仍在奔跑、被弹到空中也还是奔跑动画/奔跑判定
+	player.is_running = false
+	player.is_run_ready = false
+	player.run_speed_ramp_timer = 0.0
+	player.run_jump_timer = 0.0
+	player.is_run_jumping = false
+	PlayerRuntimeFlowService.clear_airborne_run_keep_tracking(player)
+	## 反弹不再一帧翻转：记下反弹目标速度与过渡速率，交给僵直阶段平滑推进
+	player.wall_bump_rebound_target_x = player.wall_bump_rebound_x * (-1.0 if player.is_facing_right else 1.0)
+	var bump_ramp_time: float = maxf(player.wall_bump_rebound_ramp_time, 0.01)
+	player.wall_bump_rebound_rate = (absf(player.velocity.x) + absf(player.wall_bump_rebound_target_x)) / bump_ramp_time
 	player.velocity.y = player.wall_bump_rebound_y
 	player.hurt_timer = maxf(player.run_wall_bump_control_lock_time, 0.0)
 	player.lock_control(maxf(player.run_wall_bump_control_lock_time, 0.0), "run_wall_bump")
 	player.is_wall_bump_stun = true
+	## 状态切回普通状态，避免“撞墙后还挂着 RUN”
+	if player.is_on_floor():
+		player.change_state(player.PlayerState.IDLE)
+	elif player.velocity.y < 0.0:
+		player.change_state(player.PlayerState.JUMP)
+	else:
+		player.change_state(player.PlayerState.DOWN)
 
 # 处理撞墙僵直期间的重力与恢复。
 static func handle_wall_bump_stun(player: Node, fixed_delta: float) -> void:
 	player.apply_gravity(fixed_delta)
 	var bump_decel: float = player.ground_deceleration if player.is_on_floor() else player.air_deceleration
-	player.velocity.x = move_toward(player.velocity.x, 0, bump_decel * player.base_move_speed * fixed_delta)
+	## 还没被推离墙面（速度方向仍指向墙）时：按固定速率把水平速度平滑推到反弹速度，
+	## 而不是一帧内直接把速度翻过来（那就是“僵硬”的来源）
+	if player.wall_bump_rebound_target_x != 0.0 and signf(player.velocity.x) != signf(player.wall_bump_rebound_target_x):
+		player.velocity.x = move_toward(player.velocity.x, player.wall_bump_rebound_target_x, player.wall_bump_rebound_rate * fixed_delta)
+	else:
+		player.velocity.x = move_toward(player.velocity.x, 0, bump_decel * player.base_move_speed * player.get_accel_step_scale())
 	player.hurt_timer -= fixed_delta
 
 	if player.hurt_timer <= 0:

@@ -12,11 +12,10 @@ colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 offsets = PackedFloat32Array(0.72008544, 1)
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 
-[node name="SnowFX" type="CanvasLayer"]
+[node name="SnowFX" type="Node2D"]
 script = ExtResource("1_snowfx")
 
 [node name="FarSnow" type="CPUParticles2D" parent="."]
-position = Vector2(640, -32)
 amount = 26
 texture = ExtResource("2_far")
 lifetime = 6.0
@@ -30,13 +29,12 @@ initial_velocity_min = 50.0
 initial_velocity_max = 70.0
 angular_velocity_min = -12.0
 angular_velocity_max = 12.0
-scale_amount_min = 0.5
+scale_amount_min = 0.25
 scale_amount_max = 2.0
 color = Color(1, 1, 1, 0.6117647)
 color_ramp = SubResource("Gradient_680sf")
 
 [node name="NearSnow" type="CPUParticles2D" parent="."]
-position = Vector2(640, -32)
 amount = 16
 texture = ExtResource("3_near")
 lifetime = 4.0
@@ -50,6 +48,6 @@ initial_velocity_min = 120.0
 initial_velocity_max = 160.0
 angular_velocity_min = -12.0
 angular_velocity_max = 12.0
-scale_amount_max = 3.0
+scale_amount_max = 2.0
 color = Color(1, 1, 1, 0.85)
 color_ramp = SubResource("Gradient_ig5fu")

@@ -27,11 +27,10 @@ static func handle_locked_physics(player: Node, fixed_delta: float) -> bool:
 	return true
 
 # 锁定输入控制。
-static func lock_control(player: Node, duration: float, lock_type: String = "general") -> void:
+static func lock_control(player: Node, duration: float, _lock_type: String = "general") -> void:
 	player.is_control_locked = true
 	player.control_lock_timer = duration
 	player.set_process_input(false)
-	print("玩家控制锁定: 类型=", lock_type, " 持续时间=", duration, "秒")
 
 # 解除输入控制。
 static func unlock_control(player: Node) -> void:

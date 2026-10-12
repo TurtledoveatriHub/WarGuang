@@ -37,6 +37,10 @@ func _ready():
 	
 	get_tree().paused = true
 	is_open = true
+	# 面板打开期间隐藏移动端 HUD：本页面会把树暂停，而 HUD 是 PROCESS_MODE_ALWAYS，
+	# 它会继续在 _input 里处理触摸/鼠标。若不同步隐藏，HUD 会抢走本页面及其子页面的
+	# 鼠标「按下」事件 → 表现成「按钮点一下只悬停、要按两次」和「设置页虚拟按键拖不动」。
+	_set_mobile_hud_visibility(false)
 	if Global:
 		Global.pause_play_time_session()
 	
@@ -61,7 +65,6 @@ func _ready():
 	# 本面板是 PlayerUI 直接 add_child() 上来的（不经过 UIRouter / SceneManager），
 	# 这里显式走一遍基类入场流程，否则基类的 ESC 门禁会一直是关闭的。
 	await ui_enter()
-	print("[UIIN][GameSetting] 面板打开完成，_enter_done=%s locked=%s" % [_enter_done, is_input_locked()])
 
 ## 覆盖基类：把输入锁应用到本页面的按钮上。
 func _on_input_lock_applied(locked: bool) -> void:
@@ -69,8 +72,6 @@ func _on_input_lock_applied(locked: bool) -> void:
 
 ## 覆盖基类：ESC 关闭本面板（设置覆盖层开着时不关）。
 func _on_ui_cancel() -> void:
-	# TODO 定位后连同其它 [UIIN] 打印一起删除。
-	print("[UIIN][GameSetting] ESC 送达 _on_ui_cancel：is_open=%s closing=%s has_overlay=%s" % [is_open, _is_closing, UIRouter.has_overlay()])
 	if not is_open:
 		return
 	if UIRouter.has_overlay():
@@ -142,6 +143,8 @@ func _close_game_setting():
 	# 点了关闭按钮就**立刻**恢复暂停与游戏计时，不等退场动画 / 黑幕渐变播完。
 	# 本页面是 PROCESS_MODE_ALWAYS，所以取消暂停后动画与补间照常推进。
 	_resume_game_now()
+	# 交回移动端 HUD（与 _ready 里的隐藏成对）。
+	_set_mobile_hud_visibility(true)
 	# 记下黑幕渐亮起始时间戳
 	var fade_started_ms: int = Time.get_ticks_msec()
 	if DarkOverlay and is_instance_valid(DarkOverlay):
@@ -222,7 +225,10 @@ func _on_main_menu_button_pressed():
 		DialogueManager.hide_balloon()
 	
 	if Global.current_save_slot >= 0:
-		SaveManager.save_game(Global.current_save_slot, Global.get_save_data())
+		# notify = false：从游戏内设置退回标题这一次的存档**不弹**「存档已更新」。
+		# 存档提示层（AchievementToast）挂在 /root 上、跨场景存活，而这次存档发生在
+		# 切场之前，提示会在标题界面上继续播完 —— 属于噪声。
+		SaveManager.save_game(Global.current_save_slot, Global.get_save_data(), false)
 
 	set_input_locked(true)
 	# 点了关闭按钮就**立刻**恢复暂停与游戏计时，不等退场动画 / 黑幕渐变播完。

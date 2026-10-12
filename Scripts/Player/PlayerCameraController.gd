@@ -16,13 +16,13 @@ const DEFAULT_WARP_CAMERA_HOLD_TIMEOUT: float = 6.0
 @export var focus_capture_enabled: bool = true
 ## 焦点抢夺全局倍率。
 ## >1.0 会增强 Beacon 影响；<1.0 会减弱。
-@export var focus_capture_global_blend: float = 0.8
+@export var focus_capture_global_blend: float = 0.9
 ## 焦点抢夺单帧目标偏移上限（像素）。
 ## 防止目标过远导致镜头跳变。
-@export var focus_capture_max_offset: float = 240.0
+@export var focus_capture_max_offset: float = 320.0
 ## 抢夺偏移平滑收敛速度系数。
 ## 值越大越“跟手”，值越小越平滑。
-@export var focus_capture_smooth: float = 8.0
+@export var focus_capture_smooth: float = 10.0
 
 # 当前绑定的 Player 节点引用。
 var player: Player = null
@@ -520,6 +520,42 @@ func _set_normal_follow_target() -> void:
 	elif is_instance_valid(player):
 		phantom_camera.follow_target = player
 
+## 当前生效的临时相机限制区（由 CameraLimitZone 注册）
+var active_limit_zones: Array[Node] = []
+
+## 注册临时相机限制区（CameraLimitZone 进入时调用）
+func register_camera_limit_zone(zone: Node) -> void:
+	if zone == null or active_limit_zones.has(zone):
+		return
+	active_limit_zones.append(zone)
+
+## 注销临时相机限制区（离开时调用）
+func unregister_camera_limit_zone(zone: Node) -> void:
+	active_limit_zones.erase(zone)
+
+## 把跟随锚点夹进所有生效中的限制区（相机中心 = 锚点，所以夹锚点就等于限制相机）
+## ★ 不改写 Camera2D / PhantomCamera 的 limit_*：那会与房间限制、门传送的临时解限互相抢夺，
+##   表现为“相机被拉进又被拉回 / 垂直抽搐”。
+func _clamp_position_to_limit_zones(point: Vector2) -> Vector2:
+	if active_limit_zones.is_empty():
+		return point
+	var result: Vector2 = point
+	var stale: Array[Node] = []
+	for zone in active_limit_zones:
+		if not is_instance_valid(zone):
+			stale.append(zone)
+			continue
+		if not zone.has_method("get_zone_world_rect"):
+			continue
+		var rect: Rect2 = zone.get_zone_world_rect()
+		if rect.size.x <= 0.0 or rect.size.y <= 0.0:
+			continue
+		result.x = clampf(result.x, rect.position.x, rect.end.x)
+		result.y = clampf(result.y, rect.position.y, rect.end.y)
+	for zone in stale:
+		active_limit_zones.erase(zone)
+	return result
+
 func _update_normal_follow_anchor(fixed_delta: float) -> void:
 	if not is_instance_valid(player):
 		return
@@ -529,6 +565,7 @@ func _update_normal_follow_anchor(fixed_delta: float) -> void:
 	var focus_offset := _compute_focus_capture_offset(fixed_delta)
 	var desired_offset := focus_offset
 	var target_position: Vector2 = player.global_position + desired_offset
+	target_position = _clamp_position_to_limit_zones(target_position)
 	normal_follow_anchor.global_position = Vector2(round(target_position.x), round(target_position.y))
 
 func _compute_focus_capture_offset(fixed_delta: float) -> Vector2:

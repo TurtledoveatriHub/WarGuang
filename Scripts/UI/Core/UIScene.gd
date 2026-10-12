@@ -195,11 +195,6 @@ func _input(event: InputEvent) -> void:
 	# 过去它会让「入场/退场动画播放期间按 ESC 毫无反应」，表现成「ESC 返回失效」。
 	# 这里放在吞噬之前处理，并用 _exit_started 防止退场途中重复触发。
 	# 被覆盖层盖住的宿主页面不处理（交给上层覆盖层）。
-	# TODO 定位「空格/ESC 失效」后连同其它 [UIIN] 打印一起删除。
-	if event.is_action_pressed("ui_cancel"):
-		print("[UIIN][%s] ESC：_exit_started=%s _enter_done=%s overlay=%s locked=%s" % [
-			name, _exit_started, _enter_done, is_overlay_active(), _input_locked
-		])
 	if not _exit_started and _enter_done and not is_overlay_active() and event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_on_ui_cancel()
@@ -207,11 +202,6 @@ func _input(event: InputEvent) -> void:
 	if not is_input_lock_effective():
 		return
 	if event is InputEventKey or event is InputEventJoypadButton:
-		# TODO 定位用：本行出现就说明这个页面刚刚把按键吞了（它此刻还锁着输入）。
-		if event is InputEventKey and event.pressed:
-			print("[UIIN][%s] 输入锁生效，吞掉按键 %s（visible=%s overlay=%s）" % [
-				name, event.as_text(), visible, is_overlay_active()
-			])
 		get_viewport().set_input_as_handled()
 		return
 	if lock_swallows_mouse and event is InputEventMouseButton:

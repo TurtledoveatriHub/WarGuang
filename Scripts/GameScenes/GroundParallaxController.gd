@@ -60,6 +60,7 @@ var _visible_applied: bool = false
 
 ## 初始化：解析房间、构建九宫格，并立即按当前参考点摆放一次。
 func _ready() -> void:
+	add_to_group("ground_parallax")
 	_resolved_room_id = _resolve_target_room_id()
 	if not is_instance_valid(source_background):
 		push_error("GroundParallaxController: source_background 未绑定")
@@ -120,6 +121,16 @@ func _nearest_lattice_point(near_point: Vector2, origin: Vector2) -> Vector2:
 ## 纯函数摆放下不需要预对齐（背景相位只由相机世界坐标决定），保留空实现以免调用方报错。
 func prepare_entry_anchor(_entry_world_pos: Vector2) -> void:
 	pass
+
+## 立即按当前参考点重排一次（相机瞬移/追镜结束的那一帧调用）。
+## 作用：相机在一帧里大位移时，避免九宫格贴图还停在旧相位、出现“偏移重影”。
+func force_realign_now() -> void:
+	if not _is_active_room:
+		return
+	_update_placement(0.0)
+	if not _visible_applied:
+		_set_tiles_visible(true)
+		_visible_applied = true
 
 
 ## 房间切换回调：切换激活状态并立即对齐一次。
@@ -211,6 +222,10 @@ func _build_nine_tiles() -> void:
 	if not is_instance_valid(source_background):
 		push_error("GroundParallaxController: source_background 未绑定")
 		return
+	# 源背景必须和克隆一样关掉物理插值：
+	# 本控制器每帧在 _process 里直接摆放它，插值只会让它在切房（大跳）后
+	# 从旧位置「快速滑到」新位置 —— 视觉上就是「背景重影快速移动、然后与正常背景重合」。
+	source_background.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	for offset in _tile_offsets:
 		if offset == Vector2i.ZERO:
 			_tiles[offset] = source_background

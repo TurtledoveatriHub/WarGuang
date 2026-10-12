@@ -10,7 +10,10 @@ extends UIScene  # UI 页面统一基类（生命周期 / 输入锁 / 动效总�
 @onready var pc_controls_page = $SettingsRoot/PagesRoot/PCControlsPage    # PC控制页面
 @onready var mobie_controls_page = get_node_or_null("SettingsRoot/PagesRoot/MobieControlsPage") # 移动端控制页面
 @onready var graphics_page = get_node_or_null("SettingsRoot/PagesRoot/GraphicsPage") # 画面页面
+@onready var lg_page: Node = get_node_or_null("SettingsRoot/PagesRoot/LGPage") # 语言页面（中文/English/日本語）
+@onready var lg_button: BaseButton = get_node_or_null("SettingsRoot/LGButton") # 语言分类按钮
 @onready var effect_level_option: OptionButton = get_node_or_null("SettingsRoot/PagesRoot/GraphicsPage/EffectLevelContainer/EffectLevelOption")
+@onready var display_fit_option: OptionButton = get_node_or_null("SettingsRoot/PagesRoot/GraphicsPage/DisplayFitContainer/DisplayFitOption")
 @onready var close_button = $BackButton                        # 关闭按钮
 ## 过渡轨道已并入 UIFxDirector（动效总线）：这里保留旧名字指向总线，业务代码无需改动。
 @onready var ui_transition_animator: Node = _get_fx_bus()
@@ -82,6 +85,8 @@ func _ready():
 	_connect_unique_signal(audio_button.pressed, _on_audio_button_pressed)
 	_connect_unique_signal(controls_button.pressed, _on_controls_button_pressed)
 	_connect_unique_signal(graphics_button.pressed, _on_graphics_button_pressed)
+	_connect_unique_signal(lg_button.pressed, _on_lg_button_pressed)
+	_connect_language_buttons()
 	_connect_unique_signal(close_button.pressed, _on_close_button_pressed)
 	
 	# 连接音量滑块信号
@@ -101,6 +106,9 @@ func _ready():
 	_populate_effect_level_options()
 	if effect_level_option:
 		_connect_unique_signal(effect_level_option.item_selected, _on_effect_level_selected)
+	_populate_display_fit_options()
+	if display_fit_option:
+		_connect_unique_signal(display_fit_option.item_selected, _on_display_fit_selected)
 	
 	# 设置焦点：正在展示的分类按钮是不可聚焦的（focus_mode = NONE），必须跳过，
 	# 否则引擎会打印 "This control can't grab focus"。
@@ -187,11 +195,13 @@ func _resolve_page(page_name: String) -> CanvasItem:
 			return mobie_controls_page
 		"graphics":
 			return graphics_page
+		"lg":
+			return lg_page
 		_:
 			return null
 
 func _cache_page_base_states() -> void:
-	for page_name in ["audio", "pc_controls", "mobie_controls", "graphics"]:
+	for page_name in ["audio", "pc_controls", "mobie_controls", "graphics", "lg"]:
 		var page: CanvasItem = _resolve_page(page_name)
 		if page:
 			_page_base_positions[page_name] = page.position
@@ -259,10 +269,12 @@ func _name_by_page(page: CanvasItem) -> String:
 		return "mobie_controls"
 	if page == graphics_page:
 		return "graphics"
+	if page == lg_page:
+		return "lg"
 	return ""
 
 func _set_only_page_visible(active_page: String) -> void:
-	for page_name in ["audio", "pc_controls", "mobie_controls", "graphics"]:
+	for page_name in ["audio", "pc_controls", "mobie_controls", "graphics", "lg"]:
 		var page: CanvasItem = _resolve_page(page_name)
 		if page == null:
 			continue
@@ -281,6 +293,7 @@ func _apply_category_buttons() -> void:
 	_apply_category_button(audio_button, _category_active_page == "audio")
 	_apply_category_button(controls_button, _category_active_page == "controls" or _category_active_page == "pc_controls" or _category_active_page == "mobie_controls" or _category_active_page == "mobile_controls")
 	_apply_category_button(graphics_button, _category_active_page == "graphics")
+	_apply_category_button(lg_button, _category_active_page == "lg")
 
 ## 正在展示的分类按钮用 **texture_pressed** 表现「已选中」，**不再用 disabled**
 ## （disabled 会画 texture_disabled，那不是我们要的「按下态」贴图）。
@@ -328,6 +341,8 @@ func _grab_initial_category_focus() -> void:
 func _populate_effect_level_options() -> void:
 	if not effect_level_option:
 		return
+	# 选中项以 Global 里实际生效（已持久化）的等级为准，保证与运行时表现一致。
+	ui_effect_level = Global.effect_level if Global != null else ui_effect_level
 	effect_level_option.clear()
 	effect_level_option.add_item("低", UiEffectLevel.LOW)
 	effect_level_option.add_item("中", UiEffectLevel.MEDIUM)
@@ -338,14 +353,27 @@ func _on_effect_level_selected(index: int) -> void:
 	ui_effect_level = index
 	_apply_effect_level(ui_effect_level)
 
+## 应用特效等级：实际生效方是 Global（粒子倍率 / 点光呼吸开关 / 帧率上限），
+## 这里只负责把选择传过去并写入 user:// 配置。
 func _apply_effect_level(level: int) -> void:
-	match level:
-		UiEffectLevel.LOW:
-			print("SettingsScene: 特效等级=低")
-		UiEffectLevel.MEDIUM:
-			print("SettingsScene: 特效等级=中")
-		UiEffectLevel.HIGH:
-			print("SettingsScene: 特效等级=高")
+	if Global != null:
+		Global.apply_effect_level(level)
+
+## 画面适配下拉框：列出三种模式并选中当前生效值。
+## 选项顺序必须与 Global.DisplayFit 的枚举值一致（DEFAULT=0 / SCALE_TO_FIT=1 / STRETCH_FILL=2），
+## 因为 add_item 不写 id 时 id 就是插入顺序，而 item_selected 回调收到的正是 id。
+func _populate_display_fit_options() -> void:
+	if not display_fit_option:
+		return
+	display_fit_option.clear()
+	display_fit_option.add_item("默认")
+	display_fit_option.add_item("等比放大适配")
+	display_fit_option.add_item("完全拉伸填满")
+	display_fit_option.select(Global.display_fit_mode)
+
+## 切换画面适配模式：立即生效并写入 user:// 配置（下次启动自动应用）。
+func _on_display_fit_selected(index: int) -> void:
+	Global.apply_display_fit(index)
 
 ## 音频按钮按下
 func _on_audio_button_pressed():
@@ -385,6 +413,42 @@ func _on_graphics_button_pressed():
 	if mobie_controls_page and mobie_controls_page.has_method("cancel_current_mapping"):
 		mobie_controls_page.cancel_current_mapping()
 	await _switch_to_page("graphics")
+
+## 语言按钮按下
+func _on_lg_button_pressed():
+	if is_input_locked() or _page_switch_in_progress:
+		return
+	# 点击音效由 UIButtonFx 组件层在 button_down 时统一播放
+	if pc_controls_page and pc_controls_page.has_method("cancel_current_mapping"):
+		pc_controls_page.cancel_current_mapping()
+	if mobie_controls_page and mobie_controls_page.has_method("cancel_current_mapping"):
+		mobie_controls_page.cancel_current_mapping()
+	await _switch_to_page("lg")
+
+## 语言三选一按钮（中文默认 / English / 日本語）。
+## 切换由 Global.apply_locale() 完成：TranslationServer 一改，整屏文本立即跟着变，并写入 user:// 持久化。
+const LANGUAGE_BUTTON_CODES: Dictionary = {
+	"LangZhButton": "zh_CN",
+	"LangEnButton": "en",
+	"LangJaButton": "ja",
+}
+
+func _connect_language_buttons() -> void:
+	for node: Node in find_children("Lang*Button", "Button", true, false):
+		if LANGUAGE_BUTTON_CODES.has(node.name):
+			_connect_unique_signal(node.pressed, _on_language_button_pressed.bind(LANGUAGE_BUTTON_CODES[node.name]))
+	_refresh_language_button_state(Global.locale_code if Global != null else "zh_CN")
+
+func _on_language_button_pressed(code: String) -> void:
+	if Global != null:
+		Global.apply_locale(code)
+	_refresh_language_button_state(code)
+
+## 用禁用态表示「当前语言」，保证三个按钮互斥（另两个可点）。
+func _refresh_language_button_state(code: String) -> void:
+	for node: Node in find_children("Lang*Button", "Button", true, false):
+		if LANGUAGE_BUTTON_CODES.has(node.name):
+			(node as Button).disabled = LANGUAGE_BUTTON_CODES[node.name] == code
 
 ## 关闭按钮按下
 func _on_close_button_pressed():
@@ -438,27 +502,27 @@ func _close_settings():
 func _on_master_volume_changed(value: float):
 	AudioManager.set_bus_volume_percent("Master", value)
 	if master_volume_label:
-		master_volume_label.text = "主  音 量：%d%%" % int(round(clampf(value, 0.0, 100.0)))
+		master_volume_label.text = tr("主  音 量：%d%%") % int(round(clampf(value, 0.0, 100.0)))
 
 func _on_bgm_volume_changed(value: float):
 	AudioManager.set_bus_volume_percent("BGM", value)
 	if bgm_volume_label:
-		bgm_volume_label.text = "背景音量：%d%%" % int(round(clampf(value, 0.0, 100.0)))
+		bgm_volume_label.text = tr("背景音量：%d%%") % int(round(clampf(value, 0.0, 100.0)))
 
 func _on_sfx_volume_changed(value: float):
 	AudioManager.set_bus_volume_percent("SFX", value)
 	if sfx_volume_label:
-		sfx_volume_label.text = "音效音量：%d%%" % int(round(clampf(value, 0.0, 100.0)))
+		sfx_volume_label.text = tr("音效音量：%d%%") % int(round(clampf(value, 0.0, 100.0)))
 
 
 ## 根据当前滑块值刷新三个音量标题的百分比显示。
 func _refresh_all_volume_labels() -> void:
 	if master_volume_label and master_volume_slider:
-		master_volume_label.text = "主  音 量：%d%%" % int(round(clampf(master_volume_slider.value, 0.0, 100.0)))
+		master_volume_label.text = tr("主  音 量：%d%%") % int(round(clampf(master_volume_slider.value, 0.0, 100.0)))
 	if bgm_volume_label and bgm_volume_slider:
-		bgm_volume_label.text = "背景音量：%d%%" % int(round(clampf(bgm_volume_slider.value, 0.0, 100.0)))
+		bgm_volume_label.text = tr("背景音量：%d%%") % int(round(clampf(bgm_volume_slider.value, 0.0, 100.0)))
 	if sfx_volume_label and sfx_volume_slider:
-		sfx_volume_label.text = "音效音量：%d%%" % int(round(clampf(sfx_volume_slider.value, 0.0, 100.0)))
+		sfx_volume_label.text = tr("音效音量：%d%%") % int(round(clampf(sfx_volume_slider.value, 0.0, 100.0)))
 
 ## 音量滑块拖拽开始时播放点击音效
 func _on_volume_slider_drag_started():

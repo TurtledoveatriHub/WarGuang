@@ -16,7 +16,7 @@
 [ext_resource type="Script" uid="uid://ky86na7armsv" path="res://Scripts/GameScenes/HiddenRegionFade.gd" id="10_jang7"]
 [ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/IceCrystal.tscn" id="10_q4kib"]
 [ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="11_jxq8l"]
-[ext_resource type="AudioStream" path="res://Assets/Audios/SFX/Instances/存档点交互.wav" id="11_x1b5c"]
+[ext_resource type="AudioStream" uid="uid://bm8l08hel60oa" path="res://Assets/Audios/SFX/Instances/存档点交互.wav" id="11_x1b5c"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="13_nuo8m"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="14_on2j3"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="15_nouxh"]
@@ -34,7 +34,7 @@ script = ExtResource("1_yav0u")
 room_id = "SnowMountain4"
 room_bgm_stream = ExtResource("2_cvf74")
 adjacent_rooms = Array[String](["SnowMountain3", "SnowMountain5", "SnowMountain6"])
-room_color = Color(0.6872149, 0.68721503, 0.68721485, 1)
+room_color = Color(0.5882353, 0.627451, 0.6666667, 1)
 room_bounds = NodePath("sm4Bounds")
 
 [node name="sm4Bounds" type="Node2D" parent="."]

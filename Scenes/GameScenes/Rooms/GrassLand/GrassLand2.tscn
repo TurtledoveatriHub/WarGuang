@@ -27,7 +27,7 @@ script = ExtResource("1_4hy6b")
 room_id = "GrassLand2"
 room_bgm_stream = ExtResource("2_e4iwl")
 adjacent_rooms = Array[String](["GrassLand1", "GrassLand3"])
-room_color = Color(0.62152386, 0.62152386, 0.6215238, 1)
+room_color = Color(0.74558026, 0.7455802, 0.74558014, 1)
 room_bounds = NodePath("gl2Bounds")
 
 [node name="gl2Bounds" type="Node2D" parent="."]
@@ -46,7 +46,6 @@ shape = SubResource("RectangleShape2D_a4x7p")
 script = ExtResource("4_fq3uk")
 target_room_id = "GrassLand2"
 source_background = NodePath("Background1")
-parallax_ratio = Vector2(0.15, 0.05)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
 texture = ExtResource("5_1ua3k")
@@ -55,7 +54,9 @@ texture = ExtResource("5_1ua3k")
 script = ExtResource("4_fq3uk")
 target_room_id = "GrassLand2"
 source_background = NodePath("Background1")
-parallax_ratio = Vector2(0.15, 0.05)
+parallax_ratio = Vector2(0.1, 0.08)
+auto_scroll_enabled = true
+auto_scroll_speed = Vector2(12, 0)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController2"]
 texture = ExtResource("6_btgvv")
@@ -64,7 +65,6 @@ texture = ExtResource("6_btgvv")
 script = ExtResource("4_fq3uk")
 target_room_id = "GrassLand2"
 source_background = NodePath("Foreground1")
-parallax_ratio = Vector2(0.25, 1)
 
 [node name="Foreground1" type="Sprite2D" parent="GroundControllers/FGController1"]
 z_index = 99

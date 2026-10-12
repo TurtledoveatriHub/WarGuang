@@ -5,5 +5,4 @@
 [resource]
 script = ExtResource("1_cfg")
 challenge_name = "第三阶段"
-target_count = 16
 challenge_container_path = NodePath("../Challenge3")

@@ -96,24 +96,30 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 基础移动速度（像素/秒）
 @export var base_move_speed: float = 120.0
 ## 奔跑移动速度（像素/秒）
-@export var run_move_speed: float = 240.0
+@export var run_move_speed: float = 220.0
 ## 地面加速度 (0-1，越大加速越快)
 @export var ground_acceleration: float = 0.8
 ## 地面减速度 (0-1，越大减速越快)
-@export var ground_deceleration: float = 0.6
+@export var ground_deceleration: float = 0.7
 ## 空中减速度 (0-1，越大减速越快)
-@export var air_deceleration: float = 0.4
+@export var air_deceleration: float = 0.6
 ## 空中移动控制力 (0-1，越小控制力越弱)
-@export var air_control: float = 0.4
-## 空中无输入时 JUMP 状态的基础衰减倍率（越大停得越快）
-@export var air_no_input_deceleration_multiplier_jump: float = 0.2
-## 空中无输入时 DOWN 状态的基础衰减倍率（越大停得越快）
-@export var air_no_input_deceleration_multiplier_down: float = 0.3
+## 说明：现在只用于墙跳后的空中操控与 JumpBox 二段跳的水平衰减，不再参与普通空中加减速
+@export var air_control: float = 0.52
+## 空中水平加速度（像素/秒²，基准值；实际还会乘上环境横向倍率）
+@export var air_acceleration: float = 1320.0
+## 空中无输入时的水平减速度（像素/秒²，JUMP 状态；数值越大停得越快）
+@export var air_no_input_deceleration: float = 420.0
+## 空中无输入时的水平减速度（像素/秒²，DOWN 状态；数值越大停得越快）
+@export var air_no_input_deceleration_down: float = 540.0
+## 空中“超速”部分（> jump_move_speed 的惯性速度）每秒衰减多少（像素/秒²）
+## 调大 → 冲刺/跑跳的惯性落得更快；调 0 → 完全保留（永久全速）
+@export var air_overspeed_decay: float = 360.0
 
 ## 受伤击退
 @export_category("受伤击退")
 ## 受伤击退冲量的水平上限（像素/秒）
-@export var hurt_impulse_max_x: float = 240.0
+@export var hurt_impulse_max_x: float = 180.0
 ## 受伤击退冲量的垂直上限（像素/秒）
 @export var hurt_impulse_max_y: float = 240.0
 
@@ -124,51 +130,49 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 一段跳初始速度
 @export var jump_velocity: float = -90.0
 ## 二段跳初始速度
-@export var double_jump_velocity: float = -30.0
+@export var double_jump_velocity: float = -60.0
 ## 最大跳跃按住时间（秒）
 @export var max_jump_hold_time: float = 0.2
 ## 跳跃额外速度（长按期间每帧增加）
-@export var jump_hold_boost: float = -30.0
+@export var jump_hold_boost: float = -28.0
 ## 重力
 @export var gravity: float = 900.0
 ## 最大下落速度
 @export var max_fall_speed: float = 480.0
 ## 土狼时间（离开平台后仍可跳跃的时间）
-@export var coyote_time: float = 0.12
+@export var coyote_time: float = 0.1
 ## 跳跃缓冲时间（提前按跳跃的有效时间）
-@export var jump_buffer_time: float = 0.16
+@export var jump_buffer_time: float = 0.12
 ## 触发落地抖动的最小DOWN状态持续时间
 @export var land_shake_min_down_time: float = 0.8
 ## 触发落地抖动后的操控禁用时间（秒）
-@export var land_shake_control_lock_time: float = 0.8
+@export var land_shake_control_lock_time: float = 0.7
 
 ## 滑翔设置
 @export_category("滑翔设置")
-## 进入滑翔的初始水平速度
-@export var glide_init_h_speed: float = 60.0
 ## 滑翔目标水平速度
-@export var glide_target_h_speed: float = 180.0
+@export var glide_target_h_speed: float = 160.0
 ## 滑翔水平加速度（按住方向键时每秒逼近目标水平速度的最大变化率）
-@export var glide_horizontal_acceleration: float = 300.0
+@export var glide_horizontal_acceleration: float = 360.0
 ## 滑翔松开方向键时的水平减速
 @export var glide_release_deceleration: float = 180.0
 ## 滑翔最大下落速度乘数
-@export var glide_max_fall_multiplier: float = 0.2
+@export var glide_max_fall_multiplier: float = 0.18
 ## 进入滑翔后的滞空时间（秒）
-@export var glide_hover_time: float = 0.1
+@export var glide_hover_time: float = 0.12
 ## 滑翔下落倍率过渡时间（秒）
-@export var glide_fall_accel_time: float = 0.8
+@export var glide_fall_accel_time: float = 1.8
 ## 滑翔输入冷却：松开跳跃键退出滑翔后，此时间内再次按下跳跃不会重新进入滑翔（秒）
-@export var glide_input_cooldown: float = 0.3
+@export var glide_input_cooldown: float = 0.28
 
 ## 受伤设置
 @export_category("受伤设置")
 ## 进入游戏开始时的禁用时间（秒）
 @export var warp_control_lock_time: float = 1.0
 ## 受伤僵直时间（秒）
-@export var hurt_stun_time: float = 0.3
+@export var hurt_stun_time: float = 0.32
 ## 受伤无敌时间（秒）
-@export var hurt_invincible_time: float = 0.5
+@export var hurt_invincible_time: float = 0.46
 ## 传送伤害飞行峰值速度（像素/秒）
 @export var warp_flight_peak_speed: float = 720.0
 ## 传送伤害飞行最低速度（像素/秒）
@@ -189,11 +193,11 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 死亡动画持续时间（秒）
 @export var die_animation_time: float = 1.2
 ## 重生后禁用时间（秒）
-@export var respawn_invincible_time: float = 1.0
+@export var respawn_invincible_time: float = 0.8
 ## 传送渐黑渐显持续时间（秒）
-@export var fade_transition_time: float = 1.2
+@export var fade_transition_time: float = 0.6
 ## 死亡慢动作时间（秒）
-@export var slowly_die_time: float = 0.8
+@export var slowly_die_time: float = 0.9
 
 ## 冲刺设置
 @export_category("冲刺设置")
@@ -209,18 +213,15 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 @export var dash_steer_duration: float = 0.05
 ## 冲刺冷却时间（秒）
 @export var dash_cooldown: float = 0.6
-## 冲刺后惯性初速度
-@export var dash_inertia_speed: float = 180.0
-
-@export_category("冲刺减速设置")
-## 地面水平冲刺结束后的水平减速度
-@export var ground_dash_deceleration: float = 0.2
-## 空中水平冲刺结束后的水平减速度
-@export var air_dash_deceleration: float = 0.2
-## 上冲刺结束后的垂直减速度
-@export var up_dash_deceleration: float = 1.9
-## 下冲刺结束后的垂直减速度
-@export var down_dash_deceleration: float = 0.1
+## 冲刺结束时的动能保留比例（0~1）：出口速度 = 当前速度 × 本值
+## 觉得“冲刺后惯性太强”就把它调小
+@export_range(0.0, 1.0, 0.01) var dash_exit_speed_retention: float = 0.45
+## 上冲刺结束后的垂直减速度（配合 dash_vertical_decel_time 形成短暂滞空手感）
+@export var up_dash_deceleration: float = 2.2
+## 下冲刺结束后的垂直减速度（越小越保留俯冲动能）
+@export var down_dash_deceleration: float = 0.05
+## 冲刺结束后的垂直阻尼持续时间（秒，0 = 不启用阻尼）
+@export var dash_vertical_decel_time: float = 0.3
 
 @export_category("后撤步设置")
 ## 后撤步持续时间（秒）
@@ -240,7 +241,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 
 @export_category("超级冲刺设置")
 ## 超级冲刺充电时间（秒）
-@export var super_dash_charge_time: float = 1.5
+@export var super_dash_charge_time: float = 1.2
 ## 超级冲刺目标速度
 @export var super_dash_speed: float = 420
 ## 超级冲刺加速时间（秒）
@@ -258,24 +259,30 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 @export_category("奔跑设置")
 ## 快速按键时间窗口（秒）
 @export var quick_tap_time_window: float = 0.25
+## 奔跑起步过渡时间（秒）：从基础移动速度加速到奔跑速度所用时间
+@export var run_speed_transition_time: float = 0.12
 ## 奔跑撞墙后的操控禁用时间（秒）
-@export var run_wall_bump_control_lock_time: float = 0.4
+@export var run_wall_bump_control_lock_time: float = 0.5
 ## 台阶修正最多向上抬多少像素（奔跑撞到矮障碍时把它抬上去，而不是吃撞墙僵直）。
 ## 判据是「玩家是否在奔跑」；高过这个值的墙照样撞。
 @export var run_off_ledge_step_up_height: float = 4.0
 ## 撞墙反弹的X轴速度
-@export var wall_bump_rebound_x: float = 180.0
+@export var wall_bump_rebound_x: float = 540.0
+## 撞墙反弹的过渡时间（秒）：水平速度在这段时间内平滑推到反弹速度（越小越接近一帧翻转）
+@export var wall_bump_rebound_ramp_time: float = 0.08
 ## 撞墙反弹的Y轴速度  
 @export var wall_bump_rebound_y: float = -240.0
 
 ## 奔跑跳跃设置
 @export_category("奔跑跳跃设置")
 ## 奔跑跳跃水平速度加成
-@export var run_jump_boost_speed: float = 90.0
+@export var run_jump_boost_speed: float = 140.0
+## 奔跑跳跃水平加成的“爬升时间”（秒）：加成不是瞬间赋值，而是在这段时间内线性升至满值
+@export var run_jump_boost_ramp_time: float = 0.18
 ## 奔跑跳跃加成持续时间（秒）
-@export var run_jump_boost_duration: float = 0.2
+@export var run_jump_boost_duration: float = 0.26
 ## 奔跑跳跃衰减时间（秒）
-@export var run_jump_decay_time: float = 0.6
+@export var run_jump_decay_time: float = 0.54
 
 ## 二段跳旋转设置
 @export_category("二段跳旋转设置")
@@ -286,27 +293,27 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 水平速度加成（增加到基础移动速度上）
 @export var jump2_horizontal_boost: float = 120.0
 ## 水平速度加成持续时间（秒）
-@export var jump2_boost_duration: float = 0.3
+@export var jump2_boost_duration: float = 0.1
 ## 水平速度加成减少过渡时间（秒）
-@export var jump2_boost_decrease_time: float = 0.6
+@export var jump2_boost_decrease_time: float = 0.8
 ## 打断 JumpBox 持续二段跳后的垂直速度衰减时间（秒）
-@export var jump2_interrupt_decay_time: float = 0.1
+@export var jump2_interrupt_decay_time: float = 0.18
 ## JumpBox 重新触发锁定时间（毫秒）
 @export var jumpbox_retrigger_lock_ms: int = 120
 ## JumpBox 单次触发的最大上抛力（像素/秒）
-@export var jumpbox_max_vertical_force: float = 640.0
+@export var jumpbox_max_vertical_force: float = 600.0
 ## JumpBox 水平速度上限（像素/秒）
-@export var jumpbox_max_horizontal_speed: float = 420.0
+@export var jumpbox_max_horizontal_speed: float = 360.0
 
 @export_category("攀墙设置")
 ## 攀墙下滑速度（像素/秒）
-@export var wall_slide_speed: float = 300.0
+@export var wall_slide_speed: float = 280.0
 ## 攀墙缓慢下滑速度（像素/秒）
-@export var wall_slide_slow_speed: float = 120.0
+@export var wall_slide_slow_speed: float = 90.0
 ## 按住向墙方向键的静止时间（秒）
-@export var hold_toward_wall_time: float = 0.15
+@export var hold_toward_wall_time: float = 0.12
 ## 不按方向键的过渡时间（秒）  
-@export var no_input_time: float = 0.6
+@export var no_input_time: float = 0.5
 
 @export_category("墙跳设置")
 ## 离墙后触发墙跳的缓冲窗口（秒）
@@ -314,13 +321,13 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 墙跳水平初速度（离开墙体的水平速度）
 @export var wall_jump_h_speed: float = 90.0
 ## 墙跳垂直速度
-@export var wall_jump_v_speed: float = -180.0
+@export var wall_jump_v_speed: float = -160.0
 ## 墙跳后重新附着延迟（秒）
 @export var wall_jump_reattach_delay: float = 0.1
 ## 墙跳最大按住时间（秒）
 @export var wall_jump_max_hold_time: float = 0.2
 ## 墙跳额外垂直速度（长按期间每帧增加）
-@export var wall_jump_hold_boost: float = -40.0
+@export var wall_jump_hold_boost: float = -42.0
 
 @export_category("特殊状态设置")
 ## IDLE状态进入SLEEP状态的时间（秒）
@@ -344,15 +351,15 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 
 @export_category("边缘修正设置")
 ## 跳跃边缘修正的单步偏移（像素）
-@export var jump_edge_correction_step: float = 0.4
+@export var jump_edge_correction_step: float = 0.5
 ## 跳跃边缘修正的最大尝试次数
-@export var jump_edge_correction_steps: int = 8
+@export var jump_edge_correction_steps: int = 6
 ## 墙跳边缘修正的单步偏移（像素）
-@export var wall_jump_edge_correction_step: float = 0.8
+@export var wall_jump_edge_correction_step: float = 0.5
 ## 墙跳边缘修正的最大尝试次数
 @export var wall_jump_edge_correction_steps: int = 8
 ## 冲刺边缘修正的单步偏移（像素）
-@export var dash_edge_correction_step: float = 0.6
+@export var dash_edge_correction_step: float = 0.5
 ## 冲刺边缘修正的最大尝试次数
 @export var dash_edge_correction_steps: int = 8
 
@@ -496,6 +503,7 @@ var last_move_direction: int = 0                # 最后移动方向（1=右，-
 var is_run_ready: bool = false                  # 是否已准备好进入奔跑状态
 var run_direction: int = 0                      # 奔跑方向
 var is_running: bool = false                    # 当前是否正在奔跑
+var run_speed_ramp_timer: float = 0.0           # 奔跑起步过渡计时（达到 run_speed_transition_time 后为满速）
 var was_running_before_coyote: bool = false     # 土狼时间前是否在奔跑状态
 
 ## 奔跑跳跃相关
@@ -503,6 +511,8 @@ var is_run_jumping: bool = false                # 标记是否正在进行奔跑
 var run_jump_timer: float = 0.0                 # 奔跑跳跃速度加成计时器
 var run_jump_original_direction: int = 0        # 奔跑跳跃原始方向
 var is_wall_bump_stun: bool = false             # 标记是否处于撞墙僵直状态
+var wall_bump_rebound_target_x: float = 0.0     # 撞墙反弹的目标水平速度（正负号 = 反弹方向）
+var wall_bump_rebound_rate: float = 0.0         # 撞墙反弹的过渡速率（像素/秒²，撞墙瞬间算好）
 ## 奔跑落地保持相关：仅用于“奔跑离地后空中连续性满足条件”时落地恢复 RUN。
 var airborne_run_keep_active: bool = false      # 当前是否处于奔跑离地后的连续性跟踪阶段
 var airborne_run_keep_valid: bool = false       # 离地到落地期间是否持续满足“同向按住 + 同向非零速度”
@@ -520,6 +530,7 @@ var super_dash_charge_timer: float = 0.0        # 超级冲刺充电计时器
 var super_dash_accel_timer: float = 0.0         # 超级冲刺加速计时器
 var super_dash_deceleration_timer: float = 0.0  # 超级冲刺减速计时器
 var super_dash_deceleration_afterimage_timer: float = 0.0  # 超级冲刺减速期间残影计时器
+var dash_vertical_decel_timer: float = 0.0      # 冲刺结束后的垂直阻尼剩余时间（上/下冲刺滞空）
 var super_dash_input_lock_timer: float = 0.0    # 超级冲刺输入锁定计时器
 var super_dash_afterimage_timer: float = 0.0    # 超级冲刺残影生成计时器
 var super_dash_duration_timer: float = 0.0      # 超级冲刺持续时间计时器
@@ -608,9 +619,6 @@ var jump2_interrupt_enabled: bool = true        # true=可以打断，false=必�
 ## 跳跃缓冲相关
 var jump_buffer_after_dash: bool = false         # 标记冲刺后是否有跳跃缓冲（用于处理冲刺后的跳跃衔接）
 var jump_buffer_type: int = 0                    # 0=无, 1=一段跳, 2=二段跳
-
-## 低速普通移动残差相关
-var ground_motion_pixel_residual_x: float = 0.0   # 普通地面移动的像素残差，用于吸收非整像素速度
 
 ## 对话相关
 var is_in_dialogue: bool = false                 # 标记玩家是否处于对话状态中
@@ -711,6 +719,17 @@ func initialize_wall_detection():
 	PlayerBootstrapServiceScript.initialize_wall_detection(self)
 #endregion
 
+## 加速度换算参考步率：原参数是“每物理步”的系数，换算成每秒需要 × 本值 × delta
+const ACCEL_STEP_RATE_REFERENCE: float = 60.0
+
+
+## 返回本帧的加速度换算倍率（= 参考步率 × 物理步长）。
+## 用途：把历史遗留的“每物理步系数”（如 ground_acceleration 0.4）换算成
+## 与帧率/物理步长无关的每秒加速量，保证换设备后手感不变。
+func get_accel_step_scale() -> float:
+	return ACCEL_STEP_RATE_REFERENCE * get_physics_process_delta_time()
+
+
 ## 主物理处理函数：每帧调用，处理玩家所有物理逻辑、状态更新和输入响应
 func _physics_process(delta):
 	## 关键修复：限制最大 delta 值，确保不同帧率下行为一致
@@ -761,7 +780,10 @@ func _physics_process(delta):
 	update_effective_multipliers()
 	## ========== 阶段8：状态处理前的逻辑 ==========
 	## 检测奔跑输入
-	detect_run_input(move_input)
+	## 控制锁定/自动走位期间不清算奔跑状态：锁定期间 move_input 恒为 0，
+	## 会把奔跑状态误清掉，导致门传送后的自动走位掉回普通移动
+	if not is_control_locked:
+		detect_run_input(move_input)
 	## 处理撞墙僵直
 	if is_wall_bump_stun:
 		handle_wall_bump_stun(fixed_delta)
@@ -786,35 +808,24 @@ func _physics_process(delta):
 	## 应用平台位置跟随（在 move_and_slide 之前执行，确保 player 从正确位置开始物理）
 	## 直接按平台位移增量移动 player 位置，让 move_and_slide 在此修正后的位置上处理速度
 	_apply_platform_follow()
+	## 冲刺结束后的垂直阻尼（上/下冲刺滞空手感）
+	PlayerAirMotionService.apply_dash_vertical_damping(self, fixed_delta)
 	## 应用重力（除了冲刺和受伤状态）
 	if current_state != PlayerState.DASH and current_state != PlayerState.HURT:
 		apply_gravity(fixed_delta)
 	## 应用跳跃、冲刺与「跑出边缘台阶修正」的边缘校正
 	PlayerEdgeCorrectionServiceScript.apply_edge_correction(self, fixed_delta)
 	## 移动玩家
-	var counter_move_scale: float = 1.0
-	if counter_slow_compensation_active:
-		counter_move_scale = 1.0 / maxf(Engine.time_scale, 0.01)
-	if counter_move_scale != 1.0:
-		velocity *= counter_move_scale
 	move_and_slide()
-	if counter_move_scale != 1.0:
-		velocity /= counter_move_scale
-	_apply_ground_motion_pixel_residual()
+	## 慢动作补偿：不放大 velocity（避免污染其它系统读到的速度值、也避免用放大后的步长穿过碰撞体），
+	## 而是在正常移动之后补上“本应有的额外位移”，并用 move_and_collide 保证碰撞正常生效。
+	if counter_slow_compensation_active:
+		var comp_time_scale: float = maxf(Engine.time_scale, 0.01)
+		if comp_time_scale < 1.0:
+			var extra_motion: Vector2 = velocity * fixed_delta * (1.0 / comp_time_scale - 1.0)
+			if extra_motion != Vector2.ZERO:
+				move_and_collide(extra_motion)
 	PlayerRuntimeFlowServiceScript.finalize_post_physics(self, fixed_delta, move_input, previous_was_on_floor)
-
-## 将地面普通移动的亚像素位移累积到像素网格，降低非 120 倍数速度造成的抖动。
-func _apply_ground_motion_pixel_residual() -> void:
-	if current_state != PlayerState.IDLE and current_state != PlayerState.MOVE and current_state != PlayerState.RUN:
-		ground_motion_pixel_residual_x = 0.0
-		return
-	if not is_on_floor():
-		ground_motion_pixel_residual_x = 0.0
-		return
-	var target_x: float = global_position.x + ground_motion_pixel_residual_x
-	var snapped_x: float = round(target_x)
-	ground_motion_pixel_residual_x = target_x - snapped_x
-	global_position.x = snapped_x
 
 ## 应用平台位置跟随（纯位置跟随模式——蔚蓝风格）
 ## 直接按平台位移增量移动 player 位置，而非叠加 velocity。
@@ -1276,6 +1287,16 @@ func unregister_camera_focus_zone(zone: Node) -> void:
 	if camera_controller and camera_controller.has_method("unregister_focus_capture_zone"):
 		camera_controller.unregister_focus_capture_zone(zone)
 
+## 注册临时相机限制区（CameraLimitZone 进入时调用）
+func register_camera_limit_zone(zone: Node) -> void:
+	if camera_controller and camera_controller.has_method("register_camera_limit_zone"):
+		camera_controller.register_camera_limit_zone(zone)
+
+## 注销临时相机限制区（离开时调用）
+func unregister_camera_limit_zone(zone: Node) -> void:
+	if camera_controller and camera_controller.has_method("unregister_camera_limit_zone"):
+		camera_controller.unregister_camera_limit_zone(zone)
+
 #endregion
 
 ##Hit Stop 相关函数集
@@ -1536,7 +1557,6 @@ func _on_wall_grip_unlocked():
 func set_canvas_original_color(color: Color):
 	canvas_original_color = color
 	canvas_modulate = get_tree().get_first_node_in_group("canvas_modulate")
-	print("Player: CanvasModulate初始化完成，原始颜色:", canvas_original_color)
 
 ## 设置玩家状态（供外部调用）
 func set_player_state(new_state: PlayerState) -> void:

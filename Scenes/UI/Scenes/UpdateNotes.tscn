@@ -43,12 +43,12 @@ text = "这里是游戏公告..."
 metadata/_edit_use_anchors_ = true
 
 [node name="Release" type="Label" parent="Background"]
-offset_left = 35.666664
-offset_top = 52.999996
-offset_right = 107.666664
-offset_bottom = 63.999996
+offset_left = 24.666664
+offset_top = 50.666664
+offset_right = 105.666664
+offset_bottom = 61.666664
 theme = ExtResource("3_0yidl")
-text = "V0.9.10.1"
+text = "V0.9.10.10"
 
 [node name="ContinueButton" type="TextureButton" parent="Background"]
 offset_left = 97.666664

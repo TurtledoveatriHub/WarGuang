@@ -373,18 +373,45 @@ func _play_anim(anim: PlatformAnim) -> void:
 
 
 ## ── 弹跳（可选）──
+## 弹跳检测带底边（= 弹跳面）相对本节点原点的 Y 偏移，首次使用时从形状计算并缓存
+var _bounce_surface_offset_y: float = 0.0
+## 弹跳面偏移是否已计算
+var _bounce_surface_offset_ready: bool = false
+
+
+## 计算并缓存弹跳面偏移（检测带底边）。形状改动后重新打开场景会自动重新计算。
+func _refresh_bounce_surface_offset() -> void:
+	_bounce_surface_offset_ready = true
+	var shape_node: CollisionShape2D = get_node_or_null("BounceArea/CollisionShape2D") as CollisionShape2D
+	if shape_node == null or not (shape_node.shape is RectangleShape2D):
+		return
+	var rect: RectangleShape2D = shape_node.shape as RectangleShape2D
+	_bounce_surface_offset_y = shape_node.position.y + rect.size.y * 0.5
+
+
 ## 扫描平台上方的弹跳区（BounceArea），对“从上方落下”的物理体施加弹跳（与蹦床虫同一套效果）。
+## 命中判定是“扫掠式”的：只要本帧的下落距离内会到达（或已经越过）弹跳面就算命中，
+## 因此与物理采样相位无关，不会因为“某一帧刚好跨过检测带”而整段漏检。
 func _poll_bounce() -> void:
 	if _bounce_area == null or not _bounce_area.monitoring:
 		return
+	if not _bounce_surface_offset_ready:
+		_refresh_bounce_surface_offset()
+	var surface_y: float = global_position.y + _bounce_surface_offset_y
+	var step_delta: float = get_physics_process_delta_time()
 	for body in _bounce_area.get_overlapping_bodies():
 		if not (body is CharacterBody2D or body is RigidBody2D):
 			continue
 		var fall_speed: float = maxf(float(body.velocity.y), 0.0)
 		if fall_speed < bounce_min_fall_speed:
 			continue
-		# 只响应从上方接触
-		if body.global_position.y > global_position.y - 4.0:
+		## 本帧允许的接触范围：本帧下落距离 + 1px 容差
+		var reach: float = fall_speed * step_delta + 1.0
+		## 还没落到弹跳面附近 → 继续下落（避免在半空中就弹）
+		if body.global_position.y < surface_y - reach:
+			continue
+		## 已经明显穿到弹跳面以下 → 不再补触发
+		if body.global_position.y > surface_y + reach:
 			continue
 		_bounce(body, fall_speed)
 

@@ -74,7 +74,7 @@ static func collect_input_snapshot(player: Node) -> Dictionary:
 	var dash_just_pressed: bool = false
 	player.is_pressing_up = false
 	player.is_pressing_down = false
-	if not player.is_control_locked:
+	if not player.is_control_locked and player.is_processing_input():
 		if player.has_method("get_resolved_horizontal_input"):
 			move_input = float(player.get_resolved_horizontal_input())
 		else:

@@ -16,8 +16,7 @@ static func handle_state(player: Node, fixed_delta: float, move_input: float, ju
 	# 冷却在任意状态下逐帧递减；在 GLIDE 态松开跳跃的当帧开始计时。
 	if player.glide_input_cooldown_remaining > 0.0:
 		player.glide_input_cooldown_remaining = maxf(player.glide_input_cooldown_remaining - fixed_delta, 0.0)
-	if player.current_state == player.PlayerState.GLIDE and jump_just_released and player.glide_input_cooldown_remaining <= 0.0:
-		player.glide_input_cooldown_remaining = player.glide_input_cooldown
+	# 注意：退出滑翔时的冷却统一由 exit_glide() 开始计时（避免多条退出路径漏算冷却）
 	# 松开跳跃即取消缓冲（只有“一直按住直到冷却结束”才会自动滑翔）
 	if jump_just_released:
 		player.glide_input_buffered = false
@@ -105,12 +104,18 @@ static func handle_jump_state(player: Node, fixed_delta: float, move_input: floa
 		# 冷却中按下跳跃：记录缓冲，按住直到冷却结束则自动进入滑翔
 		player.glide_input_buffered = true
 
+	## 松开跳跃即作废“按住加成窗口”：否则反复点击跳跃会持续累加空中额外速度
+	if jump_just_released:
+		player.jump_hold_timer = player.max_jump_hold_time
 	if jump_pressed and player.jump_hold_timer < player.max_jump_hold_time:
-		player.velocity.y += player.jump_hold_boost
+		## 加成分量按“每秒”换算，保证不同物理步长/设备表现一致
+		player.velocity.y += player.jump_hold_boost * player.get_accel_step_scale()
 		player.jump_hold_timer += fixed_delta
 
+	## 空中水平控制（起跳后必须保留：否则起跳时的水平速度既无法改变、也停不下来）
 	PlayerAirMotionServiceScript.apply_air_horizontal_motion(player, move_input)
 
+	## 上升到顶点后转入 DOWN（下落）状态
 	if player.velocity.y >= 0 and not player.is_gliding:
 		player.change_state(player.PlayerState.DOWN)
 
@@ -155,8 +160,11 @@ static func handle_down_state(player: Node, fixed_delta: float, move_input: floa
 		# 冷却中按下跳跃：记录缓冲，按住直到冷却结束则自动进入滑翔
 		player.glide_input_buffered = true
 
+	## 松开跳跃即作废“按住加成窗口”（与 JUMP 状态同一规则）
+	if jump_just_released:
+		player.jump_hold_timer = player.max_jump_hold_time
 	if jump_pressed and player.jump_hold_timer < player.max_jump_hold_time and player.has_double_jumped:
-		player.velocity.y += player.jump_hold_boost
+		player.velocity.y += player.jump_hold_boost * player.get_accel_step_scale()
 		player.jump_hold_timer += fixed_delta
 
 	PlayerAirMotionServiceScript.apply_air_horizontal_motion(player, move_input)
@@ -184,7 +192,9 @@ static func handle_super_dash_start_state(player: Node, fixed_delta: float) -> v
 			return
 
 	player.super_dash_charge_timer += fixed_delta
-	player.velocity.x = move_toward(player.velocity.x, 0, player.ground_deceleration * player.base_move_speed * player.effective_acceleration_multiplier)
+	## 停车减速按“当前速度”计算：跑得越快减速越强（最低以 base_move_speed 为基准，与旧手感对齐）
+	var stop_speed_metric: float = maxf(absf(player.velocity.x), player.base_move_speed)
+	player.velocity.x = move_toward(player.velocity.x, 0, player.ground_deceleration * stop_speed_metric * player.effective_acceleration_multiplier * player.get_accel_step_scale())
 	player.apply_gravity(fixed_delta)
 
 static func handle_super_dash_state(player: Node, fixed_delta: float, move_input: float, jump_just_pressed: bool, dash_just_pressed: bool) -> void:

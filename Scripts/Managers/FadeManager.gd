@@ -11,13 +11,12 @@ extends CanvasLayer
 @export var ui_switch_fade_in_duration: float = 0.2
 
 @export_category("UI 场景切换参数（SaveSelect 进入游戏）")
-## SaveSelect -> Game：淡出时长（秒）
-## 注意：实际使用 FadeManager.force_black() 瞬间全黑（因切场时场景正在加载，fade_out 会被截断）
-@export var ui_save_to_game_fade_out_duration: float = 0.6
+## SaveSelect -> Game：淡出时长（秒）（实际是淡入。）
+@export var ui_save_to_game_fade_out_duration: float = 0.8
 ## SaveSelect -> Game：全黑保持时长（秒）
 @export var ui_save_to_game_black_hold_duration: float = 0.6
-## SaveSelect -> Game：淡入时长（秒）
-@export var ui_save_to_game_fade_in_duration: float = 2.6
+## SaveSelect -> Game：淡入时长（秒）（实际是淡出。）
+@export var ui_save_to_game_fade_in_duration: float = 0.6
 
 ## ── 注意 ──
 ## 所有 UI 页面内过渡（Title→Settings 等非切场覆盖层）统一使用上方
@@ -28,6 +27,9 @@ signal fade_out_completed
 signal fade_in_completed
 
 var _fade_tween: Tween = null
+## 淡入/淡出的代次号：开始新的淡入淡出（或 force_black）时自增，
+## 让「过期的」淡入淡出结束时不再改画面状态。
+var _fade_generation: int = 0
 var _black_hold_tags: Dictionary = {}
 
 func _ready():
@@ -41,15 +43,24 @@ func _ready():
 	layer = 1000
 	fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
+## 等待一律用「时长」而不是 await Tween.finished：
+## 本管理器在开始新的淡入/淡出（或 force_black）时会 kill 掉上一个 Tween，
+## 而被 kill 的 Tween 永远不会发 finished —— 任何 await 它的调用者（例如整条场景切换流程）
+## 会永久卡住，表现就是「切到标题后整页卡死、按钮全不可点」。
 func fade_out(duration: float):
 	var safe_duration: float = clampf(duration, 0.0, 30.0)
 	_stop_active_fade_tween()
+	var generation: int = _fade_generation
 	fade_rect.visible = true
 	
 	_fade_tween = create_tween()
 	_fade_tween.tween_property(fade_rect, "color", Color(0.0, 0.0, 0.0, 1.0), safe_duration)
 	
-	await _fade_tween.finished
+	await _wait_fade(safe_duration)
+	if generation != _fade_generation:
+		return
+	fade_rect.color = Color(0.0, 0.0, 0.0, 1.0)
+	fade_rect.visible = true
 	fade_out_completed.emit()
 
 func fade_in(duration: float):
@@ -59,13 +70,24 @@ func fade_in(duration: float):
 		return
 	var safe_duration: float = clampf(duration, 0.0, 30.0)
 	_stop_active_fade_tween()
+	var generation: int = _fade_generation
 	
 	_fade_tween = create_tween()
 	_fade_tween.tween_property(fade_rect, "color", Color(0, 0, 0, 0), safe_duration)
 	
-	await _fade_tween.finished
+	await _wait_fade(safe_duration)
+	if generation != _fade_generation:
+		return
+	fade_rect.color = Color(0, 0, 0, 0)
 	fade_rect.visible = false
 	fade_in_completed.emit()
+
+
+## 等待一段时长（不依赖 Tween 信号）。
+func _wait_fade(seconds: float) -> void:
+	if seconds <= 0.0:
+		return
+	await get_tree().create_timer(seconds).timeout
 
 func force_fade_in():
 	if has_black_hold():
@@ -84,6 +106,8 @@ func _stop_active_fade_tween() -> void:
 	if _fade_tween and _fade_tween.is_valid():
 		_fade_tween.kill()
 	_fade_tween = null
+	# 代次号自增：正在等待中的淡入/淡出会发现自己已过期，不再改画面。
+	_fade_generation += 1
 
 func get_black_alpha() -> float:
 	if not is_instance_valid(fade_rect):

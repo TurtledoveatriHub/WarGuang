@@ -32,7 +32,6 @@ func determine_belongs_to_room():
 		if parent.has_method("get_room_data"):
 			var room_data = parent.get_room_data()
 			belongs_to_room = room_data["id"]
-			print("自动确定检查点", checkpoint_id, "所属房间:", belongs_to_room)
 			return
 		parent = parent.get_parent()
 		depth += 1

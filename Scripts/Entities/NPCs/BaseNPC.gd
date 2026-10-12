@@ -71,6 +71,20 @@ func _ready():
 	if interaction_prompt:
 		interaction_prompt.visible = false
 	_play_default_idle()
+	_prewarm_interaction()
+
+## 气泡场景全局只预热一次（第一个 NPC 进树时）。
+static var _balloon_prewarmed: bool = false
+
+## 交互预热：按 E 那一帧的卡顿主要来自「首次 load 对话气泡场景」。
+## 这里在 NPC 进树时（房间加载阶段，画面通常还在黑幕/过场里）把它载入资源缓存，
+## 玩家按键时只剩实例化与显示。
+func _prewarm_interaction() -> void:
+	if _balloon_prewarmed:
+		return
+	_balloon_prewarmed = true
+	if balloon_scene == null:
+		balloon_scene = load(ScenePaths.UI_MY_BALLOON)
 
 func _process(delta):
 	# 看向玩家（开关打开时）：死区 + 冷却判定

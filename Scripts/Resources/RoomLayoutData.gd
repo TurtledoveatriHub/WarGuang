@@ -73,6 +73,11 @@ extends Resource
 	"GrassLand": Color(0.451, 0.529, 0.435, 1.0),
 	"SnowMountain": Color(0.427, 0.529, 0.576, 1.0),
 	"SuperMario": Color(0.529, 0.475, 0.337, 1.0),
+	"Atlantis": Color(0.337, 0.502, 0.588, 1.0),
+	"Cave": Color(0.686, 0.667, 0.706, 1.0),
+	"Dream": Color(0.549, 0.427, 0.616, 1.0),
+	"Town": Color(0.573, 0.478, 0.373, 1.0),
+	"WindValley": Color(0.549, 0.569, 0.549, 1.0),
 }
 
 ## 没有匹配到任何前缀时使用的房间底色

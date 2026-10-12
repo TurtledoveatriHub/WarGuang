@@ -18,7 +18,7 @@ static func handle_die_state(player: Node, fixed_delta: float) -> void:
 		player.velocity.x = move_toward(
 			player.velocity.x,
 			0.0,
-			die_decel * player.base_move_speed * fixed_delta * player.effective_acceleration_multiplier
+			die_decel * player.base_move_speed * player.get_accel_step_scale() * player.effective_acceleration_multiplier
 		)
 
 	player.die_timer -= fixed_delta

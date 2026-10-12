@@ -21,7 +21,7 @@ static func handle_sleep_state(player: Node, fixed_delta: float, move_input: flo
 		return
 
 	if not player.is_on_floor():
-		player.velocity.y += player.gravity * fixed_delta
+		player.velocity.y += player.gravity * player.effective_gravity_multiplier * fixed_delta
 		player.velocity.y = min(player.velocity.y, player.max_fall_speed)
 	else:
 		player.velocity.y = 0.0
@@ -29,5 +29,5 @@ static func handle_sleep_state(player: Node, fixed_delta: float, move_input: flo
 	player.velocity.x = move_toward(
 		player.velocity.x,
 		0.0,
-		player.ground_deceleration * player.base_move_speed * player.effective_acceleration_multiplier
+		player.ground_deceleration * player.base_move_speed * player.effective_acceleration_multiplier * player.get_accel_step_scale()
 	)

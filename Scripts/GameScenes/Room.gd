@@ -1,4 +1,8 @@
+@tool
 extends Node2D
+
+## 编辑器预览节点名（临时节点，不设 owner → 不会被写入 .tscn）
+const EDITOR_PREVIEW_NODE_NAME: String = "__RoomColorPreview"
 
 ## 交互提示统一纹理（房间里所有 InteractionPrompt 都会被换成它）
 const INTERACTION_PROMPT_TEXTURE: Texture2D = preload("res://Assets/Textures/UIs/InstanceUIs/交互提示.png")
@@ -19,7 +23,11 @@ const PROMPT_SCALE_MULTIPLIER: float = 1.0
 @export var adjacent_rooms: Array[String] = []
 
 ## 房间颜色（用于全局 CanvasModulate）
-@export var room_color: Color = Color.WHITE
+## 在编辑器中修改时会实时刷新预览（仅编辑器可见，运行时仍由 RoomManager 写入全局 CanvasModulate）
+@export var room_color: Color = Color.WHITE:
+	set(value):
+		room_color = value
+		_refresh_editor_color_preview()
 
 ## 相机设置
 @export_category("相机设置")
@@ -33,6 +41,12 @@ const PROMPT_SCALE_MULTIPLIER: float = 1.0
 @onready var room_trigger = $RoomTrigger
 
 func _ready():
+	## 编辑器：只搭建颜色预览，不执行任何运行时初始化
+	## （否则 setup_room_trigger 会改写触发区形状、_correct_container_children_world_positions
+	##   会真的挪动子节点、set_room_active(false) 会让房间在编辑器里不可见，均会污染场景）
+	if Engine.is_editor_hint():
+		_refresh_editor_color_preview()
+		return
 	setup_room_trigger()
 	set_room_active(false)
 	
@@ -158,3 +172,22 @@ func get_room_data() -> Dictionary:
 
 func get_room_color() -> Color:
 	return room_color
+
+
+## 刷新编辑器内的房间颜色预览（仅编辑器，且仅当“直接编辑该房间场景”时生效）。
+## 为什么限制到 edited_scene_root：MainGameScene 里会同时实例化多个房间，
+## 若每个房间都挂一个 CanvasModulate，多个调色会互相叠加/覆盖，编辑器画面就会失真。
+func _refresh_editor_color_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	if not is_inside_tree():
+		return
+	var tree: SceneTree = get_tree()
+	if tree == null or tree.edited_scene_root != self:
+		return
+	var preview: CanvasModulate = get_node_or_null(EDITOR_PREVIEW_NODE_NAME) as CanvasModulate
+	if preview == null:
+		preview = CanvasModulate.new()
+		preview.name = EDITOR_PREVIEW_NODE_NAME
+		add_child(preview)
+	preview.color = room_color

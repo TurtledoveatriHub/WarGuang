@@ -17,11 +17,11 @@ class_name TrampolineBug
 ## ── 弹跳 ──
 @export_category("弹跳")
 ## 基础弹跳力（像素/秒，也等于最小弹跳力）
-@export var base_bounce_force: float = 160.0
+@export var base_bounce_force: float = 240.0
 ## 下落速度对弹跳力的加成系数（落下越快弹得越高）
 @export var fall_speed_factor: float = 0.8
 ## 弹跳力上限（像素/秒）
-@export var max_bounce_force: float = 1080.0
+@export var max_bounce_force: float = 960.0
 ## 最小下落速度阈值（低于它不触发弹跳，避免上升/平移中误触）
 @export var min_fall_speed: float = 5.0
 
@@ -76,9 +76,15 @@ func _is_anim_locked() -> bool:
 
 
 ## 每物理帧扫描顶部弹跳区，对“从上方落下”的物理体施加弹跳
+## 命中判定是“扫掠式”的：只要本帧的下落距离内会到达（或已经越过）弹跳面就算命中，
+## 因此与物理采样相位无关，不会因为“某一帧刚好跨过检测带”而整段漏检。
 func _poll_bounce() -> void:
 	if _bounce_area == null or not _bounce_area.monitoring:
 		return
+	## 弹跳面：本虫顶面（原点即碰撞盒顶面）
+	var surface_y: float = global_position.y
+	## 本帧物理步长（扫掠用）
+	var step_delta: float = get_physics_process_delta_time()
 	for body in _bounce_area.get_overlapping_bodies():
 		if body == null or body == self:
 			continue
@@ -87,8 +93,13 @@ func _poll_bounce() -> void:
 		var fall_speed: float = maxf(float(body.velocity.y), 0.0)
 		if fall_speed < min_fall_speed:
 			continue
-		# 只响应从上方接触（身体中心不应低于弹跳面太多）
-		if body.global_position.y > global_position.y + 6.0:
+		## 本帧允许的接触范围：本帧下落距离 + 1px 容差（尽量贴合“踩到顶面”的时机）
+		var reach: float = fall_speed * step_delta + 1.0
+		## 还没落到弹跳面附近 → 继续下落（避免在半空中就弹）
+		if body.global_position.y < surface_y - reach:
+			continue
+		## 已经明显穿到弹跳面以下 → 不再补触发
+		if body.global_position.y > surface_y + reach:
 			continue
 		_bounce(body, fall_speed)
 
@@ -117,7 +128,9 @@ func _play_trigger() -> void:
 			sprite.play(trigger_name)
 		return
 	# 记录 Trigger 之前的动画进度，避免结束后 Idle/Move 从第 0 帧重播
-	if sprite:
+	# 注意：若当前已经在播 Trigger（上一段 Trigger 刚结束、还没切回 Idle/Move），
+	# 不能把“恢复点”记成 Trigger，否则结束后会反复重播 Trigger 而卡在弹跳动画。
+	if sprite and sprite.animation != trigger_name:
 		_resume_anim = sprite.animation
 		_resume_frame = sprite.frame
 		_resume_frame_progress = sprite.frame_progress

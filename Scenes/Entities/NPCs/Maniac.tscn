@@ -1,0 +1,158 @@
+[gd_scene load_steps=21 format=3 uid="uid://bjlvqrcplff4s"]
+
+[ext_resource type="Script" uid="uid://dusdsdd6jnj1s" path="res://Scripts/Entities/NPCs/Maniac.gd" id="1_canhq"]
+[ext_resource type="Texture2D" uid="uid://bx0ye7xrni3ix" path="res://Assets/Textures/Entities/NPCs/店员.png" id="3_sybhg"]
+[ext_resource type="Resource" uid="uid://6xq44tqbudix" path="res://Assets/Dialogues/NPCs/Maniac.dialogue" id="5_4nbwd"]
+[ext_resource type="Texture2D" uid="uid://d2esp1mx0142k" path="res://Assets/Textures/Entities/NPCs/白毛.png" id="5_sybhg"]
+[ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="6_ojyfu"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mu5ov"]
+atlas = ExtResource("3_sybhg")
+region = Rect2(224, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_umv6y"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_05pru"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tnbqt"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4nbwd"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ojyfu"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qey0w"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cq8wo"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t616g"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yipe3"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i6qnj"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s6wss"]
+atlas = ExtResource("3_sybhg")
+region = Rect2(0, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f7bdh"]
+atlas = ExtResource("5_sybhg")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fvu2l"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mu5ov")
+}],
+"loop": true,
+"name": &"AMAZED",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_umv6y")
+}],
+"loop": true,
+"name": &"GOFANATICAL",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_05pru")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tnbqt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4nbwd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ojyfu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qey0w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cq8wo")
+}],
+"loop": true,
+"name": &"IDLE",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t616g")
+}],
+"loop": true,
+"name": &"IMPRESSED",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yipe3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i6qnj")
+}],
+"loop": true,
+"name": &"MOVE",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s6wss")
+}],
+"loop": true,
+"name": &"STUNNED",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f7bdh")
+}],
+"loop": true,
+"name": &"TALK",
+"speed": 4.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g62kn"]
+size = Vector2(36, 24)
+
+[node name="Maniac" type="Area2D"]
+collision_layer = 64
+script = ExtResource("1_canhq")
+dialogue_resource = ExtResource("5_4nbwd")
+balloon_scene = ExtResource("6_ojyfu")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_fvu2l")
+animation = &"IDLE"
+
+[node name="InteractionPrompt" type="Sprite2D" parent="."]
+position = Vector2(0, -24)
+region_rect = Rect2(96, 144, 17, 11)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 32
+position = Vector2(6, 2)
+shape = SubResource("RectangleShape2D_g62kn")

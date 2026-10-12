@@ -121,6 +121,10 @@ var _map_ready: bool = false
 var _view_zoom: float = 1.0
 ## 是否正在用鼠标左键拖拽平移地图
 var _pan_dragging: bool = false
+## 触屏捏合缩放：当前按在屏幕上的手指位置（index → 位置）。
+var _active_touches: Dictionary = {}
+## 上一帧两根手指之间的距离，用于算缩放倍率。
+var _pinch_last_distance: float = 0.0
 ## 缓存的玩家节点引用（避免每帧做 get_first_node_in_group 查询）
 var _player_ref: Node2D = null
 ## 迷雾初始化失败时的重试倒计时（秒），避免每帧重复尝试
@@ -549,7 +553,7 @@ func _restore_lighting() -> void:
 # 输入
 # ════════════════════════════════════════════════════════════
 
-## 地图界面作为模态覆盖层：打开期间接受关闭键、滚轮缩放、鼠标左键拖拽平移。
+## 地图界面作为模态覆盖层：打开期间接受关闭键、滚轮/双指缩放、单指（或鼠标左键）拖拽平移。
 ## 平移范围由 _clamp_pan() 限制：窗口永远不会跑出地图；缩到最小时地图刚好铺满窗口，也就无法再平移。
 ## 交互键 U 不在这里处理 —— MapManager 在开图期间直接把 interactive 的按键事件摘掉了。
 func _input(event: InputEvent) -> void:
@@ -561,7 +565,33 @@ func _input(event: InputEvent) -> void:
 			MapManager.close_map()
 		get_viewport().set_input_as_handled()
 		return
+	# ── 触屏捏合缩放 ──────────────────────────────────────
+	# Godot 在 Android 上不会发 MagnifyGesture，所以自己用两指距离比算缩放。
+	if event is InputEventScreenTouch:
+		var touch: InputEventScreenTouch = event
+		if touch.pressed:
+			_active_touches[touch.index] = touch.position
+		else:
+			_active_touches.erase(touch.index)
+		_pinch_last_distance = _pinch_distance()
+		return
+	if event is InputEventScreenDrag:
+		var touch_drag: InputEventScreenDrag = event
+		if not _active_touches.has(touch_drag.index):
+			return
+		_active_touches[touch_drag.index] = touch_drag.position
+		if _active_touches.size() < 2:
+			return
+		var distance: float = _pinch_distance()
+		if _pinch_last_distance > 1.0 and distance > 1.0:
+			_apply_zoom(distance / _pinch_last_distance)
+		_pinch_last_distance = distance
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseButton:
+		# 双指捏合期间禁掉单指平移（触摸会被引擎同时合成为鼠标事件，否则会边缩放边跑）
+		if _active_touches.size() >= 2:
+			return
 		# 按住鼠标左键拖动 = 平移地图（松开即停）
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			_pan_dragging = event.pressed
@@ -577,9 +607,19 @@ func _input(event: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 		return
 	if event is InputEventMouseMotion and _pan_dragging and map_container != null:
+		if _active_touches.size() >= 2:
+			return
 		map_container.position += event.relative
 		_clamp_pan()
 		get_viewport().set_input_as_handled()
+
+
+## 当前两根手指之间的距离（不足两指时返回 0）。
+func _pinch_distance() -> float:
+	if _active_touches.size() != 2:
+		return 0.0
+	var points: Array = _active_touches.values()
+	return (points[0] as Vector2).distance_to(points[1] as Vector2)
 
 
 ## 每帧工作只在「确实需要」时才跑，否则 _process 会被彻底关掉（零开销）：

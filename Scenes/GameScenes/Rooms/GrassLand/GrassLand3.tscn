@@ -15,11 +15,11 @@
 [ext_resource type="Script" uid="uid://ky86na7armsv" path="res://Scripts/GameScenes/HiddenRegionFade.gd" id="12_nji43"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="13_1kchy"]
 [ext_resource type="TileSet" uid="uid://0om4a1jhi8of" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原隐藏瓦片集.tres" id="13_27t7p"]
-[ext_resource type="AudioStream" path="res://Assets/Audios/SFX/Instances/存档点交互.wav" id="13_sg836"]
+[ext_resource type="AudioStream" uid="uid://bm8l08hel60oa" path="res://Assets/Audios/SFX/Instances/存档点交互.wav" id="13_sg836"]
 [ext_resource type="PackedScene" uid="uid://ctgxsaoq0vrlk" path="res://Scenes/Instances/Platforms/Platform.tscn" id="16_27t7p"]
 [ext_resource type="PackedScene" uid="uid://ck7fy1kuqx8h0" path="res://Scenes/Instances/Props/MechanismGate.tscn" id="19_do46g"]
 [ext_resource type="PackedScene" uid="uid://oorimac8h2bw" path="res://Scenes/Instances/Props/Sign.tscn" id="19_q2ntn"]
-[ext_resource type="Resource" uid="uid://ii0b5qaxybdh" path="res://Assets/Dialogues/Signs/Sign3.dialogue" id="20_nrvjb"]
+[ext_resource type="Resource" uid="uid://ii0b5qaxybdh" path="res://Assets/Dialogues/Signs/gl3Sign.dialogue" id="20_nrvjb"]
 [ext_resource type="PackedScene" uid="uid://dekrt2dtacnvc" path="res://Scenes/Instances/Props/JoystickSwitch.tscn" id="20_q2ntn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a4x7p"]
@@ -29,10 +29,11 @@ script = ExtResource("1_5yqw6")
 room_id = "GrassLand3"
 room_bgm_stream = ExtResource("2_nji43")
 adjacent_rooms = Array[String](["GrassLand2", "GrassLand4"])
-room_color = Color(0.7814064, 0.7814074, 0.7814063, 1)
+room_color = Color(0.74558026, 0.7455802, 0.74558014, 1)
 room_bounds = NodePath("gl3Bounds")
 
 [node name="gl3Bounds" type="Node2D" parent="."]
+visible = false
 scale = Vector2(4, 6)
 script = ExtResource("3_sg836")
 debug_color = Color(0, 0.7294118, 0.52156866, 0)
@@ -49,18 +50,18 @@ shape = SubResource("RectangleShape2D_a4x7p")
 script = ExtResource("4_27t7p")
 target_room_id = "GrassLand3"
 source_background = NodePath("Background1")
-parallax_ratio = Vector2(0, 0)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
 z_as_relative = false
 texture = ExtResource("5_gddxb")
-region_rect = Rect2(0, 0, 512, 288)
 
 [node name="BGController2" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_27t7p")
 target_room_id = "GrassLand3"
 source_background = NodePath("Background2")
-parallax_ratio = Vector2(0.05, 0.05)
+parallax_ratio = Vector2(0.1, 0.08)
+auto_scroll_enabled = true
+auto_scroll_speed = Vector2(12, 0)
 
 [node name="Background2" type="Sprite2D" parent="GroundControllers/BGController2"]
 z_as_relative = false
@@ -70,12 +71,11 @@ texture = ExtResource("6_do46g")
 script = ExtResource("4_27t7p")
 target_room_id = "GrassLand3"
 source_background = NodePath("Foreground1")
-parallax_ratio = Vector2(0.3, 0.2)
 
 [node name="Foreground1" type="Sprite2D" parent="GroundControllers/FGController1"]
-modulate = Color(1, 1, 1, 0.627451)
-z_index = 101
+z_index = 99
 z_as_relative = false
+scale = Vector2(2, 2)
 
 [node name="TileMapLayers" type="Node2D" parent="."]
 

@@ -5,13 +5,18 @@
 [resource]
 script = ExtResource("1")
 room_positions = {
+"Cave1": Vector2(-3680, 64),
+"Cave2": Vector2(-5760, 32),
 "GrassLand1": Vector2(0, 0),
 "GrassLand10": Vector2(-2240, 64),
 "GrassLand11": Vector2(6400, -16),
 "GrassLand12": Vector2(8960, -560),
-"GrassLand13": Vector2(11584, -872),
-"GrassLand14": Vector2(13496, -208),
-"GrassLand15": Vector2(15320, -1312),
+"GrassLand13": Vector2(11200, -528),
+"GrassLand14": Vector2(12480, -1296),
+"GrassLand15": Vector2(12576, 304),
+"GrassLand16": Vector2(12288, 2224),
+"GrassLand17": Vector2(8480, -2320),
+"GrassLand18": Vector2(10880, -3120),
 "GrassLand2": Vector2(2560, 256),
 "GrassLand3": Vector2(4480, 464),
 "GrassLand4": Vector2(4480, 2688),
@@ -20,22 +25,47 @@ room_positions = {
 "GrassLand7": Vector2(-1664, 3968),
 "GrassLand8": Vector2(3008, 4800),
 "GrassLand9": Vector2(-3264, 4640),
-"SnowMountain1": Vector2(17536, 0),
-"SnowMountain2": Vector2(21056, -416),
-"SnowMountain3": Vector2(23936, 800),
-"SnowMountain4": Vector2(25536, -800),
-"SnowMountain5": Vector2(23664, -4992),
-"SnowMountain6": Vector2(26816, -2768),
-"SuperMario2": Vector2(31248, 808)
+"SnowMountain1": Vector2(14400, -2000),
+"SnowMountain2": Vector2(17920, -2416),
+"SnowMountain3": Vector2(20800, -1200),
+"SnowMountain4": Vector2(22400, -2800),
+"SnowMountain5": Vector2(20528, -6992),
+"SnowMountain6": Vector2(23680, -4768),
+"SnowMountain7": Vector2(17008, -8368),
+"SuperMario2": Vector2(29720, 2680),
+"Town1": Vector2(27800, -448),
+"Town2": Vector2(29160, -448),
+"Town3": Vector2(30520, -448),
+"Town4": Vector2(31880, -448),
+"Town5": Vector2(33328, -2200),
+"Town6": Vector2(34600, -448),
+"Town7": Vector2(35960, -448),
+"WindValley1": Vector2(-9000, 0),
+"WindValley10": Vector2(-21240, 0),
+"WindValley11": Vector2(-22600, 0),
+"WindValley12": Vector2(-23960, 0),
+"WindValley2": Vector2(-10360, 0),
+"WindValley3": Vector2(-11720, 0),
+"WindValley4": Vector2(-13080, 0),
+"WindValley5": Vector2(-14440, 0),
+"WindValley6": Vector2(-15800, 0),
+"WindValley7": Vector2(-17160, 0),
+"WindValley8": Vector2(-18520, 0),
+"WindValley9": Vector2(-19880, 0)
 }
 room_bounds_rects = {
+"Cave1": Rect2(-480, -960, 960, 1920),
+"Cave2": Rect2(-1280, -960, 2560, 1920),
 "GrassLand1": Rect2(-1280, -960, 2560, 1920),
 "GrassLand10": Rect2(-640, -960, 1280, 1920),
 "GrassLand11": Rect2(-960, -640, 1920, 1280),
 "GrassLand12": Rect2(-1280, -960, 2560, 1920),
-"GrassLand13": Rect2(-960, -640, 1920, 1280),
-"GrassLand14": Rect2(-640, -1280, 1280, 2560),
-"GrassLand15": Rect2(-640, -1920, 1280, 3840),
+"GrassLand13": Rect2(-640, -960, 1280, 1920),
+"GrassLand14": Rect2(-320, -320, 640, 640),
+"GrassLand15": Rect2(-640, -960, 1280, 1920),
+"GrassLand16": Rect2(-640, -640, 1280, 1280),
+"GrassLand17": Rect2(-480, -480, 960, 960),
+"GrassLand18": Rect2(-1600, -1280, 3200, 2560),
 "GrassLand2": Rect2(-960, -640, 1920, 1280),
 "GrassLand3": Rect2(-640, -960, 1280, 1920),
 "GrassLand4": Rect2(-960, -960, 1920, 1920),
@@ -50,9 +80,55 @@ room_bounds_rects = {
 "SnowMountain4": Rect2(-640, -2560, 1280, 5120),
 "SnowMountain5": Rect2(-2560, -1280, 5120, 2560),
 "SnowMountain6": Rect2(-320, -2240, 640, 4480),
-"SuperMario2": Rect2(-1280, -640, 2560, 1280)
+"SnowMountain7": Rect2(-640, -960, 1280, 1920),
+"SuperMario2": Rect2(-1280, -640, 2560, 1280),
+"Town1": Rect2(-640, -640, 1280, 1280),
+"Town2": Rect2(-640, -640, 1280, 1280),
+"Town3": Rect2(-640, -640, 1280, 1280),
+"Town4": Rect2(-640, -640, 1280, 1280),
+"Town5": Rect2(-1280, -960, 2560, 1920),
+"Town6": Rect2(-640, -640, 1280, 1280),
+"Town7": Rect2(-640, -640, 1280, 1280),
+"WindValley1": Rect2(-640, -640, 1280, 1280),
+"WindValley10": Rect2(-640, -640, 1280, 1280),
+"WindValley11": Rect2(-640, -640, 1280, 1280),
+"WindValley12": Rect2(-640, -640, 1280, 1280),
+"WindValley2": Rect2(-640, -640, 1280, 1280),
+"WindValley3": Rect2(-640, -640, 1280, 1280),
+"WindValley4": Rect2(-640, -640, 1280, 1280),
+"WindValley5": Rect2(-640, -640, 1280, 1280),
+"WindValley6": Rect2(-640, -640, 1280, 1280),
+"WindValley7": Rect2(-640, -640, 1280, 1280),
+"WindValley8": Rect2(-640, -640, 1280, 1280),
+"WindValley9": Rect2(-640, -640, 1280, 1280)
 }
 room_doors = {
+"Cave1": [{
+"door_id": "gl10c1x1",
+"position": Vector2(520, 640),
+"target": "GrassLand10"
+}, {
+"door_id": "gl10c1x2",
+"position": Vector2(520, -864),
+"target": "GrassLand10"
+}, {
+"door_id": "c1c2x1",
+"position": Vector2(-520, 640),
+"target": "Cave2"
+}, {
+"door_id": "c1c2x2",
+"position": Vector2(-520, -864),
+"target": "Cave2"
+}],
+"Cave2": [{
+"door_id": "c1c2x1",
+"position": Vector2(1320, 672),
+"target": "Cave1"
+}, {
+"door_id": "c1c2x2",
+"position": Vector2(1320, -832),
+"target": "Cave1"
+}],
 "GrassLand1": [{
 "door_id": "gl1gl2x1",
 "position": Vector2(1320, 608),
@@ -73,10 +149,6 @@ room_doors = {
 "door_id": "gl1gl0x3",
 "position": Vector2(-1320, -672),
 "target": "GrassLand10"
-}, {
-"door_id": "gl1sm1",
-"position": Vector2(808, 352),
-"target": "SnowMountain1"
 }],
 "GrassLand10": [{
 "door_id": "gl1gl0x1",
@@ -91,9 +163,13 @@ room_doors = {
 "position": Vector2(680, -672),
 "target": "GrassLand1"
 }, {
-"door_id": "gl10gl11",
+"door_id": "gl10c1x1",
+"position": Vector2(-680, 640),
+"target": "Cave1"
+}, {
+"door_id": "gl10c1x2",
 "position": Vector2(-680, -864),
-"target": "GrassLand11"
+"target": "Cave1"
 }],
 "GrassLand11": [{
 "door_id": "gl3gl11",
@@ -121,25 +197,68 @@ room_doors = {
 "position": Vector2(1320, 448),
 "target": "GrassLand13"
 }, {
-"door_id": "gl12gl13x1",
-"position": Vector2(1320, -416),
+"door_id": "gl12gl13x2",
+"position": Vector2(1320, -320),
 "target": "GrassLand13"
+}, {
+"door_id": "gl12gl17",
+"position": Vector2(-1000, -416),
+"target": "GrassLand17"
+}, {
+"door_id": "gl12gl18",
+"position": Vector2(-744, 288),
+"target": "GrassLand18"
 }],
 "GrassLand13": [{
 "door_id": "gl12gl13x1",
-"position": Vector2(1320, 448),
+"position": Vector2(-680, 416),
 "target": "GrassLand12"
 }, {
-"door_id": "gl12gl13x1",
-"position": Vector2(1320, -416),
+"door_id": "gl12gl13x2",
+"position": Vector2(-680, -352),
 "target": "GrassLand12"
 }, {
 "door_id": "gl13gl14",
-"position": Vector2(-1320, 448),
+"position": Vector2(680, -608),
 "target": "GrassLand14"
 }],
-"GrassLand14": [],
-"GrassLand15": [],
+"GrassLand14": [{
+"door_id": "gl13gl14",
+"position": Vector2(-360, 160),
+"target": "GrassLand13"
+}, {
+"door_id": "gl14sm1",
+"position": Vector2(360, -160),
+"target": "SnowMountain1"
+}, {
+"door_id": "gl14gl15",
+"position": Vector2(256, 340),
+"target": "GrassLand15"
+}],
+"GrassLand15": [{
+"door_id": "gl14gl15",
+"position": Vector2(160, -980),
+"target": "GrassLand14"
+}, {
+"door_id": "gl15gl16",
+"position": Vector2(-288, 1000),
+"target": "GrassLand16"
+}],
+"GrassLand16": [{
+"door_id": "gl15gl16",
+"position": Vector2(0, -680),
+"target": "GrassLand15"
+}],
+"GrassLand17": [{
+"door_id": "gl12gl17",
+"position": Vector2(-520, 320),
+"target": "GrassLand12"
+}],
+"GrassLand18": [{
+"door_id": "gl12gl18",
+"position": Vector2(-1640, 1120),
+"target": "GrassLand12"
+}],
 "GrassLand2": [{
 "door_id": "gl1gl2x1",
 "position": Vector2(-1000, 352),
@@ -217,17 +336,13 @@ room_doors = {
 "target": "GrassLand7"
 }],
 "SnowMountain1": [{
-"door_id": "gl12sm1",
-"position": Vector2(-1320, 392),
-"target": "GrassLand12"
+"door_id": "gl14sm1",
+"position": Vector2(-1320, 544),
+"target": "GrassLand14"
 }, {
 "door_id": "sm1sm2",
 "position": Vector2(1320, -160),
 "target": "SnowMountain2"
-}, {
-"door_id": "gl1sm1",
-"position": Vector2(-1320, 544),
-"target": "GrassLand1"
 }],
 "SnowMountain2": [{
 "door_id": "sm1sm2",
@@ -282,6 +397,19 @@ room_doors = {
 "position": Vector2(0, -2280),
 "target": "SnowMountain9"
 }],
+"SnowMountain7": [{
+"door_id": "sm5sm7x1",
+"position": Vector2(680, 544),
+"target": "SnowMountain5"
+}, {
+"door_id": "sm5sm7x2",
+"position": Vector2(680, 224),
+"target": "SnowMountain5"
+}, {
+"door_id": "sm7sm8",
+"position": Vector2(680, -864),
+"target": "SnowMountain8"
+}],
 "SuperMario2": [{
 "door_id": "2-4",
 "position": Vector2(-1320, -64),
@@ -290,15 +418,55 @@ room_doors = {
 "door_id": "4sm1",
 "position": Vector2(1320, 64),
 "target": "SnowMountain1"
-}]
+}],
+"Town1": [{
+"door_id": "t1t2",
+"position": Vector2(-680, 448),
+"target": "Town2"
+}],
+"Town2": [{
+"door_id": "t1t2",
+"position": Vector2(680, 448),
+"target": "Town1"
+}],
+"Town3": [],
+"Town4": [],
+"Town5": [],
+"Town6": [],
+"Town7": [],
+"WindValley1": [{
+"door_id": "wv1wv2",
+"position": Vector2(-680, 448),
+"target": "WindValley2"
+}],
+"WindValley10": [],
+"WindValley11": [],
+"WindValley12": [],
+"WindValley2": [{
+"door_id": "wv1wv2",
+"position": Vector2(680, 448),
+"target": "WindValley1"
+}],
+"WindValley3": [],
+"WindValley4": [],
+"WindValley5": [],
+"WindValley6": [],
+"WindValley7": [],
+"WindValley8": [],
+"WindValley9": []
 }
-map_world_origin = Vector2(-4224, -6592)
-map_texture_size = Vector2i(2317, 772)
+map_world_origin = Vector2(-24928, -9648)
+map_texture_size = Vector2i(3866, 963)
 center_texture_on_world_origin = false
 map_terrain_colors = {
+"Atlantis": Color(0.3372549, 0.5019608, 0.5882353, 1),
+"Cave": Color(0.6862745, 0.6666667, 0.7058824, 1),
+"Dream": Color(0.54901963, 0.42745098, 0.6156863, 1),
 "GrassLand": Color(0.4509804, 0.5294118, 0.43529412, 1),
 "SnowMountain": Color(0.42745098, 0.5294118, 0.5764706, 1),
-"SuperMario": Color(0.5294118, 0.4745098, 0.3372549, 1)
+"SuperMario": Color(0.5294118, 0.4745098, 0.3372549, 1),
+"Town": Color(0.57254905, 0.47843137, 0.37254903, 1),
+"WindValley": Color(0.54901963, 0.5686275, 0.54901963, 1)
 }
 map_landmark_colors = {
 "ChairSavePoint": Color(0.30980393, 0.8, 0.47843137, 1),

@@ -19,12 +19,22 @@ class_name MobieControlsPage
 ## 虚拟按键统一透明度：0=完全透明, 1=完全不透明。
 @export_range(0.0, 1.0, 0.01) var default_button_alpha: float = 1.0
 
+## 布局编辑时，按下去拖拽虚拟按键是否要有悬停/按下贴图变化。
+## 默认关闭：编辑时手指按住按钮只表示「拖动」，贴图变化会干扰观察按钮真实外观。
+## 以后需要时把本开关勾上即可（贴图仍配在场景里，不用重新接）。
+@export var show_button_texture_feedback: bool = false
+
 ## 内部变量
 signal layout_saved_and_closed
 
 var _layout_config_path: String = "user://mobile_controls_layout.cfg"
 var _layout_editing: bool = false
+## 初始化期间禁止写盘：_ready 里的程序性 slider.value 赋值会触发 value_changed，
+## 若那时就保存，会把默认值写回配置，反而把磁盘上已保存的大小/透明度冲掉。
+var _suppress_layout_write: bool = false
 var _dragging_button: TextureButton = null
+## 上一次拖拽时的**指针位置**（画布坐标）。位移一律用「本次指针位置 − 上次指针位置」求。
+var _drag_last_pointer_pos: Vector2 = Vector2.ZERO
 var _joystick_base: TextureButton = null
 var _joystick_thumb: TextureButton = null
 var _action_buttons: Dictionary = {}
@@ -61,6 +71,8 @@ var _controls_root: Node2D = null
 var _layout_overlay_sprite: Sprite2D = null
 
 func _ready() -> void:
+	# 初始化期间（建滑块 / 读配置 / 应用布局）一律不写盘，避免默认值覆盖已保存的设置。
+	_suppress_layout_write = true
 	# 初始化编辑页：先准备顶部编辑按钮，再绑定场景中已存在的虚拟按键，并保留编辑器中的原始位置。
 	_controls_root = get_node_or_null("MobieControls") as Node2D
 	if _controls_root == null:
@@ -70,6 +82,7 @@ func _ready() -> void:
 		_layout_overlay_alpha = _layout_overlay_sprite.modulate.a
 	_update_layout_bounds_from_viewport()
 	_ensure_editor_buttons()
+	_normalize_button_rects()
 	_capture_base_scales()
 	_create_alpha_slider()
 	_create_scale_slider()
@@ -80,6 +93,8 @@ func _ready() -> void:
 	_build_virtual_buttons()
 	_apply_layout_to_buttons()
 	_set_layout_editor_visible(false)
+	# 初始化完成：之后的滑块/下拉改动才允许写盘 + 通知游戏内 HUD。
+	_suppress_layout_write = false
 
 func _update_layout_bounds_from_viewport() -> void:
 	# 使用当前视口尺寸作为布局边界，保证不同分辨率下仍然能把按钮限制在屏幕内。
@@ -153,17 +168,23 @@ func _build_virtual_buttons() -> void:
 	# 只绑定场景中已经存在的虚拟按键节点（含十字键）。
 	var button_names: Array = ["MoveJoystick", "DpadUp", "DpadDown", "DpadLeft", "DpadRight", "JumpButton", "DashButton", "InteractButton", "SuperDashButton", "MapButton"]
 	var controls_root := _controls_root if _controls_root != null else self
-	_base_scales.clear()
+	# 注意：**不要**在这里重置 / 重采 _base_scales ——
+	# 此时 _load_layout_from_disk() 已经按保存的倍率改过 scale，再采一次就会把
+	# 「场景基准 × 倍率」当成新基准，倍率于是层层累积（150% 重进设置页变成 1.5×1.5，
+	# 再设 100% 却显示 150%）。基准统一只在 _capture_base_scales() 里读一次。
 	_joystick_group.clear()
 	_dpad_group.clear()
 	for button_name in button_names:
 		var button: TextureButton = controls_root.get_node_or_null(button_name) as TextureButton
 		if button == null:
 			continue
-		if not _base_scales.has(button_name):
-			_base_scales[button_name] = button.scale
 		button.focus_mode = Control.FOCUS_NONE
 		button.mouse_filter = Control.MOUSE_FILTER_STOP
+		if not show_button_texture_feedback:
+			# 编辑布局时不希望按下/悬停改变贴图：清掉这两张，BaseButton 自动回退到
+			# texture_normal，按住拖拽全程画面不变。
+			button.texture_pressed = null
+			button.texture_hover = null
 		_connect_unique(button.pressed, _on_virtual_button_pressed.bind(button))
 		_connect_unique(button.button_down, _on_virtual_button_drag_started.bind(button))
 		_connect_unique(button.button_up, _on_virtual_button_drag_ended.bind(button))
@@ -178,13 +199,11 @@ func _build_virtual_buttons() -> void:
 	# 摇杆拖动球单独处理
 	var thumb: TextureButton = controls_root.get_node_or_null("MoveJoystickThumb") as TextureButton
 	if thumb != null:
-		if not _base_scales.has("MoveJoystickThumb"):
-			_base_scales["MoveJoystickThumb"] = thumb.scale
 		thumb.focus_mode = Control.FOCUS_NONE
-		thumb.mouse_filter = Control.MOUSE_FILTER_STOP
-		_connect_unique(thumb.gui_input, _on_virtual_button_gui_input.bind(thumb))
-		_connect_unique(thumb.button_down, _on_virtual_button_drag_started.bind(thumb))
-		_connect_unique(thumb.button_up, _on_virtual_button_drag_ended.bind(thumb))
+		# 摇杆是一个整体（按需求：只能整体拖动）。
+		# 拖动球不接收指针：否则按住摇杆正中（球所在处）会落到球上，
+		# 出现「按上下两端能拖、按中间反而拖不动」的怪象。按在摇杆任意位置都由基座接收。
+		thumb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_joystick_thumb = thumb
 		_joystick_group.append(thumb)
 	if _joystick_base == null:
@@ -307,19 +326,56 @@ func _on_button_alpha_changed(value: float) -> void:
 	default_button_alpha = clampf(value, 0.0, 1.0)
 	_update_alpha_label()
 	_apply_button_alpha()
+	# 立即落盘并通知游戏内 HUD：否则只有在编辑态里点「保存并关闭」才会保存，
+	# 用 ESC / 退回主菜单离开设置页时改动会丢。
+	if _suppress_layout_write:
+		return
+	_save_layout_to_disk()
+	_notify_mobile_hud_reload()
 
 
 ## 在“按键不透明度” Label 上显示当前百分比。
 func _update_alpha_label() -> void:
 	if _button_alpha_text_label != null and is_instance_valid(_button_alpha_text_label):
-		_button_alpha_text_label.text = "按键不透明度：%d%%" % int(round(default_button_alpha * 100.0))
+		_button_alpha_text_label.text = tr("按键不透明度：%d%%") % int(round(default_button_alpha * 100.0))
+
+
+## 把每个虚拟按键的「可点击矩形」对齐到它实际画出来的纹理大小。
+## 起因：按钮用 stretch_mode = KEEP_CENTERED（按纹理原始尺寸居中绘制），
+## 而节点矩形往往被 clamp 到纹理的最小尺寸/写成 32×32；两者不一致时，
+## 手指按在看得见的纹理上却落在矩形之外 —— 表现就是「拖拽范围跟看到的按钮对不上」，
+## 纹理最大的摇杆、十字键最明显。这里把矩形改成纹理尺寸，并保持**视觉中心不动**。
+func _normalize_button_rects() -> void:
+	var target_root := _controls_root if _controls_root != null else self
+	for child in target_root.get_children():
+		if child is TextureButton:
+			_normalize_button_rect(child as TextureButton)
+
+
+## 单个按钮：矩形 = 纹理尺寸，pivot = 中心，且移动后视觉中心不变。
+func _normalize_button_rect(button: TextureButton) -> void:
+	if button == null or button.texture_normal == null:
+		return
+	var tex_size: Vector2 = button.texture_normal.get_size()
+	if tex_size.x <= 0.0 or tex_size.y <= 0.0:
+		return
+	if button.size.is_equal_approx(tex_size):
+		return
+	var old_center: Vector2 = button.position + button.size * 0.5
+	button.custom_minimum_size = tex_size
+	button.size = tex_size
+	button.position = old_center - tex_size * 0.5
+	button.pivot_offset = tex_size * 0.5
 
 
 ## 记录所有虚拟按键在编辑器中的原始 scale（必须在应用倍率之前调用，保证幂等）。
+## 只在这里读一次场景值：之后所有缩放都从这份基准推算 —— 一旦从「当前 scale」反推，
+## 倍率就会层层累积（150% → 缩短 → 再回 150%，三次结果互不相同）。
 func _capture_base_scales() -> void:
+	_base_scales.clear()
 	var target_root := _controls_root if _controls_root != null else self
 	for child in target_root.get_children():
-		if child is TextureButton and child.name not in ["EditLayoutButton", "SaveAndCloseButton", "ResetLayoutButton"]:
+		if child is TextureButton:
 			_base_scales[child.name] = child.scale
 			# 像素美术：强制最近邻采样，避免缩放时像素块被插值糊掉。
 			child.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -351,24 +407,34 @@ func _on_button_scale_changed(value: float) -> void:
 	_button_scale = clampf(value, 0.5, 2.0)
 	_update_scale_label()
 	_apply_button_scale()
+	# 同不透明度：立即落盘 + 通知游戏内 HUD 重载布局（无需重进存档即可看到效果）。
+	if _suppress_layout_write:
+		return
+	_save_layout_to_disk()
+	_notify_mobile_hud_reload()
 
 
 ## 在“按键大小” Label 上显示当前百分比数值。
 func _update_scale_label() -> void:
 	if _button_scale_text_label != null and is_instance_valid(_button_scale_text_label):
-		_button_scale_text_label.text = "按键大小：%d%%" % int(round(_button_scale * 100.0))
+		_button_scale_text_label.text = tr("按键大小：%d%%") % int(round(_button_scale * 100.0))
 
 
 ## 统一应用大小倍率（含被禁用的那一组移动按键）。
+## 只按「基准 × 倍率」写一次，绝不从当前 scale 反推。
 func _apply_button_scale() -> void:
 	var target_root := _controls_root if _controls_root != null else self
-	for child in target_root.get_children():
-		if child is TextureButton and child.name not in ["EditLayoutButton", "SaveAndCloseButton", "ResetLayoutButton"]:
-			var base: Vector2 = _base_scales.get(child.name, child.scale)
-			# 以按键自身中心为缩放基准（而不是左上角）。
-			child.pivot_offset = child.size * 0.5
-			child.scale = base * _button_scale
-			child.modulate = Color(1.0, 1.0, 1.0, default_button_alpha)
+	for button_name in _base_scales.keys():
+		var key: String = String(button_name)
+		if key in ["EditLayoutButton", "SaveAndCloseButton", "ResetLayoutButton"]:
+			continue
+		var child: TextureButton = target_root.get_node_or_null(key) as TextureButton
+		if child == null:
+			continue
+		# 以按键自身中心为缩放基准（而不是左上角）。
+		child.pivot_offset = child.size * 0.5
+		child.scale = _base_scales[button_name] * _button_scale
+		child.modulate = Color(1.0, 1.0, 1.0, default_button_alpha)
 	if _button_scale_slider != null and is_instance_valid(_button_scale_slider):
 		_button_scale_slider.value = _button_scale
 
@@ -406,7 +472,8 @@ func _on_move_mode_selected(index: int) -> void:
 	_notify_mobile_hud_reload()
 
 
-## 编辑态只显示当前选中的移动方案那一组（另一组隐藏但保留缩放/透明度状态）。
+## 只显示当前选中的移动方案那一组（按需求：编辑态也不允许两组同时显示）。
+## 想编辑另一组，请在编辑态里用「移动方式」下拉切过去，再拖那一组的按钮。
 func _apply_move_mode_visibility() -> void:
 	var show_dpad := _move_mode == 1
 	for b in _joystick_group:
@@ -435,6 +502,11 @@ func _apply_layout_to_buttons() -> void:
 				_joystick_base.position = saved_base
 	_apply_button_alpha()
 	_apply_button_scale()
+	# 摇杆球必须始终与基座同心：
+	# 存档里可能残留旧版本写下的偏移位置，而需求是「摇杆只能整体移动」。
+	if _joystick_base != null and _joystick_thumb != null:
+		var base_center: Vector2 = _joystick_base.position + _joystick_base.size * 0.5
+		_joystick_thumb.position = base_center - _joystick_thumb.size * 0.5
 
 func _set_layout_editor_visible(show_state: bool) -> void:
 	# 关键修正（按需求）：
@@ -497,9 +569,46 @@ func _request_scene_lock(locked: bool) -> void:
 			return
 		current = current.get_parent()
 
+## 编辑布局时，把「本页之外」的所有控件（返回按钮、三个分类按钮…）设为不接收指针。
+## ── 实测证据（在运行中的游戏里注入真实鼠标事件）─────────────────────
+##   * BackButton：offset(58,608) size(176,32) scale 2.5 → 可点击矩形是
+##     P:(-74,584) S:(440,80)（左半截还在屏幕外），正好盖住整个左下角。
+##   * Godot 的控件拾取按场景树顺序、**不看 z_index**（返回按钮在场景树里比页面更靠后），
+##     所以它先拿到按下事件：按在左下角虚拟按键**正中心**都抓不到（实测 grabbed=false），
+##     而把返回按钮设为 IGNORE 后同一次拖拽立即正常（grabbed=true, 位移 13.33）。
+## 表象就是「左下角那几个固定小位置拖不动、可拖区域很小且位置偏离」。
+var _suppressed_mouse_filters: Dictionary = {}
+
+func _suppress_outside_input(suppress: bool) -> void:
+	if suppress:
+		_suppressed_mouse_filters.clear()
+		var scene_root: Node = self
+		# 一路走到本页所在场景的根（SettingsScene），只处理这一棵树。
+		while scene_root.get_parent() != null and scene_root.get_parent() != get_tree().root:
+			scene_root = scene_root.get_parent()
+		_suppress_recursive(scene_root, self)
+	else:
+		for node in _suppressed_mouse_filters.keys():
+			if is_instance_valid(node):
+				(node as Control).mouse_filter = _suppressed_mouse_filters[node]
+		_suppressed_mouse_filters.clear()
+
+func _suppress_recursive(node: Node, keep_root: Node) -> void:
+	for child in node.get_children():
+		# keep_root 是「本页」：整棵子树都要保留（虚拟按键 + 大小/透明度滑块都要能操作），
+		# 只屏蔽本页之外的控件。
+		if child == keep_root:
+			continue
+		if child is Control:
+			var control: Control = child as Control
+			_suppressed_mouse_filters[control] = control.mouse_filter
+			control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_suppress_recursive(child, keep_root)
+
 func _on_edit_layout_pressed() -> void:
 	# 进入拖拽编辑态：将所有虚拟按键设置为可拖拽、可查看、但不执行真实操作。
 	_request_scene_lock(true)
+	_suppress_outside_input(true)
 	_set_layout_editor_visible(true)
 
 func _on_save_and_close_pressed() -> void:
@@ -507,6 +616,7 @@ func _on_save_and_close_pressed() -> void:
 	_save_layout_to_disk()
 	_notify_mobile_hud_reload()
 	_set_layout_editor_visible(false)
+	_suppress_outside_input(false)
 	_request_scene_lock(false)
 	layout_saved_and_closed.emit()
 
@@ -542,58 +652,79 @@ func _on_virtual_button_pressed(_button: TextureButton) -> void:
 	pass
 
 func _on_virtual_button_drag_started(button: TextureButton) -> void:
-	# 开始拖动时记录当前正在拖拽的按钮；摇杆基座按住时必须视作拖动摇杆球。
+	# 记录**收到按下的那个**按钮即可：摇杆基座与拖动球是一对，
+	# _drag_button_by_event() 无论从哪一个开始都会把两者一起移动。
+	# （以前这里把基座硬改成「拖动球」：拖动事件来自基座、而 _dragging_button 是球，
+	#   两者永远不相等 → 按住基座拖动毫无反应，只能精确按住中间那颗小球才拖得动。）
 	if not _layout_editing:
 		return
-	if button == _joystick_base:
-		_dragging_button = _joystick_thumb
-		return
 	_dragging_button = button
+	_drag_last_pointer_pos = button.get_global_mouse_position()
 
 func _on_virtual_button_drag_ended(_button: TextureButton) -> void:
 	# 拖拽结束时写入布局配置，并更新到磁盘。
 	_dragging_button = null
 	_save_layout_to_disk()
 
+## 夹住 position，只保证**按钮中心**留在屏幕内。
+## 迭代记录：曾经改成「整个可见矩形必须在屏内」，结果放大 3 倍的按钮在屏幕边缘
+## 会被 clamp 抢位置 —— 手指拖到角落时按钮不跟手（发粘），而且继续拖会“躲”开手指，
+## 看起来就像「那一片区域的拖拽范围变小且位置偏离」。现在只夹中心，移动完全跟手。
 func _clamp_button_position(button: TextureButton, next_position: Vector2) -> Vector2:
-	var max_x: float = maxf(layout_bounds.x - button.size.x, 0.0)
-	var max_y: float = maxf(layout_bounds.y - button.size.y, 0.0)
-	return Vector2(clampf(next_position.x, 0.0, max_x), clampf(next_position.y, 0.0, max_y))
+	var s: Vector2 = button.scale
+	var pivot: Vector2 = button.pivot_offset
+	# position → 可见矩形中心的固定偏移（由 pivot 与 scale 决定）
+	var center_offset: Vector2 = pivot + (button.size * 0.5 - pivot) * s
+	var center: Vector2 = next_position + center_offset
+	center.x = clampf(center.x, 0.0, layout_bounds.x)
+	center.y = clampf(center.y, 0.0, layout_bounds.y)
+	return center - center_offset
 
 func _drag_button_by_event(button: TextureButton, drag_delta: Vector2) -> void:
 	_update_layout_bounds_from_viewport()
+	# 注意：拖动过程中**不要**写盘。以前每一帧都 _save_layout_to_disk()，
+	# 一次拖动就是几十次文件写入，表现为拖动发滞、不跟手。
+	# 保存统一放在 _on_virtual_button_drag_ended() 里做。
 	if button == _joystick_base and _joystick_thumb:
 		var next_base: Vector2 = _clamp_button_position(button, button.position + drag_delta)
 		var delta: Vector2 = next_base - button.position
 		button.position = next_base
 		_joystick_thumb.position = _clamp_button_position(_joystick_thumb, _joystick_thumb.position + delta)
-		_save_layout_to_disk()
 		return
 	if button == _joystick_thumb and _joystick_base:
 		var next_thumb: Vector2 = _clamp_button_position(button, button.position + drag_delta)
 		var delta: Vector2 = next_thumb - button.position
 		button.position = next_thumb
 		_joystick_base.position = _clamp_button_position(_joystick_base, _joystick_base.position + delta)
-		_save_layout_to_disk()
 		return
-	var next_button_position: Vector2 = _clamp_button_position(button, button.position + drag_delta)
-	button.position = next_button_position
-	_save_layout_to_disk()
+	button.position = _clamp_button_position(button, button.position + drag_delta)
 
+
+## 拖拽位移：**不要用 event.relative**。
+## ── 实测证据（在运行中的游戏里注入 40px 位移的真实鼠标事件）───────────
+##   * scale = 3 的按钮：event.relative 只有 13.33px（= 40 / 3，即真实位移的 1/scale）；
+##     把同一个按钮 scale 改成 1 再拖同样 40px，正好走 40px ⇒ 事件已被处理成「控件局部坐标」。
+##   * 触摸：位置只同步到「模拟鼠标」上（手机端悬停能正常触发就是证据），事件自身的 position 不可靠
+##     （注入 ScreenDrag 实测位移为 0）。
+## 所以统一用「指针位置求差」（get_global_mouse_position）：鼠标与触摸都跟随，
+## 也天然免疫「一次手指移动同时产生 ScreenDrag + 模拟 MouseMotion」的重复叠加。
 func _on_virtual_button_gui_input(event: InputEvent, button: TextureButton) -> void:
-	# 编辑态时，摇杆基座和摇杆球必须一起拖动，不允许单独分离，且不强制把 thumb 归正到中心。
 	if not _layout_editing:
 		return
-	var target_button: TextureButton = button
-	if button == _joystick_base:
-		target_button = _joystick_base
-	if _dragging_button != target_button:
+	if button != _dragging_button:
 		return
-	if event is InputEventMouseMotion:
-		_drag_button_by_event(target_button, event.relative)
+	if not (event is InputEventMouseMotion or event is InputEventScreenDrag):
 		return
-	if event is InputEventScreenDrag:
-		_drag_button_by_event(target_button, event.relative)
+	var pointer: Vector2 = button.get_global_mouse_position()
+	var delta: Vector2 = pointer - _drag_last_pointer_pos
+	_drag_last_pointer_pos = pointer
+	# 指针位置是画布坐标，而 button.position 是父节点局部坐标：按父节点缩放换算。
+	var parent: Node = button.get_parent()
+	if parent is CanvasItem:
+		var parent_scale: Vector2 = (parent as CanvasItem).get_global_transform_with_canvas().get_scale()
+		if absf(parent_scale.x) > 0.0001 and absf(parent_scale.y) > 0.0001:
+			delta = Vector2(delta.x / parent_scale.x, delta.y / parent_scale.y)
+	_drag_button_by_event(button, delta)
 
 func cancel_current_mapping() -> void:
 	# 兼容设置页调用接口，与 PC 端控制页保持一致。

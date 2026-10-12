@@ -71,15 +71,20 @@ func _ready():
 	if player_ui:
 		player_ui.player_died.connect(_on_player_died)
 
-	_boot_visual_ready = true
 	# 等待一帧渲染 + 一帧物理让 PhantomCamera 内部跟随逻辑稳定
 	await get_tree().process_frame
 	await get_tree().physics_frame
 	# 在淡入前最后一次对齐相机到玩家位置，防止 PhantomCamera 跟随偏移
 	if is_instance_valid(player) and player.has_method("sync_camera_to_player_center"):
 		player.sync_camera_to_player_center(true)
+	# ★ _boot_visual_ready 必须等「相机也对齐完」才置位。
+	#   切场方 SceneManager 是在 wait_until_boot_visual_ready() 返回后立刻开始淡入的；
+	#   若提前置位（原来就在本段开头），就会出现「淡入已经开始、相机却还没对齐」的一两帧错误画面
+	#   —— 这正是「正常进入存档开头有短暂错误」的来源。
+	_boot_visual_ready = true
 	boot_visual_ready.emit()
 
+## 新存档开场流程：黑幕下拉起房间并交给开场导演播放。
 func _play_new_game_opening_sequence() -> void:
 	if FadeManager and FadeManager.has_method("force_black"):
 		FadeManager.force_black()

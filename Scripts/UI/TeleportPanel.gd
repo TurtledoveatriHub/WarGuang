@@ -28,6 +28,7 @@ var source_teleport_id: String = ""
 	$PanelRoot/GrassLand1,
 	$PanelRoot/GrassLand7,
 	$PanelRoot/GrassLand12,
+	$PanelRoot/GrassLand14,
 	$PanelRoot/SnowMountain4
 ]
 
@@ -110,9 +111,10 @@ func _handle_pointer_release(event: InputEvent) -> void:
 
 func _set_game_setting_btn_visible(state: bool) -> void:
 	var ui = get_tree().get_first_node_in_group("player_ui")
-	if ui and "game_setting_button" in ui:
-		## 按钮已被 PlayerUI 移动到独立 CanvasLayer，不能通过 get_node 查找
-		ui.game_setting_button.visible = state
+	if ui and ui.has_method("set_icon_locked"):
+		## 按钮已被 PlayerUI 移动到独立 CanvasLayer，不能通过 get_node 查找。
+		## 按要求：传送面板打开期间**不隐藏**图标，只保持按下外观并禁止再按。
+		ui.set_icon_locked(not state)
 
 
 ## 每帧根据指针位置手动驱动按钮的悬停/按下纹理反馈。

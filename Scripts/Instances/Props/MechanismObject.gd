@@ -31,6 +31,11 @@ class_name MechanismObject
 ## 完全开启后是否关闭碰撞体
 @export var disable_collision_when_open: bool = true
 
+## 激活（开）前的延迟（秒）：开关激活后先等这么久再开始位移；
+## 延迟期间开关反复切换会刷新这个延迟。默认 0 = 立即移动（原行为）。
+## 只影响“开”的方向；“关”仍然立即回位。
+@export var activation_delay: float = 0.0
+
 ## ── 表现 ──
 ## 动画名枚举（内部固定，不导出）
 enum Anim {
@@ -57,6 +62,8 @@ var _want_open: bool = false
 var _speed: float = 0.0
 ## 本帧实际位移速度（像素/秒，供机关平台等子类对外暴露）
 var _motion_velocity: Vector2 = Vector2.ZERO
+## 激活延迟剩余时间（秒，>0 时不位移）
+var _activation_delay_left: float = 0.0
 
 
 func _ready() -> void:
@@ -79,6 +86,15 @@ func _physics_process(delta: float) -> void:
 
 ## 每物理帧推进移动（带加速/减速；子类可重写接管）
 func _advance_physics(delta: float) -> void:
+	# 激活延迟：到点前保持静止（不位移），到点后才把目标设为开启位置
+	if _activation_delay_left > 0.0:
+		_activation_delay_left = maxf(_activation_delay_left - delta, 0.0)
+		if _activation_delay_left > 0.0:
+			_motion_velocity = Vector2.ZERO
+			_speed = 0.0
+			_on_motion_updated(false)
+			return
+		_target_pos = _open_pos
 	var before_global: Vector2 = global_position
 	if not position.is_equal_approx(_target_pos):
 		var to_target: Vector2 = _target_pos - position
@@ -127,11 +143,17 @@ func _recompute() -> void:
 	if _want_open:
 		# 开门：立即切 ON；开启过程中保留碰撞，到达后再按需关闭
 		_play_anim(ANIM_NAMES[Anim.ON])
-		_target_pos = _open_pos
 		_set_collision_enabled(true)
+		# 激活延迟：延迟内目标仍是当前位置（因此不会位移）；反复激活会刷新延迟
+		if activation_delay > 0.0:
+			_activation_delay_left = activation_delay
+		else:
+			_activation_delay_left = 0.0
+			_target_pos = _open_pos
 	else:
-		# 关门：立即切 OFF；恢复碰撞并移回初始位置
+		# 关门：立即切 OFF；恢复碰撞并移回初始位置（关不延迟）
 		_play_anim(ANIM_NAMES[Anim.OFF])
+		_activation_delay_left = 0.0
 		_target_pos = _closed_pos
 		_set_collision_enabled(true)
 

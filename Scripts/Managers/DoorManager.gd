@@ -21,7 +21,6 @@ func register_door(door: Node):
 	var door_count = doors_by_id[door.door_id].size()
 	if door_count > 2:
 		push_error("严重错误：door_id='" + door.door_id + "'的门数量超过 2 个（当前：" + str(door_count) + "个）！已禁用该 ID 的传送功能")
-		print("  当前门列表:")
 		for i in range(door_count):
 			var d = doors_by_id[door.door_id][i]
 			if is_instance_valid(d):

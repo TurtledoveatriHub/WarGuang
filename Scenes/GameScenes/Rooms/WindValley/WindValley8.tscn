@@ -1,0 +1,95 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_80bg5"]
+[ext_resource type="AudioStream" uid="uid://wh2j8kh5ma1q" path="res://Assets/Audios/BGM/跳跃天空.ogg" id="2_ww6rs"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_u0im6"]
+[ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_b7qt5"]
+[ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="6_4jflh"]
+[ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="7_um6p4"]
+[ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="8_q6eno"]
+[ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="9_r541e"]
+[ext_resource type="TileSet" uid="uid://ddmqsmr1batw4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原背景瓦片集.tres" id="10_erlmr"]
+[ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="18_5whwx"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
+
+[node name="WindValley8" type="Node2D" node_paths=PackedStringArray("room_bounds")]
+script = ExtResource("1_80bg5")
+room_id = "WindValley8"
+room_bgm_stream = ExtResource("2_ww6rs")
+adjacent_rooms = Array[String](["WindValley7", "WindValley9"])
+room_color = Color(0.54901963, 0.5686275, 0.54901963, 1)
+room_bounds = NodePath("wv8Bounds")
+
+[node name="wv8Bounds" type="Node2D" parent="."]
+scale = Vector2(4, 4)
+script = ExtResource("3_u0im6")
+metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
+
+[node name="RoomTrigger" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomTrigger"]
+shape = SubResource("RectangleShape2D_qqk48")
+
+[node name="GroundControllers" type="Node2D" parent="."]
+
+[node name="BGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
+script = ExtResource("4_b7qt5")
+target_room_id = "WindValley8"
+source_background = NodePath("Background1")
+parallax_ratio = Vector2(0.15, 0.05)
+
+[node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
+
+[node name="BGController2" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
+script = ExtResource("4_b7qt5")
+target_room_id = "WindValley8"
+source_background = NodePath("Background1")
+parallax_ratio = Vector2(0.15, 0.05)
+
+[node name="Background1" type="Sprite2D" parent="GroundControllers/BGController2"]
+
+[node name="FGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
+script = ExtResource("4_b7qt5")
+target_room_id = "WindValley8"
+source_background = NodePath("Foreground1")
+parallax_ratio = Vector2(0.25, 1)
+
+[node name="Foreground1" type="Sprite2D" parent="GroundControllers/FGController1"]
+z_index = 99
+scale = Vector2(2, 2)
+
+[node name="TileMapLayers" type="Node2D" parent="."]
+
+[node name="GroundTile" type="TileMapLayer" parent="TileMapLayers"]
+z_index = 20
+tile_set = ExtResource("6_4jflh")
+
+[node name="BlockTile" type="TileMapLayer" parent="TileMapLayers"]
+z_index = 20
+tile_set = ExtResource("7_um6p4")
+
+[node name="HurtTile" type="TileMapLayer" parent="TileMapLayers"]
+tile_set = ExtResource("8_q6eno")
+script = ExtResource("9_r541e")
+
+[node name="BGTile" type="TileMapLayer" parent="TileMapLayers"]
+tile_set = ExtResource("10_erlmr")
+
+[node name="HurtBoxs" type="Node2D" parent="."]
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="DynamicCheckpoints" type="Node2D" parent="."]
+
+[node name="1" parent="DynamicCheckpoints" instance=ExtResource("18_5whwx")]
+position = Vector2(-592, 448)
+checkpoint_id = "1"
+belongs_to_room = "WindValley8"
+
+[node name="2" parent="DynamicCheckpoints" instance=ExtResource("18_5whwx")]
+position = Vector2(-384, 320)
+checkpoint_id = "2"
+belongs_to_room = "WindValley8"
+
+[node name="Doors" type="Node2D" parent="."]

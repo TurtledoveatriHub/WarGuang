@@ -500,10 +500,11 @@ func _collect_doors(room_node: Node, layout: RoomLayoutData, room_id: String) ->
 	return doors
 
 
-## 画「玩家真实走过」的门连线。
-## ★ 唯一条件就是这对门被走过（`mark_door_used` 记录过）—— 其它条件（房间是否已探索、
-##   门是否在 room_bounds 内、迷雾是否揭开）全部多余：记录里已经带了两个端点坐标，
-##   而且画在贴图里的东西本来就受迷雾遮罩管，没探索到的位置根本看不见。
+## 画「玩家真实走过」的门连线。三个条件全部满足才画：
+##   ① 这对门被玩家真实走过（`mark_door_used` 记录过）；
+##   ② **两个门都在各自房间 room_bounds 之外** —— 房间「内部」的门通往的是另一层地图，
+##      那个房间在世界里被放得很远，连线会横穿整张地图，所以这种门不参与连线；
+##   ③ 门附近走过 → 迷雾已揭开（连线画在贴图里，本来就受迷雾遮罩管，没揭开的位置看不见）。
 ## 两端会**延伸到各自房间的 room_bounds 边缘**（贴着框、不留缝），宽度 1 像素。
 ## 两个房间类型不同（地形底色不同）时，中线对半分色，各用自己房间的颜色。
 func _draw_used_door_connectors(layout: RoomLayoutData) -> void:
@@ -520,9 +521,51 @@ func _draw_used_door_connectors(layout: RoomLayoutData) -> void:
 		var to_pos: Vector2 = _to_vector2(entry.get("to_pos", null))
 		if from_pos == to_pos:
 			continue
-		var start_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(from_room), from_pos)
-		var end_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(to_room), to_pos)
+		# ★ 条件②：用房间「当前」的门坐标判定 —— 任一扇门落在自己房间的 room_bounds 里就跳过
+		#   （存档里的旧坐标可能还是门被挪动之前的位置，不能直接拿来判定）
+		var current_positions: Array = _resolve_door_pair_positions(layout, from_room, to_room, from_pos, to_pos)
+		var current_from: Vector2 = current_positions[0]
+		var current_to: Vector2 = current_positions[1]
+		if _is_inside_room_pair(layout, from_room, to_room, current_from, current_to):
+			continue
+		var start_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(from_room), current_from)
+		var end_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(to_room), current_to)
 		_draw_connector_line(layout, start_pos, end_pos, layout.get_terrain_color(from_room), layout.get_terrain_color(to_room))
+
+
+## 取「这对门」两端当前的世界坐标：优先用房间当前门清单（_room_doors），记录坐标只兜底
+func _resolve_door_pair_positions(_layout: RoomLayoutData, from_room: String, to_room: String, recorded_from: Vector2, recorded_to: Vector2) -> Array:
+	return [
+		_find_current_door_pos(from_room, to_room, recorded_from),
+		_find_current_door_pos(to_room, from_room, recorded_to),
+	]
+
+
+## 在房间的当前门清单里找「通往 other_room 的门」的世界坐标；多个候选时取最接近 recorded_pos 的那个
+func _find_current_door_pos(room_id: String, other_room: String, recorded_pos: Vector2) -> Vector2:
+	if not _room_doors.has(room_id):
+		return recorded_pos
+	var best: Vector2 = recorded_pos
+	var best_dist: float = -1.0
+	for entry: Variant in _room_doors[room_id]:
+		if typeof(entry) != TYPE_DICTIONARY:
+			continue
+		var item: Dictionary = entry
+		if str(item.get("target", "")) != other_room:
+			continue
+		var pos: Vector2 = _to_vector2(item.get("world_pos", null))
+		var dist: float = pos.distance_to(recorded_pos)
+		if best_dist < 0.0 or dist < best_dist:
+			best_dist = dist
+			best = pos
+	return best
+
+
+## 这对门是否应当整体跳过（任一扇落在自己房间 room_bounds 内）
+func _is_inside_room_pair(layout: RoomLayoutData, from_room: String, to_room: String, from_pos: Vector2, to_pos: Vector2) -> bool:
+	if _is_point_inside_room_bounds(layout, from_room, from_pos):
+		return true
+	return _is_point_inside_room_bounds(layout, to_room, to_pos)
 
 
 ## 兼容存档往返：Vector2 与 [x, y] 两种形式都能还原成 Vector2
@@ -533,6 +576,15 @@ func _to_vector2(value: Variant) -> Vector2:
 		var arr: Array = value
 		return Vector2(float(arr[0]), float(arr[1]))
 	return Vector2.ZERO
+
+
+## 判断某个世界坐标是否落在该房间的 room_bounds 矩形**内部**。
+## 房间尺寸信息缺失（没扫到 bounds）时一律返回 false —— 宁可画连线，也不要因为缺数据吞掉正常连线。
+func _is_point_inside_room_bounds(layout: RoomLayoutData, room_id: String, world_pos: Vector2) -> bool:
+	var rect: Rect2 = layout.get_room_world_rect(room_id)
+	if rect.size.x <= 0.0 or rect.size.y <= 0.0:
+		return false
+	return rect.has_point(world_pos)
 
 
 ## 求「房间框上离这扇门最近的一点」：直接把门坐标夹进矩形范围。
@@ -841,8 +893,13 @@ func _reveal_used_door_corridors(layout: RoomLayoutData) -> void:
 		var to_pos: Vector2 = _to_vector2(entry.get("to_pos", null))
 		if from_pos == to_pos:
 			continue
-		var start_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(from_room), from_pos)
-		var end_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(to_room), to_pos)
+		# 与连线同一套条件：用当前门坐标判定，房间内部的门不揭迷雾
+		# （否则会揭出一条本不该存在的走廊，看起来就是一条“灰色线条”）
+		var current_positions: Array = _resolve_door_pair_positions(layout, from_room, to_room, from_pos, to_pos)
+		if _is_inside_room_pair(layout, from_room, to_room, current_positions[0], current_positions[1]):
+			continue
+		var start_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(from_room), current_positions[0])
+		var end_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(to_room), current_positions[1])
 		# 比连线本身再宽 2 像素：保证连线两端的像素一定落在揭开范围内
 		_paint_world_line_on(_reveal_image, layout, start_pos, end_pos, Color(1, 1, 1, 1), width + 2)
 		_revealed_corridor_keys[line_key] = true
@@ -1014,17 +1071,138 @@ func load_save_data(data: Dictionary) -> void:
 	# 恢复「已走过门对」：不恢复的话重开游戏后地图上的门连线会全部消失
 	var doors_raw: Variant = data.get("used_map_doors", {})
 	_used_doors = doors_raw if doors_raw is Dictionary else {}
+	# ★ 恢复「已烘焙的房间地图数据」（见 get_baked_state 的说明）：
+	#   命中后 open_map() 里的 bake_pending_visited_rooms() 全部直接跳过，
+	#   不会再对每个探索过的房间做 load()+instantiate() 整个场景 —— 这是第一次开图卡顿的根源。
+	#   老存档没有这个字段时保持原行为（下次保存起就会带上）。
+	var baked_raw: Variant = data.get("map_baked", {})
+	if baked_raw is Dictionary:
+		restore_baked_state(baked_raw)
 	_redraw_generated_map()
 
 ## 重置地图状态（新游戏时调用）
 func reset_state() -> void:
 	visited_rooms.clear()
 	_used_doors.clear()
+	# ★ 连烘焙缓存一起清：不清的话上一存档探索过的房间形状会被带进新存档
+	_gen_rooms.clear()
+	_room_ground_runs.clear()
+	_room_doors.clear()
+	_room_landmarks.clear()
+	_revealed_corridor_keys.clear()
 	close_map()
 	# close_map 在「本来就没开着」时会提前返回，所以这里再兜底把交互键装回去
 	_restore_interact_action()
 	clear_markers()
 	clear_reveal_mask()
+
+
+## 把「已烘焙的房间地图数据」打包成存档可用的纯数据（JSON 友好）。
+## ★ 为什么要存进存档：open_map() 里 bake_pending_visited_rooms() 会对「去过但本次会话还没烘焙」的
+##   每个房间做 load() + instantiate() 整个房间场景再扫描 —— 探索得越多这一步越慢（实测就是第一次
+##   开图的明显卡顿）。把烘焙结果随存档一起存下来后，读档后开图直接命中缓存，一次场景实例化都不需要。
+## 存的都是纯数字数组（Rect2/Vector2/Color 拆成数组），因为存档会走 JSON 序列化。
+func get_baked_state() -> Dictionary:
+	var rooms: Array = []
+	var ground: Dictionary = {}
+	for room_id: Variant in _gen_rooms.keys():
+		var id: String = str(room_id)
+		rooms.append(id)
+		var runs: Array = []
+		for run: Variant in _room_ground_runs.get(id, []):
+			var rect: Rect2 = run
+			runs.append([rect.position.x, rect.position.y, rect.size.x, rect.size.y])
+		ground[id] = runs
+	var doors: Dictionary = {}
+	for room_id: Variant in _room_doors.keys():
+		var id: String = str(room_id)
+		var door_list: Array = []
+		for entry: Variant in _room_doors[id]:
+			var door: Dictionary = entry
+			var pos: Vector2 = door.get("world_pos", Vector2.ZERO)
+			door_list.append({"p": [pos.x, pos.y], "t": str(door.get("target", ""))})
+		doors[id] = door_list
+	var landmarks: Dictionary = {}
+	for room_id: Variant in _room_landmarks.keys():
+		var id: String = str(room_id)
+		var mark_list: Array = []
+		for entry: Variant in _room_landmarks[id]:
+			var mark: Dictionary = entry
+			var rect: Rect2 = mark.get("world_rect", Rect2())
+			var color: Color = mark.get("color", Color.WHITE)
+			mark_list.append({
+				"r": [rect.position.x, rect.position.y, rect.size.x, rect.size.y],
+				"c": [color.r, color.g, color.b, color.a],
+			})
+		landmarks[id] = mark_list
+	return {"rooms": rooms, "ground": ground, "doors": doors, "landmarks": landmarks}
+
+
+## 从存档恢复「已烘焙的房间地图数据」（get_baked_state 的逆操作）
+func restore_baked_state(data: Dictionary) -> void:
+	if data.is_empty():
+		return
+	_gen_rooms.clear()
+	_room_ground_runs.clear()
+	_room_doors.clear()
+	_room_landmarks.clear()
+	for room_id: Variant in (data.get("rooms", []) as Array):
+		_gen_rooms[str(room_id)] = true
+	var ground_raw: Variant = data.get("ground", {})
+	if ground_raw is Dictionary:
+		for room_id: Variant in (ground_raw as Dictionary).keys():
+			var runs: Array = []
+			for run: Variant in (ground_raw[room_id] as Array):
+				runs.append(_bake_to_rect2(run))
+			_room_ground_runs[str(room_id)] = runs
+	var doors_raw: Variant = data.get("doors", {})
+	if doors_raw is Dictionary:
+		for room_id: Variant in (doors_raw as Dictionary).keys():
+			var door_list: Array = []
+			for entry: Variant in (doors_raw[room_id] as Array):
+				if entry is Dictionary:
+					var door: Dictionary = entry
+					door_list.append({
+						"world_pos": _bake_to_vector2(door.get("p", [])),
+						"target": str(door.get("t", "")),
+					})
+			_room_doors[str(room_id)] = door_list
+	var landmarks_raw: Variant = data.get("landmarks", {})
+	if landmarks_raw is Dictionary:
+		for room_id: Variant in (landmarks_raw as Dictionary).keys():
+			var mark_list: Array = []
+			for entry: Variant in (landmarks_raw[room_id] as Array):
+				if entry is Dictionary:
+					var mark: Dictionary = entry
+					mark_list.append({
+						"world_rect": _bake_to_rect2(mark.get("r", [])),
+						"color": _bake_to_color(mark.get("c", [])),
+					})
+			_room_landmarks[str(room_id)] = mark_list
+
+
+## 存档里的 Vector2（[x, y]）→ Vector2；非法值给零向量
+func _bake_to_vector2(value: Variant) -> Vector2:
+	if value is Array and (value as Array).size() >= 2:
+		var arr: Array = value
+		return Vector2(float(arr[0]), float(arr[1]))
+	return Vector2.ZERO
+
+
+## 存档里的 Rect2（[x, y, w, h]）→ Rect2；非法值给空矩形
+func _bake_to_rect2(value: Variant) -> Rect2:
+	if value is Array and (value as Array).size() >= 4:
+		var arr: Array = value
+		return Rect2(float(arr[0]), float(arr[1]), float(arr[2]), float(arr[3]))
+	return Rect2()
+
+
+## 存档里的 Color（[r, g, b, a]）→ Color；非法值给白色
+func _bake_to_color(value: Variant) -> Color:
+	if value is Array and (value as Array).size() >= 4:
+		var arr: Array = value
+		return Color(float(arr[0]), float(arr[1]), float(arr[2]), float(arr[3]))
+	return Color.WHITE
 
 ## 把存档中的通用数组安全转换为字符串数组
 func _to_string_array(source: Variant) -> Array:

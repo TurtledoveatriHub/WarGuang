@@ -304,7 +304,6 @@ func _process(delta):
 		debug_timer += delta
 		if debug_timer >= 1.0:
 			debug_timer = 0.0
-			print("HurtBox: 玩家=", bodies_in_area.size(), " 相位=", _anim_phase, " 伤害=", _damage_allowed, " 进度=", _progress, " 翻转=", animated_sprite.scale.x)
 
 # ── 信号回调 ──────────────────────────────────────
 

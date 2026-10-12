@@ -107,11 +107,35 @@ text = "草原城镇"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="GrassLand14" type="TextureButton" parent="PanelRoot"]
+offset_left = -32.0
+offset_top = -58.0
+offset_right = 36.0
+offset_bottom = -36.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "GrassLand14"
+
+[node name="Label" type="Label" parent="PanelRoot/GrassLand14"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "草原雪山"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="SnowMountain4" type="TextureButton" parent="PanelRoot"]
-offset_left = 88.0
-offset_top = 13.0
-offset_right = 156.0
-offset_bottom = 35.0
+offset_left = 108.0
+offset_top = -32.0
+offset_right = 176.0
+offset_bottom = -10.0
 texture_normal = ExtResource("8_ex6nn")
 texture_pressed = ExtResource("9_7alhu")
 texture_hover = ExtResource("10_pq6s8")

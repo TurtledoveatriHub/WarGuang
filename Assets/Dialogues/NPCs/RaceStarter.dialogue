@@ -1,0 +1,117 @@
+~ start
+
+# ==================== 已经跑过哪一段？ ====================
+if Global.race_best_times.has("5")
+    => menu_full
+
+if Global.race_best_times.has("4")
+    => menu_4
+
+if Global.race_best_times.has("3")
+    => menu_3
+
+if Global.race_best_times.has("2")
+    => menu_2
+
+if Global.race_best_times.has("1")
+    => menu_1
+
+=> intro
+
+# ==================== 初次见面 ====================
+~ intro
+
+"飞毛腿":哟！！新面孔！你也是来跑步的？
+"飞毛腿":我叫飞毛腿——这片草原上，没有我跑不过的直线！
+"飞毛腿":规则超简单：按顺序踩过检查点、跑够圈数、别超时。
+"飞毛腿":第一段最轻松，先给你热热身！敢不敢？
+- 来！我要跑！ => stage1
+- 我先看看情况 => END
+
+~ stage1
+
+do npc.launch_race()
+=> END
+
+# ==================== 通过第一段：可重跑 / 继续 ====================
+~ menu_1
+
+"飞毛腿":这股劲儿，我喜欢！还想再来一段？
+- 再跑第一段（最佳 {{Global.get_race_best_time_text(1)}}） => stage1
+- 挑战第二段 => stage2
+- 今天先到这儿 => END
+
+~ stage2
+
+do npc.launch_stage2_race()
+=> END
+
+# ==================== 通过第二段 ====================
+~ menu_2
+
+"飞毛腿":两段都拿下了，你的腿在笑！
+- 重跑第一段（{{Global.get_race_best_time_text(1)}}） => stage1
+- 重跑第二段（{{Global.get_race_best_time_text(2)}}） => stage2
+- 挑战第三段 => stage3
+- 先喘口气 => END
+
+~ stage3
+
+do npc.launch_stage3_race()
+=> END
+
+# ==================== 通过第三段 ====================
+~ menu_3
+
+"飞毛腿":三段！你已经开始追着风跑了！
+- 重跑第一段（{{Global.get_race_best_time_text(1)}}） => stage1
+- 重跑第二段（{{Global.get_race_best_time_text(2)}}） => stage2
+- 重跑第三段（{{Global.get_race_best_time_text(3)}}） => stage3
+- 挑战第四段 => stage4
+- 让我歇会儿 => END
+
+~ stage4
+
+do npc.launch_stage4_race()
+=> END
+
+# ==================== 通过第四段 ====================
+~ menu_4
+
+"飞毛腿":四段全过！这条跑道开始记住你的脚步声了！
+- 重跑第一段（{{Global.get_race_best_time_text(1)}}） => stage1
+- 重跑第二段（{{Global.get_race_best_time_text(2)}}） => stage2
+- 重跑第三段（{{Global.get_race_best_time_text(3)}}） => stage3
+- 重跑第四段（{{Global.get_race_best_time_text(4)}}） => stage4
+- 挑战最后一段 => stage5
+- 先缓缓 => END
+
+~ stage5
+
+do npc.launch_stage5_race()
+=> END
+
+# ==================== 五段全清 ====================
+~ menu_full
+
+"飞毛腿":五段全清！！你已经是这条跑道上的风了！
+"飞毛腿":只要你还想跑，我永远在这里等你冲线。
+- 重跑第一段（{{Global.get_race_best_time_text(1)}}） => stage1
+- 重跑第二段（{{Global.get_race_best_time_text(2)}}） => stage2
+- 重跑第三段（{{Global.get_race_best_time_text(3)}}） => stage3
+- 重跑第四段（{{Global.get_race_best_time_text(4)}}） => stage4
+- 重跑第五段（{{Global.get_race_best_time_text(5)}}） => stage5
+- 下次再来刷新纪录 => END
+
+# ==================== 挑战结束后的自动分支 ====================
+~ result_win
+
+"飞毛腿":漂亮！！这速度——我都听见风声了！
+"飞毛腿":成绩已经刻在告示牌上了。歇口气，随时再来找我！
+=> END
+
+~ result_lose
+
+"飞毛腿":呼——差一点点！跑步就是这样，下一趟一定更快。
+"飞毛腿":别灰心，跑道上见真章。我在这儿等你回来！
+=> END

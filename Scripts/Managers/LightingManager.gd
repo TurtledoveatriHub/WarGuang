@@ -15,6 +15,10 @@ func _ready():
 
 ## 创建UI场景的灯光呼吸效果
 func create_breathing_effect():
+	# 低特效档不跑点光呼吸（每盏灯一条无限循环 Tween，是手机上持续的开销）
+	if Global != null and Global.effect_level == Global.EffectLevel.LOW:
+		stop_all_light_effects()
+		return
 	stop_all_light_effects()
 	
 	await get_tree().process_frame
@@ -24,7 +28,11 @@ func create_breathing_effect():
 		if light is PointLight2D and is_instance_valid(light):
 			if not original_light_energies.has(light.get_instance_id()):
 				original_light_energies[light.get_instance_id()] = light.energy
-			var tween = create_tween()
+			# 必须绑定到灯光节点：无限循环 Tween 的 target 随场景销毁后，
+			# 引擎在下一轮 step() 会判定「整轮不消耗时间的无限循环」并报
+			# "Infinite loop detected"（TitleScene → SaveSelectScene 每次必现）。
+			# 绑定后灯光离树即被跳过，Tween 不再步进，也就不会报错。
+			var tween = create_tween().bind_node(light)
 			tween.set_loops()
 			tween.set_trans(Tween.TRANS_SINE)
 			tween.set_ease(Tween.EASE_IN_OUT)
@@ -39,6 +47,13 @@ func stop_all_light_effects():
 		if tween and is_instance_valid(tween):
 			tween.kill()
 	active_tweens.clear()
+	# 灯光已随场景销毁的条目一并清掉，避免字典里累积死引用。
+	var stale: Array = []
+	for key in original_light_energies:
+		if not is_instance_valid(instance_from_id(key)):
+			stale.append(key)
+	for key in stale:
+		original_light_energies.erase(key)
 
 ## 调暗灯光（用于对话框打开等场景）
 func dim_lights(target_energy: float = 0.0, duration: float = 0.3):

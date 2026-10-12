@@ -27,10 +27,6 @@ signal player_died()
 @onready var coin_label = $CoinContainer/CoinLabel
 @onready var coin_change_label = $CoinContainer/CoinChangeLabel
 @onready var game_setting_button = $PlayerIcon
-@onready var player_icon = $x # 添加玩家头像引用
-
-## 游戏设置按钮的独立 CanvasLayer
-var game_setting_button_layer: CanvasLayer
 
 ## 游戏设置实例引用
 var game_setting_instance: Node = null
@@ -76,9 +72,6 @@ func _ready():
 	initialize_coin_display()
 	add_to_group("player_ui")
 	
-	# 关键修复：创建独立的 CanvasLayer 包裹 GameSettingButton
-	_create_game_setting_button_layer()
-	
 	# 连接信号
 	game_setting_button.pressed.connect(_open_game_setting_menu)
 	Global.player_max_health_changed.connect(_on_global_max_health_changed)
@@ -89,17 +82,20 @@ func _ready():
 	Global.coins_changed.connect(_on_coins_changed)
 	Global.coins_changing.connect(_on_coins_changing)
 
-## 创建 GameSettingButton 的独立 CanvasLayer
-func _create_game_setting_button_layer():
-	# 创建新的 CanvasLayer
-	game_setting_button_layer = CanvasLayer.new()
-	game_setting_button_layer.layer = 101  # 比设置界面 (100) 还高
-	
-	# 从父节点移除按钮并添加到新的 CanvasLayer
-	if game_setting_button and game_setting_button.get_parent():
-		game_setting_button.get_parent().remove_child(game_setting_button)
-		game_setting_button_layer.add_child(game_setting_button)
-		get_tree().root.call_deferred("add_child", game_setting_button_layer)
+## 退场清理：设置面板实例是 add_child 到 /root 的，不属于本场景，异常路径下会残留，
+## 这里统一清掉。
+func _exit_tree() -> void:
+	if is_instance_valid(game_setting_instance):
+		game_setting_instance.queue_free()
+	game_setting_instance = null
+
+## 层级契约（别再加独立高层 CanvasLayer）：PlayerIcon 必须留在 PlayerUI 自己的
+## CanvasLayer 里，它才能像 HealthContainer 一样被 DarkOverlay 的全屏黑幕（layer 95，
+## alpha 0.7）压暗 —— 地图 / 传送面板 / 游戏内设置打开时都是这层在暗化背景。
+## 曾经把图标挪到 layer 101（「比设置界面 100 还高」），后果：
+##   1) 黑幕压暗不到它 → 只有图标是亮的；
+##   2) SettingsScene 的全屏背景（layer 100）盖不住它 → 打开设置后图标不消失。
+## 留在本层后：黑幕能暗化它、设置界面能盖住它；点击拦截靠已有的 set_icon_locked()。
 
 func _process(_delta):
 	# 处理钱币延迟递增
@@ -453,23 +449,26 @@ func _open_game_setting_menu():
 	if game_setting_instance.has_signal("menu_closed"):
 		game_setting_instance.menu_closed.connect(_on_game_setting_closed)
 	
-	# 隐藏 GameSettingButton
-	if game_setting_button:
-		game_setting_button.visible = false
+	# 设置面板打开期间：图标不隐藏，保持按下外观并禁止再按（按需求）。
+	set_icon_locked(true)
 	
 	# 确保游戏暂停 - 关键修复
 	get_tree().paused = true
-
-	# TODO 定位后连同其它 [UIIN] 打印一起删除。
-	print("[UIIN][PlayerUI] 挂载游戏内设置面板并暂停游戏（paused=true）")
 	get_tree().root.add_child(game_setting_instance)
 
 func _on_game_setting_closed():
 	game_setting_instance = null
-	
-	# 重新显示 GameSettingButton
-	if game_setting_button:
-		game_setting_button.visible = true
+	set_icon_locked(false)
+
+
+## 图标按钮（PlayerIcon）的锁定状态：地图 / 传送面板 / 游戏内设置打开期间，
+## 图标**保持显示**并保持按下外观，但不能再按（避免重复触发同一个面板）。
+func set_icon_locked(locked: bool) -> void:
+	if not game_setting_button:
+		return
+	game_setting_button.toggle_mode = true
+	game_setting_button.button_pressed = locked
+	game_setting_button.disabled = locked
 
 func _input(event):
 	## Tab：有地图能力且设置未打开时切换地图（优先处理，避免与 Esc 互斥）
@@ -482,26 +481,16 @@ func _input(event):
 		return
 	## Esc：地图打开时关闭地图，否则打开设置
 	if event.is_action_pressed("ui_cancel"):
-		# TODO 定位「ESC 关不掉游戏内设置」后连同其它 [UIIN] 打印一起删除。
-		print("[UIIN][PlayerUI] ESC：map_open=%s setting_open=%s setting_instance=%s paused=%s" % [
-			(MapManager != null and MapManager.is_map_open), game_setting_instance != null,
-			is_instance_valid(game_setting_instance), get_tree().paused
-		])
 		if MapManager and MapManager.is_map_open:
-			print("[UIIN][PlayerUI] → 地图打开中：关闭地图并吞掉 ESC")
 			MapManager.close_map()
 			get_viewport().set_input_as_handled()
 			return
 		if game_setting_instance == null:
-			print("[UIIN][PlayerUI] → 打开游戏内设置面板")
 			_open_game_setting_menu()
-		else:
-			print("[UIIN][PlayerUI] → 设置已打开，PlayerUI 不处理（交给面板自己的 _input）")
 
 func _on_map_visibility_changed(map_visible: bool) -> void:
-	## 地图打开时禁用 GameSettingButton
-	if game_setting_button:
-		game_setting_button.visible = not map_visible
+	## 地图打开时锁定图标（不隐藏）：保持按下外观，并禁止再次按下
+	set_icon_locked(map_visible)
 
 # 全局数据更新
 func _on_global_max_health_changed(new_max_health: int):
@@ -536,19 +525,13 @@ func set_max_health(new_max_health: int):
 func hide_ui_except_settings():
 	health_container.visible = false
 	coin_container.visible = false
-	if player_icon:
-		player_icon.visible = false
 
 ## 带淡出效果隐藏 UI（忽略钱币，因为挑战开始时钱币已经是隐藏的）
 func fade_out_ui_no_coin(duration: float):
 	var tween = create_tween()
 	tween.tween_property(health_container, "modulate:a", 0.0, duration)
-	if player_icon:
-		tween.parallel().tween_property(player_icon, "modulate:a", 0.0, duration)
 	tween.tween_callback(func():
 		health_container.visible = false
-		if player_icon:
-			player_icon.visible = false
 	)
 
 ## 显示 UI
@@ -557,15 +540,9 @@ func show_ui():
 	coin_container.visible = true
 	health_container.modulate.a = 1.0
 	coin_container.modulate.a = 1.0
-	if player_icon:
-		player_icon.visible = true
-		player_icon.modulate.a = 1.0
 
 ## 带淡入效果显示 UI（忽略钱币，因为挑战结束时钱币不需要自动显示）
 func fade_in_ui_no_coin(_duration: float):
 	health_container.visible = true
 	health_container.modulate.a = 1.0
-	if player_icon:
-		player_icon.visible = true
-		player_icon.modulate.a = 1.0
 	# 注意：不显示 coin_container，保持隐藏状态

@@ -11,12 +11,19 @@ signal backstep_unlocked()
 signal vertical_dash_unlocked()
 signal map_unlocked()
 
+# 竞速挑战：某个阶段刷新了最佳时间时广播（参数：阶段序号、新最佳时间秒数）
+signal race_best_time_updated(stage_number: int, best_time: float)
+
 # 单例实例
 static var instance: EventBus
 
+## 广播「某阶段刷新了竞速最佳时间」。
+## ★ 走这个入口而不是外部直接 emit：信号在声明类里被显式使用，才不会有 UNUSED_SIGNAL 告警。
+func notify_race_best_time_updated(stage_number: int, best_time: float) -> void:
+	race_best_time_updated.emit(stage_number, best_time)
+
 func _ready():
 	instance = self
-	print("EventBus 初始化完成")
 	
 	# 添加这行来"使用"信号，消除警告
 	_use_signals()

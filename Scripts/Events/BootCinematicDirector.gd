@@ -517,24 +517,50 @@ func _take_over_camera_host() -> void:
 	_camera_2d.offset = Vector2.ZERO
 	_drop_camera_taken_over = true
 
-## 交还相机：**先让 PhantomCamera 对齐跟随目标，再恢复 PhantomCameraHost**。
-## ★ 顺序很关键（这就是新存档「禁控结束闪一帧」的根因）：
-##   实证日志里 settle_end 时 camera2d 在 y=645，恢复 Host 后的下一帧相机被写成 y=-640（旧位置），
-##   再下一帧才回到 645 —— 中间那一帧画面完全不在玩家所在区域，看起来就是「闪」。
-##   把对齐放在恢复之前，Host 一起手拿到的就已经是正确位置，没有这个空档。
+## 交还相机：**先把 PhantomCamera 内部状态对齐到玩家，再恢复 PhantomCameraHost**。
+## ★ 这就是新存档「禁控结束闪一帧」的真正根因（已用无头逐帧探针实测）：
+##   本项目 PCam 用的是 FRAMED 跟随模式，而 FRAMED 在「目标处于死区内」时会执行
+##   `_follow_target_position = _transform_output.origin`（保持当前输出不动）。
+##   演出期间 Host 被 set_process(false) 停用，PCam 的 _transform_output 就永远停在
+##   演出开始前的旧值（实测 (0,-640)）。于是恢复 Host 后：teleport_position() 算出的目标也是
+##   (0,-640) → 相机被写到 (0,-640) 并维持 4 帧才自己纠正回来 → 画面短暂完全不在玩家所在区域。
+##   修法：交还前直接把 _transform_output / _follow_target_position / _follow_framed_offset
+##   写成「玩家中心」，让 FRAMED 的死区分支从正确值出发，第一帧就是对的。
 func _release_camera_host() -> void:
 	if not _drop_camera_taken_over:
 		return
-	# 1) 先把 PhantomCamera 本体搬到玩家身上（光调 teleport_position 不够：
-	#    实测日志里它一直停在天空 y=-640，恢复 Host 后相机就被拉到那里去了）
+	# 1) 把 PhantomCamera 的节点位置与「内部输出变换」都写到玩家中心。
+	#    只改节点位置是不够的：Host 读的是 _transform_output，不是节点位置。
 	if is_instance_valid(_phantom_camera) and _phantom_camera is Node2D and is_instance_valid(_player):
-		(_phantom_camera as Node2D).global_position = (_player as Node2D).global_position
+		var center: Vector2 = (_player as Node2D).global_position
+		(_phantom_camera as Node2D).global_position = center
+		if _phantom_camera.get("_transform_output") != null:
+			var out: Transform2D = _phantom_camera.get("_transform_output") as Transform2D
+			out.origin = center
+			_phantom_camera.set("_transform_output", out)
+		if _phantom_camera.get("_follow_target_position") != null:
+			_phantom_camera.set("_follow_target_position", center)
+		if _phantom_camera.get("_follow_framed_offset") != null:
+			_phantom_camera.set("_follow_framed_offset", Vector2.ZERO)
+	# 2) 再让插件自己走一遍 teleport（此时它会从上面写好的正确值推导，结果仍然正确）
 	if is_instance_valid(_phantom_camera) and _phantom_camera.has_method("teleport_position"):
 		_phantom_camera.teleport_position()
-	# 2) 再把当前真实位置直接写进 Camera2D，避免恢复 Host 后的第一帧还没被更新
+	# 3) 把真实位置直接写进 Camera2D，避免恢复 Host 后的第一帧还没被更新
 	if is_instance_valid(_camera_2d) and is_instance_valid(_player):
 		_camera_2d.global_position = (_player as Node2D).global_position
-	# 3) 最后才恢复 Host
+	# 3) ★ 清掉 Host 里「PCam 激活时挂起的那次 tween」再恢复 Host。
+	#    证据（实证日志 + 插件源码 phantom_camera_host.gd 的 _pcam_tween）：
+	#    该 tween 的插值起点是 _prev_active_pcam_2d_transform —— 即 PCam 激活那一刻的旧变换
+	#    （场景加载时相机停在的旧位置，实测 y=-640）。演出期间 Host 被 set_process(false) 停用，
+	#    _trigger_pcam_tween 一直是 true；恢复 Host 后它仍会从这个旧起点插值几帧，
+	#    把画面拉到玩家所在区域之外 —— 这就是「禁控结束闪一帧」。
+	#    清掉后 Host 恢复的第一帧直接走 _pcam_follow，写的就是刚对齐好的正确位置。
+	if is_instance_valid(_drop_camera_host):
+		if _drop_camera_host.get("_trigger_pcam_tween") != null:
+			_drop_camera_host.set("_trigger_pcam_tween", false)
+		if _drop_camera_host.get("_tween_elapsed_time") != null:
+			_drop_camera_host.set("_tween_elapsed_time", 0.0)
+	# 4) 最后才恢复 Host
 	if is_instance_valid(_drop_camera_host):
 		_drop_camera_host.set_process(_drop_host_process_backup)
 		_drop_camera_host.set_physics_process(_drop_host_physics_backup)

@@ -22,11 +22,10 @@ func record_npc_dialogue(npc_id: String):
 	
 	npc_interactions[npc_id] += 1
 	
-	# 强制保存到全局存档
-	if Global.current_save_slot >= 0:
-		# 等待一帧确保所有状态更新
-		await get_tree().process_frame
-		SaveManager.save_game(Global.current_save_slot, Global.get_save_data())
+	# 交给 SaveManager 的合并窗口延迟写档：
+	# 原先这里是 await 一帧后同步写盘，导致「和 NPC 交互瞬间轻微卡顿」。
+	# 内容不变，只是把写盘从交互当帧挪到 1.5 秒内的空闲时刻。
+	SaveManager.request_auto_save(false)
 
 
 

@@ -5,11 +5,11 @@
 [ext_resource type="Texture2D" uid="uid://dsmkpa4mrxuwg" path="res://Assets/Textures/UIs/SceneUIs/存档.png" id="6_e2r2w"]
 [ext_resource type="Texture2D" uid="uid://c83r16knvve2y" path="res://Assets/Textures/UIs/SceneUIs/存档泡泡粒子.png" id="8_e2r2w"]
 [ext_resource type="Texture2D" uid="uid://bfxe5gkbkkx8r" path="res://Assets/Textures/UIs/ButtonUIs/大按钮默认纹理.png" id="9_ohahd"]
+[ext_resource type="Texture2D" uid="uid://brc6tvkt3v3yi" path="res://Assets/Textures/UIs/SceneUIs/存档纹理.png" id="9_oo60n"]
 [ext_resource type="Material" uid="uid://bm5itbhjbjqxy" path="res://Assets/Instances/SaveSelectSceneParticle.tres" id="9_uoh5f"]
-[ext_resource type="Texture2D" uid="uid://djq7wirgbw64u" path="res://Assets/Textures/UIs/InstanceUIs/tres/存档1.tres" id="10_sj26l"]
+[ext_resource type="Texture2D" uid="uid://bct8mxxh0xfe3" path="res://Assets/Textures/UIs/SceneUIs/存档纹理2.png" id="10_e2r2w"]
 [ext_resource type="Texture2D" uid="uid://dpdyrq21bh47g" path="res://Assets/Textures/UIs/ButtonUIs/大按钮按下纹理.png" id="10_uoh5f"]
 [ext_resource type="Texture2D" uid="uid://dk2iy0xo6ucju" path="res://Assets/Textures/UIs/ButtonUIs/大按钮悬停纹理.png" id="11_6ol7e"]
-[ext_resource type="Texture2D" uid="uid://mvkfwpucr4xm" path="res://Assets/Textures/UIs/InstanceUIs/tres/存档2.tres" id="11_oo60n"]
 [ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="12_ohahd"]
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="14_c6mq1"]
 [ext_resource type="Script" uid="uid://dloxn5pxm2x3q" path="res://Scripts/UI/UILoopAnimator.gd" id="16_oo60n"]
@@ -99,22 +99,34 @@ script = ExtResource("16_oo60n")
 autoplay_on_ready = false
 
 [node name="SaveSlot1" type="TextureButton" parent="."]
-offset_left = 81.0
-offset_top = 133.0
-offset_right = 267.0
-offset_bottom = 337.0
+offset_left = 84.0
+offset_top = 194.0
+offset_right = 270.0
+offset_bottom = 398.0
 pivot_offset = Vector2(89, 100)
 script = ExtResource("12_ohahd")
+hover_scale_multiplier = 1.1
+hover_enter_duration = 0.2
+hover_exit_duration = 0.18
+hover_offset = Vector2(0, -24)
+hover_offset_duration = 0.18
+enter_duration = 0.42
+enter_drift_distance = Vector2(0, 64)
+enter_overshoot_scale = 1.12
+exit_duration = 0.42
+exit_drift_distance = Vector2(0, 64)
+enter_fade_ratio = 1.0
+exit_fade_ratio = 1.0
 
 [node name="EmptySlot" type="Sprite2D" parent="SaveSlot1"]
 position = Vector2(93, 102)
-scale = Vector2(4, 4)
-texture = ExtResource("10_sj26l")
+scale = Vector2(2, 2)
+texture = ExtResource("9_oo60n")
 
 [node name="FilledSlot" type="Sprite2D" parent="SaveSlot1"]
 position = Vector2(93, 102)
-scale = Vector2(4, 4)
-texture = ExtResource("11_oo60n")
+scale = Vector2(2, 2)
+texture = ExtResource("10_e2r2w")
 
 [node name="PlayTimeLabel" type="Label" parent="SaveSlot1"]
 layout_mode = 0
@@ -128,22 +140,34 @@ text = "游戏时长 00:00:00"
 horizontal_alignment = 1
 
 [node name="SaveSlot2" type="TextureButton" parent="."]
-offset_left = 359.0
-offset_top = 133.0
-offset_right = 545.0
-offset_bottom = 337.0
+offset_left = 429.0
+offset_top = 324.0
+offset_right = 615.0
+offset_bottom = 528.0
 pivot_offset = Vector2(89, 100)
 script = ExtResource("12_ohahd")
+hover_scale_multiplier = 1.1
+hover_enter_duration = 0.2
+hover_exit_duration = 0.18
+hover_offset = Vector2(0, -24)
+hover_offset_duration = 0.18
+enter_duration = 0.42
+enter_drift_distance = Vector2(0, 64)
+enter_overshoot_scale = 1.12
+exit_duration = 0.42
+exit_drift_distance = Vector2(0, 64)
+enter_fade_ratio = 1.0
+exit_fade_ratio = 1.0
 
 [node name="EmptySlot" type="Sprite2D" parent="SaveSlot2"]
 position = Vector2(93, 102)
-scale = Vector2(4, 4)
-texture = ExtResource("10_sj26l")
+scale = Vector2(2, 2)
+texture = ExtResource("9_oo60n")
 
 [node name="FilledSlot" type="Sprite2D" parent="SaveSlot2"]
 position = Vector2(93, 102)
-scale = Vector2(4, 4)
-texture = ExtResource("11_oo60n")
+scale = Vector2(2, 2)
+texture = ExtResource("10_e2r2w")
 
 [node name="PlayTimeLabel" type="Label" parent="SaveSlot2"]
 layout_mode = 0
@@ -157,22 +181,34 @@ text = "游戏时长 00:00:00"
 horizontal_alignment = 1
 
 [node name="SaveSlot3" type="TextureButton" parent="."]
-offset_left = 618.0
-offset_top = 129.0
-offset_right = 804.0
-offset_bottom = 333.0
+offset_left = 674.0
+offset_top = 101.0
+offset_right = 860.0
+offset_bottom = 305.0
 pivot_offset = Vector2(89, 100)
 script = ExtResource("12_ohahd")
+hover_scale_multiplier = 1.1
+hover_enter_duration = 0.2
+hover_exit_duration = 0.18
+hover_offset = Vector2(0, -24)
+hover_offset_duration = 0.18
+enter_duration = 0.42
+enter_drift_distance = Vector2(0, 64)
+enter_overshoot_scale = 1.12
+exit_duration = 0.42
+exit_drift_distance = Vector2(0, 64)
+enter_fade_ratio = 1.0
+exit_fade_ratio = 1.0
 
 [node name="EmptySlot" type="Sprite2D" parent="SaveSlot3"]
 position = Vector2(93, 102)
-scale = Vector2(4, 4)
-texture = ExtResource("10_sj26l")
+scale = Vector2(2, 2)
+texture = ExtResource("9_oo60n")
 
 [node name="FilledSlot" type="Sprite2D" parent="SaveSlot3"]
 position = Vector2(93, 102)
-scale = Vector2(4, 4)
-texture = ExtResource("11_oo60n")
+scale = Vector2(2, 2)
+texture = ExtResource("10_e2r2w")
 
 [node name="PlayTimeLabel" type="Label" parent="SaveSlot3"]
 layout_mode = 0

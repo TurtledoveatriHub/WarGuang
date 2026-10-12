@@ -25,7 +25,6 @@ func switch_scene(scene_path: String):
 		target_bgm
 	)
 	_end_scene_switch()
-	print("场景切换完成")
 
 # 特殊处理：从 GameSettingScene 返回到 TitleScene
 func return_to_title_from_game_setting(already_black: bool = false) -> bool:
@@ -59,39 +58,18 @@ func return_to_title_from_game_setting(already_black: bool = false) -> bool:
 	_end_scene_switch()
 	return true
 
-## 等主场景真正有画面可看（房间已加载 + 视口又渲染了几帧）再淡入。
-## 最长等 2 秒，超时就照常淡入，绝不把玩家卡在黑幕里。
-func _wait_room_ready_for_reveal() -> void:
+## 等「当前房间已经真正加载」并再多渲染指定帧数，确保淡入时画面是完整的一帧。
+## 最长等 2 秒：房间加载异常时也照常放行，绝不把玩家永久卡在黑幕里。
+## @param extra_frames: 房间落地后再额外等待的渲染帧数（默认 2，足够让第一帧画面画出来）
+func _wait_room_rendered(extra_frames: int = 2) -> void:
 	var deadline_ms: int = Time.get_ticks_msec() + 2000
 	while Time.get_ticks_msec() < deadline_ms:
 		var room_manager: Node = get_node_or_null("/root/RoomManager")
 		if room_manager == null or str(room_manager.get("current_room")) != "":
 			break
 		await get_tree().process_frame
-	# 再多等两帧，确保这一帧的画面已经真的画出来
-	await get_tree().process_frame
-	await get_tree().process_frame
-
-
-## 把 PhantomCamera 瞬间对齐到玩家（跳过跟随阻尼），避免进场时先看到相机「飞过去」。
-## 优先用 PhantomCamera2D.teleport_position()；没有 PCam 时退回直接摆 Camera2D。
-func _snap_phantom_camera_to_player() -> void:
-	var tree := get_tree()
-	if tree == null:
-		return
-	var player: Node = tree.get_first_node_in_group("player")
-	if player == null or not is_instance_valid(player) or not (player is Node2D):
-		return
-	var phantom: Node = player.get_node_or_null("PhantomCamera2D")
-	if phantom != null and phantom.has_method("teleport_position"):
-		phantom.call("teleport_position")
-		return
-	var viewport: Viewport = player.get_viewport()
-	if viewport == null:
-		return
-	var camera: Camera2D = viewport.get_camera_2d()
-	if camera != null:
-		camera.global_position = (player as Node2D).global_position
+	for _i in range(maxi(extra_frames, 0)):
+		await get_tree().process_frame
 
 
 # 从存档进入游戏
@@ -133,14 +111,11 @@ func start_game_from_save(slot_index: int):
 	if task_manager and task_manager.has_method("reset_for_scene_load"):
 		task_manager.reset_for_scene_load()
 	
-	# 存档进游戏采用专用流程：淡出 -> 全黑保持 -> 切场并等待主场景可视准备 -> 淡入。
-	var black_start_ms: int = Time.get_ticks_msec()
+	# 存档进游戏采用专用流程：淡出 -> 切场并等画面真的可看 -> 全黑保持 -> 淡入。
 	# ★ 这里用真正的淡出（时长 = ui_save_to_game_fade_out_duration）。
 	#   之前写的是 force_black()（瞬间全黑）→ 那个导出参数成了死参数，怎么改都没效果。
 	#   淡出发生在 change_scene 之前，此时 SaveSelect 场景还活着，Tween 不会被切场截断。
 	await FadeManager.fade_out(FadeManager.ui_save_to_game_fade_out_duration)
-	# 以「刚刚全黑」为起点重新计时，这样 ui_save_to_game_black_hold_duration 就是真实的全黑时长
-	black_start_ms = Time.get_ticks_msec()
 	# 新存档入场动画期间抑制 BGM，并停止当前标题 BGM
 	if is_new_save_opening:
 		AudioManager.stop_bgm_stream()
@@ -154,8 +129,14 @@ func start_game_from_save(slot_index: int):
 	var main_scene = get_tree().current_scene
 	if main_scene and main_scene.has_method("wait_until_boot_visual_ready"):
 		await main_scene.wait_until_boot_visual_ready()
-	var elapsed_black: float = float(Time.get_ticks_msec() - black_start_ms) / 1000.0
-	var remain_black: float = maxf(0.0, FadeManager.ui_save_to_game_black_hold_duration - elapsed_black)
+	# ★ 主场景「可视准备完成」≠ 房间已经真的加载并画出第一帧。
+	#   如果这时就淡入，前几帧会露出「房间/背景还没出来」的空档 —— 也就是正常进入存档开头
+	#   那一小段说不清是「没加载完还是设置错」的错误画面。等到房间落地并多渲染两帧再开始揭黑。
+	await _wait_room_rendered(2)
+	# 从「画面真的可看」这一刻起，完整地保持一次全黑时长。
+	# 这样 ui_save_to_game_black_hold_duration 才是真实可控的全黑时长，
+	# 不会被场景加载耗时吃掉（加载慢时不再变短，也就不再出现「黑屏太短」）。
+	var remain_black: float = maxf(0.0, FadeManager.ui_save_to_game_black_hold_duration)
 	if remain_black > 0.0:
 		await get_tree().create_timer(remain_black).timeout
 	if not is_new_save_opening:
@@ -230,8 +211,20 @@ func _do_scene_transition(scene_path: String, fade_out_duration: float, black_ho
 	if target_bgm != "":
 		await AudioManager.play_bgm(target_bgm, fade_out_duration)
 
+	# change_scene_to_file() 是**延迟执行**的：调用后 current_scene 仍指向旧场景，
+	# 新场景实例化完成前还会短暂变成 null。必须等新场景真正成为 current_scene，
+	# 否则后面的 ui_prepare_enter() / ui_enter() 会落到旧场景或 null 上：
+	#   * 新场景没被摆到入场起始态 → 画面露出时是未经摆位的完整内容；
+	#   * ui_enter() 根本没人调 → 输入锁永不解除，按钮全部点不动。
+	if not ResourceLoader.exists(scene_path):
+		push_error("SceneManager: 场景文件不存在，切场中止：%s" % scene_path)
+		UIRouter.set_phase(UIRouter.Phase.IDLE)
+		_end_scene_switch()
+		return
+	var previous_scene: Node = get_tree().current_scene
 	get_tree().change_scene_to_file(scene_path)
-	await get_tree().process_frame
+	while get_tree().current_scene == null or get_tree().current_scene == previous_scene:
+		await get_tree().process_frame
 	# 新场景的入场动画 / Tween / 粒子 / 灯光都靠 _process 推进：
 	# 若树还停在暂停态（典型的：从游戏内设置页返回标题，那个页面会 paused = true），
 	# 它们会整段冻住 —— 表现就是「卡一下、粒子要等一秒才开始动」。
@@ -257,13 +250,14 @@ func _do_scene_transition(scene_path: String, fade_out_duration: float, black_ho
 	if FadeManager and FadeManager.has_method("clear_black_holds"):
 		FadeManager.clear_black_holds()
 
-	# 先淡入：等黑屏过渡**完全结束**、画面完全可见，之后才播入场动画。
-	# （反过来做的话，入场动画会被黑幕/淡入盖掉：轻则只看到后半段，重则已经播完）
+	# 先启动入场动画、再同步淡入。
+	# 实测（无头逐帧计时）：黑幕归零那一帧画面完全静止，入场动画要 ~0.2s 后才开始，
+	# 玩家看到的就是「先出现静止的完整内容 → 过一会儿才补上入场动画」的断层。
+	# 让动画与淡入同一帧起步，画面露出时动画已经在进行。
 	UIRouter.set_phase(UIRouter.Phase.ENTERING)
-	await FadeManager.fade_in(fade_in_duration)
-
 	if current_scene and current_scene.has_method("ui_enter"):
-		await current_scene.call("ui_enter")
+		current_scene.call("ui_enter")
+	await FadeManager.fade_in(fade_in_duration)
 	UIRouter.set_phase(UIRouter.Phase.IDLE)
 
 func _begin_scene_switch(tag: String) -> bool:

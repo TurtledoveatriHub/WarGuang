@@ -69,7 +69,6 @@ func _ready():
 	
 	# 未被摧毁，连接 WallDetector 的信号并开始检测
 	wall_detector.body_entered.connect(_on_detector_body_entered)
-	print("DestructibleWall: 检测器已连接, layer=", wall_detector.collision_layer, " mask=", wall_detector.collision_mask, " monitoring=", wall_detector.monitoring)
 	
 	# 关键：确保未被摧毁时播放 IDLE 动画
 	if animated_sprite and animated_sprite.sprite_frames:
@@ -105,7 +104,6 @@ func _on_detector_body_entered(body):
 		player_velocity = body.get_velocity()
 	
 	var speed = abs(player_velocity.x)
-	print("  speed=", speed, " threshold=[", velocity_threshold_min, ",", velocity_threshold_max, "]")
 	if speed < velocity_threshold_min or speed > velocity_threshold_max:
 		print("  → return: speed out of range")
 		return
@@ -114,7 +112,6 @@ func _on_detector_body_entered(body):
 		print("  → return: not touching wall (dist=", body.global_position.distance_to(wall_body.global_position), ")")
 		return
 	
-	print("  ✅ ALL PASSED, triggering impact!")
 	_handle_impact(body)
 	
 	# 已被摧毁，忽略
@@ -130,7 +127,6 @@ func _on_detector_body_entered(body):
 		return
 
 	# 所有条件满足，触发撞击
-	print("  ✅ ALL PASSED, triggering impact!")
 	_handle_impact(body)
 	
 	# 速度阈值检查已在上面完成

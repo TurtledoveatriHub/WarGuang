@@ -46,11 +46,6 @@ func _ready() -> void:
 	AchievementManager.achievement_unlocked.connect(_on_achievement_unlocked)
 
 
-## 成就提示是否正在展示（PlayerUI 用它决定要不要让位）。
-func is_showing() -> bool:
-	return _showing
-
-
 ## 存档提示调用本函数：正在展示成就提示时返回 true（并记住结束后补发一次）。
 func defer_save_label() -> bool:
 	if not _showing:
@@ -68,6 +63,9 @@ func defer_save_label() -> bool:
 
 func show_save_hint() -> void:
 	if save_hint == null:
+		return
+	# 文字提示只在游戏内出现：没有 PlayerUI（标题 / 选存档 / 设置等 UI 场景）就不提示。
+	if _get_player_ui() == null:
 		return
 	# 成就提示优先：正在播成就提示时这次让位，成就提示播完 1 秒后由本层补发。
 	if defer_save_label():

@@ -226,6 +226,10 @@ static func start_wallgrip(player: Node) -> void:
 
 static func exit_wallgrip(player: Node) -> void:
 	if player.current_state == player.PlayerState.WALLGRIP:
+		## 离开攀墙时清掉“贴墙下滑速度”：不该把墙上的下滑速度带进空中，
+		## 脱墙后的下落应当和正常离地一样从 0 重新加速（不影响向上墙跳的速度）
+		if player.velocity.y > 0.0:
+			player.velocity.y = 0.0
 		if not player.is_on_floor() and player.wall_grip_direction != 0 and player.wall_jump_escape_buffer_time > 0.0:
 			player.wall_jump_escape_buffer_timer = player.wall_jump_escape_buffer_time
 		# 离开攀墙时锁定当前朝向用于墙跳纹理特效，避免后续朝向变化影响 FX
@@ -254,6 +258,9 @@ static func exit_glide(player: Node) -> void:
 	player.is_gliding = false
 	player.glide_timer = 0.0
 	player.is_double_jump_holding = false
+	## 冷却统一在这里开始计时：任何退出滑翔的路径（松手/落地/冲刺/攀墙）都受同一份冷却约束，
+	## 避免“从别的状态退出后可以无视冷却反复切换滑翔”
+	player.glide_input_cooldown_remaining = maxf(player.glide_input_cooldown, 0.0)
 	if player.velocity.y < 0:
 		player.change_state(player.PlayerState.JUMP)
 	else:
@@ -352,7 +359,7 @@ static func handle_jump2_boost(player: Node, fixed_delta: float) -> void:
 			if move_input != 0:
 				_apply_jumpbox_horizontal_speed(player, player.jump_move_speed + boosted, player.jump2_boost_direction)
 			else:
-				player.velocity.x = move_toward(player.velocity.x, 0, player.air_control * player.ground_deceleration * (player.jump_move_speed + boosted) * player.effective_acceleration_multiplier)
+				player.velocity.x = move_toward(player.velocity.x, 0, player.air_control * player.ground_deceleration * (player.jump_move_speed + boosted) * player.effective_acceleration_multiplier * player.get_accel_step_scale())
 		elif player.jump2_boost_timer <= total_duration:
 			var progress: float = (player.jump2_boost_timer - boost_duration_scaled) / player.jump2_boost_decrease_time
 			var current_boost: float = boosted * (1.0 - progress)
@@ -360,7 +367,7 @@ static func handle_jump2_boost(player: Node, fixed_delta: float) -> void:
 			if move_input != 0:
 				_apply_jumpbox_horizontal_speed(player, player.jump_move_speed + current_boost, player.jump2_boost_direction)
 			else:
-				player.velocity.x = move_toward(player.velocity.x, 0, player.air_control * player.ground_deceleration * (player.jump_move_speed + current_boost) * player.effective_acceleration_multiplier)
+				player.velocity.x = move_toward(player.velocity.x, 0, player.air_control * player.ground_deceleration * (player.jump_move_speed + current_boost) * player.effective_acceleration_multiplier * player.get_accel_step_scale())
 		else:
 			player.is_jump2_boost_active = false
 	else:

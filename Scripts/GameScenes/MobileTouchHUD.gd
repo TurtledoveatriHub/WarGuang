@@ -9,9 +9,9 @@ extends CanvasLayer
 
 @export_category("移动端真实 HUD")
 ## 淡入时间，单位：秒。
-@export var fade_in_duration: float = 0.5
+@export var fade_in_duration: float = 0.4
 ## 淡出时间，单位：秒。
-@export var fade_out_duration: float = 0.5
+@export var fade_out_duration: float = 0.4
 ## 移动方案切换（摇杆 ↔ 十字键）时的淡入淡出时长，单位：秒。
 @export var move_mode_fade_duration: float = 0.25
 ## 调试用：在 PC 上也打开移动端 HUD 以验证布局和输入。
@@ -24,11 +24,12 @@ extends CanvasLayer
 ## 用途：当你想“直接在编辑器里摆 HUD 位置”，不希望被设置页保存的布局覆盖时打开。
 @export var use_scene_layout_only: bool = false
 ## 摇杆最大拖动半径（像素）。这是实际控制范围，决定摇杆响应跨度。
-@export var joystick_radius: float = 72.0
+@export var joystick_radius: float = 96.0
 ## 摇杆死区：小于此值时不触发方向，避免轻微偏移导致方向抖动。
 @export var joystick_deadzone: float = 0.14
 ## 轴优先分离比：当横向/纵向差异超过此值时，优先按 X 或 Y 轴响应，形成明确的上下左右分区。
-@export var joystick_axis_split_ratio: float = 1.8
+## 轴向判定系数：|y| ≥ |x| × ratio 才算“上下”优先，|x| ≥ |y| × ratio 才算“左右”优先
+@export var joystick_axis_split_ratio: float = 1.6
 
 var _root: Control = null
 var _button_map: Dictionary = {}
@@ -64,8 +65,17 @@ var _button_touch_index: Dictionary = {}
 
 func _ready() -> void:
 	# 初始化真实 HUD：读取配置、绑定节点、注册输入逻辑。
+	# 传送面板 / 游戏内设置面板会把 get_tree().paused 设为 true；HUD 必须继续处理输入，
+	# 否则暂停期间触摸事件收不到：交互键的「按下/抬起」丢失 → 面板无法用交互键关闭，
+	# 同时 _pressed_buttons 会残留为 true，使该按键（及其它按键）看起来永久失效。
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("mobile_touch_hud")
 	_root = get_node_or_null("Root")
+	if _root != null:
+		# 全屏容器必须 IGNORE：它只是摆放虚拟按键的坐标系。
+		# 否则它会吃掉屏幕上的所有点击/触摸，对话框（继续/选项）就点不动了。
+		# 真正的按键在 _bind_virtual_buttons() 里也是 IGNORE，由本脚本自己按触摸 index 分发。
+		_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_load_layout_from_disk()
 	_bind_virtual_buttons()
 	_apply_layout_from_config()
@@ -161,6 +171,8 @@ func _bind_virtual_buttons() -> void:
 			button.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			# 像素美术：强制最近邻采样，避免缩放时像素块被插值糊掉。
 			button.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			# 可点击/可抓取矩形必须等于实际画出的纹理大小，否则手指按在纹理上却落在矩形外。
+			_normalize_button_rect(button)
 	if _joystick_base:
 		_joystick_group.append(_joystick_base)
 	if _joystick_thumb:
@@ -168,6 +180,22 @@ func _bind_virtual_buttons() -> void:
 	for key in ["DpadUp", "DpadDown", "DpadLeft", "DpadRight"]:
 		if _button_map.has(key):
 			_dpad_group.append(_button_map[key])
+
+func _normalize_button_rect(button: TextureButton) -> void:
+	# 矩形 = 纹理尺寸，pivot = 中心，且移动后视觉中心不变。
+	if button == null or button.texture_normal == null:
+		return
+	var tex_size: Vector2 = button.texture_normal.get_size()
+	if tex_size.x <= 0.0 or tex_size.y <= 0.0:
+		return
+	if button.size.is_equal_approx(tex_size):
+		return
+	var old_center: Vector2 = button.position + button.size * 0.5
+	button.custom_minimum_size = tex_size
+	button.size = tex_size
+	button.position = old_center - tex_size * 0.5
+	button.pivot_offset = tex_size * 0.5
+
 
 func _apply_layout_from_config(animate_mode: bool = false) -> void:
 	# 根据配置设置按钮位置。
@@ -177,6 +205,10 @@ func _apply_layout_from_config(animate_mode: bool = false) -> void:
 			target.position = _layout_config[key]
 	if _joystick_thumb and _layout_config.has("MoveJoystickThumb"):
 		_joystick_thumb.position = _layout_config["MoveJoystickThumb"]
+	# 摇杆球必须与基座同心（摇杆只能整体移动；存档里可能残留旧偏移值）。
+	if _joystick_base != null and _joystick_thumb != null:
+		var base_center: Vector2 = _joystick_base.position + _joystick_base.size * 0.5
+		_joystick_thumb.position = base_center - _joystick_thumb.size * 0.5
 	# 统一应用不透明度 + 大小，并按当前移动方案切换摇杆/十字键。
 	_apply_move_mode(animate_mode)
 
@@ -209,6 +241,18 @@ func _emit_action_event(action_name: String, pressed: bool) -> void:
 	else:
 		Input.action_release(action_name)
 
+## 摇杆抓取半径倍率：抓取圈 = joystick_radius × 本值（以摇杆中心为圆心）。
+## 按下圈内任意位置会立刻把拖动球吸到按下点并可继续拖拽；1.0 = 与摇杆半径完全一致。
+@export var joystick_grab_radius_multiplier: float = 1.5
+
+## 真机输入诊断日志（默认关闭，关闭时不产生任何 IO / 打印）。
+## 用途：只在真机触摸设备上出现、桌面注入事件无法复现的问题（例如「先按交互，再按跳跃+移动，
+## 跳跃变短按且后续按键失灵」）。打开后每个触摸/拖拽事件与 HUD 的处置结果会写入
+## user://hud_input_log.txt（同时打印到控制台）。复现一次后把该文件给我即可定位。
+@export var log_input_diagnostics: bool = false
+
+var _diag_file: FileAccess = null
+
 func _set_move_action(action_name: String, should_press: bool) -> void:
 	# 统一管理方向键按下/抬起状态，并同步派发 InputEventAction，保证 _input(event) 监听也能响应。
 	if should_press and not _move_state[action_name]:
@@ -234,6 +278,13 @@ func _apply_move_vector_from_joystick(vector_offset: Vector2) -> void:
 		horizontal_axis = signf(normalized.x)
 	if abs_y > joystick_deadzone and vertical_priority:
 		vertical_axis = signf(normalized.y)
+	# 斜向区（既不是横向优先也不是纵向优先）：记录本帧状态，供冲刺方向判定优先取左右。
+	# PC 键盘不会走到这里，所以不影响键盘上「上+左」同时按住的上下冲刺。
+	if Global != null:
+		Global.joystick_diagonal_horizontal_bias = (
+			not horizontal_priority and not vertical_priority
+			and normalized.length() > joystick_deadzone
+		)
 	if not horizontal_priority and not vertical_priority:
 		if abs_x > joystick_deadzone:
 			horizontal_axis = signf(normalized.x)
@@ -247,25 +298,52 @@ func _apply_move_vector_from_joystick(vector_offset: Vector2) -> void:
 func _input(event: InputEvent) -> void:
 	if _root == null or not _root.visible:
 		return
+	# 树被暂停 = 有全屏面板（游戏内设置 / 传送面板等）正在接管交互。
+	# 本 HUD 此时仍要继续处理（PROCESS_MODE_ALWAYS，供面板期间按交互键），
+	# 但**绝不能吞事件**：吞掉鼠标「按下」会让面板按钮点一次只显示悬停、要按两次，
+	# 也让设置页里的虚拟按键完全拖不动（鼠标移动不会被吞，所以只表现为悬停）。
+	var paused: bool = get_tree() != null and get_tree().paused
 	if event is InputEventScreenTouch:
 		var t: InputEventScreenTouch = event
+		var local: Vector2 = _to_root_local(t.position)
 		if t.pressed:
-			if _begin_pointer(t.index, _to_root_local(t.position), false):
+			var consumed: bool = _begin_pointer(t.index, local, false)
+			_diag("touch_down idx=%d pos=%s local=%s consumed=%s joy=%s/%d buttons=%s" % [
+				t.index, str(t.position), str(local), str(consumed),
+				str(_is_dragging_joystick), _joystick_touch_index, str(_button_touch_index.keys())])
+			if consumed and not paused:
 				get_viewport().set_input_as_handled()
 		else:
+			_diag("touch_up   idx=%d before=%s" % [t.index, str(_button_touch_index.keys())])
 			_end_pointer(t.index, false)
+			_diag("touch_up   idx=%d after=%s joy=%s/%d" % [
+				t.index, str(_button_touch_index.keys()),
+				str(_is_dragging_joystick), _joystick_touch_index])
 		return
 	if event is InputEventScreenDrag:
 		var d: InputEventScreenDrag = event
 		if _is_dragging_joystick and not _joystick_by_mouse and d.index == _joystick_touch_index:
 			_update_joystick_from_pointer(_to_root_local(d.position))
-			get_viewport().set_input_as_handled()
+			if not paused:
+				get_viewport().set_input_as_handled()
+		else:
+			_diag("drag_skip  idx=%d joy=%s/%d by_mouse=%s" % [
+				d.index, str(_is_dragging_joystick), _joystick_touch_index, str(_joystick_by_mouse)])
+		return
+	# 触摸平台上忽略「由触摸合成出来的鼠标事件」：
+	# emulate_mouse_from_touch 会让每次触摸额外产生一个 index = -1 的鼠标事件，
+	# 同一根手指因此被记成两份（实测 _button_touch_index 里 -1 与触摸 index 绑在同一按键上，
+	# 摇杆也会被这一路抢走拖动权）。手机端只认真实触摸事件。
+	if _is_touch_platform():
+		if event is InputEventMouseButton:
+			_diag("mouse_skip idx=-1 pos=%s pressed=%s (触摸平台忽略合成鼠标)" % [
+				str((event as InputEventMouseButton).position), str((event as InputEventMouseButton).pressed)])
 		return
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event
 		if mb.button_index == MOUSE_BUTTON_LEFT:
 			if mb.pressed:
-				if _begin_pointer(-1, _to_root_local(mb.position), true):
+				if _begin_pointer(-1, _to_root_local(mb.position), true) and not paused:
 					get_viewport().set_input_as_handled()
 			else:
 				_end_pointer(-1, true)
@@ -274,12 +352,34 @@ func _input(event: InputEvent) -> void:
 		_update_joystick_from_pointer(_to_root_local((event as InputEventMouseMotion).position))
 
 
+## 是否是触摸平台（手机 / 平板）。PC 上仅在 force_mobile_test_mode 时启用 HUD，
+## 那种调试场景仍需要鼠标事件，所以这里按平台判断而不是按「HUD 是否可见」判断。
+func _is_touch_platform() -> bool:
+	return OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("ios")
+
+
+## 写一行输入诊断日志（仅在 log_input_diagnostics 打开时生效）。
+func _diag(line: String) -> void:
+	if not log_input_diagnostics:
+		return
+	if _diag_file == null:
+		_diag_file = FileAccess.open("user://hud_input_log.txt", FileAccess.WRITE)
+		if _diag_file == null:
+			return
+		_diag_file.store_line("=== MobileTouchHUD input diagnostics ===")
+	if _diag_file != null:
+		_diag_file.store_line("%d %s" % [Time.get_ticks_msec(), line])
+		_diag_file.flush()
+	print("[HUDIO] ", line)
+
+
 ## 统一的“指针落下”分发：返回 true 表示本 HUD 已消费（摇杆或某按键）。
 func _begin_pointer(touch_index: int, local: Vector2, is_mouse: bool) -> bool:
 	if _move_mode == 0 and not _is_dragging_joystick and _point_in_joystick_grab(local):
 		_is_dragging_joystick = true
 		_joystick_by_mouse = is_mouse
 		_joystick_touch_index = touch_index
+		_set_joystick_pressed_visual(true)
 		if _joystick_thumb:
 			_joystick_thumb.modulate = Color(1, 1, 1, 1.0)
 		_update_joystick_from_pointer(local)
@@ -305,21 +405,22 @@ func _point_in_joystick_grab(local: Vector2) -> bool:
 	if _joystick_base == null:
 		return false
 	var center: Vector2 = _to_root_local(_joystick_base.get_global_rect().get_center())
-	var grab_r: float = maxf(joystick_radius, 18.0)
+	var grab_r: float = maxf(joystick_radius, 18.0) * maxf(joystick_grab_radius_multiplier, 1.0)
 	var rect: Rect2 = _joystick_base.get_global_rect()
-	grab_r = maxf(grab_r, maxf(rect.size.x, rect.size.y) * 0.5 + 24.0)
+	grab_r = maxf(grab_r, maxf(rect.size.x, rect.size.y) * 0.5)
 	return center.distance_to(local) <= grab_r
 
 
 func _try_press_button_at(touch_index: int, local: Vector2) -> bool:
+	# 原逻辑：同一指位已经有绑定就直接放弃（不做多点重绑定）。
 	if _button_touch_index.has(touch_index):
 		return false
-	var names: Array = ["JumpButton", "DashButton", "InteractButton", "SuperDashButton", "MapButton"]
-	if _move_mode == 1:
-		names = ["DpadUp", "DpadDown", "DpadLeft", "DpadRight"] + names
-	for button_name in names:
-		var button: TextureButton = _button_map.get(button_name, null) as TextureButton
+	for key in _button_map.keys():
+		var button: TextureButton = _button_map[key] as TextureButton
 		if button == null or not is_instance_valid(button) or not button.visible:
+			continue
+		# 摇杆本体/拖动球由 _begin_pointer 里的摇杆分支处理，不能当普通按键。
+		if _joystick_group.has(button):
 			continue
 		if _control_rect_in_root(button).has_point(local):
 			_button_touch_index[touch_index] = button
@@ -329,6 +430,11 @@ func _try_press_button_at(touch_index: int, local: Vector2) -> bool:
 
 
 func _press_button(button: TextureButton) -> void:
+	# TextureButton 只有在「toggle_mode + button_pressed」时才会画 texture_pressed；
+	# 本 HUD 的按键是 MOUSE_FILTER_IGNORE，引擎永远不会给它们置按下态，
+	# 所以必须在这里自己置位，否则按下去只看到 modulate 明暗变化、没有按下贴图。
+	button.toggle_mode = true
+	button.button_pressed = true
 	var move_action: String = _move_action_for_button(button)
 	if move_action != "":
 		if _pressed_buttons.get(button.name, false):
@@ -348,6 +454,7 @@ func _press_button(button: TextureButton) -> void:
 
 
 func _release_button(button: TextureButton) -> void:
+	button.button_pressed = false
 	var move_action: String = _move_action_for_button(button)
 	if move_action != "":
 		_pressed_buttons[button.name] = false
@@ -377,15 +484,15 @@ func _move_action_for_button(button: TextureButton) -> String:
 
 
 ## 统一应用所有虚拟按键的大小倍率与不透明度（含被禁用的那一组）。
+## 只按「基准 × 倍率」写一次，绝不从当前 scale 反推（否则倍率会层层累积）。
 func _apply_button_visuals() -> void:
-	for key in _button_map.keys():
-		var b: TextureButton = _button_map[key] as TextureButton
+	for key in _base_scales.keys():
+		var b: TextureButton = _button_map.get(key, null) as TextureButton
 		if b == null or not is_instance_valid(b):
 			continue
-		var base: Vector2 = _base_scales.get(key, b.scale)
 		# 以按键自身中心为缩放基准（而不是左上角）。
 		b.pivot_offset = b.size * 0.5
-		b.scale = base * _button_scale
+		b.scale = _base_scales[key] * _button_scale
 		b.modulate = Color(1.0, 1.0, 1.0, _button_alpha)
 
 
@@ -453,6 +560,7 @@ func _release_move_actions() -> void:
 	_is_dragging_joystick = false
 	_joystick_by_mouse = false
 	_joystick_touch_index = -1
+	_set_joystick_pressed_visual(false)
 	_button_touch_index.clear()
 	_set_move_action("left", false)
 	_set_move_action("right", false)
@@ -461,6 +569,18 @@ func _release_move_actions() -> void:
 	if _joystick_base and _joystick_thumb:
 		var center: Vector2 = _to_root_local(_joystick_base.get_global_rect().get_center())
 		_joystick_thumb.position = center - _joystick_thumb.size * 0.5
+
+
+## 摇杆整体的「按下态」贴图：底座与拖动球都是 TextureButton，
+## 只有 toggle_mode + button_pressed 才会画 texture_pressed（本 HUD 的按键全是
+## MOUSE_FILTER_IGNORE，引擎永远不会给它们置位，必须自己置）。
+func _set_joystick_pressed_visual(pressed: bool) -> void:
+	for entry in _joystick_group:
+		var button: TextureButton = entry as TextureButton
+		if button == null or not is_instance_valid(button):
+			continue
+		button.toggle_mode = true
+		button.button_pressed = pressed
 
 
 func _action_name_for_button(button: TextureButton) -> String:
@@ -511,6 +631,7 @@ func _update_joystick_from_pointer(local: Vector2) -> void:
 
 func _end_joystick_drag() -> void:
 	_is_dragging_joystick = false
+	_set_joystick_pressed_visual(false)
 	if _joystick_base and _joystick_thumb:
 		var center: Vector2 = _to_root_local(_joystick_base.get_global_rect().get_center())
 		_joystick_thumb.position = center - _joystick_thumb.size * 0.5
@@ -520,18 +641,10 @@ func _end_joystick_drag() -> void:
 	_set_move_action("up", false)
 	_set_move_action("down", false)
 
-func apply_layout_config(config: Dictionary) -> void:
-	# 外部调用入口：允许其他脚本重置布局。
-	if config.has("layout"):
-		_layout_config = config["layout"]
-		_apply_layout_from_config()
-
-func get_layout_config() -> Dictionary:
-	# 外部读取入口：返回当前布局。
-	return _layout_config
-
 func reload_layout() -> void:
 	# 外部调用入口：重新从磁盘读取布局/透明度/大小/移动方案并立即应用。
 	# 供设置页的移动端布局编辑器在保存/重置后调用，使改动在游戏内即时生效，无需重进存档。
+	# 注意：游戏内设置面板打开时树是暂停的（本节点不是 PROCESS_MODE_ALWAYS），
+	# 带动画的切换会卡在暂停里 —— 这种情况改用直接应用，保证回到面板背景时已经是新布局。
 	_load_layout_from_disk()
-	_apply_layout_from_config(true)
+	_apply_layout_from_config(get_tree() != null and not get_tree().paused)

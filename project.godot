@@ -12,6 +12,7 @@ config_version=5
 
 config/name="WarmaShadowTest"
 run/main_scene="uid://cnx8rqa13bm26"
+config/quit_on_go_back=false
 config/features=PackedStringArray("4.5", "GL Compatibility")
 
 [audio]
@@ -144,7 +145,9 @@ map={
 
 [internationalization]
 
-locale/translations_pot_files=PackedStringArray("res://Assets/Dialogues/Signs/Sign1.dialogue", "res://Assets/Dialogues/Signs/Sign2.dialogue", "res://Assets/Dialogues/Signs/Sign3.dialogue", "res://Assets/Dialogues/Signs/Sign4.dialogue", "res://Assets/Dialogues/NPCs/AerialRollMaster.dialogue", "res://Assets/Dialogues/NPCs/Salesclerk.dialogue", "res://Assets/Dialogues/NPCs/MasterNPC.dialogue", "res://Assets/Dialogues/NPCs/ManiacNPC.dialogue", "res://Assets/Dialogues/NPCs/GrassLandMerchant.dialogue")
+locale/translations=PackedStringArray("res://Assets/Configs/Translations/ui_text.en.translation", "res://Assets/Configs/Translations/ui_text.ja.translation")
+locale/translations_pot_files=PackedStringArray("res://Assets/Dialogues/NPCs/AerialRollMaster.dialogue", "res://Assets/Dialogues/NPCs/Salesclerk.dialogue", "res://Assets/Dialogues/NPCs/GrassLandMerchant.dialogue", "res://Assets/Dialogues/Signs/gl6Sign.dialogue", "res://Assets/Dialogues/Signs/gl1Signx1.dialogue", "res://Assets/Dialogues/Signs/gl1Signx2.dialogue", "res://Assets/Dialogues/Signs/gl3Sign.dialogue", "res://Assets/Dialogues/Signs/gl4Sign.dialogue", "res://Assets/Dialogues/NPCs/Maniac.dialogue", "res://Assets/Dialogues/NPCs/Master.dialogue", "res://Assets/Dialogues/NPCs/RaceStarter.dialogue", "res://Assets/Dialogues/Signs/gl18RaceBoard.dialogue", "res://Assets/Dialogues/Signs/gl17ChallengeBoard.dialogue")
+locale/fallback="zh_CN"
 
 [layer_names]
 
@@ -172,6 +175,6 @@ common/max_physics_ticks_per_second=60
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
 viewport/hdr_2d=true
-2d/snap/snap_2d_transforms_to_pixel=true
 2d/snap/snap_2d_vertices_to_pixel=true

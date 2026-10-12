@@ -52,11 +52,11 @@ extends Node
 ## 参与过渡动画的节点路径（相对本节点，例如 "../Background"）。只接受 CanvasItem。
 @export var target_paths: Array[NodePath] = []
 ## 漂移距离（像素，Vector2）。例如 (0, -12) = 入场从上方归位、退场收向上方；(-48, 0) = 左右漂移。
-@export var drift_distance: Vector2 = Vector2(0.0, 12.0)
+@export var drift_distance: Vector2 = Vector2(0.0, -8.0)
 ## 入场动画总时长（秒）。
-@export var enter_duration: float = 0.5
+@export var enter_duration: float = 0.6
 ## 退场动画总时长（秒）。
-@export var exit_duration: float = 0.5
+@export var exit_duration: float = 0.6
 ## 入场：从 0 放大到峰值阶段的占比（与 exit_peak_phase_ratio 对称）。
 @export_range(0.1, 0.8, 0.05) var enter_peak_phase_ratio: float = 0.2
 ## 入场峰值停顿时长（秒）。
@@ -96,7 +96,12 @@ var _transition_fade_tween: Tween = null
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_cache_targets()
-	_apply_transition_enter_start_state()
+	# 「摆起始态」必须晚一帧：本节点在场景里通常排在目标节点**之前**，
+	# 而摆起始态会把目标的 scale 置零、alpha 置零。
+	# 若此刻就置零，目标自己的组件脚本（如 UIButtonFx._ready()）会把「基准 scale」缓存成 (0,0)，
+	# 之后任何归位 / 悬停都会把节点缩到 0 —— 表现就是「鼠标一移到按钮上，按钮就缩小消失」。
+	# 晚一帧后所有目标都已缓存好自己的基准，再由 prepare_enter() 统一摆位。
+	call_deferred("_apply_transition_enter_start_state")
 	if auto_enter_on_ready:
 		call_deferred("play_enter")
 

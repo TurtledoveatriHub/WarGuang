@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RaceStageConfig" load_steps=2 format=3 uid="uid://cox1lo4mcbji1"]
+
+[ext_resource type="Script" uid="uid://bwx20w7u386dv" path="res://Scripts/Resources/RaceStageConfig.gd" id="1_racestage"]
+
+[resource]
+script = ExtResource("1_racestage")
+race_name = "第二阶段"
+lap_count = 2
+target_time = 80.0
+stage_root_path = NodePath("../../../RaceTrack/Stage2")
+checkpoint_container_path = NodePath("../../../RaceTrack/Stage2/Checkpoints")
+race_area_path = NodePath("../../../RaceTrack/Stage2/RaceArea")
+start_position_path = NodePath("../../../RaceTrack/Stage2/RaceStart")

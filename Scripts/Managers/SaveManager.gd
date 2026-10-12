@@ -2,6 +2,46 @@ extends Node
 
 const SAVE_PATH = "user://saves/"
 
+## 自动存档合并窗口（秒）：窗口内的多次请求只写一次盘
+const AUTO_SAVE_COALESCE_SECONDS := 1.5
+
+## 合并窗口定时器
+var _auto_save_timer: Timer = null
+## 合并窗口内是否请求过「弹存档提示」
+var _auto_save_notify_pending: bool = false
+
+## 建立合并定时器（autoload 启动时执行一次）
+func _ready() -> void:
+	_auto_save_timer = Timer.new()
+	_auto_save_timer.one_shot = true
+	_auto_save_timer.wait_time = AUTO_SAVE_COALESCE_SECONDS
+	_auto_save_timer.timeout.connect(_flush_auto_save)
+	add_child(_auto_save_timer)
+
+## 请求一次「延迟合并」的自动存档。
+## 用于热路径（金币增减、NPC 对话计数）：不再在交互当帧同步写盘
+## —— 那是「和 NPC 对话 / 拾取金币时轻微卡顿」的根源；
+## 窗口内的多次请求会合并成一次写入，持久化效果不变。
+func request_auto_save(notify: bool = false) -> void:
+	if not is_instance_valid(Global) or Global.current_save_slot < 0:
+		return
+	if notify:
+		_auto_save_notify_pending = true
+	if _auto_save_timer == null:
+		# 定时器不可用（极少见）时退回同步写入，避免丢档
+		save_game(Global.current_save_slot, Global.get_save_data(), _auto_save_notify_pending)
+		_auto_save_notify_pending = false
+		return
+	if _auto_save_timer.is_stopped():
+		_auto_save_timer.start()
+
+## 合并窗口结束：真正写一次盘
+func _flush_auto_save() -> void:
+	if not is_instance_valid(Global) or Global.current_save_slot < 0:
+		return
+	save_game(Global.current_save_slot, Global.get_save_data(), _auto_save_notify_pending)
+	_auto_save_notify_pending = false
+
 func save_game(slot_index: int, data: Dictionary, notify: bool = true):
 	var file_path = SAVE_PATH + "save_" + str(slot_index) + ".dat"
 	var tmp_path = file_path + ".tmp"
@@ -47,7 +87,6 @@ func save_game(slot_index: int, data: Dictionary, notify: bool = true):
 		print("存档失败(最终文件不存在)：", file_path)
 		return false
 	
-	print("存档成功：", file_path)
 	
 	if notify:
 		call_deferred("_show_save_notification")
@@ -99,7 +138,6 @@ func delete_save(slot_index: int) -> bool:
 		print("删除存档失败(文件仍存在): ", file_path, " tmp=", tmp_path)
 		return false
 
-	print("删除存档成功: ", file_path)
 	return true
 
 func save_exists(slot_index: int) -> bool:

@@ -1,49 +1,17 @@
-[gd_scene load_steps=14 format=3 uid="uid://c6x5b736ihdqj"]
+[gd_scene load_steps=6 format=3 uid="uid://c6x5b736ihdqj"]
 
 [ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_3yudw"]
-[ext_resource type="Texture2D" uid="uid://d0th6w2o2081k" path="res://Assets/Textures/Instances/SnowMountain/冰晶.png" id="2_rkgmm"]
+[ext_resource type="Texture2D" uid="uid://cnn6bgo04oqs1" path="res://Assets/Textures/Instances/GrassLand/手里剑.png" id="2_3yudw"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_6bg1h"]
-atlas = ExtResource("2_rkgmm")
+[sub_resource type="AtlasTexture" id="AtlasTexture_rkgmm"]
+atlas = ExtResource("2_3yudw")
 region = Rect2(0, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_kc4w8"]
-atlas = ExtResource("2_rkgmm")
-region = Rect2(320, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_hkpn1"]
-atlas = ExtResource("2_rkgmm")
-region = Rect2(0, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ouvnp"]
-atlas = ExtResource("2_rkgmm")
-region = Rect2(64, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_u4bwp"]
-atlas = ExtResource("2_rkgmm")
-region = Rect2(128, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_rbv2l"]
-atlas = ExtResource("2_rkgmm")
-region = Rect2(192, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_xphkr"]
-atlas = ExtResource("2_rkgmm")
-region = Rect2(256, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_e16y8"]
-atlas = ExtResource("2_rkgmm")
-region = Rect2(320, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_lelqd"]
-atlas = ExtResource("2_rkgmm")
-region = Rect2(192, 0, 64, 64)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_3abc"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_6bg1h")
+"texture": null
 }],
 "loop": false,
 "name": &"CLOSE",
@@ -51,7 +19,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_kc4w8")
+"texture": null
 }],
 "loop": true,
 "name": &"OFF",
@@ -59,38 +27,23 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_hkpn1")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ouvnp")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_u4bwp")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_rbv2l")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_xphkr")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_e16y8")
+"texture": SubResource("AtlasTexture_rkgmm")
 }],
-"loop": true,
+"loop": false,
 "name": &"ON",
 "speed": 6.0
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_lelqd")
+"texture": null
 }],
 "loop": false,
 "name": &"OPEN",
 "speed": 12.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_d6byj"]
-size = Vector2(32, 32)
+[sub_resource type="CircleShape2D" id="CircleShape2D_3yudw"]
+radius = 28.0
 
 [node name="Shuriken" type="Area2D" node_paths=PackedStringArray("collision_shapes")]
 visibility_layer = 16
@@ -98,8 +51,7 @@ collision_layer = 16
 collision_mask = 129
 script = ExtResource("1_3yudw")
 sprite_effect = 1
-rotation_speed = 360.0
-clockwise = false
+rotation_speed = 540.0
 movement_mode = 1
 move_speed = 360.0
 end_offset = Vector2(256, 0)
@@ -109,8 +61,8 @@ collision_shapes = [NodePath("CollisionShape2D")]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_3abc")
-animation = &"OPEN"
+animation = &"ON"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 16
-shape = SubResource("RectangleShape2D_d6byj")
+shape = SubResource("CircleShape2D_3yudw")

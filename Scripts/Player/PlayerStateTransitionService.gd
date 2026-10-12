@@ -6,11 +6,15 @@ static func apply_exit_state(player: Node, from_state: int) -> void:
 	match from_state:
 		player.PlayerState.DASH:
 			if player.dash_locked_vector.y == 0:
-				# 水平冲刺退出：应用水平惯性
-				player.velocity.x = player.dash_inertia_speed * player.effective_horizontal_multiplier * sign(player.dash_locked_vector.x)
+				## 水平冲刺退出：按 dash_exit_speed_retention 保留冲刺动能（不再有惯性速度兜底）
+				var dash_exit_dir: float = signf(player.dash_locked_vector.x)
+				var dash_exit_speed: float = absf(player.velocity.x) * player.dash_exit_speed_retention
+				player.velocity.x = dash_exit_speed * dash_exit_dir
 			else:
 				# 垂直冲刺退出：终止跳跃按住时间加成（切换状态后不应继续生效）。
 				player.jump_hold_timer = player.max_jump_hold_time
+				## 开启“冲刺后垂直阻尼”窗口：上冲刺滞空 / 下冲刺保留俯冲动能
+				player.dash_vertical_decel_timer = maxf(player.dash_vertical_decel_time, 0.0)
 				# 地面垂直冲刺退出时启用空中能力（二段跳、滑翔等）。
 				if not player.has_dashed_in_air:
 					player.is_jumping = true

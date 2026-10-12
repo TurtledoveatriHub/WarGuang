@@ -38,7 +38,7 @@ enum TriggerEffectType {
 ## 触发的弹跳效果类型
 @export var trigger_effect_type: TriggerEffectType = TriggerEffectType.BOUNCE_BOOST
 ## 垂直弹跳力（像素/秒）
-@export var vertical_force: float = 600.0
+@export var vertical_force: float = 420.0
 
 ## ── 移动设置 ──
 @export_category("移动设置")
@@ -98,20 +98,20 @@ enum TriggerEffectType {
 ## ── SPEED_BOOST（水平速度加强）参数 ──
 @export_category("SPEED_BOOST（水平速度加强）")
 ## 普通触发时水平加速倍率
-@export var normal_horizontal_boost: float = 1.5
+@export var normal_horizontal_boost: float = 1.25
 ## 完美触发时水平加速倍率
-@export var perfect_horizontal_boost: float = 2.0
+@export var perfect_horizontal_boost: float = 1.75
 ## 普通触发时 boost_duration 倍率
-@export var normal_boost_duration: float = 1.0
+@export var normal_boost_duration: float = 1.25
 ## 完美触发时 boost_duration 倍率
-@export var perfect_boost_duration: float = 2.5
+@export var perfect_boost_duration: float = 2.0
 
 ## ── HEAL（生命恢复）参数 ──
 @export_category("HEAL（生命恢复）")
 ## 普通触发回复生命数
-@export var heal_normal_amount: int = 2
+@export var heal_normal_amount: int = 1
 ## 完美触发回复生命数
-@export var heal_perfect_amount: int = 3
+@export var heal_perfect_amount: int = 2
 
 signal bounce_triggered(player)
 

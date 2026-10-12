@@ -97,7 +97,6 @@ func _ready():
 	# 现在可以显示
 	visible = true
 	
-	print("VignetteEffect: 已初始化，Shader参数已设置")
 
 func _process(delta):
 	if effect_timer > 0:

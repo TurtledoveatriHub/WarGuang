@@ -18,18 +18,10 @@ func create_dialogue_state(player) -> Dictionary:
 		"super_dash_unlocked": player.super_dash_unlocked
 	}
 
-func validate_dialogue_conditions(npc_id: String, player) -> void:
-	print("=== 对话条件验证 ===")
-	print("NPC ID:", npc_id)
-	print("黑色冲刺解锁:", player.black_dash_unlocked)
-	print("超级冲刺解锁:", player.super_dash_unlocked)
-	print("===================")
-
 func start_dialogue():
 	if not is_dialogue_active:
 		is_dialogue_active = true
 		dialogue_started.emit()
-		print("DialogueSystem: 对话开始")
 
 func end_dialogue():
 	if is_dialogue_active:
@@ -39,7 +31,6 @@ func end_dialogue():
 # 新增：重置对话系统状态（用于场景切换时）
 func reset():
 	is_dialogue_active = false
-	print("DialogueSystem: 状态已重置")
 
 func trigger_effect(effect_name: String):
 	effect_triggered.emit(effect_name)

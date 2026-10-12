@@ -1,4 +1,4 @@
-[gd_scene load_steps=61 format=3 uid="uid://8vv4frjt0qmt"]
+[gd_scene load_steps=63 format=3 uid="uid://8vv4frjt0qmt"]
 
 [ext_resource type="Script" uid="uid://b8qfrtedcjp8w" path="res://Scripts/UI/Scenes/SettingsScene.gd" id="1_kwsuw"]
 [ext_resource type="Texture2D" uid="uid://tjem5txgtco5" path="res://Assets/Textures/UIs/SceneUIs/设置.png" id="3_kwbpc"]
@@ -13,10 +13,16 @@
 [ext_resource type="Texture2D" uid="uid://cbxu06v4xk2lp" path="res://Assets/Textures/UIs/ButtonUIs/按钮悬停纹理.png" id="12_ihv7n"]
 [ext_resource type="Texture2D" uid="uid://boxb0bg1nuw8x" path="res://Assets/Textures/UIs/ButtonUIs/翻转大按钮悬停纹理.png" id="12_plmvg"]
 [ext_resource type="Texture2D" uid="uid://dh7lqkmf1t51n" path="res://Assets/Textures/UIs/ButtonUIs/按钮按下纹理.png" id="13_plmvg"]
+[ext_resource type="Texture2D" uid="uid://rfinfwreiykv" path="res://Assets/Textures/UIs/MobieControlsUIs/摇杆1.tres" id="20_22g1o"]
+[ext_resource type="Texture2D" uid="uid://5vof573rpwhg" path="res://Assets/Textures/UIs/MobieControlsUIs/摇杆杆2.tres" id="22_fw62u"]
+[ext_resource type="Texture2D" uid="uid://biex1ykpn1qgq" path="res://Assets/Textures/UIs/MobieControlsUIs/跳跃2.tres" id="22_kwbpc"]
+[ext_resource type="Texture2D" uid="uid://cmqn3lq3grd75" path="res://Assets/Textures/UIs/MobieControlsUIs/冲刺2.tres" id="24_d8wvb"]
 [ext_resource type="Texture2D" uid="uid://bxip4ialo0qsl" path="res://Assets/Textures/UIs/SceneUIs/tres/音量滑块1.tres" id="24_houfj"]
 [ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/WindValley/2.png" id="25_fw62u"]
 [ext_resource type="Texture2D" uid="uid://dolaxw8vcjj6y" path="res://Assets/Textures/UIs/SceneUIs/tres/音量滑块2.tres" id="25_ppuk0"]
+[ext_resource type="Texture2D" uid="uid://br0syxlpkp878" path="res://Assets/Textures/UIs/MobieControlsUIs/交互2.tres" id="26_22g1o"]
 [ext_resource type="Texture2D" uid="uid://dim2f13dvnmib" path="res://Assets/Textures/UIs/MobieControlsUIs/地图1.tres" id="28_em6rb"]
+[ext_resource type="Texture2D" uid="uid://dh3o6v2fippdq" path="res://Assets/Textures/UIs/MobieControlsUIs/超级冲刺2.tres" id="28_fw62u"]
 [ext_resource type="Texture2D" uid="uid://d25qqy4l3uw55" path="res://Assets/Textures/UIs/MobieControlsUIs/摇杆2.tres" id="29_0j7py"]
 [ext_resource type="Texture2D" uid="uid://do2prxybw8u4p" path="res://Assets/Textures/UIs/MobieControlsUIs/上1.tres" id="29_c30sq"]
 [ext_resource type="Texture2D" uid="uid://bxbloyj8ao1wb" path="res://Assets/Textures/UIs/MobieControlsUIs/地图2.tres" id="29_kwbpc"]
@@ -67,17 +73,6 @@ color = Color(1, 1, 0.6862745, 1)
 thickness = 3
 
 [sub_resource type="ImageTexture" id="ImageTexture_em6rb"]
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_houfj"]
-texture = ExtResource("11_leam6")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ppuk0"]
-texture = ExtResource("13_plmvg")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_leam6"]
-texture = ExtResource("12_ihv7n")
-
-[sub_resource type="ImageTexture" id="ImageTexture_ihv7n"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lnewd"]
 atlas = ExtResource("39_kwbpc")
@@ -772,7 +767,6 @@ text = "请按下新的按键...
 (ESC取消)"
 
 [node name="MobieControlsPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
-visible = false
 z_index = 200
 script = ExtResource("mobie_controls_script")
 
@@ -944,6 +938,8 @@ pivot_offset = Vector2(32, 32)
 focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("29_0j7py")
+texture_pressed = ExtResource("20_22g1o")
+texture_hover = ExtResource("20_22g1o")
 stretch_mode = 3
 
 [node name="MoveJoystickThumb" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -956,6 +952,8 @@ pivot_offset = Vector2(16, 16)
 focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("30_sqcj2")
+texture_pressed = ExtResource("22_fw62u")
+texture_hover = ExtResource("22_fw62u")
 stretch_mode = 3
 
 [node name="JumpButton" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -968,6 +966,8 @@ pivot_offset = Vector2(16, 16)
 focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("31_kmmkq")
+texture_pressed = ExtResource("22_kwbpc")
+texture_hover = ExtResource("22_kwbpc")
 stretch_mode = 3
 
 [node name="DashButton" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -980,6 +980,8 @@ pivot_offset = Vector2(16, 16)
 focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("33_kamy2")
+texture_pressed = ExtResource("24_d8wvb")
+texture_hover = ExtResource("24_d8wvb")
 stretch_mode = 3
 
 [node name="InteractButton" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -992,6 +994,8 @@ pivot_offset = Vector2(16, 16)
 focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("35_t8pih")
+texture_pressed = ExtResource("26_22g1o")
+texture_hover = ExtResource("26_22g1o")
 stretch_mode = 3
 
 [node name="SuperDashButton" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -1004,6 +1008,8 @@ pivot_offset = Vector2(16, 16)
 focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("37_ynhls")
+texture_pressed = ExtResource("28_fw62u")
+texture_hover = ExtResource("28_fw62u")
 stretch_mode = 3
 
 [node name="MapButton" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -1017,6 +1023,7 @@ focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("28_em6rb")
 texture_pressed = ExtResource("29_kwbpc")
+texture_hover = ExtResource("29_kwbpc")
 stretch_mode = 3
 
 [node name="DpadUp" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -1030,6 +1037,7 @@ focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("29_c30sq")
 texture_pressed = ExtResource("30_em6rb")
+texture_hover = ExtResource("30_em6rb")
 stretch_mode = 3
 
 [node name="DpadDown" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -1043,6 +1051,7 @@ focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("31_kwbpc")
 texture_pressed = ExtResource("32_d8wvb")
+texture_hover = ExtResource("32_d8wvb")
 stretch_mode = 3
 
 [node name="DpadLeft" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -1056,6 +1065,7 @@ focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("33_22g1o")
 texture_pressed = ExtResource("34_fw62u")
+texture_hover = ExtResource("34_fw62u")
 stretch_mode = 3
 
 [node name="DpadRight" type="TextureButton" parent="SettingsRoot/PagesRoot/MobieControlsPage/MobieControls"]
@@ -1069,9 +1079,11 @@ focus_mode = 0
 mouse_filter = 2
 texture_normal = ExtResource("35_p6lbb")
 texture_pressed = ExtResource("36_u5jm1")
+texture_hover = ExtResource("36_u5jm1")
 stretch_mode = 3
 
 [node name="AudioPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
+visible = false
 
 [node name="VolumeContainer" type="Node2D" parent="SettingsRoot/PagesRoot/AudioPage"]
 position = Vector2(447, 80)
@@ -1159,7 +1171,7 @@ visible = false
 [node name="EffectLevelContainer" type="VBoxContainer" parent="SettingsRoot/PagesRoot/GraphicsPage"]
 offset_left = 551.0
 offset_top = 80.0
-offset_right = 714.0
+offset_right = 958.0
 offset_bottom = 286.0
 theme_override_constants/separation = 6
 alignment = 1
@@ -1174,10 +1186,7 @@ text = "特效等级"
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 theme = ExtResource("5_wi6u5")
-theme_override_styles/normal = SubResource("StyleBoxTexture_houfj")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_ppuk0")
-theme_override_styles/hover = SubResource("StyleBoxTexture_leam6")
-theme_override_icons/arrow = SubResource("ImageTexture_ihv7n")
+theme_override_font_sizes/font_size = 20
 
 [node name="GraphicsHint" type="Label" parent="SettingsRoot/PagesRoot/GraphicsPage/EffectLevelContainer"]
 layout_mode = 2
@@ -1187,6 +1196,74 @@ theme_override_font_sizes/font_size = 20
 text = "低: 仅基础表现
 中: 默认  
 高: 增强演出"
+
+[node name="DisplayFitContainer" type="VBoxContainer" parent="SettingsRoot/PagesRoot/GraphicsPage"]
+offset_left = 551.0
+offset_top = 322.0
+offset_right = 760.0
+offset_bottom = 528.0
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="DisplayFitLabel" type="Label" parent="SettingsRoot/PagesRoot/GraphicsPage/DisplayFitContainer"]
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+text = "画面适配"
+
+[node name="DisplayFitOption" type="OptionButton" parent="SettingsRoot/PagesRoot/GraphicsPage/DisplayFitContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_font_sizes/font_size = 20
+
+[node name="DisplayFitHint" type="Label" parent="SettingsRoot/PagesRoot/GraphicsPage/DisplayFitContainer"]
+layout_mode = 2
+theme = ExtResource("5_wi6u5")
+theme_override_colors/font_color = Color(1, 1, 1, 0.65)
+theme_override_font_sizes/font_size = 20
+text = "默认: 像素完美(手机上可能变小)
+等比放大: 铺满屏幕并保持比例(推荐)
+拉伸填满: 无黑边但画面会变形"
+
+[node name="LGPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
+visible = false
+
+[node name="Lang0Box" type="VBoxContainer" parent="SettingsRoot/PagesRoot/LGPage"]
+offset_left = 520.0
+offset_top = 200.0
+offset_right = 780.0
+offset_bottom = 260.0
+
+[node name="LangZhButton" type="Button" parent="SettingsRoot/PagesRoot/LGPage/Lang0Box"]
+custom_minimum_size = Vector2(260, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "中文"
+
+[node name="Lang1Box" type="VBoxContainer" parent="SettingsRoot/PagesRoot/LGPage"]
+offset_left = 520.0
+offset_top = 290.0
+offset_right = 780.0
+offset_bottom = 350.0
+
+[node name="LangEnButton" type="Button" parent="SettingsRoot/PagesRoot/LGPage/Lang1Box"]
+custom_minimum_size = Vector2(260, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "English"
+
+[node name="Lang2Box" type="VBoxContainer" parent="SettingsRoot/PagesRoot/LGPage"]
+offset_left = 520.0
+offset_top = 380.0
+offset_right = 780.0
+offset_bottom = 440.0
+
+[node name="LangJaButton" type="Button" parent="SettingsRoot/PagesRoot/LGPage/Lang2Box"]
+custom_minimum_size = Vector2(260, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "日本語"
 
 [node name="BackButton" type="TextureButton" parent="."]
 z_index = 10

@@ -56,7 +56,7 @@ extends TextureButton
 @export_category("入场 / 退场")
 ## 入场时长（秒）。
 @export_range(0.05, 2.0, 0.01) var enter_duration: float = 0.32
-## 入场起始位置相对基准位置的漂移（像素）。Vector2，所以可以左右漂，例如 (-32, 0)。
+## 入场起始位置相对基准位置的漂移（像素）。
 @export var enter_drift_distance: Vector2 = Vector2(0.0, 16.0)
 ## 入场起始的额外放大倍率（配合 TRANS_BACK 形成轻 overshoot）。
 @export_range(1.0, 1.5, 0.005) var enter_overshoot_scale: float = 1.08

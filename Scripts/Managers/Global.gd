@@ -70,21 +70,8 @@ var maniac_stage5_last_challenge_failed: bool = false
 var maniac_stage6_challenge_completed: bool = false
 var maniac_stage6_last_challenge_failed: bool = false
 
-# 第七阶段挑战状态记录
-var maniac_stage7_challenge_completed: bool = false
-var maniac_stage7_last_challenge_failed: bool = false
-
-# 第八阶段挑战状态记录
-var maniac_stage8_challenge_completed: bool = false
-var maniac_stage8_last_challenge_failed: bool = false
-
-# 第九阶段挑战状态记录
-var maniac_stage9_challenge_completed: bool = false
-var maniac_stage9_last_challenge_failed: bool = false
-
-# 第十阶段挑战状态记录
-var maniac_stage10_challenge_completed: bool = false
-var maniac_stage10_last_challenge_failed: bool = false
+# 竞速挑战最佳时间：key = 阶段序号字符串（"1"~"5"），value = 秒数 float
+var race_best_times: Dictionary = {}
 
 # 存档点数据
 var save_point_position: Vector2 = Vector2.ZERO  # 静态存档点位置
@@ -97,6 +84,164 @@ func _ready():
 	save_point_position = get_save_point_position()
 	last_checkpoint_position = get_save_point_position()
 	last_checkpoint_type = "static"
+	_apply_saved_display_fit()
+	_apply_saved_effect_level()
+	_apply_saved_locale()
+	if get_tree() != null:
+		get_tree().node_added.connect(_on_tree_node_added)
+
+# ======================= 画面适配（多分辨率） =======================
+## 画面填充方式。
+## 背景：工程里是 stretch/mode="viewport" + scale_mode="integer"（像素完美）。
+## 但手机分辨率（如 2400x1080）不是 1280x720 的整数倍时，整数倍会被向下取整成 1，
+## 于是 720p 视口 1:1 贴在屏幕正中 —— 这就是“手机上画面只占一小块”的原因。
+## 所以手机端应切到“等比放大适配”。
+enum DisplayFit {
+	DEFAULT,       ## 工程默认：viewport + integer + keep（像素完美，非整数倍分辨率会有黑边）
+	SCALE_TO_FIT,  ## 等比放大适配：viewport + fractional + keep（保持比例铺满，推荐手机）
+	STRETCH_FILL,  ## 完全拉伸填满：viewport + fractional + ignore（无黑边，但比例不同会变形）
+}
+
+const DISPLAY_FIT_CONFIG_PATH: String = "user://display_settings.cfg"
+
+## 当前生效的画面填充方式（启动时从 user://display_settings.cfg 读取）。
+var display_fit_mode: int = DisplayFit.DEFAULT
+
+## 应用画面填充方式。save_to_disk = true 时写入 user:// 配置，下次启动自动生效。
+func apply_display_fit(mode: int, save_to_disk: bool = true) -> void:
+	display_fit_mode = clampi(mode, DisplayFit.DEFAULT, DisplayFit.STRETCH_FILL)
+	var root_window: Window = get_tree().root if get_tree() != null else null
+	if root_window != null:
+		# 三种模式都用 viewport 拉伸：本项目是像素风 2D，必须由引擎统一缩放根视口。
+		root_window.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+		match display_fit_mode:
+			DisplayFit.DEFAULT:
+				root_window.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+				root_window.content_scale_stretch = Window.CONTENT_SCALE_STRETCH_INTEGER
+			DisplayFit.SCALE_TO_FIT:
+				root_window.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+				root_window.content_scale_stretch = Window.CONTENT_SCALE_STRETCH_FRACTIONAL
+			DisplayFit.STRETCH_FILL:
+				root_window.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_IGNORE
+				root_window.content_scale_stretch = Window.CONTENT_SCALE_STRETCH_FRACTIONAL
+	if save_to_disk:
+		_save_display_fit_setting()
+
+## 启动时读取并应用上次保存的画面填充方式。
+func _apply_saved_display_fit() -> void:
+	var config: ConfigFile = ConfigFile.new()
+	if config.load(DISPLAY_FIT_CONFIG_PATH) == OK:
+		display_fit_mode = int(config.get_value("display", "fit_mode", DisplayFit.DEFAULT))
+	apply_display_fit(display_fit_mode, false)
+
+func _save_display_fit_setting() -> void:
+	var config: ConfigFile = ConfigFile.new()
+	config.load(DISPLAY_FIT_CONFIG_PATH)  # 先读再写：同文件还存着特效等级，直接 save 会把那段冲掉
+	config.set_value("display", "fit_mode", display_fit_mode)
+	config.save(DISPLAY_FIT_CONFIG_PATH)
+
+
+# ======================= 特效等级 =======================
+## 特效等级：影响粒子数量、2D 点光呼吸与帧率上限。
+## 具体的分级含义见 EFFECT_PARTICLE_RATIO 与 apply_effect_level() 内的注释。
+enum EffectLevel {
+	LOW,     ## 低：粒子 35%、不开 2D 点光呼吸、帧率上限 60（手机上降发热）
+	MEDIUM,  ## 中：与旧版本表现一致（粒子 100%、点光呼吸开、帧率不额外封顶）
+	HIGH,    ## 高：粒子 150%（UI 场景粒子、雪地下雪等），其余同中
+}
+
+## 各等级对应的粒子数量倍率。
+const EFFECT_PARTICLE_RATIO: Dictionary = {
+	EffectLevel.LOW: 0.35,
+	EffectLevel.MEDIUM: 1.0,
+	EffectLevel.HIGH: 1.5,
+}
+
+## 特效等级变化时发出，供各系统订阅（例：LightingManager 决定是否开点光呼吸）。
+signal effect_level_changed(level: int)
+
+## 当前特效等级（启动时从 user://display_settings.cfg 读取）。
+var effect_level: int = EffectLevel.MEDIUM
+
+## 应用特效等级。save_to_disk = true 时写入 user:// 配置，下次启动自动生效。
+func apply_effect_level(level: int, save_to_disk: bool = true) -> void:
+	effect_level = clampi(level, EffectLevel.LOW, EffectLevel.HIGH)
+	# 低特效档在手机上封 60 帧，减少发热与随之而来的热节流掉帧；中/高不额外封顶（跟随 vsync）。
+	Engine.max_fps = 60 if effect_level == EffectLevel.LOW else 0
+	_apply_particle_ratio_to_tree()
+	effect_level_changed.emit(effect_level)
+	if save_to_disk:
+		_save_effect_level_setting()
+
+## 启动时读取并应用上次保存的特效等级。
+func _apply_saved_effect_level() -> void:
+	var config: ConfigFile = ConfigFile.new()
+	if config.load(DISPLAY_FIT_CONFIG_PATH) == OK:
+		effect_level = int(config.get_value("effects", "level", EffectLevel.MEDIUM))
+	apply_effect_level(effect_level, false)
+
+func _save_effect_level_setting() -> void:
+	var config: ConfigFile = ConfigFile.new()
+	config.load(DISPLAY_FIT_CONFIG_PATH)
+	config.set_value("effects", "level", effect_level)
+	config.save(DISPLAY_FIT_CONFIG_PATH)
+
+## 新节点进树时按当前等级套用：房间/UI 都是之后才加载的，必须动态覆盖。
+func _on_tree_node_added(node: Node) -> void:
+	if node is GPUParticles2D or node is CPUParticles2D:
+		_apply_single_particle(node)
+
+## 把粒子数量按当前等级套用到整棵树（UI 场景与房间的粒子都在 /root 下）。
+func _apply_particle_ratio_to_tree() -> void:
+	if get_tree() == null:
+		return
+	_apply_particle_ratio(get_tree().root)
+
+func _apply_particle_ratio(node: Node) -> void:
+	if node is GPUParticles2D or node is CPUParticles2D:
+		_apply_single_particle(node)
+	for child in node.get_children():
+		_apply_particle_ratio(child)
+
+## 单个粒子节点：首次套用时把原始 amount 记进 meta，之后只做倍率换算，反复切等级也不会累乘。
+func _apply_single_particle(node: Node) -> void:
+	var base_amount: int = int(node.get_meta("fx_base_amount", node.get("amount")))
+	node.set_meta("fx_base_amount", base_amount)
+	var ratio: float = float(EFFECT_PARTICLE_RATIO.get(effect_level, 1.0))
+	node.set("amount", maxi(1, int(round(float(base_amount) * ratio))))
+
+
+# ======================= 语言 =======================
+## 支持的语言（与 Assets/Configs/Translations/ui_text.csv 的列对应）。
+const SUPPORTED_LOCALES: PackedStringArray = ["zh_CN", "en", "ja"]
+
+## 当前语言，启动时从 user://display_settings.cfg 读取。
+var locale_code: String = "zh_CN"
+
+## 虚拟摇杆“斜向”标志：由 MobileTouchHUD 每帧写入。
+## 为 true 时（摇杆处于斜向区、既非横向优先也非纵向优先），冲刺判定优先取左右方向。
+var joystick_diagonal_horizontal_bias: bool = false
+
+## 切换语言并持久化。
+## 文本替换完全由 Godot 内置自动翻译完成：ui_text.csv 里 key = 中文原文，
+## 配合 project.godot 的 internationalization/rendering/root_node_auto_translate，
+## 切换后所有 Control 的 text 会自动换成对应语言（数字等无译文的内容保持原样）。
+func apply_locale(code: String, save_to_disk: bool = true) -> void:
+	if not SUPPORTED_LOCALES.has(code):
+		return
+	locale_code = code
+	TranslationServer.set_locale(code)
+	if save_to_disk:
+		var config: ConfigFile = ConfigFile.new()
+		config.load(DISPLAY_FIT_CONFIG_PATH)  # 先读再写，保留同文件里的其它段
+		config.set_value("locale", "code", locale_code)
+		config.save(DISPLAY_FIT_CONFIG_PATH)
+
+func _apply_saved_locale() -> void:
+	var config: ConfigFile = ConfigFile.new()
+	if config.load(DISPLAY_FIT_CONFIG_PATH) == OK:
+		locale_code = str(config.get_value("locale", "code", locale_code))
+	apply_locale(locale_code, false)
 
 # 当前存档槽
 var current_save_slot: int = -1
@@ -154,14 +299,9 @@ func initialize_new_game():
 	maniac_stage5_last_challenge_failed = false
 	maniac_stage6_challenge_completed = false
 	maniac_stage6_last_challenge_failed = false
-	maniac_stage7_challenge_completed = false
-	maniac_stage7_last_challenge_failed = false
-	maniac_stage8_challenge_completed = false
-	maniac_stage8_last_challenge_failed = false
-	maniac_stage9_challenge_completed = false
-	maniac_stage9_last_challenge_failed = false
-	maniac_stage10_challenge_completed = false
-	maniac_stage10_last_challenge_failed = false
+	
+	# 清空竞速最佳时间（每个存档独立）
+	race_best_times = {}
 	
 	last_save_point = {"position": Vector2(0, 0), "scene_path": "", "save_point_id": ""}
 	save_point_position = Vector2.ZERO
@@ -172,6 +312,13 @@ func initialize_new_game():
 	# 清空地图探索状态（已绘制 / 待绘制房间）
 	if MapManager and MapManager.has_method("reset_state"):
 		MapManager.reset_state()
+	
+	# 清空传送阵激活记录。
+	# ★ TeleportManager 是 autoload，activated 会跨「回标题 → 开新存档」保留下来；
+	#   不在这里重置的话，上一个存档激活过的传送阵会直接带进新存档（面板按钮直接亮着）。
+	#   清空 _teleports 注册表也是安全的：每个房间的 TeleportPoint 会在自己的 _ready 里重新注册。
+	if TeleportManager and TeleportManager.has_method("reset"):
+		TeleportManager.reset()
 	
 	var task_manager = get_node_or_null("/root/TaskManager")
 	if task_manager:
@@ -267,14 +414,8 @@ func get_save_data() -> Dictionary:
 		"maniac_stage5_last_challenge_failed": maniac_stage5_last_challenge_failed,
 		"maniac_stage6_challenge_completed": maniac_stage6_challenge_completed,
 		"maniac_stage6_last_challenge_failed": maniac_stage6_last_challenge_failed,
-		"maniac_stage7_challenge_completed": maniac_stage7_challenge_completed,
-		"maniac_stage7_last_challenge_failed": maniac_stage7_last_challenge_failed,
-		"maniac_stage8_challenge_completed": maniac_stage8_challenge_completed,
-		"maniac_stage8_last_challenge_failed": maniac_stage8_last_challenge_failed,
-		"maniac_stage9_challenge_completed": maniac_stage9_challenge_completed,
-		"maniac_stage9_last_challenge_failed": maniac_stage9_last_challenge_failed,
-		"maniac_stage10_challenge_completed": maniac_stage10_challenge_completed,
-		"maniac_stage10_last_challenge_failed": maniac_stage10_last_challenge_failed,
+		
+		"race_best_times": race_best_times.duplicate(true),
 		
 		"destructible_walls_destroyed": destructible_walls_destroyed.duplicate(true),
 		"hidden_rooms_activated": hidden_rooms_activated.duplicate(),
@@ -282,6 +423,9 @@ func get_save_data() -> Dictionary:
 		"visited_rooms": MapManager.visited_rooms.duplicate() if MapManager else [],
 		"used_map_doors": MapManager.get_used_doors() if MapManager and MapManager.has_method("get_used_doors") else {},
 		"map_reveal_mask": MapManager.get_reveal_mask_base64() if MapManager and MapManager.has_method("get_reveal_mask_base64") else "",
+		# ★ 已烘焙的房间地图数据（地面横条/门/标志）。存下来后读档开图不再需要实例化房间场景，
+		#   直接解决「探索越多、第一次开图越卡」的问题。
+		"map_baked": MapManager.get_baked_state() if MapManager and MapManager.has_method("get_baked_state") else {},
 		"activated_teleports": TeleportManager.activated.duplicate() if TeleportManager else [],
 		"tp_coords": TeleportManager.get_save_coords() if TeleportManager and TeleportManager.has_method("get_save_coords") else {},
 		"played_cinematic_flags": played_cinematic_flags.duplicate(true),
@@ -384,40 +528,22 @@ func load_save_data(data: Dictionary):
 		maniac_stage4_last_challenge_failed = data["maniac_stage4_last_challenge_failed"]
 	
 	if data.has("maniac_stage5_challenge_completed"):
-		maniac_stage2_challenge_completed = data["maniac_stage5_challenge_completed"]
+		maniac_stage5_challenge_completed = data["maniac_stage5_challenge_completed"]
 	
 	if data.has("maniac_stage5_last_challenge_failed"):
-		maniac_stage2_last_challenge_failed = data["maniac_stage5_last_challenge_failed"]
+		maniac_stage5_last_challenge_failed = data["maniac_stage5_last_challenge_failed"]
 
 	if data.has("maniac_stage6_challenge_completed"):
-		maniac_stage3_challenge_completed = data["maniac_stage6_challenge_completed"]
+		maniac_stage6_challenge_completed = data["maniac_stage6_challenge_completed"]
 
 	if data.has("maniac_stage6_last_challenge_failed"):
-		maniac_stage3_last_challenge_failed = data["maniac_stage6_last_challenge_failed"]
-
-	if data.has("maniac_stage7_challenge_completed"):
-		maniac_stage4_challenge_completed = data["maniac_stage7_challenge_completed"]
-
-	if data.has("maniac_stage7_last_challenge_failed"):
-		maniac_stage4_last_challenge_failed = data["maniac_stage7_last_challenge_failed"]
+		maniac_stage6_last_challenge_failed = data["maniac_stage6_last_challenge_failed"]
 	
-	if data.has("maniac_stage8_challenge_completed"):
-		maniac_stage2_challenge_completed = data["maniac_stage8_challenge_completed"]
-	
-	if data.has("maniac_stage8_last_challenge_failed"):
-		maniac_stage2_last_challenge_failed = data["maniac_stage8_last_challenge_failed"]
-
-	if data.has("maniac_stage9_challenge_completed"):
-		maniac_stage3_challenge_completed = data["maniac_stage9_challenge_completed"]
-
-	if data.has("maniac_stage9_last_challenge_failed"):
-		maniac_stage3_last_challenge_failed = data["maniac_stage9_last_challenge_failed"]
-
-	if data.has("maniac_stage10_challenge_completed"):
-		maniac_stage4_challenge_completed = data["maniac_stage10_challenge_completed"]
-
-	if data.has("maniac_stage10_last_challenge_failed"):
-		maniac_stage4_last_challenge_failed = data["maniac_stage10_last_challenge_failed"]
+	# 竞速挑战最佳时间（key = 阶段序号字符串，value = 秒数）
+	if data.has("race_best_times") and typeof(data["race_best_times"]) == TYPE_DICTIONARY:
+		race_best_times = data["race_best_times"].duplicate(true)
+	else:
+		race_best_times = {}
 	
 	# 加载可破坏石墙摧毁记录（每个存档独立）
 	if data.has("destructible_walls_destroyed"):
@@ -449,7 +575,6 @@ func load_save_data(data: Dictionary):
 	# 通知场景内已存在的开关立即刷新状态
 	switch_states_changed.emit()
 
-	print("Global: 存档数据加载完成")
 
 
 ## 登记一个隐藏区域已被永久触发（permanent_hide=true 淡出完成时调用）。
@@ -506,7 +631,6 @@ func unlock_ability(ability_name: String):
 		_notify_ability_unlocks()
 		if current_save_slot >= 0:
 			SaveManager.save_game(current_save_slot, get_save_data())
-			print("Global: 能力解锁已保存到存档")
 
 # 击败Boss
 func defeat_boss(boss_name: String):
@@ -521,8 +645,8 @@ func add_coins(amount: int):
 	# 发射钱币变化信号
 	coins_changed.emit(player_coins)
 	if current_save_slot >= 0:
-		# 钱币变动频繁：保存但不弹「存档已更新」提示
-		SaveManager.save_game(current_save_slot, get_save_data(), false)
+		# 钱币变动频繁：交给 SaveManager 合并窗口延迟写档（当帧同步写盘会造成拾取卡顿）
+		SaveManager.request_auto_save(false)
 
 ## 花费钱币（带动画效果）- 关键修复：只发射 coins_changing 信号
 func spend_coins(amount: int) -> bool:
@@ -534,8 +658,8 @@ func spend_coins(amount: int) -> bool:
 		# PlayerUI 会在动画完成后自己更新显示
 		coins_changing.emit(old_coins, player_coins, 0.1)
 		if current_save_slot >= 0:
-			# 钱币变动频繁：保存但不弹「存档已更新」提示
-			SaveManager.save_game(current_save_slot, get_save_data(), false)
+			# 钱币变动频繁：交给 SaveManager 合并窗口延迟写档
+			SaveManager.request_auto_save(false)
 		return true
 	else:
 		print("DEBUG: 钱币不足，需要", amount, "当前:", player_coins)
@@ -544,6 +668,28 @@ func spend_coins(amount: int) -> bool:
 ## 获取当前钱币数（新增）
 func get_coins() -> int:
 	return player_coins
+
+## 竞速最佳时间的显示文本（告示牌对话 / NPC 对话插值用）：没有记录返回「--:--」
+func get_race_best_time_text(stage_number: int) -> String:
+	var key: String = str(stage_number)
+	if not race_best_times.has(key):
+		return "--:--"
+	var best_time: float = float(race_best_times[key])
+	if best_time < 0.0:
+		return "--:--"
+	return "%.2f 秒" % best_time
+
+## 是否已有某阶段的竞速记录（对话条件用）
+func has_race_best_time(stage_number: int) -> bool:
+	return race_best_times.has(str(stage_number))
+
+## 告示牌用：五个阶段的最佳时间合成**一段文本**
+## ★ 开头带一个换行：对话里写成「竞速记录：{{...}}」时，记录会从下一行开始。
+func get_race_board_text() -> String:
+	var lines: PackedStringArray = PackedStringArray()
+	for stage_number: int in range(1, 6):
+		lines.append("第 %d 段：%s" % [stage_number, get_race_best_time_text(stage_number)])
+	return "\n" + "\n".join(lines)
 
 # 记录已收集的道具
 func mark_item_collected(item_id: String):
@@ -621,6 +767,16 @@ func get_total_play_time_seconds() -> int:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		_persist_play_time_before_quit()
+	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		# Android 返回手势 / 返回键：不再直接退出游戏，转成 ui_cancel（等同 Esc），
+		# 由当前 UI 页面自己决定怎么处理（关面板 / 关地图 / 返回上级）。
+		# 必须同时保证工程设置 application/config/quit_on_go_back = false
+		#（工程设置 → 应用 → 配置 → 返回时退出），否则引擎会在发出这个通知之前
+		# 就直接退出应用 —— 而且该设置是**导出时烘焙**的，改完必须重新导出 APK 才生效。
+		var back_event: InputEventAction = InputEventAction.new()
+		back_event.action = &"ui_cancel"
+		back_event.pressed = true
+		Input.parse_input_event(back_event)
 
 func _exit_tree() -> void:
 	_persist_play_time_before_quit()

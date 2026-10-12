@@ -25,7 +25,7 @@ static func handle_lookup_state(player: Node, _delta: float, move_input: float, 
 	player.velocity.x = move_toward(
 		player.velocity.x,
 		0.0,
-		player.ground_deceleration * player.base_move_speed * player.effective_acceleration_multiplier
+		player.ground_deceleration * player.base_move_speed * player.effective_acceleration_multiplier * player.get_accel_step_scale()
 	)
 	player.PlayerCameraBridgeServiceScript.apply_lookup_observe_offset(player)
 
@@ -53,6 +53,6 @@ static func handle_lookdown_state(player: Node, _delta: float, move_input: float
 	player.velocity.x = move_toward(
 		player.velocity.x,
 		0.0,
-		player.ground_deceleration * player.base_move_speed * player.effective_acceleration_multiplier
+		player.ground_deceleration * player.base_move_speed * player.effective_acceleration_multiplier * player.get_accel_step_scale()
 	)
 	player.PlayerCameraBridgeServiceScript.apply_lookdown_observe_offset(player)

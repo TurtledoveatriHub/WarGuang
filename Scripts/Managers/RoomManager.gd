@@ -357,6 +357,9 @@ func update_camera_limits():
 				main_camera.limit_right = CAMERA_LIMIT_DISABLED
 				main_camera.limit_bottom = CAMERA_LIMIT_DISABLED
 			_debug_room_camera_trace("update_camera_limits_disabled", {"room": current_room})
+	# 限制框刚变过，立刻让背景九宫格按新参考点重排一次：
+	# 否则相机被夹/追镜的那一两帧里，背景会停在旧相位（移动端更容易看出来）
+	get_tree().call_group("ground_parallax", "force_realign_now")
 
 func _is_camera_debug_enabled() -> bool:
 	if player_ref == null:

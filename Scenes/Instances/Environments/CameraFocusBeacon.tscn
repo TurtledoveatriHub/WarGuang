@@ -7,7 +7,6 @@ size = Vector2(128, 128)
 
 [node name="CameraFocusBeacon" type="Area2D"]
 script = ExtResource("1_script")
-capture_radius = 280.0
 steal_strength = 0.88
 falloff_power = 1.15
 max_focus_offset = 320.0
@@ -16,4 +15,3 @@ max_focus_offset = 320.0
 shape = SubResource("RectangleShape2D_tbx8o")
 
 [node name="FocusTarget" type="Marker2D" parent="."]
-position = Vector2(0, -96)

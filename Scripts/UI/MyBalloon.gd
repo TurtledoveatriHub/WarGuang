@@ -219,16 +219,35 @@ func _set_mouse_filter_recursive(node: Node, filter: int):
 func _on_click_area_input(event):
 	# 只有在没有选项时才处理点击（继续对话）
 	if dialogue_line.responses.size() == 0 and is_waiting_for_input:
+		# 点进对话框本体（PanelContainer）不算“继续对话”，只有点框外区域才推进。
+		if _is_inside_dialogue_panel():
+			return
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			next(dialogue_line.next_id)
 			get_viewport().set_input_as_handled()
+		elif event is InputEventScreenTouch and event.pressed:
+			# 触屏：直接点屏幕也能推进对话（不依赖「触摸模拟鼠标」这个项目设置）。
+			next(dialogue_line.next_id)
+			get_viewport().set_input_as_handled()
+
+## 当前指针是否落在对话框面板（Balloon/MarginContainer/PanelContainer）内部。
+func _is_inside_dialogue_panel() -> bool:
+	if balloon == null:
+		return false
+	var panel: Control = balloon.get_node_or_null("MarginContainer/PanelContainer") as Control
+	if panel == null or not panel.is_visible_in_tree():
+		return false
+	return panel.get_global_rect().has_point(get_viewport().get_mouse_position())
 
 func _unhandled_input(event):
+	# 面板被隐藏时（游戏内设置 / 传送面板打开、转场中）一律不处理输入：
+	# 否则点屏幕或按空格会把它后面的对话继续推进。
+	if not visible:
+		return
 	# 如果正在阻断输入（转场中）或已经在退场销毁流程里，不处理任何输入
 	if is_blocking_input or _closing:
 		return
 	
-	# 修复：检查 dialogue_line 是否为 null
 	if not dialogue_line:
 		return
 	

@@ -10,6 +10,5 @@ class_name ChallengeCounterUI
 func update_counter(current: int, target: int):
 	if label:
 		label.text = str(current) + "/" + str(target)
-		print("DEBUG ChallengeCounterUI: 更新计数为 ", current, "/", target)
 	else:
 		push_error("ChallengeCounterUI: Label 节点未找到！")

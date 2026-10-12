@@ -20,7 +20,7 @@ static func handle_hurt_state(player: Node, fixed_delta: float) -> void:
 	player.velocity.x = move_toward(
 		player.velocity.x,
 		0.0,
-		hurt_decel * player.base_move_speed * fixed_delta * player.effective_acceleration_multiplier
+		hurt_decel * player.base_move_speed * player.get_accel_step_scale() * player.effective_acceleration_multiplier
 	)
 
 	if player.current_animation != "HURT":
