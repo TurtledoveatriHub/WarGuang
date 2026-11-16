@@ -450,3 +450,19 @@ func set_sfx_volume(value: float):
 
 func set_voice_volume(value: float):
 	set_bus_volume_percent("Voice", value * 100.0)
+## 程序退出前停止所有播放器，避免 Ogg 播放对象在 ObjectDB 清理阶段泄漏
+## （否则每次关闭游戏都会打印 "ObjectDB instances leaked at exit" 与 "resources still in use"）。
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
+		_stop_all_players_for_exit()
+
+
+## 停止 BGM 与音效池中的全部播放器并释放播放对象
+func _stop_all_players_for_exit() -> void:
+	if is_instance_valid(_bgm_player):
+		_bgm_player.stop()
+		_bgm_player.stream = null
+	for p in _sfx_pool:
+		if is_instance_valid(p):
+			p.stop()
+			p.stream = null

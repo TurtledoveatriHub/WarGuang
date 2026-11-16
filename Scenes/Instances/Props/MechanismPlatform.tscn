@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://bywk00ct1ifc2"]
 
 [ext_resource type="Script" uid="uid://dwjlh2x7ggryd" path="res://Scripts/Instances/Props/MechanismPlatform.gd" id="1_gate"]
-[ext_resource type="Texture2D" uid="uid://ce1ofa5fn1tnl" path="res://Assets/Textures/Instances/GrassLand/石块.png" id="2_txfwg"]
+[ext_resource type="Texture2D" uid="uid://cos1si4kcnmon" path="res://Assets/Textures/Instances/GrassLand/石块.png" id="2_txfwg"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_imi58"]
 atlas = ExtResource("2_txfwg")

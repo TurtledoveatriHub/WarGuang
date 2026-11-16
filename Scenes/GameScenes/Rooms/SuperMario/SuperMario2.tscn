@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_vbuyt"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_jksrl"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_0pe4i"]
-[ext_resource type="Texture2D" uid="uid://r1phyxs82tcr" path="res://Assets/Textures/Tiles/SuperMario/马里奥城堡内背景.png" id="4_h3pg8"]
+[ext_resource type="Texture2D" uid="uid://bfurjrqrtcq5v" path="res://Assets/Textures/Tiles/SuperMario/马里奥城堡内背景.png" id="4_h3pg8"]
 [ext_resource type="TileSet" uid="uid://gcdv7t4035pp" path="res://Assets/Textures/Tiles/SuperMario/Tres/马里奥瓦片集.tres" id="5_v2cfe"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="6_3111a"]
 [ext_resource type="TileSet" uid="uid://dlcw4ctxq1dwl" path="res://Assets/Textures/Tiles/SuperMario/Tres/马里奥伤害瓦片集.tres" id="7_sp3ln"]

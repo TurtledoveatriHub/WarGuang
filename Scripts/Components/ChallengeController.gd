@@ -2,273 +2,233 @@ extends Node
 class_name ChallengeController
 const ChallengeUIControllerScript = preload("res://Scripts/UI/ChallengeUIController.gd")
 
-## ============================================
-## ChallengeController - 挑战系统核心控制器
-## ============================================
-## 功能:
-## - 挑战流程控制
-## - JumpBox 生成管理
-## - 失败条件检测
-## - UI 管理
-## ============================================
+## 普通触发的得分
+const NORMAL_TRIGGER_SCORE: int = 1
+## 完美触发的基础得分（连续完美第 1 次）
+const PERFECT_TRIGGER_SCORE: int = 2
+## 完美触发连续加分的封顶值（第 8 次及以后都是这个分数）
+const PERFECT_SCORE_CAP: int = 9
 
-## 配置资源（在 Inspector 中指定）
-@export var config: ChallengeConfig
+## ── 挑战音效 ──
+@export_category("挑战音效")
+## 挑战开始时播放一遍
+@export var start_sfx: AudioStream
+## 挑战成功时播放一遍
+@export var success_sfx: AudioStream
+## 挑战失败时播放一遍
+@export var fail_sfx: AudioStream
 
-## UI 过渡配置
-@export_category("UI Transition")
+## ── 各阶段配置（Inspector 中依次拖入各 ChallengeConfig 资源） ──
+## 索引 0=第一阶段，1=第二阶段，2=第三阶段...
+@export var stage_configs: Array[ChallengeConfig] = []
+
+## ── 挑战区域 ──
+@export_category("挑战区域")
+## 挑战区域 TextArea 节点路径（用于 require_in_bounds 检测玩家离开区域）
+@export_node_path var challenge_area_path: NodePath = NodePath()
+## 挑战开始位置（Marker2D 节点路径）
+## 挑战开始时 player 会被传送到此位置，黑屏过渡后再正式开始
+@export_node_path var start_position_path: NodePath = NodePath()
+
+## ── 黑屏效果参数 ──
+@export_category("黑屏效果")
+## 淡出时长（秒，画面渐黑）
+@export var challenge_fade_out: float = 0.4
+## 黑屏保持时长（秒，全黑期间传送 player 到起始位置）
+@export var challenge_black_hold: float = 0.4
+## 淡入时长（秒，渐亮恢复画面，挑战正式开始）
+@export var challenge_fade_in: float = 0.4
+
+## ── 挑战规则 ──
+@export_category("挑战规则")
+## 挑战开始后的宽限期（秒），期间不检测失败条件
+## 等待 player 传送到起始位置 + JumpBox 激活完成后再开始正式检测
+@export var challenge_grace_period: float = 2.0
+
+## ── UI ──
+@export_category("UI")
+## 挑战 UI 场景（ChallengeCounter.tscn）
+@export var challenge_ui_scene: PackedScene
 ## UI 淡入淡出时间（秒）
 @export var ui_fade_duration: float = 1.0
 
-## 挑战 UI 场景（由 ManiacNPC 传递过来）
-var challenge_ui_scene: PackedScene
-
-## 挑战状态
 enum State { INACTIVE, ACTIVE, SUCCESS, FAILED }
 var current_state: State = State.INACTIVE
 
-## 运行时变量
+var active_config: ChallengeConfig = null
 var triggered_count: int = 0
-var spawned_jumpboxes: Array = []  # 当前生成的 JumpBox 数组
+## 连续完美触发的次数（普通触发或挑战重开时清零；无尽模式用它做累进加分）
+var perfect_streak: int = 0
+var spawned_jumpboxes: Array = []
 var challenge_bounds: Rect2
-var respawn_timers: Dictionary = {}  # spawn_point_index -> timer
-var has_triggered_first: bool = false  # 是否已触发第一个 JumpBox
-var runtime_spawn_points: Array[Marker2D] = []  # 运行时生成点缓存（不污染资源）
+var has_triggered_first: bool = false
+var _challenge_grace_timer: float = 0.0
 var player_ref: Node = null
 var ui_controller = null
 
-## 信号
 signal challenge_started()
 signal challenge_completed()
 signal challenge_failed()
 
 func _ready():
 	ui_controller = ChallengeUIControllerScript.new()
-	ui_controller.setup(self, challenge_ui_scene, ui_fade_duration)
+	if challenge_ui_scene:
+		ui_controller.setup(self, challenge_ui_scene, ui_fade_duration)
 
-## 初始化挑战边界和生成点
-func _init_challenge_bounds():
-	# 获取 ManiacNPC（父节点）
-	var maniac_npc = get_parent()
-	
-	# 尝试获取 NPC_Areas 层
-	var npcs_layer = maniac_npc.get_parent()  # NPCs
-	var areas_layer = null
-	if npcs_layer.has_node("../NPC_Areas"):
-		areas_layer = npcs_layer.get_node("../NPC_Areas")
-	elif maniac_npc.has_node("../../NPC_Areas"):
-		areas_layer = maniac_npc.get_node("../../NPC_Areas")
-	
-	if not areas_layer:
-		push_error("ChallengeController: 找不到 NPC_Areas 层！")
+## 初始化挑战边界（从 ChallengeArea TextArea 读取）
+func _init_challenge_bounds() -> void:
+	if challenge_area_path == NodePath() or challenge_area_path.is_empty():
+		push_warning("ChallengeController: 未设置 challenge_area_path，区域检测禁用")
 		return
-	
-	# 从 NPC_Areas 获取 ChallengeArea
-	var challenge_area_name = "Maniac_Challenge/ChallengeArea"
-	if areas_layer.has_node(challenge_area_name):
-		var challenge_area = areas_layer.get_node(challenge_area_name)
-		if challenge_area and challenge_area.has_method("get_global_rect"):
-			challenge_bounds = challenge_area.get_global_rect()
-			
-	else:
-		push_warning("ChallengeController: 未找到挑战区域 ", challenge_area_name)
-	
-	# 关键修复：根据配置名称查找对应的 SpawnPoints 容器
-	var spawn_points_name = _get_spawn_points_name()
-	var spawn_points_container = maniac_npc.get_node_or_null(spawn_points_name)
-	
-	if not spawn_points_container:
-		push_error("ChallengeController: 没有找到指定的 SpawnPoints 容器 [", spawn_points_name, "]！请在 ManiacNPC 下创建该节点")
-		return
-	
-	if spawn_points_container:
-		# 清空并重新收集所有 Marker2D 子节点
-		runtime_spawn_points.clear()
-		for child in spawn_points_container.get_children():
-			if child is Marker2D:
-				runtime_spawn_points.append(child)
-				# 关键修复：强制更新 global_position，确保 transform 正确累积
-				child.force_update_transform()
+	var area = get_node_or_null(challenge_area_path)
+	if area and area.has_method("get_global_rect"):
+		challenge_bounds = area.get_global_rect()
 
-## 根据配置名称获取生成点节点名称
-func _get_spawn_points_name() -> String:
-	if not config:
-		return "SpawnPoints"
-
-	if config.stage_id > 0:
-		return "SpawnPoints" + str(config.stage_id)
-	
-	var challenge_name = config.challenge_name
-	
-	# 修复：支持多种命名方式
-	# 方式 1: "疯子挑战 1", "疯子挑战 2"...
-	# 方式 2: "疯子挑战 第一阶段", "疯子挑战 第二阶段"...
-	# 方式 3: "Challenge1", "Challenge2"...
-	
-	if challenge_name.contains("1") or challenge_name.contains("第一阶段"):
-		return "SpawnPoints1"
-	elif challenge_name.contains("2") or challenge_name.contains("第二阶段"):
-		return "SpawnPoints2"
-	elif challenge_name.contains("3") or challenge_name.contains("第三阶段"):
-		return "SpawnPoints3"
-	elif challenge_name.contains("4") or challenge_name.contains("第四阶段"):
-		return "SpawnPoints4"
-	# 未来扩展：添加更多阶段...
-	
-	# 默认回退
-	return "SpawnPoints"
-
-func _init_spawn_points():
-	# 修复：ChallengeController 的父节点是 ManiacNPC
-	var maniac_npc = get_parent()
-	
-	var spawn_points_name = _get_spawn_points_name()
-	
-	var spawn_points_node: Node = null
-	
-	# 在 ManiacNPC 的子节点中查找
-	if maniac_npc.has_node(spawn_points_name):
-		spawn_points_node = maniac_npc.get_node(spawn_points_name)
-	else:
-		# 回退方案：查找任意 SpawnPoints
-		if maniac_npc.has_node("SpawnPoints"):
-			spawn_points_node = maniac_npc.get_node("SpawnPoints")
-	
-	if spawn_points_node:
-		var spawn_points = []
-		
-		for child in spawn_points_node.get_children():
-			if child is Marker2D:
-				spawn_points.append(child)
-		
-		spawn_points.sort_custom(func(a, b): return a.name < b.name)
-		
-		if config:
-			config.spawn_points = spawn_points
-		
-	else:
-		push_warning("ChallengeController: 没有找到 SpawnPoints 节点！请在 ManiacNPC 下创建", spawn_points_name)
-
-func start_challenge():
+## ManiacNPC 调用此方法启动挑战
+func start_challenge(stage_index: int = 0) -> void:
 	if current_state == State.ACTIVE:
 		return
-	
-	if not config:
-		push_error("ChallengeController: 配置无效！")
+	if stage_index < 0 or stage_index >= stage_configs.size():
+		push_error("ChallengeController: 阶段索引越界 ", stage_index)
 		return
-	
-	# 修复：启动挑战时才初始化区域和生成点
-	_init_challenge_bounds()
-	if runtime_spawn_points.is_empty():
-		push_error("ChallengeController: 运行时生成点为空！")
+	active_config = stage_configs[stage_index]
+	if active_config == null:
+		push_error("ChallengeController: 阶段 ", stage_index, " 配置为空")
 		return
 	
 	current_state = State.ACTIVE
 	triggered_count = 0
-	respawn_timers.clear()
+	perfect_streak = 0
 	has_triggered_first = false
+	_challenge_grace_timer = challenge_grace_period
+	challenge_bounds = Rect2()
+	_init_challenge_bounds()
 	if ui_controller != null:
 		ui_controller.setup(self, challenge_ui_scene, ui_fade_duration)
 	
-	var tween = create_tween()
-	tween.set_parallel(true)
+	# 变黑之前就把 JumpBox 复位并隐藏：避免淡入瞬间先闪出上一次结束时的位置
+	_prepare_container_jumpboxes()
+	# 黑屏传送到挑战起始位置
+	await _teleport_player_to_start()
 	
-	tween.tween_callback(_fade_out_player_ui)
-	tween.tween_callback(_spawn_all_jumpboxes)
-	tween.tween_callback(_show_challenge_ui)
-	tween.tween_callback(_update_challenge_ui)
-	
+	var tw = create_tween()
+	tw.set_parallel(true)
+	tw.tween_callback(_fade_out_player_ui)
+	tw.tween_callback(_activate_container_jumpboxes)
+	tw.tween_callback(_show_challenge_ui)
+	tw.tween_callback(_update_challenge_ui)
+	if start_sfx:
+		AudioManager.play_stream_sfx(start_sfx)
 	challenge_started.emit()
 
-## 带淡出效果隐藏玩家 UI（不管钱币 UI）
-func _fade_out_player_ui():
-	if ui_controller != null:
-		ui_controller.fade_out_player_ui()
-
-func _spawn_all_jumpboxes():
-	if not config or runtime_spawn_points.is_empty():
-		push_error("ChallengeController: 没有配置生成点！")
+## 黑屏将 player 传送到挑战起始位置（参考 Door 的传送效果）
+func _teleport_player_to_start() -> void:
+	if start_position_path == NodePath() or start_position_path.is_empty():
 		return
-	
-	for i in range(runtime_spawn_points.size()):
-		var spawn_point = runtime_spawn_points[i]
-		if not is_instance_valid(spawn_point):
-			print("DEBUG ChallengeController: 生成点 ", i, " 无效！")
-			continue
-		
-		_spawn_jumpbox_at(spawn_point)
-
-func _spawn_jumpbox_at(spawn_point: Marker2D):
-	if not config.jumpbox_scene:
-		push_error("ChallengeController: 没有配置 JumpBox 场景！")
+	var marker = get_node_or_null(start_position_path) as Marker2D
+	if marker == null:
 		return
-	
-	var jumpbox = config.jumpbox_scene.instantiate()
-	jumpbox.global_position = spawn_point.global_position
-	jumpbox.challenge_id = config.challenge_name
-	
-	# 关键修复：添加到 MainGameScene 而不是 current_scene（确保坐标系统一）
-	var main_scene = get_tree().root.get_node_or_null("MainGameScene")
-	if main_scene:
-		main_scene.add_child(jumpbox)
-	else:
-		get_tree().current_scene.add_child(jumpbox)
-	spawned_jumpboxes.append(jumpbox)
-	
-	if jumpbox.has_signal("bounce_triggered"):
-		jumpbox.bounce_triggered.connect(_on_jumpbox_bounce_triggered.bind(jumpbox, spawn_point))
+	var player = _get_player()
+	if player == null:
+		return
+	# 淡出 → 黑屏
+	if FadeManager and FadeManager.has_method("fade_out"):
+		await FadeManager.fade_out(challenge_fade_out)
+	# 黑屏中传送 player
+	player.global_position = marker.global_position
+	player.velocity = Vector2.ZERO
+	if player.has_method("sync_camera_to_player_center"):
+		player.sync_camera_to_player_center(true)
+	# 黑屏保持
+	if challenge_black_hold > 0.0:
+		await get_tree().create_timer(challenge_black_hold).timeout
+	# 淡入恢复
+	if FadeManager and FadeManager.has_method("fade_in"):
+		await FadeManager.fade_in(challenge_fade_in)
 
-func _on_jumpbox_bounce_triggered(body, jumpbox, spawn_point):
+## 开赛前预处理容器内挑战 JumpBox：回到初始位置并隐藏
+func _prepare_container_jumpboxes() -> void:
+	if active_config == null:
+		return
+	var container = get_node_or_null(active_config.challenge_container_path)
+	if container == null:
+		return
+	for child in container.get_children():
+		if child is JumpBox and child.is_challenge_jumpbox:
+			child.prepare_for_challenge()
+
+## 激活容器下所有 is_challenge_jumpbox=true 的 JumpBox（不扫描子容器）
+func _activate_container_jumpboxes() -> void:
+	spawned_jumpboxes.clear()
+	var container = get_node_or_null(active_config.challenge_container_path)
+	if container == null:
+		push_error("ChallengeController: 容器不存在 ", active_config.challenge_container_path)
+		return
+	for child in container.get_children():
+		if child is JumpBox and child.is_challenge_jumpbox:
+			spawned_jumpboxes.append(child)
+			child.play_start_animation()
+			if child.has_signal("bounce_triggered"):
+				# 不带 bind：否则 is_connected 判定不到已连接的绑定版本，重开挑战时会重复连接导致重复计分
+				if not child.bounce_triggered.is_connected(_on_jumpbox_bounce):
+					child.bounce_triggered.connect(_on_jumpbox_bounce)
+	if spawned_jumpboxes.is_empty():
+		push_warning("ChallengeController: 容器无 JumpBox")
+
+## JumpBox 触发回调：按触发等级计分
+func _on_jumpbox_bounce(body, trigger_grade: String) -> void:
 	if body.is_in_group("player") and current_state == State.ACTIVE:
-		if body.current_animation != "JUMP2":
+		var eligible = body.current_animation == "JUMP2"
+		if not eligible and body.has_method("is_recent_double_jump_start"):
+			eligible = body.is_recent_double_jump_start(0.12)
+		if not eligible:
 			return
-		
-		# 修复：立即增加计数并更新 UI
-		triggered_count += 1
-		
-		if jumpbox in spawned_jumpboxes:
-			spawned_jumpboxes.erase(jumpbox)
-		
-		# 修复：立即更新 UI
+		triggered_count += _score_for_trigger(trigger_grade)
 		_update_challenge_ui()
-		
 		has_triggered_first = true
-		
-		var spawn_index = runtime_spawn_points.find(spawn_point)
-		
-		if jumpbox.animated_sprite and jumpbox.animated_sprite.sprite_frames:
-			if jumpbox.animated_sprite.sprite_frames.has_animation("END"):
-				jumpbox.animated_sprite.play("END")
-				await jumpbox.animated_sprite.animation_finished
-		
-		jumpbox.queue_free()
-		
-		if triggered_count >= config.target_count:
+		# 无尽模式没有目标分数，不会通关（只会在失败条件满足时结束）
+		if _is_endless_mode():
+			return
+		if triggered_count >= active_config.target_count:
 			_complete_challenge()
-		else:
-			respawn_timers[spawn_index] = config.cooldown_time
 
-func _process(_delta):
+## 本次触发应得的分数：
+## 普通触发固定加 NORMAL_TRIGGER_SCORE 并把连续完美次数清零；
+## 完美触发加 PERFECT_TRIGGER_SCORE（2 分）；无尽模式下连续完美每次再 +1 分，最高封顶 PERFECT_SCORE_CAP（9 分）。
+func _score_for_trigger(trigger_grade: String) -> int:
+	if trigger_grade != "perfect":
+		perfect_streak = 0
+		return NORMAL_TRIGGER_SCORE
+	perfect_streak += 1
+	if not _is_endless_mode():
+		return PERFECT_TRIGGER_SCORE
+	return mini(perfect_streak + 1, PERFECT_SCORE_CAP)
+
+## 当前阶段是否为无尽模式
+func _is_endless_mode() -> bool:
+	return active_config != null and active_config.endless_mode
+
+func _process(_delta: float) -> void:
 	if current_state == State.ACTIVE:
-		# 更新所有重生计时器（每个生成点独立）
-		for spawn_index in respawn_timers.keys():
-			respawn_timers[spawn_index] -= _delta
-			if respawn_timers[spawn_index] <= 0:
-				_on_respawn_timer_finished(spawn_index)
-				respawn_timers.erase(spawn_index)
-		
-		# 检查失败条件（落地或离开区域）
+		# 宽限期内不检测失败条件（等待 player 传送到位 + JumpBox 激活）
+		if _challenge_grace_timer > 0.0:
+			_challenge_grace_timer -= _delta
+			return
 		_check_failure_conditions()
 
-func _on_respawn_timer_finished(spawn_index: int):
-	if current_state != State.ACTIVE:
+func _check_failure_conditions() -> void:
+	var player = _get_player()
+	if not player or active_config == null:
 		return
-	
-	if spawn_index < runtime_spawn_points.size():
-		var spawn_point = runtime_spawn_points[spawn_index]
-		_spawn_jumpbox_at(spawn_point)
-	else:
-		print("DEBUG ChallengeController: 生成点 ", spawn_index, " 无效，跳过重生")
+	if active_config.require_in_bounds:
+		if challenge_bounds != Rect2() and challenge_bounds.has_point(player.global_position) == false:
+				print("[Challenge] 离开区域，失败")
+				_fail_challenge()
+				return
+	if active_config.require_no_floor and has_triggered_first:
+		if player.is_on_floor():
+			print("[Challenge] 落地，失败")
+			_fail_challenge()
 
 func _get_player() -> Node:
 	if is_instance_valid(player_ref):
@@ -276,129 +236,46 @@ func _get_player() -> Node:
 	player_ref = get_tree().get_first_node_in_group("player")
 	return player_ref
 
-func _check_failure_conditions():
-	var player = _get_player()
-	if not player:
-		return
-	
-	if config.require_in_bounds:
-		var player_pos = player.global_position
-		var in_bounds = challenge_bounds.has_point(player_pos)
-		
-		if not in_bounds:
-			print("DEBUG ChallengeController: 玩家离开挑战区域，挑战失败")
-			_fail_challenge()
-			return
-	
-	if config.require_no_floor and has_triggered_first:
-		if player.is_on_floor():
-			print("DEBUG ChallengeController: 玩家落地，挑战失败")
-			_fail_challenge()
-			return
-
-## 完成挑战
-func _complete_challenge():
+func _complete_challenge() -> void:
 	if current_state != State.ACTIVE:
 		return
-	
-	# 修复：先改变状态，_process 会停止检测
 	current_state = State.SUCCESS
-	
-	# 清理所有重生计时器
-	respawn_timers.clear()
-	
-	await _play_end_animation_and_cleanup_force()
-	
-	# 修复：同步淡出挑战 UI 和淡入玩家 UI
+	_deactivate_all_jumpboxes()
 	_hide_challenge_ui_with_fade()
 	_do_fade_in_player_ui()
-	
+	if success_sfx:
+		AudioManager.play_stream_sfx(success_sfx)
 	challenge_completed.emit()
 
-## 挑战失败
-func _fail_challenge():
+func _fail_challenge() -> void:
 	if current_state != State.ACTIVE:
 		return
-	
-	# 修复：先改变状态，_process 会停止检测
 	current_state = State.FAILED
-	
-	# 清理所有重生计时器
-	respawn_timers.clear()
-	
-	await _play_end_animation_and_cleanup_force()
-	
-	# 修复：同步淡出挑战 UI 和淡入玩家 UI（与成功逻辑保持一致）
+	# 无尽模式：没有通关，结束时把本局积分提交到无尽积分榜（0 分不入榜）
+	if _is_endless_mode() and triggered_count > 0:
+		if Global and Global.has_method("submit_endless_score"):
+			Global.submit_endless_score(triggered_count)
+	_deactivate_all_jumpboxes()
 	_hide_challenge_ui_with_fade()
 	_do_fade_in_player_ui()
-	
+	if fail_sfx:
+		AudioManager.play_stream_sfx(fail_sfx)
 	challenge_failed.emit()
 
-## 播放所有剩余 JumpBox 的 END 动画并清理（同时销毁）
-func _play_end_animation_and_cleanup_force():
-	if spawned_jumpboxes.is_empty():
-		return
-	
-	for jumpbox in spawned_jumpboxes:
-		if is_instance_valid(jumpbox):
-			jumpbox.set_inactive()
-			jumpbox.current_anim_state = jumpbox.AnimState.FLY
-			
-			if jumpbox.animated_sprite and jumpbox.animated_sprite.sprite_frames:
-				if jumpbox.animated_sprite.sprite_frames.has_animation("END"):
-					jumpbox.animated_sprite.play("END")
-	
-	var max_wait_time = 0.0
-	for jumpbox in spawned_jumpboxes:
-		if is_instance_valid(jumpbox) and jumpbox.animated_sprite:
-			if jumpbox.animated_sprite.sprite_frames:
-				if jumpbox.animated_sprite.sprite_frames.has_animation("END"):
-					var anim_length = jumpbox.animated_sprite.sprite_frames.get_frame_duration("END", 0)
-					max_wait_time = max(max_wait_time, anim_length)
-	
-	await get_tree().create_timer(max_wait_time).timeout
-	
-	for jumpbox in spawned_jumpboxes:
-		if is_instance_valid(jumpbox):
-			jumpbox.queue_free()
-	
+func _deactivate_all_jumpboxes() -> void:
+	for jb in spawned_jumpboxes:
+		if is_instance_valid(jb):
+			jb.play_end_and_hide()
 	spawned_jumpboxes.clear()
 
-## 通用清理逻辑（挑战和失败都用）
-func _cleanup_challenge_common():
-	if spawned_jumpboxes.is_empty():
-		return
-	
-	# 同时销毁所有 JumpBox（不播放 END 动画）
-	for jumpbox in spawned_jumpboxes:
-		if is_instance_valid(jumpbox):
-			jumpbox.queue_free()
-	
-	spawned_jumpboxes.clear()
-
-func _update_challenge_ui():
-	if ui_controller != null:
-		ui_controller.update_challenge_ui(triggered_count, config.target_count)
-
-func _show_challenge_ui():
-	if ui_controller != null:
-		ui_controller.show_challenge_ui()
-
-func _hide_challenge_ui_with_fade():
-	if ui_controller != null:
-		ui_controller.hide_challenge_ui_with_fade(_on_challenge_ui_fade_out_complete)
-
-## 带淡入效果恢复玩家 UI（真正的淡入实现）
-func _do_fade_in_player_ui():
-	if ui_controller != null:
-		ui_controller.fade_in_player_ui()
-
-func _hide_challenge_ui():
-	var challenge_ui = get_tree().current_scene.get_node_or_null("ChallengeUI")
-	if challenge_ui:
-		challenge_ui.queue_free()
-
-## 挑战 UI 淡出完成回调
-func _on_challenge_ui_fade_out_complete(challenge_ui: Node):
-	if is_instance_valid(challenge_ui):
-		challenge_ui.queue_free()
+func _fade_out_player_ui() -> void:
+	if ui_controller: ui_controller.fade_out_player_ui()
+func _do_fade_in_player_ui() -> void:
+	if ui_controller: ui_controller.fade_in_player_ui()
+func _show_challenge_ui() -> void:
+	if ui_controller: ui_controller.show_challenge_ui()
+func _hide_challenge_ui_with_fade() -> void:
+	if ui_controller: ui_controller.hide_challenge_ui_with_fade(Callable())
+func _update_challenge_ui() -> void:
+	if ui_controller and active_config != null:
+		ui_controller.update_challenge_ui(triggered_count, active_config.target_count, _is_endless_mode())

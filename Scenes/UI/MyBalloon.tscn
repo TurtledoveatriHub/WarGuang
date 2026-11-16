@@ -1,14 +1,14 @@
 [gd_scene load_steps=19 format=3 uid="uid://f7j6a5p8vguo"]
 
 [ext_resource type="Script" uid="uid://dbgaf7wy7ajxv" path="res://Scripts/UI/MyBalloon.gd" id="1_m6elf"]
-[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="2_ecih3"]
-[ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="2_ji2e4"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="2_ecih3"]
+[ext_resource type="Texture2D" uid="uid://chrxvtfsyndtw" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="2_ji2e4"]
 [ext_resource type="PackedScene" uid="uid://ckvgyvclnwggo" path="res://addons/dialogue_manager/dialogue_label.tscn" id="2_o83wj"]
 [ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="2_rrj0s"]
 [ext_resource type="Script" uid="uid://bb52rsfwhkxbn" path="res://addons/dialogue_manager/dialogue_responses_menu.gd" id="3_exgiy"]
-[ext_resource type="Texture2D" path="res://Assets/Textures/UIs/ButtonUIs/按钮默认纹理.png" id="6_ao5jq"]
-[ext_resource type="Texture2D" path="res://Assets/Textures/UIs/ButtonUIs/按钮按下纹理.png" id="7_qylx3"]
-[ext_resource type="Texture2D" path="res://Assets/Textures/UIs/ButtonUIs/按钮悬停纹理.png" id="8_fp63g"]
+[ext_resource type="Texture2D" uid="uid://760cxaapn7og" path="res://Assets/Textures/UIs/ButtonUIs/按钮默认纹理.png" id="6_ao5jq"]
+[ext_resource type="Texture2D" uid="uid://diyd7rw1i2bs2" path="res://Assets/Textures/UIs/ButtonUIs/按钮按下纹理.png" id="7_qylx3"]
+[ext_resource type="Texture2D" uid="uid://c7oewm0yh0p6j" path="res://Assets/Textures/UIs/ButtonUIs/按钮悬停纹理.png" id="8_fp63g"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_spyqn"]
 bg_color = Color(0, 0, 0, 1)

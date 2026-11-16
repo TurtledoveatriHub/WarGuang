@@ -1,7 +1,7 @@
-[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://0om4a1jhi8of"]
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://00012oaf21mdm"]
 
-[ext_resource type="Texture2D" uid="uid://dkwydpbsf8eng" path="res://Assets/Textures/Tiles/GrassLand/草原瓦片.png" id="1_nbxfp"]
-[ext_resource type="Texture2D" uid="uid://c8u6fmxmiuhe7" path="res://Assets/Textures/Tiles/GrassLand/石砖瓦片.png" id="1_xqkio"]
+[ext_resource type="Texture2D" uid="uid://cgafqg5yx71oh" path="res://Assets/Textures/Tiles/GrassLand/草原瓦片.png" id="1_nbxfp"]
+[ext_resource type="Texture2D" uid="uid://dyo8bylav02la" path="res://Assets/Textures/Tiles/GrassLand/石砖瓦片.png" id="1_xqkio"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0uuhg"]
 texture = ExtResource("1_xqkio")

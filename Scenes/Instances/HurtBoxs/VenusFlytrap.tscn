@@ -1,8 +1,8 @@
 [gd_scene load_steps=16 format=3 uid="uid://dmpqbx6ek803k"]
 
 [ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_j6s1w"]
-[ext_resource type="AudioStream" uid="uid://cgi3k7w680673" path="res://Assets/Audios/SFX/Rooms/GrassLand/捕蝇草激活.wav" id="2_3ndj1"]
-[ext_resource type="Texture2D" uid="uid://cepdpoq1f45m1" path="res://Assets/Textures/Instances/GrassLand/捕蝇草.png" id="2_j6s1w"]
+[ext_resource type="AudioStream" uid="uid://bb2i871ydmll8" path="res://Assets/Audios/SFX/Rooms/GrassLand/捕蝇草激活.wav" id="2_3ndj1"]
+[ext_resource type="Texture2D" uid="uid://digvia1wjsbgo" path="res://Assets/Textures/Instances/GrassLand/捕蝇草.png" id="2_j6s1w"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3ndj1"]
 atlas = ExtResource("2_j6s1w")

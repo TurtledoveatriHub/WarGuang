@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dc1qsl75hv74p"]
 
-[ext_resource type="Script" uid="uid://xf376fye21u2" path="res://Scripts/Instances/Environments/CameraLimitZone.gd" id="1_zone"]
+[ext_resource type="Script" uid="uid://xf376fye21u2" path="res://Scripts/Instances/CameraLimitZone.gd" id="1_zone"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_limit_zone"]
 size = Vector2(160, 160)

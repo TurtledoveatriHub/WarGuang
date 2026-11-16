@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://d3qaaq7iu4xlw"]
 
 [ext_resource type="Script" uid="uid://doslbptxl5yq1" path="res://Scripts/Instances/RaceCheckpoints/RaceStartLine.gd" id="1_startline"]
-[ext_resource type="Texture2D" uid="uid://okn4ishga2vw" path="res://Assets/Textures/Instances/GrassLand/告示牌.png" id="2_f36e3"]
+[ext_resource type="Texture2D" uid="uid://d4ldue6vbmpt5" path="res://Assets/Textures/Instances/GrassLand/告示牌.png" id="2_f36e3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_startline"]
 size = Vector2(64, 64)

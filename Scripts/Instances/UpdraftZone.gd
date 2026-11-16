@@ -1,5 +1,5 @@
 # ★ 不加 @tool（理由见 EnvironmentZoneBase 顶部）：保证场景里的参数可自由修改
-extends "res://Scripts/Instances/Environments/EnvironmentZoneBase.gd"
+extends "res://Scripts/Instances/EnvironmentZoneBase.gd"
 class_name UpdraftZone
 
 ## 上升气流区（滑翔上升气流，参考空洞骑士丝之歌里大黄蜂的滑翔手感）

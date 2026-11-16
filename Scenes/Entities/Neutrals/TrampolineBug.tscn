@@ -1,7 +1,7 @@
 [gd_scene load_steps=17 format=3 uid="uid://brlmsk1ql3b4v"]
 
 [ext_resource type="Script" uid="uid://cdq7c7e1rs1hs" path="res://Scripts/Entities/Neutrals/TrampolineBug.gd" id="1_tramp"]
-[ext_resource type="Texture2D" uid="uid://dqh5qsvy55f8r" path="res://Assets/Textures/Entities/Neutrals/蹦床虫.png" id="2_x241u"]
+[ext_resource type="Texture2D" uid="uid://cgkxevc3xwhoc" path="res://Assets/Textures/Entities/Neutrals/蹦床虫.png" id="2_x241u"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2bc0h"]
 atlas = ExtResource("2_x241u")

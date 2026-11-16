@@ -524,7 +524,7 @@ func _rebuild_room_name_labels() -> void:
 		return
 	var theme_to_use: Theme = room_name_theme
 	if theme_to_use == null:
-		theme_to_use = load("res://Assets/Themes/NormalTheme9x9.tres") as Theme
+		theme_to_use = load("res://Assets/Themes/Theme9x9.tres") as Theme
 	for room_id in layout.room_display_names.keys():
 		var display_name: String = str(layout.room_display_names.get(room_id, "")).strip_edges()
 		if display_name == "":

@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://bfgxgslkvovs7"]
 
 [ext_resource type="Script" uid="uid://4sjq1we6xrql" path="res://Scripts/Instances/SavePoints/ChairSavePoint.gd" id="1_vuhko"]
-[ext_resource type="AudioStream" uid="uid://ba720jqpu2mb4" path="res://Assets/Audios/SFX/Instances/钢琴选择.wav" id="2_1kmbp"]
+[ext_resource type="AudioStream" uid="uid://c4rbg2bvt3hcl" path="res://Assets/Audios/SFX/Instances/钢琴选择.wav" id="2_1kmbp"]
 [ext_resource type="Texture2D" uid="uid://c3vxbgsr8tfou" path="res://Assets/Textures/UIs/InstanceUIs/tres/YellowDuck_Idle.tres" id="2_yuh5w"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v4w6y"]

@@ -1,7 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://bq5gktnvtvvop"]
+[gd_scene load_steps=4 format=3 uid="uid://0001tp1gg28fq"]
 
 [ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_5nrrw"]
-[ext_resource type="Texture2D" uid="uid://bqh8rnopioeeo" path="res://Assets/Textures/Tiles/new tiles 8×8-01.png" id="2_5nrrw"]
+[ext_resource type="Texture2D" uid="uid://uqr2gc8fqla3" path="res://Assets/Textures/Tiles/new tiles 8×8-01.png" id="2_5nrrw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1cqcb"]
 

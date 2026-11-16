@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=3 uid="uid://bljm1u0f8romo"]
 
-[ext_resource type="AudioStream" uid="uid://d1ggp6cs6cy5d" path="res://Assets/Audios/SFX/Instances/商店.wav" id="2_62rtu"]
+[ext_resource type="AudioStream" uid="uid://buasptydj5j17" path="res://Assets/Audios/SFX/Instances/商店.wav" id="2_62rtu"]
 [ext_resource type="Script" uid="uid://ch04duw4ekuta" path="res://Scripts/Entities/NPCs/GrassLandMerchant.gd" id="3_glm_script"]
-[ext_resource type="AudioStream" uid="uid://dtybtbls2nxvl" path="res://Assets/Audios/SFX/Instances/敲钟.wav" id="3_scl0x"]
-[ext_resource type="Resource" uid="uid://d0a30btjuujcw" path="res://Assets/Dialogues/NPCs/GrassLandMerchant.dialogue" id="4_glm_dialogue"]
+[ext_resource type="AudioStream" uid="uid://bqpqfd1hb2pl3" path="res://Assets/Audios/SFX/Instances/敲钟.wav" id="3_scl0x"]
+[ext_resource type="Resource" uid="uid://rspetkti0nyf" path="res://Assets/Dialogues/NPCs/GrassLandMerchant.dialogue" id="4_glm_dialogue"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="5_glm_balloon"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_fvu2l"]

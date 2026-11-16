@@ -4,7 +4,7 @@
 [ext_resource type="AudioStream" uid="uid://wh2j8kh5ma1q" path="res://Assets/Audios/BGM/跳跃天空.ogg" id="2_dj8vp"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_mp7th"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_0s1r3"]
-[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_mjh3g"]
+[ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_mjh3g"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="7_w5dyk"]
 [ext_resource type="TileSet" uid="uid://ddmqsmr1batw4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原背景瓦片集.tres" id="8_4h011"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="9_7furf"]

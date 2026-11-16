@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://dleai1y0iaa7s"]
 
 [ext_resource type="Script" uid="uid://0f0qymy75vah" path="res://Scripts/Instances/Props/Switch.gd" id="1_qkht4"]
-[ext_resource type="Texture2D" uid="uid://cy2gwpiimwxb0" path="res://Assets/Textures/Instances/GrassLand/开关.png" id="2_bv0hl"]
+[ext_resource type="Texture2D" uid="uid://cpy8ngi17wen5" path="res://Assets/Textures/Instances/GrassLand/开关.png" id="2_bv0hl"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_kjogn"]
 atlas = ExtResource("2_bv0hl")

@@ -1,8 +1,8 @@
 [gd_scene load_steps=22 format=3 uid="uid://dvyyx1gsopmfx"]
 
 [ext_resource type="Script" uid="uid://d2jvn2sq2nkpk" path="res://Scripts/Instances/Items/Coin.gd" id="1_58uoq"]
-[ext_resource type="AudioStream" uid="uid://7xh1f147eci0" path="res://Assets/Audios/SFX/Instances/拾取钱币.wav" id="2_nwgl6"]
-[ext_resource type="Texture2D" uid="uid://n6vhw43ywjid" path="res://Assets/Textures/Instances/1.png" id="3_nwgl6"]
+[ext_resource type="AudioStream" uid="uid://de3qpru0itb7i" path="res://Assets/Audios/SFX/Instances/拾取钱币.wav" id="2_nwgl6"]
+[ext_resource type="Texture2D" uid="uid://cwh1gwfexepw4" path="res://Assets/Textures/Instances/1.png" id="3_nwgl6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6w1vh"]
 size = Vector2(14, 16)

@@ -1,6 +1,6 @@
 [gd_resource type="TileSet" load_steps=3 format=3 uid="uid://gcdv7t4035pp"]
 
-[ext_resource type="Texture2D" uid="uid://b0hbbefp7do0v" path="res://Assets/Textures/Tiles/SuperMario/马里奥城堡瓦片集.png" id="1_4fi5e"]
+[ext_resource type="Texture2D" uid="uid://cxarcnx23r8ye" path="res://Assets/Textures/Tiles/SuperMario/马里奥城堡瓦片集.png" id="1_4fi5e"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_n7h83"]
 texture = ExtResource("1_4fi5e")

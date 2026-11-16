@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://c8p4bv4n7if4"]
 
 [ext_resource type="Script" uid="uid://bh2ckgvruvdj2" path="res://Scripts/Entities/Neutrals/StoneBug.gd" id="1_stonebug"]
-[ext_resource type="Texture2D" uid="uid://cggvea5jfwmtx" path="res://Assets/Textures/Entities/Neutrals/石头虫.png" id="2_x0srl"]
+[ext_resource type="Texture2D" uid="uid://cvhdpdg6galva" path="res://Assets/Textures/Entities/Neutrals/石头虫.png" id="2_x0srl"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lqtnq"]
 atlas = ExtResource("2_x0srl")

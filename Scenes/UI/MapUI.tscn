@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=3 uid="uid://b5jls6ojf2s46"]
 
 [ext_resource type="Script" uid="uid://dqe1fpd8vpobx" path="res://Scripts/UI/MapUI.gd" id="1_mapui"]
-[ext_resource type="Texture2D" uid="uid://doogm7aww61n3" path="res://Assets/Textures/UIs/InstanceUIs/特殊标志.png" id="3_legend"]
-[ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="4_frame"]
-[ext_resource type="Texture2D" uid="uid://daixedsvp128g" path="res://Assets/Textures/UIs/SceneUIs/地图角色图标.png" id="5_53eeq"]
+[ext_resource type="Texture2D" uid="uid://b28mtiuib1kyv" path="res://Assets/Textures/UIs/InstanceUIs/特殊标志.png" id="3_legend"]
+[ext_resource type="Texture2D" uid="uid://chrxvtfsyndtw" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="4_frame"]
+[ext_resource type="Texture2D" uid="uid://cgglpyof6634f" path="res://Assets/Textures/UIs/SceneUIs/地图角色图标.png" id="5_53eeq"]
 [ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="6_fx"]
 
 [node name="MapUI" type="CanvasLayer"]

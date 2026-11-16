@@ -4,8 +4,8 @@
 [ext_resource type="AudioStream" uid="uid://wh2j8kh5ma1q" path="res://Assets/Audios/BGM/跳跃天空.ogg" id="2_ww6rs"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_u0im6"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_b7qt5"]
-[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_ox2vf"]
-[ext_resource type="Texture2D" uid="uid://bdk4g1kpab4q3" path="res://Assets/Textures/Backgrounds/风之谷背景2.png" id="6_wggag"]
+[ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_ox2vf"]
+[ext_resource type="Texture2D" uid="uid://djrjcf1vqq1e" path="res://Assets/Textures/Backgrounds/风之谷背景2.png" id="6_wggag"]
 [ext_resource type="TileSet" uid="uid://dni030wpfuehf" path="res://Assets/Textures/Tiles/WindValley/Tres/风之谷瓦片集.tres" id="7_wggag"]
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="8_q6eno"]
 [ext_resource type="TileSet" uid="uid://4av1b0gy6x1j" path="res://Assets/Textures/Tiles/WindValley/Tres/风之谷物块瓦片集.tres" id="8_wggag"]
@@ -23,7 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="18_5whwx"]
 [ext_resource type="PackedScene" uid="uid://oorimac8h2bw" path="res://Scenes/Instances/Props/Sign.tscn" id="19_ie052"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="19_lcvv2"]
-[ext_resource type="Resource" uid="uid://dnfga52xfvmxd" path="res://Assets/Dialogues/Signs/SignNO.dialogue" id="20_6vfrl"]
+[ext_resource type="Resource" uid="uid://dmqnuhaq5ncuj" path="res://Assets/Dialogues/Signs/SignNO.dialogue" id="20_6vfrl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 

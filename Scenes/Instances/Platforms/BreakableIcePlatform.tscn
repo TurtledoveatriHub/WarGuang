@@ -1,7 +1,7 @@
 [gd_scene load_steps=19 format=3 uid="uid://djjlaharmqnms"]
 
 [ext_resource type="Script" uid="uid://b02s23wuh8fbt" path="res://Scripts/Instances/Platforms/Platform.gd" id="1_ghkwv"]
-[ext_resource type="Texture2D" uid="uid://57iush21y0j0" path="res://Assets/Textures/Instances/SnowMountain/易碎冰面平台.png" id="2_ghkwv"]
+[ext_resource type="Texture2D" uid="uid://ch55mwyqwoxvx" path="res://Assets/Textures/Instances/SnowMountain/易碎冰面平台.png" id="2_ghkwv"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_x1udo"]
 atlas = ExtResource("2_ghkwv")

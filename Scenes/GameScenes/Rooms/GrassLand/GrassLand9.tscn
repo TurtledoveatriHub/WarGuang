@@ -1,11 +1,11 @@
-[gd_scene load_steps=21 format=4 uid="uid://0m3ttiev545t"]
+[gd_scene load_steps=21 format=4 uid="uid://0002bcb751ypv"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_3sv2x"]
 [ext_resource type="AudioStream" uid="uid://chuvp6gn40l48" path="res://Assets/Audios/BGM/蔚蓝云.ogg" id="2_3jenr"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_r8803"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="3_p00b8"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="5_snns7"]
-[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_vad6y"]
+[ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_vad6y"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="6_vad6y"]
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="7_2v7nf"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="8_11tu6"]

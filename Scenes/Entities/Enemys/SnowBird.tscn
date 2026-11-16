@@ -1,7 +1,7 @@
 [gd_scene load_steps=25 format=3 uid="uid://dlv8b3hprlwy"]
 
 [ext_resource type="PackedScene" uid="uid://vt88yo4m3y6" path="res://Scenes/Instances/HurtBoxs/EnemyIceSpike.tscn" id="2_pr8pd"]
-[ext_resource type="Texture2D" uid="uid://b7b3hm0qk0dtv" path="res://Assets/Textures/Entities/Enemys/雪地飞行敌怪.png" id="3_pr8pd"]
+[ext_resource type="Texture2D" uid="uid://d3i3jbpt8naee" path="res://Assets/Textures/Entities/Enemys/雪地飞行敌怪.png" id="3_pr8pd"]
 [ext_resource type="Script" uid="uid://c1qg2xnuu7c8k" path="res://Scripts/Entities/Enemys/EnemyBase.gd" id="4_5g7nx"]
 [ext_resource type="Script" uid="uid://ch52a1y1es10w" path="res://Scripts/Entities/Enemys/FlyingEnemy.gd" id="5_flyng"]
 [ext_resource type="Script" uid="uid://dcwdjd1fwukf4" path="res://Scripts/Entities/Enemys/EnemyAudio.gd" id="6_aud"]

@@ -1,10 +1,10 @@
 [gd_scene load_steps=21 format=4 uid="uid://c6c03adfoa4ov"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_qjhhs"]
-[ext_resource type="AudioStream" uid="uid://2o54aw0j0bet" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_1f3mw"]
+[ext_resource type="AudioStream" uid="uid://bs0ucop4s2m8h" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_1f3mw"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_pkc7a"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_ge11p"]
-[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_qjhhs"]
+[ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_qjhhs"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="6_g8com"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="7_vlr7r"]
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="8_qk3yl"]

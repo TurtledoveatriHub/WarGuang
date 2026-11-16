@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_1c38w"]
 [ext_resource type="AudioStream" uid="uid://y2b4bofrgj85" path="res://Assets/Audios/BGM/酒吧畅想2.ogg" id="2_b7wgd"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="3_5r1e4"]
-[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_61wan"]
+[ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_61wan"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="5_b7wgd"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="6_61wan"]
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="7_bf40o"]

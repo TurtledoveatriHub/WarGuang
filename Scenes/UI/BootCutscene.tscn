@@ -1,7 +1,7 @@
 [gd_scene load_steps=52 format=3 uid="uid://8fgwvc0o8k5q"]
 
 [ext_resource type="Script" uid="uid://jolprxfg3rym" path="res://Scripts/UI/BootCutscene.gd" id="1_2u0jc"]
-[ext_resource type="Texture2D" uid="uid://br3ytyifr1kwh" path="res://Assets/Textures/UIs/SceneUIs/开场动画.png" id="2_bh5cf"]
+[ext_resource type="Texture2D" uid="uid://knqidl5ecy87" path="res://Assets/Textures/UIs/SceneUIs/开场动画.png" id="2_bh5cf"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3csli"]
 atlas = ExtResource("2_bh5cf")

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ch52a1y1es10w" path="res://Scripts/Entities/Enemys/FlyingEnemy.gd" id="1_nre1j"]
 [ext_resource type="PackedScene" uid="uid://b2bcmv7t70mjs" path="res://Scenes/Instances/HurtBoxs/EnemyShit.tscn" id="2_nre1j"]
-[ext_resource type="Texture2D" uid="uid://cimd4dboia0ai" path="res://Assets/Textures/Entities/Enemys/夜露敌怪.png" id="3_kbb2x"]
+[ext_resource type="Texture2D" uid="uid://buty8qxcny27i" path="res://Assets/Textures/Entities/Enemys/夜露敌怪.png" id="3_kbb2x"]
 [ext_resource type="Script" uid="uid://c1qg2xnuu7c8k" path="res://Scripts/Entities/Enemys/EnemyBase.gd" id="4_lcoxq"]
 [ext_resource type="Script" uid="uid://dcwdjd1fwukf4" path="res://Scripts/Entities/Enemys/EnemyAudio.gd" id="5_bx82x"]
 

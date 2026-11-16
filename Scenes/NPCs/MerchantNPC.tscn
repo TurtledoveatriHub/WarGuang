@@ -1,10 +1,10 @@
-[gd_scene load_steps=38 format=3 uid="uid://b5u66wh2js8e"]
+[gd_scene load_steps=38 format=3 uid="uid://0002lw57llfpf"]
 
-[ext_resource type="Script" uid="uid://igv5cxvnqu52" path="res://Scripts/NPCs/MerchantNPC.gd" id="1_5oicq"]
-[ext_resource type="Resource" uid="uid://c4girsu3fahn" path="res://Assets/Dialogues/MerchantDialogue.dialogue" id="2_ppi4a"]
+[ext_resource type="Script" uid="uid://ch04duw4ekuta" path="res://Scripts/Entities/NPCs/GrassLandMerchant.gd" id="1_5oicq"]
+[ext_resource type="Resource" uid="uid://dtqpxhfh6g3nd" path="res://Assets/Dialogues/MerchantDialogue.dialogue" id="2_ppi4a"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="3_ac534"]
-[ext_resource type="Texture2D" uid="uid://bx0ye7xrni3ix" path="res://Assets/Textures/NPCs/9a9a3147ec18946ac8f53c26d0099d1c.png" id="3_dsyu1"]
-[ext_resource type="Texture2D" uid="uid://dohto6nf1nd73" path="res://Assets/Textures/UIs/new tiles 16×16-1.png" id="4_o1pgj"]
+[ext_resource type="Texture2D" uid="uid://buxh6qli2cj8d" path="res://Assets/Textures/NPCs/9a9a3147ec18946ac8f53c26d0099d1c.png" id="3_dsyu1"]
+[ext_resource type="Texture2D" uid="uid://dc3s0uq06bhpn" path="res://Assets/Textures/UIs/new tiles 16×16-1.png" id="4_o1pgj"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tlho6"]
 atlas = ExtResource("3_dsyu1")

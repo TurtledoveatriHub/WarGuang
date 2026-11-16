@@ -1,9 +1,9 @@
 [gd_scene load_steps=21 format=3 uid="uid://bjlvqrcplff4s"]
 
 [ext_resource type="Script" uid="uid://dusdsdd6jnj1s" path="res://Scripts/Entities/NPCs/Maniac.gd" id="1_canhq"]
-[ext_resource type="Texture2D" uid="uid://nmg6qkfwx1r7" path="res://Assets/Textures/Entities/NPCs/店员.png" id="3_sybhg"]
-[ext_resource type="Resource" uid="uid://6xq44tqbudix" path="res://Assets/Dialogues/NPCs/Maniac.dialogue" id="5_4nbwd"]
-[ext_resource type="Texture2D" uid="uid://d2esp1mx0142k" path="res://Assets/Textures/Entities/NPCs/白毛.png" id="5_sybhg"]
+[ext_resource type="Texture2D" uid="uid://8be33leogd6g" path="res://Assets/Textures/Entities/NPCs/店员.png" id="3_sybhg"]
+[ext_resource type="Resource" uid="uid://d33f4uc2uleoh" path="res://Assets/Dialogues/NPCs/Maniac.dialogue" id="5_4nbwd"]
+[ext_resource type="Texture2D" uid="uid://b51v33kscq3da" path="res://Assets/Textures/Entities/NPCs/白毛.png" id="5_sybhg"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="6_ojyfu"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_mu5ov"]

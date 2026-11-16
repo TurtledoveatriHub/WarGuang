@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://0mjagkn16vdd" path="res://Scripts/Instances/MineCart/MineCart.gd" id="1_cart"]
 [ext_resource type="Script" uid="uid://3sc2mg6jcng3" path="res://Scripts/Instances/MineCart/MineCartTrack.gd" id="2_trk"]
-[ext_resource type="AudioStream" uid="uid://cqqlb62bedu8f" path="res://Assets/Audios/SFX/UI/鼠标点击.wav" id="2_wr80o"]
-[ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/鼠标悬停.wav" id="3_d82lh"]
+[ext_resource type="AudioStream" uid="uid://mvobsx20q7le" path="res://Assets/Audios/SFX/UI/鼠标点击.wav" id="2_wr80o"]
+[ext_resource type="AudioStream" uid="uid://fqkauelckjyd" path="res://Assets/Audios/SFX/UI/鼠标悬停.wav" id="3_d82lh"]
 [ext_resource type="SpriteFrames" uid="uid://bo6tmy6ys866l" path="res://Assets/Textures/FXs/InstanceFXs/MineCartFX.tres" id="4_d82lh"]
-[ext_resource type="Texture2D" uid="uid://c1jrdgisl8krh" path="res://Assets/Textures/Instances/MineCart/轨道.png" id="6_d82lh"]
-[ext_resource type="Texture2D" uid="uid://bwh35fdj2awsl" path="res://Assets/Textures/Instances/MineCart/缆车.png" id="7_6fufq"]
+[ext_resource type="Texture2D" uid="uid://b35o6ohmndmms" path="res://Assets/Textures/Instances/MineCart/轨道.png" id="6_d82lh"]
+[ext_resource type="Texture2D" uid="uid://betsxd008qlm6" path="res://Assets/Textures/Instances/MineCart/缆车.png" id="7_6fufq"]
 [ext_resource type="Texture2D" uid="uid://dejbumaq8x8hm" path="res://Assets/Textures/Instances/MineCart/轮子_rot24.png" id="8_d82lh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_st"]

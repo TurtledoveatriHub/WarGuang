@@ -1,12 +1,12 @@
 [gd_scene load_steps=18 format=3 uid="uid://dbsqhd2of3pjn"]
 
 [ext_resource type="Script" uid="uid://0mjagkn16vdd" path="res://Scripts/Instances/MineCart/MineCart.gd" id="1_4qbvh"]
-[ext_resource type="AudioStream" uid="uid://cqqlb62bedu8f" path="res://Assets/Audios/SFX/UI/鼠标点击.wav" id="2_n4res"]
-[ext_resource type="AudioStream" uid="uid://bspeo0fgsbw6x" path="res://Assets/Audios/SFX/UI/鼠标悬停.wav" id="3_boegl"]
-[ext_resource type="Texture2D" uid="uid://dk7oyvk8fjwr4" path="res://Assets/Textures/Instances/MineCart/蓝色烟雾.png" id="4_4qbvh"]
+[ext_resource type="AudioStream" uid="uid://mvobsx20q7le" path="res://Assets/Audios/SFX/UI/鼠标点击.wav" id="2_n4res"]
+[ext_resource type="AudioStream" uid="uid://fqkauelckjyd" path="res://Assets/Audios/SFX/UI/鼠标悬停.wav" id="3_boegl"]
+[ext_resource type="Texture2D" uid="uid://cdoh8e5vww1pw" path="res://Assets/Textures/Instances/MineCart/蓝色烟雾.png" id="4_4qbvh"]
 [ext_resource type="Script" uid="uid://3sc2mg6jcng3" path="res://Scripts/Instances/MineCart/MineCartTrack.gd" id="5_fieoj"]
-[ext_resource type="Texture2D" uid="uid://c1jrdgisl8krh" path="res://Assets/Textures/Instances/MineCart/轨道.png" id="6_awlao"]
-[ext_resource type="Texture2D" uid="uid://28f68at0pg2g" path="res://Assets/Textures/Instances/MineCart/雪地缆车.png" id="7_n4res"]
+[ext_resource type="Texture2D" uid="uid://b35o6ohmndmms" path="res://Assets/Textures/Instances/MineCart/轨道.png" id="6_awlao"]
+[ext_resource type="Texture2D" uid="uid://teion58jfkpb" path="res://Assets/Textures/Instances/MineCart/雪地缆车.png" id="7_n4res"]
 [ext_resource type="Texture2D" uid="uid://c33sbwsxewp65" path="res://Assets/Textures/Instances/MineCart/雪地轮子_rot24.png" id="8_4qbvh"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cunx8"]

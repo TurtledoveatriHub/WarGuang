@@ -1,7 +1,7 @@
 [gd_scene load_steps=16 format=3 uid="uid://vt88yo4m3y6"]
 
 [ext_resource type="Script" uid="uid://coyhoi2hy0saj" path="res://Scripts/Instances/HurtBoxs/EnemyBullet.gd" id="1_vvqta"]
-[ext_resource type="Texture2D" uid="uid://sgqpjbgrdkyu" path="res://Assets/Textures/Instances/SnowMountain/敌怪冰锥.png" id="2_vvqta"]
+[ext_resource type="Texture2D" uid="uid://blcnylc7283dy" path="res://Assets/Textures/Instances/SnowMountain/敌怪冰锥.png" id="2_vvqta"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ck5pq"]
 atlas = ExtResource("2_vvqta")

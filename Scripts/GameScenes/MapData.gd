@@ -10,10 +10,10 @@ extends Resource
 ##   var data = MapData.new()
 ##   data.room_id = "Room1"
 ##   data.map_position = Vector2(100, 200)
-##   ResourceSaver.save(data, "res://Assets/Maps/Room1_mapdata.tres")
+##   ResourceSaver.save(data, "res://Assets/Maps/" + room_id + "_mapdata.tres")
 ##
 ## 加载方式（在 MapManager 中）：
-##   var data = load("res://Assets/Maps/Room1_mapdata.tres") as MapData
+##   var data = load("res://Assets/Maps/" + room_id + "_mapdata.tres") as MapData
 
 ## 对应的房间 ID（必须与 Room.gd 中的 room_id 一致）
 @export var room_id: String = ""

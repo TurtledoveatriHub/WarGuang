@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dlv8b3hprlwy" path="res://Scenes/Entities/Enemys/SnowBird.tscn" id="2_nbtfg"]
 [ext_resource type="PackedScene" uid="uid://o037k83wlf4b" path="res://Scenes/Entities/Enemys/NightHeron.tscn" id="3_jpow8"]
 [ext_resource type="Script" uid="uid://c1qg2xnuu7c8k" path="res://Scripts/Entities/Enemys/EnemyBase.gd" id="4_5g7nx"]
-[ext_resource type="Texture2D" uid="uid://b7b3hm0qk0dtv" path="res://Assets/Textures/Entities/Enemys/雪地飞行敌怪.png" id="5_nbtfg"]
+[ext_resource type="Texture2D" uid="uid://d3i3jbpt8naee" path="res://Assets/Textures/Entities/Enemys/雪地飞行敌怪.png" id="5_nbtfg"]
 [ext_resource type="Script" uid="uid://cyhdthdaeivg6" path="res://Scripts/Entities/Enemys/SacredBird.gd" id="5_sacr"]
 [ext_resource type="Script" uid="uid://dcwdjd1fwukf4" path="res://Scripts/Entities/Enemys/EnemyAudio.gd" id="6_aud"]
 

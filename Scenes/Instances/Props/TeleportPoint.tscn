@@ -1,9 +1,9 @@
 [gd_scene load_steps=19 format=3 uid="uid://cbxsbnigsn8l2"]
 
 [ext_resource type="Script" uid="uid://b5xcliou3hjjs" path="res://Scripts/Instances/Props/TeleportPoint.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://k33jnveinxxe" path="res://Assets/Textures/Instances/炽天使传送阵.png" id="2_sg6h8"]
-[ext_resource type="AudioStream" uid="uid://cp275sq8c2oho" path="res://Assets/Audios/SFX/Instances/传送阵.wav" id="2_vusba"]
-[ext_resource type="AudioStream" uid="uid://7rfys6i010wd" path="res://Assets/Audios/SFX/Instances/传送阵2.wav" id="3_0ga7l"]
+[ext_resource type="Texture2D" uid="uid://cm0qir50yoq0k" path="res://Assets/Textures/Instances/炽天使传送阵.png" id="2_sg6h8"]
+[ext_resource type="AudioStream" uid="uid://dsvne7jvdcqf4" path="res://Assets/Audios/SFX/Instances/传送阵.wav" id="2_vusba"]
+[ext_resource type="AudioStream" uid="uid://fpr6or8lqb10" path="res://Assets/Audios/SFX/Instances/传送阵2.wav" id="3_0ga7l"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3i6ge"]
 atlas = ExtResource("2_sg6h8")

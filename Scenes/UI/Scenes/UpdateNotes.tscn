@@ -1,10 +1,10 @@
 [gd_scene load_steps=8 format=3 uid="uid://djladah2cc3ru"]
 
 [ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="1_obe08"]
-[ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="2_bmmub"]
-[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="3_0yidl"]
-[ext_resource type="Texture2D" uid="uid://ckdrvf1m1nuec" path="res://Assets/Textures/UIs/ButtonUIs/小按钮默认纹理.png" id="4_3a4er"]
-[ext_resource type="Texture2D" uid="uid://b8q1icjm5xwqn" path="res://Assets/Textures/UIs/ButtonUIs/小按钮按下纹理.png" id="6_obe08"]
+[ext_resource type="Texture2D" uid="uid://chrxvtfsyndtw" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="2_bmmub"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="3_0yidl"]
+[ext_resource type="Texture2D" uid="uid://bod62woigqies" path="res://Assets/Textures/UIs/ButtonUIs/小按钮默认纹理.png" id="4_3a4er"]
+[ext_resource type="Texture2D" uid="uid://cjvjfc6g33cgb" path="res://Assets/Textures/UIs/ButtonUIs/小按钮按下纹理.png" id="6_obe08"]
 [ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="7_8c1f3"]
 [ext_resource type="Script" uid="uid://del6qp3ylpn7b" path="res://Scripts/UI/Scenes/UIPopupPanel.gd" id="9_popup"]
 

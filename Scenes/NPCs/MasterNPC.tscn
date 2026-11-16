@@ -1,10 +1,10 @@
-[gd_scene load_steps=17 format=3 uid="uid://c27lxln10kkbv"]
+[gd_scene load_steps=17 format=3 uid="uid://0000l4tutiyid"]
 
-[ext_resource type="Script" uid="uid://bwq04wp484mw7" path="res://Scripts/NPCs/MasterNPC.gd" id="1_5awuc"]
-[ext_resource type="Resource" uid="uid://fd85ehfbg5ed" path="res://Assets/Dialogues/MasterDialogue.dialogue" id="2_h7ebo"]
+[ext_resource type="Script" uid="uid://bwq04wp484mw7" path="res://Scripts/Entities/NPCs/Master.gd" id="1_5awuc"]
+[ext_resource type="Resource" uid="uid://db4m7u346k825" path="res://Assets/Dialogues/MasterDialogue.dialogue" id="2_h7ebo"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="3_06twq"]
-[ext_resource type="Texture2D" uid="uid://bx0ye7xrni3ix" path="res://Assets/Textures/NPCs/9a9a3147ec18946ac8f53c26d0099d1c.png" id="3_n4g7q"]
-[ext_resource type="Texture2D" uid="uid://dohto6nf1nd73" path="res://Assets/Textures/UIs/new tiles 16×16-1.png" id="4_dwtlg"]
+[ext_resource type="Texture2D" uid="uid://buxh6qli2cj8d" path="res://Assets/Textures/NPCs/9a9a3147ec18946ac8f53c26d0099d1c.png" id="3_n4g7q"]
+[ext_resource type="Texture2D" uid="uid://dc3s0uq06bhpn" path="res://Assets/Textures/UIs/new tiles 16×16-1.png" id="4_dwtlg"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_m5tcw"]
 atlas = ExtResource("3_n4g7q")

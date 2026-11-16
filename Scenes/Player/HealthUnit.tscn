@@ -1,9 +1,9 @@
 [gd_scene load_steps=12 format=3 uid="uid://h0kyvxadfyys"]
 
-[ext_resource type="Script" uid="uid://dlnhn12wstg44" path="res://Scripts/Player/HealthUnit.gd" id="1_ddyvn"]
+[ext_resource type="Script" uid="uid://dlnhn12wstg44" path="res://Scripts/Player/PlayerUI/HealthUnit.gd" id="1_ddyvn"]
 [ext_resource type="Texture2D" uid="uid://bshrqifraeukj" path="res://Assets/Textures/UIs/BackButtonBlue.tres" id="2_lb7it"]
 [ext_resource type="Texture2D" uid="uid://dsyolv1vx0smy" path="res://Assets/Textures/UIs/Apple.tres" id="4_pjbqo"]
-[ext_resource type="Texture2D" uid="uid://bxb8iqy5ueokq" path="res://Assets/Textures/UIs/health_empty.png" id="5_871ls"]
+[ext_resource type="Texture2D" uid="uid://s7pqtbpfft1f" path="res://Assets/Textures/UIs/health_empty.png" id="5_871ls"]
 [ext_resource type="Texture2D" uid="uid://br01fc8kaubld" path="res://Assets/Textures/UIs/BackButtonRed.tres" id="6_r7uek"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o3ubt"]

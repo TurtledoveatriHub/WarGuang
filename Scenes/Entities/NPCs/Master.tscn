@@ -1,10 +1,10 @@
 [gd_scene load_steps=18 format=3 uid="uid://c27lxln10kkbv"]
 
 [ext_resource type="Script" uid="uid://bwq04wp484mw7" path="res://Scripts/Entities/NPCs/Master.gd" id="1_5awuc"]
-[ext_resource type="Resource" uid="uid://fd85ehfbg5ed" path="res://Assets/Dialogues/NPCs/Master.dialogue" id="2_h7ebo"]
+[ext_resource type="Resource" uid="uid://brj2bx6grxf4b" path="res://Assets/Dialogues/NPCs/Master.dialogue" id="2_h7ebo"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="3_06twq"]
-[ext_resource type="AudioStream" uid="uid://7rfys6i010wd" path="res://Assets/Audios/SFX/Instances/传送阵2.wav" id="4_1hdl2"]
-[ext_resource type="Texture2D" uid="uid://cu3006c8sx5j4" path="res://Assets/Textures/Entities/NPCs/吸烟蘑菇.png" id="4_06twq"]
+[ext_resource type="AudioStream" uid="uid://fpr6or8lqb10" path="res://Assets/Audios/SFX/Instances/传送阵2.wav" id="4_1hdl2"]
+[ext_resource type="Texture2D" uid="uid://b2mhp3mudrox6" path="res://Assets/Textures/Entities/NPCs/吸烟蘑菇.png" id="4_06twq"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_n4g7q"]
 atlas = ExtResource("4_06twq")

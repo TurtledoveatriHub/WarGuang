@@ -1,6 +1,6 @@
 [gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://do2prxybw8u4p"]
 
-[ext_resource type="Texture2D" uid="uid://b25qysoqabkuu" path="res://Assets/Textures/UIs/MobieControlsUIs/操作按键图.png" id="1_kndef"]
+[ext_resource type="Texture2D" uid="uid://spn3ah4yfwuu" path="res://Assets/Textures/UIs/MobieControlsUIs/操作按键图.png" id="1_kndef"]
 
 [resource]
 atlas = ExtResource("1_kndef")

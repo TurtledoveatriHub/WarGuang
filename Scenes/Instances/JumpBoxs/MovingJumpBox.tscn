@@ -1,7 +1,7 @@
 [gd_scene load_steps=20 format=3 uid="uid://svg0nqkaksx4"]
 
 [ext_resource type="Script" uid="uid://o2ydc1bxasd2" path="res://Scripts/Instances/JumpBoxs/MovingJumpBox.gd" id="1_sx4gy"]
-[ext_resource type="Texture2D" uid="uid://4jbxxqn058o2" path="res://Assets/Textures/anim16×16_01-Sheet.png" id="2_mc2it"]
+[ext_resource type="Texture2D" uid="uid://chhli1vqdjyu7" path="res://Assets/Textures/anim16×16_01-Sheet.png" id="2_mc2it"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5g173"]
 size = Vector2(9, 9)

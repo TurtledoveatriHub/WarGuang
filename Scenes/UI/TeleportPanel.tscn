@@ -1,12 +1,12 @@
 [gd_scene load_steps=9 format=3 uid="uid://diylsfmb0ckg5"]
 
 [ext_resource type="Script" uid="uid://x3hbxtwnrr30" path="res://Scripts/UI/TeleportPanel.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://cjwinxl7swy2w" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="3_juc85"]
-[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/NormalTheme9x9.tres" id="7_ex6nn"]
-[ext_resource type="Texture2D" uid="uid://bflntllsubejm" path="res://Assets/Textures/UIs/ButtonUIs/按钮默认纹理.png" id="8_ex6nn"]
-[ext_resource type="Texture2D" uid="uid://cbxu06v4xk2lp" path="res://Assets/Textures/UIs/ButtonUIs/按钮悬停纹理.png" id="9_7alhu"]
+[ext_resource type="Texture2D" uid="uid://chrxvtfsyndtw" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="3_juc85"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="7_ex6nn"]
+[ext_resource type="Texture2D" uid="uid://760cxaapn7og" path="res://Assets/Textures/UIs/ButtonUIs/按钮默认纹理.png" id="8_ex6nn"]
+[ext_resource type="Texture2D" uid="uid://c7oewm0yh0p6j" path="res://Assets/Textures/UIs/ButtonUIs/按钮悬停纹理.png" id="9_7alhu"]
 [ext_resource type="Script" uid="uid://dw76ryy8ii6g7" path="res://Scripts/UI/TeleportPanelButton.gd" id="9_l5e8y"]
-[ext_resource type="Texture2D" uid="uid://dh7lqkmf1t51n" path="res://Assets/Textures/UIs/ButtonUIs/按钮按下纹理.png" id="10_pq6s8"]
+[ext_resource type="Texture2D" uid="uid://diyd7rw1i2bs2" path="res://Assets/Textures/UIs/ButtonUIs/按钮按下纹理.png" id="10_pq6s8"]
 [ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="11_fxbus"]
 
 [node name="TeleportPanel" type="CanvasLayer"]

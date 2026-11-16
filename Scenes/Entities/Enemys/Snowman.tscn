@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://c5bnxy7sxs4o4" path="res://Scripts/Entities/Enemys/RegularEnemy.gd" id="1_v1wb1"]
 [ext_resource type="PackedScene" uid="uid://bb7u8dqe3lep" path="res://Scenes/Instances/HurtBoxs/EnemyIceBall.tscn" id="2_infkk"]
-[ext_resource type="Texture2D" uid="uid://bofk2fa78wx82" path="res://Assets/Textures/Warmas/小沃玛1.png" id="2_xw338"]
-[ext_resource type="Texture2D" uid="uid://d46ruf7uw1ee" path="res://Assets/Textures/Warmas/小沃玛2.png" id="3_hjs2s"]
+[ext_resource type="Texture2D" uid="uid://tsv4yksnl1kt" path="res://Assets/Textures/Warmas/小沃玛1.png" id="2_xw338"]
+[ext_resource type="Texture2D" uid="uid://lmv7mum46ern" path="res://Assets/Textures/Warmas/小沃玛2.png" id="3_hjs2s"]
 [ext_resource type="Script" uid="uid://c1qg2xnuu7c8k" path="res://Scripts/Entities/Enemys/EnemyBase.gd" id="4_xw338"]
 [ext_resource type="Script" uid="uid://dcwdjd1fwukf4" path="res://Scripts/Entities/Enemys/EnemyAudio.gd" id="5_aud"]
 

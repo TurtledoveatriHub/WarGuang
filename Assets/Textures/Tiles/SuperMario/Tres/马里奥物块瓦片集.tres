@@ -1,7 +1,7 @@
 [gd_resource type="TileSet" load_steps=5 format=3 uid="uid://dxhvxoxaobqjj"]
 
-[ext_resource type="Texture2D" uid="uid://6c0i1f45ykms" path="res://Assets/Textures/Tiles/SuperMario/马里奥物块瓦片集.png" id="1_mktdq"]
-[ext_resource type="Texture2D" uid="uid://drgj6542y7rac" path="res://Assets/Textures/Tiles/SuperMario/水管.png" id="2_teacy"]
+[ext_resource type="Texture2D" uid="uid://cr0x2n1qvief6" path="res://Assets/Textures/Tiles/SuperMario/马里奥物块瓦片集.png" id="1_mktdq"]
+[ext_resource type="Texture2D" uid="uid://bqpbhdda6ev7k" path="res://Assets/Textures/Tiles/SuperMario/水管.png" id="2_teacy"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mktdq"]
 texture = ExtResource("1_mktdq")

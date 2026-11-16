@@ -1,6 +1,7 @@
 [gd_resource type="Theme" load_steps=2 format=3 uid="uid://x6qv7hs1dfnn"]
 
-[ext_resource type="FontFile" uid="uid://doiq1klof33ds" path="res://Assets/Themes/Theme9x9.ttf" id="1_gowpo"]
+[ext_resource type="FontVariation" uid="uid://m23bt8wehne0" path="res://Assets/Themes/NormalTheme.tres" id="1_t7ox3"]
 
 [resource]
-default_font = ExtResource("1_gowpo")
+default_font = ExtResource("1_t7ox3")
+default_font_size = 10

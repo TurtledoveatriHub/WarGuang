@@ -1,8 +1,8 @@
 [gd_scene load_steps=23 format=3 uid="uid://bdo6ilwaiccma"]
 
 [ext_resource type="Script" uid="uid://88jpwuxuxpwj" path="res://Scripts/Entities/NPCs/RaceStarter.gd" id="1_racer"]
-[ext_resource type="Texture2D" uid="uid://b3kmmagyjp8yq" path="res://Assets/Textures/Entities/NPCs/飞毛腿.png" id="4_tipmx"]
-[ext_resource type="Resource" uid="uid://caw6miyhm1ai8" path="res://Assets/Dialogues/NPCs/RaceStarter.dialogue" id="5_raceres"]
+[ext_resource type="Texture2D" uid="uid://bk4u1y63c4eq4" path="res://Assets/Textures/Entities/NPCs/飞毛腿.png" id="4_tipmx"]
+[ext_resource type="Resource" uid="uid://bwufndu6k2ve7" path="res://Assets/Dialogues/NPCs/RaceStarter.dialogue" id="5_raceres"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="6_ojyfu"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nbsh7"]

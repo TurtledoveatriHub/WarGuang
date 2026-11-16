@@ -1,7 +1,7 @@
 [gd_scene load_steps=14 format=3 uid="uid://bq5gktnvtvvop"]
 
 [ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_5nrrw"]
-[ext_resource type="Texture2D" uid="uid://d0th6w2o2081k" path="res://Assets/Textures/Instances/SnowMountain/冰晶.png" id="2_xms2i"]
+[ext_resource type="Texture2D" uid="uid://p3djq5dulijl" path="res://Assets/Textures/Instances/SnowMountain/冰晶.png" id="2_xms2i"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6bg1h"]
 atlas = ExtResource("2_xms2i")

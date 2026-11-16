@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://ctgxsaoq0vrlk"]
 
 [ext_resource type="Script" uid="uid://b02s23wuh8fbt" path="res://Scripts/Instances/Platforms/Platform.gd" id="1_ldtsg"]
-[ext_resource type="Texture2D" uid="uid://b6kkci1fhcbkw" path="res://Assets/Textures/Instances/GrassLand/移动平台.png" id="2_ldtsg"]
+[ext_resource type="Texture2D" uid="uid://cxhbylulocd4m" path="res://Assets/Textures/Instances/GrassLand/移动平台.png" id="2_ldtsg"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_62g6y"]
 atlas = ExtResource("2_ldtsg")

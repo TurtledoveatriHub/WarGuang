@@ -1,11 +1,11 @@
 [gd_scene load_steps=22 format=4 uid="uid://dy16wdg8g67bk"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_5ol86"]
-[ext_resource type="AudioStream" uid="uid://bjv3hvygk0135" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_f6vgp"]
+[ext_resource type="AudioStream" uid="uid://d2jppcmflv4dn" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_f6vgp"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_wllfw"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_kxt7c"]
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="5_6jb2b"]
-[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="6_cbmfw"]
+[ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="6_cbmfw"]
 [ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地物块瓦片集.tres" id="6_t3nta"]
 [ext_resource type="TileSet" uid="uid://qtdk7cq6rg5m" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地伤害瓦片集.tres" id="7_cbmfw"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="8_056qy"]

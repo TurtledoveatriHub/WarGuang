@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dhvpsakgvr6v5"]
 
-[ext_resource type="Script" uid="uid://de4ch1pjkbn33" path="res://Scripts/Instances/Environments/CameraFocusBeacon.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://de4ch1pjkbn33" path="res://Scripts/Instances/CameraFocusBeacon.gd" id="1_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tbx8o"]
 size = Vector2(128, 128)

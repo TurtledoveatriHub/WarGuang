@@ -1,9 +1,9 @@
 [gd_scene load_steps=36 format=3 uid="uid://cm3h413lvuans"]
 
 [ext_resource type="Script" uid="uid://dq0rdjsxrddg6" path="res://Scripts/Instances/JumpBoxs/JumpBox.gd" id="1_ol2j8"]
-[ext_resource type="AudioStream" uid="uid://c1rbd42778cdi" path="res://Assets/Audios/SFX/Instances/JumpBox.wav" id="2_kowqp"]
-[ext_resource type="Texture2D" uid="uid://chl3o3i5chgjf" path="res://Assets/Textures/Instances/SnowMountain/雪地JumpBox.png" id="4_jb1q7"]
-[ext_resource type="Texture2D" uid="uid://n6vhw43ywjid" path="res://Assets/Textures/Instances/1.png" id="5_b1ty5"]
+[ext_resource type="AudioStream" uid="uid://bngxopjd4hp71" path="res://Assets/Audios/SFX/Instances/JumpBox.wav" id="2_kowqp"]
+[ext_resource type="Texture2D" uid="uid://c5enk6k86qoi7" path="res://Assets/Textures/Instances/SnowMountain/雪地JumpBox.png" id="4_jb1q7"]
+[ext_resource type="Texture2D" uid="uid://cwh1gwfexepw4" path="res://Assets/Textures/Instances/1.png" id="5_b1ty5"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jrej3"]
 atlas = ExtResource("4_jb1q7")

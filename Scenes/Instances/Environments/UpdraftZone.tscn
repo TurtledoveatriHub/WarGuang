@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://d3lkakeejul6f"]
 
-[ext_resource type="Script" uid="uid://kbawxxq03kd2" path="res://Scripts/Instances/Environments/UpdraftZone.gd" id="1_updraft"]
-[ext_resource type="Script" uid="uid://cd40oqnytjly3" path="res://Scripts/Instances/Environments/EnvironmentZoneVisual.gd" id="2_upviz"]
+[ext_resource type="Script" uid="uid://kbawxxq03kd2" path="res://Scripts/Instances/UpdraftZone.gd" id="1_updraft"]
+[ext_resource type="Script" uid="uid://cd40oqnytjly3" path="res://Scripts/Instances/EnvironmentZoneVisual.gd" id="2_upviz"]
 [ext_resource type="Texture2D" uid="uid://bn5j5b16b3bl3" path="res://Assets/Textures/FX/wind_streak.tres" id="3_streak"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_updraft"]

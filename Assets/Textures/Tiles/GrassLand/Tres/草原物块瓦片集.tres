@@ -1,7 +1,7 @@
 [gd_resource type="TileSet" load_steps=5 format=3 uid="uid://bcepqj28nsvep"]
 
-[ext_resource type="Texture2D" uid="uid://beq5xo5oi87fq" path="res://Assets/Textures/Tiles/GrassLand/草原物块瓦片.png" id="1_orb80"]
-[ext_resource type="Texture2D" uid="uid://baiqllx5y4y7o" path="res://Assets/Textures/Instances/GrassLand/木制单向平台.png" id="2_orb80"]
+[ext_resource type="Texture2D" uid="uid://ckhj1bvukssd3" path="res://Assets/Textures/Tiles/GrassLand/草原物块瓦片.png" id="1_orb80"]
+[ext_resource type="Texture2D" uid="uid://ddynb07o8t0bf" path="res://Assets/Textures/Instances/GrassLand/木制单向平台.png" id="2_orb80"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2t1lg"]
 texture = ExtResource("1_orb80")
