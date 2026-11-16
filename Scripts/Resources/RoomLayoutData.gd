@@ -57,10 +57,16 @@ extends Resource
 ## 每个房间边缘允许向外多画多少个像素（0~2）。
 ## 房间边缘的精度不重要，但 room_bounds 正好切在墙中间时会在边缘留下整齐的缺口，
 ## 所以每个房间按 ID 哈希取一个 0~该值的固定随机量向外放宽（每次重画结果一致）。
-@export_range(0, 4, 1) var map_edge_tolerance_px: int = 2
+## 门连线超过这个像素长度（地图纹理像素）时，超过的部分在中间段变成虚线（隔一个像素画一个）。
+## 例：阈值为 16、连线 32px → 两端各 8px 实线，中间 16px 虚线。
+@export_range(0, 512, 1) var map_connector_dash_threshold_px: int = 16
+
+## 房间显示名称：room_id → 名称（地图放大到一定倍率时画在房间块下方）。
+## 没设置的房间不绘制。
+@export var room_display_names: Dictionary = {}
 ## 自动计算地图画布原点时，四周预留的世界像素
 ## 320 世界像素 = 4 纹理像素，用于给后续新增房间留空间，避免边界房间紧贴画布边缘
-@export var map_padding_world: float = 320.0
+@export var map_padding_world: float = 960.0
 
 # ════════════════════════════════════════════════════════════
 # 代码生成地图纹理的绘制规范

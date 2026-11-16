@@ -4,7 +4,7 @@
 [ext_resource type="AudioStream" uid="uid://bjv3hvygk0135" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_orx6g"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_xkl56"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_orx6g"]
-[ext_resource type="Texture2D" uid="uid://dwpgj2yjqy8oc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景2.png" id="5_xkl56"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_t35eu"]
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="5_yxtg7"]
 [ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地物块瓦片集.tres" id="6_vokt0"]
 [ext_resource type="TileSet" uid="uid://qtdk7cq6rg5m" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地伤害瓦片集.tres" id="7_mxpr2"]
@@ -54,7 +54,8 @@ source_background = NodePath("Background1")
 parallax_ratio = Vector2(0.15, 0.05)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
-texture = ExtResource("5_xkl56")
+modulate = Color(0.14509805, 0.14509805, 0.21176471, 1)
+texture = ExtResource("5_t35eu")
 
 [node name="FGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_orx6g")

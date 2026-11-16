@@ -53,10 +53,17 @@ static func refresh_dash(player: Node) -> void:
 	player.has_dashed_in_air = false
 
 static func update_effective_multipliers(player: Node) -> void:
-	player.effective_horizontal_multiplier = player.env_horizontal_multiplier
+	## 环境效果区：水平乘数按「本帧移动意图方向」取（向右 / 向左各一个乘数）
+	var horizontal_dir_mul: float = 1.0
+	var intent: float = player.get_resolved_horizontal_input() if player.has_method("get_resolved_horizontal_input") else Input.get_axis("left", "right")
+	if intent > 0.0:
+		horizontal_dir_mul = player.env_zone_speed_mul_right
+	elif intent < 0.0:
+		horizontal_dir_mul = player.env_zone_speed_mul_left
+	player.effective_horizontal_multiplier = player.env_horizontal_multiplier * horizontal_dir_mul
 	player.effective_vertical_multiplier = player.env_vertical_multiplier
-	player.effective_gravity_multiplier = player.env_gravity_multiplier
-	player.effective_max_fall_multiplier = player.env_max_fall_multiplier
+	player.effective_gravity_multiplier = player.env_gravity_multiplier * player.env_zone_gravity_mul
+	player.effective_max_fall_multiplier = player.env_max_fall_multiplier * player.env_zone_max_fall_mul
 	player.effective_acceleration_multiplier = player.env_acceleration_multiplier
 	player.effective_max_fall_speed = player.max_fall_speed * player.effective_max_fall_multiplier
 

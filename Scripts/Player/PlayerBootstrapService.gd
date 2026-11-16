@@ -33,7 +33,7 @@ static func initialize_on_ready(player: Node) -> void:
 	DialogueSystem.dialogue_ended.connect(player._on_dialogue_ended)
 
 	if RoomManager.has_method("set_low_health_effect"):
-		print("Player: 已连接RoomManager颜色管理")
+		pass  # 颜色管理已接线（原调试输出已清理）
 
 	_connect_ability_unlock_signals(player)
 
@@ -78,9 +78,9 @@ static func initialize_player_ui(player: Node) -> void:
 				player.player_ui.player_died.disconnect(player._on_player_died)
 			player.player_ui.player_died.connect(player._on_player_died)
 		else:
-			print("警告: PlayerUI没有player_died信号")
+			push_warning("PlayerUI 没有 player_died 信号")
 	else:
-		print("=== PlayerUI查找失败 ===")
+		push_error("PlayerUI 查找失败")
 
 static func initialize_afterimage_pool(player: Node) -> void:
 	_ensure_afterimage_trail(player)

@@ -58,7 +58,7 @@ func show_challenge_ui() -> void:
 		container.modulate.a = 0.0
 	challenge_ui.add_to_group("challenge_counter")
 
-func update_challenge_ui(current: int, target: int) -> void:
+func update_challenge_ui(current: int, target: int, endless: bool = false) -> void:
 	var challenge_ui = _find_challenge_ui()
 	if challenge_ui == null:
 		show_challenge_ui()
@@ -67,7 +67,7 @@ func update_challenge_ui(current: int, target: int) -> void:
 		return
 
 	if challenge_ui.has_method("update_counter"):
-		challenge_ui.update_counter(current, target)
+		challenge_ui.update_counter(current, target, endless)
 	if challenge_ui.has_node("MarginContainer"):
 		var container = challenge_ui.get_node("MarginContainer")
 		if container.modulate.a < 1.0:

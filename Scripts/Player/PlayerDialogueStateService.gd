@@ -18,7 +18,6 @@ static func on_dialogue_ended(player: Node) -> void:
 	player.is_in_dialogue = false
 	await player.get_tree().process_frame
 	if player.current_state == player.PlayerState.INTERACTIVE:
-		print("Player: 从 INTERACTIVE 状态退出")
 		if player.is_on_floor():
 			player.change_state(player.PlayerState.IDLE)
 		else:

@@ -113,7 +113,8 @@ enum TriggerEffectType {
 ## 完美触发回复生命数
 @export var heal_perfect_amount: int = 2
 
-signal bounce_triggered(player)
+## 触发时发出（player = 触发者，trigger_grade = "perfect" / "normal"）
+signal bounce_triggered(player, trigger_grade)
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -128,7 +129,8 @@ var pending_perfect_until_ms: Dictionary = {}
 var _trigger_flash_default_modulate: Color = Color.WHITE
 var _trigger_sfx_player: AudioStreamPlayer2D = null
 
-# ── 移动 ──
+# ── 移动（全部用相对父节点的局部坐标：父节点若会移动（例：巡游中的 NPC），
+#     路径不会被拖着偏移，复位也能回到编辑器里摆的位置）──
 var _start_pos: Vector2
 var _end_pos: Vector2
 var _path_length: float = 0.0
@@ -139,14 +141,13 @@ var _wait_timer: float = 0.0
 var _current_speed: float = 0.0
 var _circle_center: Vector2
 var _circle_radius: float = 0.0
-var _wave_time: float = 0.0  # 波浪振荡相位计时
 
 # ════════════════════════════════════════
 # _ready
 # ════════════════════════════════════════
 
 func _ready():
-	_start_pos = global_position
+	_start_pos = position
 	_end_pos = _start_pos + end_offset
 	_path_length = end_offset.length()
 	_wait_timer = wait_time
@@ -178,7 +179,6 @@ func _physics_process(delta: float) -> void:
 		return
 	if current_anim_state != AnimState.YES:
 		return
-	_wave_time += delta
 	_handle_movement(delta)
 
 # ════════════════════════════════════════
@@ -273,9 +273,9 @@ func trigger_bounce(player):
 	if not _can_trigger_for_player(player):
 		return
 	
-	bounce_triggered.emit(player)
-	
 	var trigger_grade := _determine_trigger_grade(player)
+	bounce_triggered.emit(player, trigger_grade)
+	
 	_apply_trigger_effect(player, trigger_grade)
 	_apply_common_feedback(player, trigger_grade)
 	pending_perfect_until_ms.erase(player.get_instance_id())
@@ -397,6 +397,9 @@ func _consume_after_trigger(_player, _trigger_grade: String) -> void:
 func play_start_animation():
 	if is_destroying:
 		is_destroying = false
+	# 每次开始都从编辑器初始位置重新起步：
+	# 否则挑战失败重开时，会从上一次失败那一刻停在的位置继续移动
+	reset_movement_state()
 	is_transitioning = true
 	set_inactive()
 	if animated_sprite:
@@ -418,6 +421,26 @@ func play_end_animation():
 	if animated_sprite.sprite_frames.has_animation("END"):
 		animated_sprite.play("END")
 		await animated_sprite.animation_finished
+
+## 挑战开赛前预处理：回到初始位置并隐藏
+## （在屏幕变黑之前调用，避免淡入瞬间闪出上一次结束时的位置）
+func prepare_for_challenge() -> void:
+	is_destroying = false
+	is_transitioning = false
+	reset_movement_state()
+	set_inactive()
+	current_anim_state = AnimState.NONE
+	if animated_sprite:
+		animated_sprite.visible = false
+
+## 把移动状态复位到编辑器初始位置（挑战重新开始时用，避免从上次失败位置继续运动）
+func reset_movement_state() -> void:
+	position = _start_pos
+	_progress = 0.0
+	_moving_to_end = true
+	_is_waiting = false
+	_wait_timer = 0.0
+	_current_speed = 0.0
 
 ## 由 ChallengeController 调用：播放 END 动画后禁用+隐藏
 func play_end_and_hide() -> void:
@@ -467,9 +490,6 @@ func _start_lifecycle() -> void:
 # ════════════════════════════════════════
 
 func _handle_movement(delta: float) -> void:
-	if movement_mode == MovementMode.WAVE:
-		_update_position()
-		return
 	if _path_length <= 0.0 or move_speed <= 0.0:
 		return
 	if _is_waiting:
@@ -496,9 +516,9 @@ func _handle_movement(delta: float) -> void:
 		_current_speed = move_speed
 	if _current_speed <= 0.0 and dist_left < half_decel * 0.5:
 		if _moving_to_end:
-			_progress = 1.0; global_position = _end_pos
+			_progress = 1.0; position = _end_pos
 		else:
-			_progress = 0.0; global_position = _start_pos
+			_progress = 0.0; position = _start_pos
 		_is_waiting = true; _wait_timer = wait_time
 		return
 	var step: float = (_current_speed * delta) / _path_length
@@ -507,21 +527,21 @@ func _handle_movement(delta: float) -> void:
 	var eps: float = 0.001
 	if _moving_to_end:
 		if _progress >= 1.0 - eps:
-			_progress = 1.0; global_position = _end_pos
+			_progress = 1.0; position = _end_pos
 			_is_waiting = true; _wait_timer = wait_time; return
 	else:
 		if _progress <= eps:
-			_progress = 0.0; global_position = _start_pos
+			_progress = 0.0; position = _start_pos
 			_is_waiting = true; _wait_timer = wait_time; return
 	_progress = clampf(_progress, 0.0, 1.0)
 	# CIRCULAR 模式在折返点位置可能有累积误差，修正到精确端点
 	if movement_mode == MovementMode.CIRCULAR:
 		if _progress >= 1.0 - eps:
 			_progress = 1.0
-			global_position = _end_pos
+			position = _end_pos
 		elif _progress <= eps:
 			_progress = 0.0
-			global_position = _start_pos
+			position = _start_pos
 		else:
 			_update_position()
 	else:
@@ -530,7 +550,7 @@ func _handle_movement(delta: float) -> void:
 func _update_position() -> void:
 	match movement_mode:
 		MovementMode.LINEAR:
-			global_position = _start_pos.lerp(_end_pos, _progress)
+			position = _start_pos.lerp(_end_pos, _progress)
 		MovementMode.CIRCULAR:
 			# ★ 修复：使用 end_offset 方向向量计算圆弧，支持任意方向 end_offset
 			var end_dir: Vector2 = end_offset.normalized()
@@ -541,7 +561,7 @@ func _update_position() -> void:
 				angle = dir_sign * PI * (1.0 - _progress)
 			else:
 				angle = -dir_sign * PI * (1.0 - _progress)
-			global_position = _circle_center + _circle_radius * (end_dir * cos(angle) + perp * sin(angle))
+			position = _circle_center + _circle_radius * (end_dir * cos(angle) + perp * sin(angle))
 		MovementMode.WAVE:
 			# 沿 start→end 直线前进 + 垂直方向正弦波偏移（严格对标 HurtBox）
 			var linear_pos: Vector2 = _start_pos.lerp(_end_pos, _progress)
@@ -555,7 +575,7 @@ func _update_position() -> void:
 			var perp: Vector2 = Vector2(-end_offset.y, end_offset.x).normalized()
 			if perp == Vector2.ZERO:
 				perp = Vector2.UP
-			global_position = linear_pos + perp * wave_amplitude * osc
+			position = linear_pos + perp * wave_amplitude * osc
 
 # ════════════════════════════════════════
 # 状态控制

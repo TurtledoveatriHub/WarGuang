@@ -1,0 +1,73 @@
+[gd_scene load_steps=8 format=3 uid="uid://dgm0sxuwtc7rp"]
+
+[ext_resource type="Script" uid="uid://mobfbjdy2eba" path="res://Scripts/Instances/Environments/PixelWaterSurface.gd" id="1_water"]
+[ext_resource type="Texture2D" uid="uid://dd5y02o5gkg1e" path="res://Assets/Textures/FX/water_body_tile.png" id="3_body"]
+[ext_resource type="Texture2D" uid="uid://c3iqlbqg72sra" path="res://Assets/Textures/Instances/6d45b2417c3d211c5f5f3f6cb3277890.png" id="3_t7crl"]
+[ext_resource type="Texture2D" uid="uid://dx4e52wpdyvya" path="res://Assets/Textures/FX/water_splash_dot.png" id="4_splash"]
+[ext_resource type="AudioStream" uid="uid://cvh3ikklujnj4" path="res://Assets/Audios/SFX/Instances/坏蛋冰激凌.wav" id="6_01nld"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_splash"]
+direction = Vector3(0, -1, 0)
+spread = 55.0
+initial_velocity_min = 60.0
+initial_velocity_max = 150.0
+gravity = Vector3(0, 420, 0)
+scale_min = 0.6
+scale_max = 1.4
+color = Color(0.82, 0.95, 1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_water"]
+size = Vector2(160, 160)
+
+[node name="PixelWaterSurface" type="Area2D"]
+z_index = 10
+script = ExtResource("1_water")
+body_offset_y = 5.0
+water_down_max_fall_multiplier = 0.75
+
+[node name="WaterVisuals" type="Node2D" parent="."]
+
+[node name="WaterBody" type="Sprite2D" parent="WaterVisuals"]
+modulate = Color(1, 1, 1, 0.8235294)
+texture_repeat = 2
+position = Vector2(-80, -75)
+scale = Vector2(1, 2.5)
+texture = ExtResource("3_body")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 160, 64)
+
+[node name="WaterSurfaceFar" type="Sprite2D" parent="WaterVisuals"]
+modulate = Color(0.5056, 0.65728, 0.79, 0.78431374)
+texture_repeat = 2
+position = Vector2(-80, -78)
+texture = ExtResource("3_t7crl")
+centered = false
+region_enabled = true
+region_rect = Rect2(68.175, 0, 160, 10)
+
+[node name="WaterSurface" type="Sprite2D" parent="WaterVisuals"]
+texture_repeat = 2
+position = Vector2(-80, -81)
+texture = ExtResource("3_t7crl")
+centered = false
+region_enabled = true
+region_rect = Rect2(151.5, 0, 160, 10)
+
+[node name="Splash" type="GPUParticles2D" parent="WaterVisuals"]
+emitting = false
+amount = 12
+texture = ExtResource("4_splash")
+lifetime = 0.45
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_splash")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(0, 5)
+shape = SubResource("RectangleShape2D_water")
+debug_color = Color(0.21568628, 0.8666667, 1, 0.23921569)
+
+[node name="SplashSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_01nld")

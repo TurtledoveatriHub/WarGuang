@@ -4,8 +4,8 @@
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_fsdaj"]
 [ext_resource type="AudioStream" uid="uid://2o54aw0j0bet" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_pkyhv"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_f2p7u"]
-[ext_resource type="Texture2D" uid="uid://bxf7ecw2hrks" path="res://Assets/Textures/Backgrounds/GrassLand/草原背景1.png" id="5_vnoib"]
-[ext_resource type="Texture2D" uid="uid://d2t3hjhhxndv" path="res://Assets/Textures/Backgrounds/GrassLand/草原背景1x2.png" id="6_7xbmu"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_f2p7u"]
+[ext_resource type="Texture2D" uid="uid://d2t3hjhhxndv" path="res://Assets/Textures/Backgrounds/草原背景2.png" id="6_7xbmu"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="7_iwaec"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="8_h8wy7"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="8_wumpn"]
@@ -50,7 +50,8 @@ target_room_id = "GrassLand11"
 source_background = NodePath("Background1")
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
-texture = ExtResource("5_vnoib")
+modulate = Color(0.49803922, 0.6392157, 0.84705883, 1)
+texture = ExtResource("5_f2p7u")
 
 [node name="BGController2" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_f2p7u")
@@ -187,7 +188,7 @@ checkpoint_id = "3"
 belongs_to_room = "GrassLand11"
 
 [node name="4" parent="DynamicCheckpoints" instance=ExtResource("10_tq0dq")]
-position = Vector2(936, 304)
+position = Vector2(928, 304)
 scale = Vector2(0.5, 0.5)
 checkpoint_id = "2"
 belongs_to_room = "GrassLand11"

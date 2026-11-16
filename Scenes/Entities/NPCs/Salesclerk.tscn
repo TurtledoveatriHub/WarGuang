@@ -5,7 +5,7 @@
 [ext_resource type="Resource" uid="uid://dawf1u3446hht" path="res://Assets/Dialogues/NPCs/Salesclerk.dialogue" id="2_ppi4a"]
 [ext_resource type="AudioStream" uid="uid://c26qkad66as23" path="res://Assets/Audios/SFX/Instances/交易购买.wav" id="3_0v3kd"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="3_ac534"]
-[ext_resource type="Texture2D" uid="uid://bx0ye7xrni3ix" path="res://Assets/Textures/Entities/NPCs/店员.png" id="3_dsyu1"]
+[ext_resource type="Texture2D" uid="uid://nmg6qkfwx1r7" path="res://Assets/Textures/Entities/NPCs/店员.png" id="3_dsyu1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tlho6"]
 atlas = ExtResource("3_dsyu1")
@@ -111,21 +111,21 @@ region = Rect2(224, 32, 32, 32)
 atlas = ExtResource("3_dsyu1")
 region = Rect2(0, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_2cg76"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_q4dbu"]
 atlas = ExtResource("3_dsyu1")
-region = Rect2(0, 160, 32, 32)
+region = Rect2(96, 128, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_x8mog"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_03m6l"]
 atlas = ExtResource("3_dsyu1")
-region = Rect2(32, 160, 32, 32)
+region = Rect2(128, 128, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_1x8y3"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_aukrm"]
 atlas = ExtResource("3_dsyu1")
-region = Rect2(64, 160, 32, 32)
+region = Rect2(160, 128, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_0tsv5"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_dhf7g"]
 atlas = ExtResource("3_dsyu1")
-region = Rect2(96, 160, 32, 32)
+region = Rect2(192, 128, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_fvu2l"]
 animations = [{
@@ -156,7 +156,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"ANGRY",
-"speed": 8.0
+"speed": 4.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -222,34 +222,31 @@ animations = [{
 }],
 "loop": true,
 "name": &"IDLE",
-"speed": 8.0
+"speed": 6.0
 }, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_tv7k5")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_2cg76")
+"texture": SubResource("AtlasTexture_q4dbu")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_x8mog")
+"texture": SubResource("AtlasTexture_03m6l")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_1x8y3")
+"texture": SubResource("AtlasTexture_aukrm")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_0tsv5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_tv7k5")
+"texture": SubResource("AtlasTexture_dhf7g")
 }],
 "loop": true,
 "name": &"TALK",
-"speed": 4.0
+"speed": 6.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g62kn"]
-size = Vector2(36, 24)
+size = Vector2(32, 32)
 
 [node name="Salesclerk" type="Area2D"]
 collision_layer = 64
@@ -264,11 +261,11 @@ balloon_scene = ExtResource("3_ac534")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_fvu2l")
-animation = &"HAPPY"
+animation = &"ANGRY_TALK"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 33
-position = Vector2(6, 2)
+position = Vector2(21, -3)
 shape = SubResource("RectangleShape2D_g62kn")
 
 [node name="InteractionPrompt" type="Sprite2D" parent="."]

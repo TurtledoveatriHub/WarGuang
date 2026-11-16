@@ -2,6 +2,9 @@ extends Node
 
 const SAVE_VERSION: int = 1
 
+## 无尽模式积分榜只记录历史前三
+const ENDLESS_RECORD_LIMIT: int = 3
+
 ## 信号定义
 signal player_health_changed(new_health)
 signal player_max_health_changed(new_max_health)
@@ -70,8 +73,20 @@ var maniac_stage5_last_challenge_failed: bool = false
 var maniac_stage6_challenge_completed: bool = false
 var maniac_stage6_last_challenge_failed: bool = false
 
+# 第七阶段（无尽模式）挑战状态记录（无尽模式不会通关，只记录上次是否失败）
+var maniac_stage7_last_challenge_failed: bool = false
+
 # 竞速挑战最佳时间：key = 阶段序号字符串（"1"~"5"），value = 秒数 float
 var race_best_times: Dictionary = {}
+
+# 竞速最佳成绩的达成日期：key = 阶段序号字符串，value = "年.月.日" 文本
+var race_best_time_dates: Dictionary = {}
+
+# 竞速已通关记录：key = 阶段序号字符串，value = true（与「最佳时间」分开存，避免只有刷新纪录才算通关）
+var race_stage_cleared: Dictionary = {}
+
+# 无尽模式积分榜：历史前三，元素为 {"score": int, "date": String}，按积分从高到低
+var endless_score_records: Array = []
 
 # 存档点数据
 var save_point_position: Vector2 = Vector2.ZERO  # 静态存档点位置
@@ -145,9 +160,10 @@ func _save_display_fit_setting() -> void:
 ## 特效等级：影响粒子数量、2D 点光呼吸与帧率上限。
 ## 具体的分级含义见 EFFECT_PARTICLE_RATIO 与 apply_effect_level() 内的注释。
 enum EffectLevel {
-	LOW,     ## 低：粒子 35%、不开 2D 点光呼吸、帧率上限 60（手机上降发热）
-	MEDIUM,  ## 中：与旧版本表现一致（粒子 100%、点光呼吸开、帧率不额外封顶）
-	HIGH,    ## 高：粒子 150%（UI 场景粒子、雪地下雪等），其余同中
+	LOW,     ## 低：粒子 35%、不开 2D 点光呼吸、帧率上限 60（手机上降发热）、水面关焦散/泡沫/波光
+	MEDIUM,  ## 中：与旧版本表现一致（粒子 100%、点光呼吸开、帧率不额外封顶）、水面开基础焦散
+	HIGH,    ## 高：粒子 150%（UI 场景粒子、雪地下雪等），水面焦散/泡沫/波光全开
+	ULTRA,   ## 超高：粒子 200%，水面涟漪槽位与焦散拉满（仅建议高配设备）
 }
 
 ## 各等级对应的粒子数量倍率。
@@ -155,6 +171,7 @@ const EFFECT_PARTICLE_RATIO: Dictionary = {
 	EffectLevel.LOW: 0.35,
 	EffectLevel.MEDIUM: 1.0,
 	EffectLevel.HIGH: 1.5,
+	EffectLevel.ULTRA: 2.0,
 }
 
 ## 特效等级变化时发出，供各系统订阅（例：LightingManager 决定是否开点光呼吸）。
@@ -165,7 +182,7 @@ var effect_level: int = EffectLevel.MEDIUM
 
 ## 应用特效等级。save_to_disk = true 时写入 user:// 配置，下次启动自动生效。
 func apply_effect_level(level: int, save_to_disk: bool = true) -> void:
-	effect_level = clampi(level, EffectLevel.LOW, EffectLevel.HIGH)
+	effect_level = clampi(level, EffectLevel.LOW, EffectLevel.ULTRA)
 	# 低特效档在手机上封 60 帧，减少发热与随之而来的热节流掉帧；中/高不额外封顶（跟随 vsync）。
 	Engine.max_fps = 60 if effect_level == EffectLevel.LOW else 0
 	_apply_particle_ratio_to_tree()
@@ -299,9 +316,14 @@ func initialize_new_game():
 	maniac_stage5_last_challenge_failed = false
 	maniac_stage6_challenge_completed = false
 	maniac_stage6_last_challenge_failed = false
+	maniac_stage7_last_challenge_failed = false
 	
 	# 清空竞速最佳时间（每个存档独立）
 	race_best_times = {}
+	race_best_time_dates = {}
+	race_stage_cleared = {}
+	# 清空无尽模式积分榜（每个存档独立）
+	endless_score_records = []
 	
 	last_save_point = {"position": Vector2(0, 0), "scene_path": "", "save_point_id": ""}
 	save_point_position = Vector2.ZERO
@@ -414,8 +436,12 @@ func get_save_data() -> Dictionary:
 		"maniac_stage5_last_challenge_failed": maniac_stage5_last_challenge_failed,
 		"maniac_stage6_challenge_completed": maniac_stage6_challenge_completed,
 		"maniac_stage6_last_challenge_failed": maniac_stage6_last_challenge_failed,
+		"maniac_stage7_last_challenge_failed": maniac_stage7_last_challenge_failed,
 		
 		"race_best_times": race_best_times.duplicate(true),
+		"race_best_time_dates": race_best_time_dates.duplicate(true),
+		"race_stage_cleared": race_stage_cleared.duplicate(true),
+		"endless_score_records": endless_score_records.duplicate(true),
 		
 		"destructible_walls_destroyed": destructible_walls_destroyed.duplicate(true),
 		"hidden_rooms_activated": hidden_rooms_activated.duplicate(),
@@ -538,12 +564,33 @@ func load_save_data(data: Dictionary):
 
 	if data.has("maniac_stage6_last_challenge_failed"):
 		maniac_stage6_last_challenge_failed = data["maniac_stage6_last_challenge_failed"]
+
+	if data.has("maniac_stage7_last_challenge_failed"):
+		maniac_stage7_last_challenge_failed = data["maniac_stage7_last_challenge_failed"]
 	
 	# 竞速挑战最佳时间（key = 阶段序号字符串，value = 秒数）
 	if data.has("race_best_times") and typeof(data["race_best_times"]) == TYPE_DICTIONARY:
 		race_best_times = data["race_best_times"].duplicate(true)
 	else:
 		race_best_times = {}
+
+	# 竞速最佳成绩的达成日期（key = 阶段序号字符串，value = 年.月.日）
+	if data.has("race_best_time_dates") and typeof(data["race_best_time_dates"]) == TYPE_DICTIONARY:
+		race_best_time_dates = data["race_best_time_dates"].duplicate(true)
+	else:
+		race_best_time_dates = {}
+
+	# 竞速已通关记录
+	if data.has("race_stage_cleared") and typeof(data["race_stage_cleared"]) == TYPE_DICTIONARY:
+		race_stage_cleared = data["race_stage_cleared"].duplicate(true)
+	else:
+		race_stage_cleared = {}
+
+	# 无尽模式积分榜
+	if data.has("endless_score_records") and typeof(data["endless_score_records"]) == TYPE_ARRAY:
+		endless_score_records = data["endless_score_records"].duplicate(true)
+	else:
+		endless_score_records = []
 	
 	# 加载可破坏石墙摧毁记录（每个存档独立）
 	if data.has("destructible_walls_destroyed"):
@@ -662,7 +709,6 @@ func spend_coins(amount: int) -> bool:
 			SaveManager.request_auto_save(false)
 		return true
 	else:
-		print("DEBUG: 钱币不足，需要", amount, "当前:", player_coins)
 		return false
 
 ## 获取当前钱币数（新增）
@@ -679,17 +725,91 @@ func get_race_best_time_text(stage_number: int) -> String:
 		return "--:--"
 	return "%.2f 秒" % best_time
 
+## 竞速最佳成绩的达成日期（没有记录返回「--.--.--」）
+func get_race_best_time_date_text(stage_number: int) -> String:
+	var key: String = str(stage_number)
+	if not race_best_time_dates.has(key):
+		return "--.--.--"
+	return str(race_best_time_dates[key])
+
 ## 是否已有某阶段的竞速记录（对话条件用）
 func has_race_best_time(stage_number: int) -> bool:
 	return race_best_times.has(str(stage_number))
 
-## 告示牌用：五个阶段的最佳时间合成**一段文本**
+## 写入竞速最佳成绩（同时记录达成日期）；返回是否刷新了记录
+func record_race_best_time(stage_number: int, total_time: float) -> bool:
+	var key: String = str(stage_number)
+	if race_best_times.has(key):
+		var old_time: float = float(race_best_times[key])
+		if old_time >= 0.0 and total_time >= old_time:
+			return false
+	race_best_times[key] = total_time
+	race_best_time_dates[key] = _today_text()
+	return true
+
+## 某阶段是否已经通关过（和「最佳时间」分开存：只要成功过一次就算通关，不再依赖是否刷新纪录）
+func has_race_clear(stage_number: int) -> bool:
+	return bool(race_stage_cleared.get(str(stage_number), false))
+
+## 记录某阶段已通关（不重复写档；与最佳成绩一起由调用方存档）
+func mark_race_stage_cleared(stage_number: int) -> void:
+	race_stage_cleared[str(stage_number)] = true
+
+## 告示牌记录行的统一排版：标题：成绩  达成时间：日期
+func _format_record_line(title: String, score_text: String, date_text: String) -> String:
+	return "%s：%s  达成时间：%s" % [title, score_text, date_text]
+
+## 告示牌用：五个阶段的最佳时间 + 达成日期合成**一段文本**
 ## ★ 开头带一个换行：对话里写成「竞速记录：{{...}}」时，记录会从下一行开始。
 func get_race_board_text() -> String:
 	var lines: PackedStringArray = PackedStringArray()
 	for stage_number: int in range(1, 6):
-		lines.append("第 %d 段：%s" % [stage_number, get_race_best_time_text(stage_number)])
+		lines.append(_format_record_line(
+			"第 %d 段" % stage_number,
+			get_race_best_time_text(stage_number),
+			get_race_best_time_date_text(stage_number)
+		))
 	return "\n" + "\n".join(lines)
+
+## 提交一局无尽模式积分（只保留历史前三）；同分不去重，按提交顺序保留
+func submit_endless_score(score: int) -> void:
+	endless_score_records.append({"score": score, "date": _today_text()})
+	endless_score_records.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a.get("score", 0)) > int(b.get("score", 0))
+	)
+	if endless_score_records.size() > ENDLESS_RECORD_LIMIT:
+		endless_score_records.resize(ENDLESS_RECORD_LIMIT)
+	if current_save_slot >= 0:
+		SaveManager.save_game(current_save_slot, get_save_data())
+
+## 无尽积分榜第 rank 名（从 1 开始）的积分文本（带单位）：没有记录返回「--」
+func get_endless_score_text(rank: int) -> String:
+	if rank < 1 or rank > endless_score_records.size():
+		return "--"
+	return str(int(endless_score_records[rank - 1].get("score", 0))) + " 分"
+
+## 无尽积分榜第 rank 名（从 1 开始）的达成日期：没有记录返回「--.--.--」
+func get_endless_score_date_text(rank: int) -> String:
+	if rank < 1 or rank > endless_score_records.size():
+		return "--.--.--"
+	return str(endless_score_records[rank - 1].get("date", "--.--.--"))
+
+## 无尽积分榜告示牌文本（历史前三名 + 达成日期，与竞速榜同一套排版）
+## ★ 开头带一个换行：对话里写成「无尽积分记录：{{...}}」时，记录会从下一行开始。
+func get_endless_board_text() -> String:
+	var lines: PackedStringArray = PackedStringArray()
+	for rank: int in range(1, ENDLESS_RECORD_LIMIT + 1):
+		lines.append(_format_record_line(
+			"第 %d 名" % rank,
+			get_endless_score_text(rank),
+			get_endless_score_date_text(rank)
+		))
+	return "\n" + "\n".join(lines)
+
+## 今天的日期文本（年.月.日）
+func _today_text() -> String:
+	var dt: Dictionary = Time.get_datetime_dict_from_system()
+	return "%04d.%02d.%02d" % [int(dt.get("year", 0)), int(dt.get("month", 0)), int(dt.get("day", 0))]
 
 # 记录已收集的道具
 func mark_item_collected(item_id: String):

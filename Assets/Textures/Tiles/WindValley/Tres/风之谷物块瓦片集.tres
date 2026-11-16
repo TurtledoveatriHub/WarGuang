@@ -1,0 +1,41 @@
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://4av1b0gy6x1j"]
+
+[ext_resource type="Texture2D" uid="uid://dr5pwbnd5ljqf" path="res://Assets/Textures/Tiles/WindValley/风之谷物块瓦片.png" id="1_hnemt"]
+[ext_resource type="Texture2D" uid="uid://baiqllx5y4y7o" path="res://Assets/Textures/Instances/GrassLand/木制单向平台.png" id="2_uay5y"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2t1lg"]
+texture = ExtResource("1_hnemt")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -4, 8)
+4:0/0 = 0
+4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 8, -8, 8, -8, -8, 8, -8)
+0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -8, 8, -8, 8, 8, -4, 8)
+2:1/0 = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+4:1/0 = 0
+4:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, -8, -8, -8, -8, 8, 4, 8)
+0:2/0 = 0
+0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -8, 8, -8, 8, 8, -8, 8)
+4:2/0 = 0
+4:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, -8, -8, -8, -8, 8, 8, 8)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_i2pwk"]
+texture = ExtResource("2_uay5y")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -4, -8, -2)
+0:0/0/physics_layer_0/polygon_0/one_way = true
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -4, -8, -4)
+1:0/0/physics_layer_0/polygon_0/one_way = true
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -4, -8, -4)
+2:0/0/physics_layer_0/polygon_0/one_way = true
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -4)
+3:0/0/physics_layer_0/polygon_0/one_way = true
+
+[resource]
+physics_layer_0/collision_layer = 2
+sources/0 = SubResource("TileSetAtlasSource_2t1lg")
+sources/1 = SubResource("TileSetAtlasSource_i2pwk")

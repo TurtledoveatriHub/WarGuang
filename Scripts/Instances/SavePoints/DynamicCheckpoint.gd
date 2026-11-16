@@ -44,3 +44,9 @@ func _on_body_entered(body):
 			print("[DC] 忽略: 不属于当前房间")
 			return
 		DynamicCheckpointManager.set_current_checkpoint(checkpoint_id, current_room)
+		## ★ 同步「最近一次触发的检查点」（不分静态/动态）：
+		##   传送伤害的安全点读的就是 Global 里这两个字段；此前只有静态存档点
+		##   （ChairSavePoint → Global.set_save_point）会写，所以动态检查点再近也不会被选中。
+		if Global != null:
+			Global.last_checkpoint_position = global_position
+			Global.last_checkpoint_type = "dynamic"

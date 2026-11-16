@@ -1,0 +1,25 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Instances/Props/EndlessScoreBoard.gd" id="1_endlessboard"]
+[ext_resource type="Resource" path="res://Assets/Dialogues/Signs/gl17EndlessBoard.dialogue" id="2_board_dialogue"]
+[ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="3_balloon"]
+[ext_resource type="Texture2D" uid="uid://okn4ishga2vw" path="res://Assets/Textures/Instances/GrassLand/告示牌.png" id="4_board_tex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_board"]
+size = Vector2(40, 32)
+
+[node name="EndlessScoreBoard" type="Area2D"]
+collision_layer = 64
+script = ExtResource("1_endlessboard")
+dialogue_resource = ExtResource("2_board_dialogue")
+balloon_scene = ExtResource("3_balloon")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("4_board_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_board")
+
+[node name="InteractionPrompt" type="Sprite2D" parent="."]
+position = Vector2(0, -24)
+region_rect = Rect2(96, 144, 17, 11)

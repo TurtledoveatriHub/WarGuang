@@ -53,6 +53,8 @@ const PlayerWarpFlightServiceScript = preload("res://Scripts/Player/PlayerWarpFl
 const PlayerWarpResetServiceScript = preload("res://Scripts/Player/PlayerWarpResetService.gd")
 const PlayerVisualStateServiceScript = preload("res://Scripts/Player/PlayerVisualStateService.gd")
 const PlayerCameraDebugServiceScript = preload("res://Scripts/Player/PlayerCameraDebugService.gd")
+const PlayerEnvironmentZoneServiceScript = preload("res://Scripts/Player/PlayerEnvironmentZoneService.gd")
+const PlayerBreathServiceScript = preload("res://Scripts/Player/PlayerBreathService.gd")
 
 #endregion
 
@@ -154,10 +156,13 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 @export var glide_target_h_speed: float = 160.0
 ## 滑翔水平加速度（按住方向键时每秒逼近目标水平速度的最大变化率）
 @export var glide_horizontal_acceleration: float = 360.0
+## 滑翔「反向刹车」加速度：当前水平速度与输入方向相反时，先用它把反向速度抵消掉，
+## 抵消完成后再交回 glide_horizontal_acceleration 正常加速（解决转向困难）
+@export var glide_turn_deceleration: float = 1080.0
 ## 滑翔松开方向键时的水平减速
 @export var glide_release_deceleration: float = 180.0
 ## 滑翔最大下落速度乘数
-@export var glide_max_fall_multiplier: float = 0.18
+@export var glide_max_fall_multiplier: float = 0.22
 ## 进入滑翔后的滞空时间（秒）
 @export var glide_hover_time: float = 0.12
 ## 滑翔下落倍率过渡时间（秒）
@@ -282,7 +287,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 奔跑跳跃加成持续时间（秒）
 @export var run_jump_boost_duration: float = 0.26
 ## 奔跑跳跃衰减时间（秒）
-@export var run_jump_decay_time: float = 0.54
+@export var run_jump_decay_time: float = 0.66
 
 ## 二段跳旋转设置
 @export_category("二段跳旋转设置")
@@ -376,6 +381,21 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 穿越期间忽略该平台的时长（秒）
 @export var one_way_drop_time: float = 0.2
 
+## 调试：打印「下 + 跳跃」穿越的判定过程（默认关闭）
+@export var one_way_drop_debug: bool = false
+## 「下 + 跳跃」判定时向下探测的距离（像素）
+const ONE_WAY_PROBE_DISTANCE: float = 16.0
+## 穿越单向平台时施加的最小向下初速（像素/秒）。
+## ★ 原来写的是 20（= 0.33 像素/帧）：速度太小，位移会被地板判定吃掉，人停在原地。
+const ONE_WAY_DROP_SPEED: float = 90.0
+## 穿越瞬间把玩家往下挤的距离（像素）。
+## ★ 单向碰撞只在「从正面（上方）接近」时阻挡；身体越过 one_way_collision_margin 那一带
+##   之后就会被当成从背面接近，后续向下位移不再被挡。3 像素足够越过默认 1 像素的 margin。
+const ONE_WAY_DROP_PUSH_PX: float = 3.0
+
+## 沿脚底采样单向图块时，向身体左右各偏多少像素
+const ONE_WAY_FOOT_SAMPLE_HALF_WIDTH: float = 8.0
+
 #endregion
 
 ##内部变量
@@ -405,6 +425,53 @@ var env_vertical_multiplier: float = 1.0        # 环境垂直速度乘数
 var env_gravity_multiplier: float = 1.0         # 环境重力乘数
 var env_max_fall_multiplier: float = 1.0        # 环境最大下落速度乘数
 var env_acceleration_multiplier: float = 1.0    # 环境加速度乘数
+
+## 环境效果区（EnvironmentZone / UpdraftZone）逐帧结果 —— 由 PlayerEnvironmentZoneService 写入
+var env_zone_speed_mul_right: float = 1.0      # 环境区「向右移动」速度乘数
+var env_zone_speed_mul_left: float = 1.0       # 环境区「向左移动」速度乘数
+var env_zone_speed_mul_up: float = 1.0         # 环境区「向上运动」垂直位移速度乘数
+var env_zone_speed_mul_down: float = 1.0       # 环境区「向下运动」垂直位移速度乘数
+var env_zone_gravity_mul: float = 1.0          # 环境区重力乘数
+var env_zone_max_fall_mul: float = 1.0         # 环境区最大下落速度乘数
+var env_zone_wind_target: Vector2 = Vector2.ZERO   # 风的目标速度（像素/秒，仅用于调试观察）
+var env_zone_wind_deceleration: float = 240.0      # 风离开区域后的衰减加速度（像素/秒÷秒）
+var env_wind_velocity: Vector2 = Vector2.ZERO      # 当前风速度（独立速度，只作为额外位移）
+var env_updraft_velocity: float = 0.0              # 当前上升气流速度（负数 = 向上）
+var env_updraft_acceleration: float = 0.0           # 本帧上升气流加速度（0 = 无气流）
+var env_updraft_max_speed: float = 0.0              # 本帧上升气流速度上限（0 = 无气流）
+var env_updraft_deceleration: float = 720.0          # 上升速度离开气流后的衰减加速度（像素/秒÷秒）
+
+## 水下呼吸（气泡）参数
+@export_category("水下呼吸（气泡）")
+## 每个气泡能撑多久（秒）；气泡总数 = max_bubbles
+@export var bubble_interval: float = 1.0
+## 气泡耗尽后每次受到多少伤害
+@export var drown_damage: int = 1
+## 气泡耗尽后每隔多久受到一次伤害（秒）
+@export var drown_damage_interval: float = 1.5
+## 出水 / 在气泡柱里时，每多少秒回复 1 个气泡（0 = 瞬间回满，参照《泰拉瑞亚》《我的世界》）
+@export var bubble_refill_interval: float = 0.0
+
+## 当前是否在水域内（由 PixelWaterSurface 上报）
+var in_water: bool = false
+## 当前是否浸没（头部入水；只有浸没才消耗气泡）
+var is_submerged_in_water: bool = false
+## 气泡数量上限（「额外气泡」道具调 set_max_bubbles() 增加）
+var max_bubbles: int = 3
+## 是否已获得「水下呼吸」（true = 不显示气泡、不受溺水伤害）
+var water_breathing: bool = false
+## 潜水累计时长（秒，用于换算剩余气泡）
+var breath_timer: float = 0.0
+## 溺水伤害计时（秒；<0 = 尚未开始计时）
+var breath_damage_timer: float = -1.0
+## 当前剩余气泡（供 UI / 调试读取）
+var bubbles_left: int = 3
+## 气泡是否处于显示中（水中且没有水下呼吸）
+var bubbles_visible: bool = false
+## 气泡回充计时（秒；配合 bubble_refill_interval）
+var bubble_refill_timer: float = 0.0
+## 当前是否在「气泡柱」里（水下上升气泡，可回氧）
+var in_bubble_column: bool = false
 
 ## 综合乘数（运行时自动计算）
 var effective_horizontal_multiplier: float = 1.0      # 实际水平速度乘数 = global × env
@@ -776,6 +843,10 @@ func _physics_process(delta):
 	PlayerRuntimeTickServiceScript.tick_invincible(self, fixed_delta)
 	## 更新离墙后的墙跳意图缓冲
 	PlayerRuntimeTickServiceScript.tick_wall_jump_escape_buffer(self, fixed_delta)
+	## 水下呼吸 / 气泡（泰拉瑞亚式）：气泡耗尽后持续受伤
+	PlayerBreathServiceScript.tick(self, fixed_delta)
+	## 更新「环境效果区」逐帧结果（速度乘数 / 风 / 上升气流）；必须在 update_effective_multipliers 之前
+	PlayerEnvironmentZoneServiceScript.refresh(self, fixed_delta)
 	## 更新水中效果和乘数（新增）
 	update_effective_multipliers()
 	## ========== 阶段8：状态处理前的逻辑 ==========
@@ -790,7 +861,10 @@ func _physics_process(delta):
 	## 处理二段跳水平速度加成
 	handle_jump2_boost(fixed_delta)
 	## 处理跳跃缓冲
-	if jump_just_pressed:
+	## ★ 按住下时按跳跃是「穿下单向平台」的输入，不进入跳跃缓冲：
+	##   否则缓冲会在落地那一帧被状态机消费成一次起跳（配合土狼时间还会走补偿跳），
+	##   把「下落穿过平台」变成「弹跳」，表现为怎么按都掉不下去。
+	if jump_just_pressed and Input.get_axis("up", "down") <= 0.5:
 		jump_buffer_timer.start(jump_buffer_time)
 	## 处理 DOWN 状态时间累计（放在状态处理之前，游戏暂停时不累计）
 	if current_state == PlayerState.DOWN and abs(velocity.y) >= abs(max_fall_speed * 0.9) and not is_game_paused:
@@ -813,6 +887,8 @@ func _physics_process(delta):
 	## 应用重力（除了冲刺和受伤状态）
 	if current_state != PlayerState.DASH and current_state != PlayerState.HURT:
 		apply_gravity(fixed_delta)
+	## 环境风 / 上升气流 / 上下方向速度乘数：以「额外位移」形式施加（不污染 velocity）
+	PlayerEnvironmentZoneServiceScript.apply_environment_motion(self, fixed_delta)
 	## 应用跳跃、冲刺与「跑出边缘台阶修正」的边缘校正
 	PlayerEdgeCorrectionServiceScript.apply_edge_correction(self, fixed_delta)
 	## 移动玩家
@@ -826,6 +902,7 @@ func _physics_process(delta):
 			if extra_motion != Vector2.ZERO:
 				move_and_collide(extra_motion)
 	PlayerRuntimeFlowServiceScript.finalize_post_physics(self, fixed_delta, move_input, previous_was_on_floor)
+	_debug_tick_one_way_drop()
 
 ## 应用平台位置跟随（纯位置跟随模式——蔚蓝风格）
 ## 直接按平台位移增量移动 player 位置，而非叠加 velocity。
@@ -860,8 +937,29 @@ func _update_one_way_drop(delta: float) -> void:
 	if _one_way_drop_timer <= 0.0:
 		_restore_one_way_ignored()
 
+## 调试：穿越后跟随打印剩余帧数（
+var _one_way_debug_frames: int = 0
+
+## 调试：穿越后逐帧打印 6 行（y / vy / floor / state / 忽略数），
+## 用来区分到底是「没下落」还是「下落了又卡住」—— 只打印几行，方便直接贴出来。
+func _debug_tick_one_way_drop() -> void:
+	if not one_way_drop_debug or _one_way_debug_frames <= 0:
+		return
+	_one_way_debug_frames -= 1
+	print("[OneWayDrop] f", 6 - _one_way_debug_frames,
+		" y=", snappedf(global_position.y, 0.1),
+		" vy=", snappedf(velocity.y, 0.1),
+		" floor=", is_on_floor(),
+		" st=", int(current_state),
+		" ign=", _one_way_ignored_rids.size())
+
 
 ## 尝试“下 + 跳跃”穿过脚下的单向平台。返回 true 表示已触发（调用方需吞掉这次跳跃）。
+## ★ 判定分两步：
+##   1) move_and_slide 的滑动碰撞里找单向平台（正常走动/下落时都有）
+##   2) 站得纹丝不动时滑动碰撞可能为空 → 沿「脚底一条线」多点采样脚下的图块
+##      单点采样在「站在图块接缝/位置刚好错一格」时会取到隔壁普通图块而误判，
+##      于是表现为「这个位置怎么按都掉不下去，挪一点又能掉」—— 多点采样就是把这种情况覆盖掉。
 func _try_drop_through_one_way(jump_just_pressed: bool) -> bool:
 	if not one_way_drop_enabled or not jump_just_pressed or not is_on_floor():
 		return false
@@ -873,14 +971,44 @@ func _try_drop_through_one_way(jump_just_pressed: bool) -> bool:
 		if col != null and _is_one_way_collision(col):
 			ignored_rids.append(col.get_collider_rid())
 	if ignored_rids.is_empty():
+		for rid in _scan_one_way_bodies_under_feet():
+			if not ignored_rids.has(rid):
+				ignored_rids.append(rid)
+	if one_way_drop_debug:
+		print("[OneWayDrop] just_pressed=", jump_just_pressed, " floor=", is_on_floor(),
+			" slides=", get_slide_collision_count(), " state=", int(current_state),
+			" buffer=", snappedf(jump_buffer_timer.time_left, 0.001) if jump_buffer_timer != null else -1.0,
+			" 命中碰撞体数=", ignored_rids.size())
+	if ignored_rids.is_empty():
 		return false
 	_restore_one_way_ignored()
 	for rid in ignored_rids:
 		PhysicsServer2D.body_add_collision_exception(rid, get_rid())
 		_one_way_ignored_rids.append(rid)
+	## 清掉残留的跳跃缓冲：落地前按过跳跃键时缓冲还在计时，
+	## 状态机里的 try_jump() 看到 jump_buffer_timer.time_left > 0 会立刻抢跳，
+	## 把本帧刚设好的向下初速覆盖成向上速度 —— 表现就是「下+跳跃」掉不下去。
+	if jump_buffer_timer != null:
+		jump_buffer_timer.stop()
 	_one_way_drop_timer = maxf(one_way_drop_time, 0.05)
-	# 立即生效：本帧就给一个向下初速，让它离开平台表面
-	velocity.y = maxf(velocity.y, 20.0)
+	## ★ 实测（真机 + 用户日志）结论：只装「碰撞例外」不足以穿过去 ——
+	##   例外确实装到了脚下的单向图块层上（日志 ign=1），但玩家每帧 velocity.y 仍被地板清成 0、
+	##   y 一动不动。所以这里必须再做两件事：
+	##   1) 给足向下初速（20 像素/秒 = 0.33 像素/帧，位移会被吃掉）；
+	##   2) 把玩家往下挤几像素，越过单向平台那一「面」（见常量注释）。
+	##   碰撞例外继续保留，作为双保险。
+	velocity.y = maxf(velocity.y, ONE_WAY_DROP_SPEED)
+	global_position.y += ONE_WAY_DROP_PUSH_PX
+	## ★ 观察状态（LOOKUP / LOOKDOWN）里按跳跃，本来是「打断观察 → 回 IDLE」。
+	##   但穿越把这次跳跃吞掉了（jump_just_pressed 被置 false），状态机那份打断逻辑就收不到输入，
+	##   于是会一直卡在 LOOKDOWN —— 实测日志：state=11(LOOKDOWN) 时穿越已触发（命中碰撞体数=1）却掉不下去；
+	##   state=0(IDLE) 时同一个平台正常下落。所以这里必须自己把观察状态退掉。
+	if current_state == PlayerState.LOOKDOWN or current_state == PlayerState.LOOKUP:
+		change_state(PlayerState.IDLE)
+	if one_way_drop_debug:
+		print("[OneWayDrop] 已触发 state=", int(current_state), " v=", velocity.round(),
+			" 忽略碰撞体数=", _one_way_ignored_rids.size(), " dropTimer=", snappedf(_one_way_drop_timer, 0.01))
+		_one_way_debug_frames = 6
 	return true
 
 
@@ -889,6 +1017,32 @@ func _restore_one_way_ignored() -> void:
 	for rid in _one_way_ignored_rids:
 		PhysicsServer2D.body_remove_collision_exception(rid, get_rid())
 	_one_way_ignored_rids.clear()
+
+## 沿脚底一条线多点采样，返回脚下单向平台所在碰撞体的 RID 列表。
+## ★ 从五个不同起点（中心 + 左右两侧）各向下探一小段：
+##   单点判定在「站在图块接缝、或位置刚好错一格」时会取到隔壁普通图块，
+##   判定就失败；多点采样把这种情况覆盖掉 —— 这正是「换个位置就能掉」的原因。
+func _scan_one_way_bodies_under_feet() -> Array[RID]:
+	var rids: Array[RID] = []
+	var offsets: Array[float] = [
+		0.0,
+		-ONE_WAY_FOOT_SAMPLE_HALF_WIDTH,
+		ONE_WAY_FOOT_SAMPLE_HALF_WIDTH,
+		-ONE_WAY_FOOT_SAMPLE_HALF_WIDTH * 0.5,
+		ONE_WAY_FOOT_SAMPLE_HALF_WIDTH * 0.5,
+	]
+	for offset_x in offsets:
+		var probe: KinematicCollision2D = KinematicCollision2D.new()
+		var from: Transform2D = global_transform
+		from.origin += Vector2(offset_x, 0.0)
+		if not test_move(from, Vector2(0.0, ONE_WAY_PROBE_DISTANCE), probe):
+			continue
+		if not _is_one_way_collision(probe):
+			continue
+		var rid: RID = probe.get_collider_rid()
+		if not rids.has(rid):
+			rids.append(rid)
+	return rids
 
 
 ## 判断某次接触是否是“单向平台”：
@@ -1287,16 +1441,6 @@ func unregister_camera_focus_zone(zone: Node) -> void:
 	if camera_controller and camera_controller.has_method("unregister_focus_capture_zone"):
 		camera_controller.unregister_focus_capture_zone(zone)
 
-## 注册临时相机限制区（CameraLimitZone 进入时调用）
-func register_camera_limit_zone(zone: Node) -> void:
-	if camera_controller and camera_controller.has_method("register_camera_limit_zone"):
-		camera_controller.register_camera_limit_zone(zone)
-
-## 注销临时相机限制区（离开时调用）
-func unregister_camera_limit_zone(zone: Node) -> void:
-	if camera_controller and camera_controller.has_method("unregister_camera_limit_zone"):
-		camera_controller.unregister_camera_limit_zone(zone)
-
 #endregion
 
 ##Hit Stop 相关函数集
@@ -1640,6 +1784,23 @@ func refresh_dash():
 	PlayerAbilityServiceScript.refresh_dash(self)
 
 ## 更新所有有效乘数（在_physics_process 中调用）
+## 由 EnvironmentManager 调用，设置环境乘数
+## 由 PixelWaterSurface 调用：进入 / 离开水域
+func set_in_water(p_in_water: bool) -> void:
+	in_water = p_in_water
+
+## 由 PixelWaterSurface 调用：是否浸没（头部入水）
+func set_submerged_in_water(p_submerged: bool) -> void:
+	is_submerged_in_water = p_submerged
+
+## 道具调用：「额外气泡」增加气泡上限
+func set_max_bubbles(p_max: int) -> void:
+	max_bubbles = maxi(p_max, 0)
+
+## 道具调用：获得「水下呼吸」（不再显示气泡、不受溺水伤害）
+func set_water_breathing(p_enabled: bool) -> void:
+	water_breathing = p_enabled
+
 func update_effective_multipliers():
 	PlayerAbilityServiceScript.update_effective_multipliers(self)
 

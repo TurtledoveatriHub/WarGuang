@@ -4,7 +4,7 @@
 [ext_resource type="AudioStream" uid="uid://2o54aw0j0bet" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_a7sc2"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_t3mqe"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_k0irc"]
-[ext_resource type="Texture2D" uid="uid://dwpgj2yjqy8oc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景2.png" id="5_wfdvn"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_wfdvn"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="6_e5w7o"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="7_1nfqu"]
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="8_wfdvn"]
@@ -48,6 +48,7 @@ target_room_id = "GrassLand5"
 source_background = NodePath("Background1")
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
+modulate = Color(0.29238003, 0.2772, 0.36, 1)
 texture = ExtResource("5_wfdvn")
 
 [node name="BGController2" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
@@ -107,10 +108,12 @@ position = Vector2(2, 4)
 [node name="MechanismGate" parent="Props" instance=ExtResource("12_1nfqu")]
 position = Vector2(50, -25)
 switches = Array[NodePath]([NodePath("../JoystickSwitch"), NodePath("../JoystickSwitch2"), NodePath("../JoystickSwitch3"), NodePath("../JoystickSwitch4")])
+activation_delay = 0.5
 
 [node name="MechanismGate2" parent="Props" instance=ExtResource("12_1nfqu")]
 position = Vector2(-49, -25)
 switches = Array[NodePath]([NodePath("../JoystickSwitch"), NodePath("../JoystickSwitch2"), NodePath("../JoystickSwitch3"), NodePath("../JoystickSwitch4")])
+activation_delay = 0.5
 
 [node name="JoystickSwitch" parent="Props" instance=ExtResource("13_wfdvn")]
 position = Vector2(529, 408)
@@ -136,6 +139,7 @@ interact_once_only = true
 position = Vector2(-192, 400)
 switches = Array[NodePath]([NodePath("ButtonSwitch")])
 open_offset = Vector2(576, 0)
+activation_delay = 0.5
 
 [node name="ButtonSwitch" parent="Props/MechanismPlatform" instance=ExtResource("15_1nfqu")]
 position = Vector2(0, -22)
@@ -145,6 +149,7 @@ position = Vector2(432, 336)
 switches = Array[NodePath]([NodePath("ButtonSwitch")])
 open_offset = Vector2(0, -720)
 move_speed = 240.0
+activation_delay = 0.5
 
 [node name="ButtonSwitch" parent="Props/MechanismPlatform2" instance=ExtResource("15_1nfqu")]
 position = Vector2(0, -22)
@@ -153,6 +158,7 @@ position = Vector2(0, -22)
 position = Vector2(224, -224)
 switches = Array[NodePath]([NodePath("ButtonSwitch")])
 open_offset = Vector2(-640, 0)
+activation_delay = 0.5
 
 [node name="ButtonSwitch" parent="Props/MechanismPlatform3" instance=ExtResource("15_1nfqu")]
 position = Vector2(0, -22)

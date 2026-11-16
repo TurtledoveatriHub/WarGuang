@@ -21,11 +21,9 @@ func record_npc_dialogue(npc_id: String):
 		npc_interactions[npc_id] = 0
 	
 	npc_interactions[npc_id] += 1
-	
-	# 交给 SaveManager 的合并窗口延迟写档：
-	# 原先这里是 await 一帧后同步写盘，导致「和 NPC 交互瞬间轻微卡顿」。
-	# 内容不变，只是把写盘从交互当帧挪到 1.5 秒内的空闲时刻。
-	SaveManager.request_auto_save(false)
+
+	# ★ 不在这里写盘：交互当帧写档会造成明显卡顿。
+	#   改由 BaseNPC 在「对话结束」时请求存档（SaveManager 自带合并窗口）。
 
 
 

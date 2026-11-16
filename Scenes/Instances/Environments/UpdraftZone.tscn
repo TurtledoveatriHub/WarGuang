@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3 uid="uid://d3lkakeejul6f"]
+
+[ext_resource type="Script" uid="uid://kbawxxq03kd2" path="res://Scripts/Instances/Environments/UpdraftZone.gd" id="1_updraft"]
+[ext_resource type="Script" uid="uid://cd40oqnytjly3" path="res://Scripts/Instances/Environments/EnvironmentZoneVisual.gd" id="2_upviz"]
+[ext_resource type="Texture2D" uid="uid://bn5j5b16b3bl3" path="res://Assets/Textures/FX/wind_streak.tres" id="3_streak"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_updraft"]
+size = Vector2(80, 160)
+
+[sub_resource type="Gradient" id="Gradient_7jxeg"]
+offsets = PackedFloat32Array(0, 0.09478673, 0.7464455, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_a60mj"]
+gradient = SubResource("Gradient_7jxeg")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_5qo51"]
+particle_flag_align_y = true
+emission_shape = 3
+emission_box_extents = Vector3(40, 2, 1)
+direction = Vector3(0, -1, 0)
+spread = 0.0
+initial_velocity_min = 160.0
+initial_velocity_max = 200.0
+gravity = Vector3(0, 0, 0)
+scale_min = 1.5
+scale_max = 2.5
+color = Color(0.85, 0.95, 1, 0.6862745)
+color_ramp = SubResource("GradientTexture1D_a60mj")
+
+[node name="UpdraftZone" type="Area2D"]
+monitoring = false
+script = ExtResource("1_updraft")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_updraft")
+
+[node name="UpdraftVisual" type="GPUParticles2D" parent="."]
+texture_filter = 1
+position = Vector2(0, 78)
+amount = 16
+texture = ExtResource("3_streak")
+lifetime = 0.9
+process_material = SubResource("ParticleProcessMaterial_5qo51")
+script = ExtResource("2_upviz")
+travel_ratio = 0.8

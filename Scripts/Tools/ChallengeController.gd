@@ -2,6 +2,13 @@ extends Node
 class_name ChallengeController
 const ChallengeUIControllerScript = preload("res://Scripts/UI/ChallengeUIController.gd")
 
+## 普通触发的得分
+const NORMAL_TRIGGER_SCORE: int = 1
+## 完美触发的基础得分（连续完美第 1 次）
+const PERFECT_TRIGGER_SCORE: int = 2
+## 完美触发连续加分的封顶值（第 8 次及以后都是这个分数）
+const PERFECT_SCORE_CAP: int = 9
+
 ## ── 挑战音效 ──
 @export_category("挑战音效")
 ## 挑战开始时播放一遍
@@ -50,6 +57,8 @@ var current_state: State = State.INACTIVE
 
 var active_config: ChallengeConfig = null
 var triggered_count: int = 0
+## 连续完美触发的次数（普通触发或挑战重开时清零；无尽模式用它做累进加分）
+var perfect_streak: int = 0
 var spawned_jumpboxes: Array = []
 var challenge_bounds: Rect2
 var has_triggered_first: bool = false
@@ -89,6 +98,7 @@ func start_challenge(stage_index: int = 0) -> void:
 	
 	current_state = State.ACTIVE
 	triggered_count = 0
+	perfect_streak = 0
 	has_triggered_first = false
 	_challenge_grace_timer = challenge_grace_period
 	challenge_bounds = Rect2()
@@ -96,6 +106,8 @@ func start_challenge(stage_index: int = 0) -> void:
 	if ui_controller != null:
 		ui_controller.setup(self, challenge_ui_scene, ui_fade_duration)
 	
+	# 变黑之前就把 JumpBox 复位并隐藏：避免淡入瞬间先闪出上一次结束时的位置
+	_prepare_container_jumpboxes()
 	# 黑屏传送到挑战起始位置
 	await _teleport_player_to_start()
 	
@@ -133,13 +145,17 @@ func _teleport_player_to_start() -> void:
 	# 淡入恢复
 	if FadeManager and FadeManager.has_method("fade_in"):
 		await FadeManager.fade_in(challenge_fade_in)
-	var tw = create_tween()
-	tw.set_parallel(true)
-	tw.tween_callback(_fade_out_player_ui)
-	tw.tween_callback(_activate_container_jumpboxes)
-	tw.tween_callback(_show_challenge_ui)
-	tw.tween_callback(_update_challenge_ui)
-	challenge_started.emit()
+
+## 开赛前预处理容器内挑战 JumpBox：回到初始位置并隐藏
+func _prepare_container_jumpboxes() -> void:
+	if active_config == null:
+		return
+	var container = get_node_or_null(active_config.challenge_container_path)
+	if container == null:
+		return
+	for child in container.get_children():
+		if child is JumpBox and child.is_challenge_jumpbox:
+			child.prepare_for_challenge()
 
 ## 激活容器下所有 is_challenge_jumpbox=true 的 JumpBox（不扫描子容器）
 func _activate_container_jumpboxes() -> void:
@@ -153,24 +169,44 @@ func _activate_container_jumpboxes() -> void:
 			spawned_jumpboxes.append(child)
 			child.play_start_animation()
 			if child.has_signal("bounce_triggered"):
-				if child.bounce_triggered.is_connected(_on_jumpbox_bounce):
-					child.bounce_triggered.disconnect(_on_jumpbox_bounce)
-				child.bounce_triggered.connect(_on_jumpbox_bounce.bind(child))
+				# 不带 bind：否则 is_connected 判定不到已连接的绑定版本，重开挑战时会重复连接导致重复计分
+				if not child.bounce_triggered.is_connected(_on_jumpbox_bounce):
+					child.bounce_triggered.connect(_on_jumpbox_bounce)
 	if spawned_jumpboxes.is_empty():
 		push_warning("ChallengeController: 容器无 JumpBox")
 
-func _on_jumpbox_bounce(body, _jumpbox) -> void:
+## JumpBox 触发回调：按触发等级计分
+func _on_jumpbox_bounce(body, trigger_grade: String) -> void:
 	if body.is_in_group("player") and current_state == State.ACTIVE:
 		var eligible = body.current_animation == "JUMP2"
 		if not eligible and body.has_method("is_recent_double_jump_start"):
 			eligible = body.is_recent_double_jump_start(0.12)
 		if not eligible:
 			return
-		triggered_count += 1
+		triggered_count += _score_for_trigger(trigger_grade)
 		_update_challenge_ui()
 		has_triggered_first = true
+		# 无尽模式没有目标分数，不会通关（只会在失败条件满足时结束）
+		if _is_endless_mode():
+			return
 		if triggered_count >= active_config.target_count:
 			_complete_challenge()
+
+## 本次触发应得的分数：
+## 普通触发固定加 NORMAL_TRIGGER_SCORE 并把连续完美次数清零；
+## 完美触发加 PERFECT_TRIGGER_SCORE（2 分）；无尽模式下连续完美每次再 +1 分，最高封顶 PERFECT_SCORE_CAP（9 分）。
+func _score_for_trigger(trigger_grade: String) -> int:
+	if trigger_grade != "perfect":
+		perfect_streak = 0
+		return NORMAL_TRIGGER_SCORE
+	perfect_streak += 1
+	if not _is_endless_mode():
+		return PERFECT_TRIGGER_SCORE
+	return mini(perfect_streak + 1, PERFECT_SCORE_CAP)
+
+## 当前阶段是否为无尽模式
+func _is_endless_mode() -> bool:
+	return active_config != null and active_config.endless_mode
 
 func _process(_delta: float) -> void:
 	if current_state == State.ACTIVE:
@@ -215,6 +251,10 @@ func _fail_challenge() -> void:
 	if current_state != State.ACTIVE:
 		return
 	current_state = State.FAILED
+	# 无尽模式：没有通关，结束时把本局积分提交到无尽积分榜（0 分不入榜）
+	if _is_endless_mode() and triggered_count > 0:
+		if Global and Global.has_method("submit_endless_score"):
+			Global.submit_endless_score(triggered_count)
 	_deactivate_all_jumpboxes()
 	_hide_challenge_ui_with_fade()
 	_do_fade_in_player_ui()
@@ -238,4 +278,4 @@ func _hide_challenge_ui_with_fade() -> void:
 	if ui_controller: ui_controller.hide_challenge_ui_with_fade(Callable())
 func _update_challenge_ui() -> void:
 	if ui_controller and active_config != null:
-		ui_controller.update_challenge_ui(triggered_count, active_config.target_count)
+		ui_controller.update_challenge_ui(triggered_count, active_config.target_count, _is_endless_mode())

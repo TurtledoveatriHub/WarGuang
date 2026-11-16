@@ -1,14 +1,15 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=13 format=4 uid="uid://dm27rbjcrstvo"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_80bg5"]
 [ext_resource type="AudioStream" uid="uid://wh2j8kh5ma1q" path="res://Assets/Audios/BGM/跳跃天空.ogg" id="2_ww6rs"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_u0im6"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_b7qt5"]
-[ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="6_4jflh"]
-[ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="7_um6p4"]
-[ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="8_q6eno"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_7vg7o"]
+[ext_resource type="Texture2D" uid="uid://bdk4g1kpab4q3" path="res://Assets/Textures/Backgrounds/风之谷背景2.png" id="6_lwkui"]
+[ext_resource type="TileSet" uid="uid://dni030wpfuehf" path="res://Assets/Textures/Tiles/WindValley/Tres/风之谷瓦片集.tres" id="7_7vg7o"]
+[ext_resource type="TileSet" uid="uid://4av1b0gy6x1j" path="res://Assets/Textures/Tiles/WindValley/Tres/风之谷物块瓦片集.tres" id="8_lwkui"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="9_r541e"]
-[ext_resource type="TileSet" uid="uid://ddmqsmr1batw4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原背景瓦片集.tres" id="10_erlmr"]
+[ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="11_xxx2w"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="18_5whwx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
@@ -18,11 +19,11 @@ script = ExtResource("1_80bg5")
 room_id = "WindValley10"
 room_bgm_stream = ExtResource("2_ww6rs")
 adjacent_rooms = Array[String](["WindValley9", "WindValley11"])
-room_color = Color(0.54901963, 0.5686275, 0.54901963, 1)
+room_color = Color(0.84313726, 0.8627451, 0.84313726, 1)
 room_bounds = NodePath("wv10Bounds")
 
 [node name="wv10Bounds" type="Node2D" parent="."]
-scale = Vector2(4, 4)
+scale = Vector2(4, 2)
 script = ExtResource("3_u0im6")
 metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
 
@@ -40,14 +41,20 @@ source_background = NodePath("Background1")
 parallax_ratio = Vector2(0.15, 0.05)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
+modulate = Color(0.64572614, 0.7806481, 0.7430416, 1)
+texture = ExtResource("5_7vg7o")
 
 [node name="BGController2" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_b7qt5")
 target_room_id = "WindValley10"
 source_background = NodePath("Background1")
 parallax_ratio = Vector2(0.15, 0.05)
+auto_scroll_enabled = true
+auto_scroll_speed = Vector2(-48, 0)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController2"]
+modulate = Color(1.1291975, 1.1291975, 1.1291975, 1)
+texture = ExtResource("6_lwkui")
 
 [node name="FGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_b7qt5")
@@ -63,18 +70,17 @@ scale = Vector2(2, 2)
 
 [node name="GroundTile" type="TileMapLayer" parent="TileMapLayers"]
 z_index = 20
-tile_set = ExtResource("6_4jflh")
+tile_map_data = PackedByteArray("AADe/wMAAgALAAIAAADe/wIAAgALAAEAAADe/wEAAgALAAEAAADe/wAAAgALAAAAAADd/wMAAgAKAAIAAADd/wIAAgAKAAEAAADd/wEAAgAKAAEAAADd/wAAAgAKAAAAAADc/wMAAgAKAAIAAADc/wIAAgAKAAEAAADc/wEAAgAKAAEAAADc/wAAAgAKAAAAAADb/wMAAgAKAAIAAADb/wIAAgAKAAEAAADb/wEAAgAKAAEAAADb/wAAAgAKAAAAAADa/wMAAgAKAAIAAADa/wIAAgAKAAEAAADa/wEAAgAKAAEAAADa/wAAAgAKAAAAAADZ/wMAAgAKAAIAAADZ/wIAAgAKAAEAAADZ/wEAAgAKAAEAAADZ/wAAAgAKAAAAAADY/wMAAgAKAAIAAADY/wIAAgAKAAEAAADY/wEAAgAKAAEAAADY/wAAAgAKAAAAAADX/wMAAgAKAAIAAADX/wIAAgAKAAEAAADX/wEAAgAKAAEAAADX/wAAAgAKAAAAAADW/wMAAgAKAAIAAADW/wIAAgAKAAEAAADW/wEAAgAKAAEAAADW/wAAAgAKAAAAAADV/wMAAgAKAAIAAADV/wIAAgAKAAEAAADV/wEAAgAKAAEAAADV/wAAAgAKAAAAAADU/wMAAgAKAAIAAADU/wIAAgAKAAEAAADU/wEAAgAKAAEAAADU/wAAAgAKAAAAAADT/wMAAgAJAAIAAADT/wIAAgAJAAEAAADT/wEAAgAJAAEAAADT/wAAAgAJAAAAAAAsABQAAgALAAEAAAAsABMAAgALAAEAAAAsABIAAgALAAEAAAAsABEAAgALAAEAAAAsABAAAgALAAEAAAAsAA8AAgALAAEAAAAsAA4AAgALAAEAAAAsAA0AAgALAAEAAAAsAAwAAgALAAEAAAArABQAAgAKAAEAAAArABMAAgAKAAEAAAArABIAAgAKAAEAAAArABEAAgAKAAEAAAArABAAAgAKAAEAAAArAA8AAgAKAAEAAAArAA4AAgAKAAEAAAArAA0AAgAKAAEAAAArAAwAAgAKAAEAAAAqABQAAgAKAAEAAAAqABMAAgAKAAEAAAAqABIAAgAKAAEAAAAqABEAAgAKAAEAAAAqABAAAgAKAAEAAAAqAA8AAgAKAAEAAAAqAA4AAgAKAAEAAAAqAA0AAgAKAAEAAAAqAAwAAgAKAAEAAAApABQAAgAKAAEAAAApABMAAgAKAAEAAAApABIAAgAKAAEAAAApABEAAgAKAAEAAAApABAAAgAKAAEAAAApAA8AAgAKAAEAAAApAA4AAgAKAAEAAAApAA0AAgAKAAEAAAApAAwAAgAKAAEAAAAsAAsAAgALAAEAAAAsAAoAAgALAAEAAAAsAAkAAgALAAEAAAAsAAgAAgALAAEAAAAsAAcAAgALAAEAAAAsAAYAAgALAAEAAAAsAAUAAgALAAEAAAAsAAQAAgALAAEAAAAsAAMAAgALAAEAAAAsAAIAAgALAAEAAAAsAAEAAgALAAEAAAArAAsAAgAKAAEAAAArAAoAAgAKAAEAAAArAAkAAgAKAAEAAAArAAgAAgAKAAEAAAArAAcAAgAKAAEAAAArAAYAAgAKAAEAAAArAAUAAgAKAAEAAAArAAQAAgAKAAEAAAArAAMAAgAKAAEAAAArAAIAAgAKAAEAAAArAAEAAgAKAAEAAAAqAAsAAgAKAAEAAAAqAAoAAgAKAAEAAAAqAAkAAgAKAAEAAAAqAAgAAgAKAAEAAAAqAAcAAgAKAAEAAAAqAAYAAgAKAAEAAAAqAAUAAgAKAAEAAAAqAAQAAgAKAAEAAAAqAAMAAgAKAAEAAAAqAAIAAgAKAAEAAAAqAAEAAgAKAAEAAAApAAsAAgAKAAEAAAApAAoAAgAKAAEAAAApAAkAAgAKAAEAAAApAAgAAgAKAAEAAAApAAcAAgAKAAEAAAApAAYAAgAKAAEAAAApAAUAAgAKAAEAAAApAAQAAgAKAAEAAAApAAMAAgAKAAEAAAApAAIAAgAKAAEAAAApAAEAAgAKAAEAAAAoAAoAAgAKAAEAAAAoAAkAAgAKAAEAAAAoAAgAAgAKAAEAAAAoAAcAAgAKAAEAAAAoAAYAAgAKAAEAAAAoAAUAAgAKAAEAAAAoAAQAAgAKAAEAAAAoAAMAAgAKAAEAAAAoAAIAAgAKAAEAAAAoAAEAAgAKAAEAAAAnAAoAAgAKAAEAAAAnAAkAAgAKAAEAAAAnAAgAAgAKAAEAAAAnAAcAAgAKAAEAAAAnAAYAAgAKAAEAAAAnAAUAAgAKAAEAAAAnAAQAAgAKAAEAAAAnAAMAAgAKAAEAAAAnAAIAAgAKAAEAAAAnAAEAAgAKAAEAAAAmAAoAAgAKAAEAAAAmAAkAAgAKAAEAAAAmAAgAAgAKAAEAAAAmAAcAAgAKAAEAAAAmAAYAAgAKAAEAAAAmAAUAAgAKAAEAAAAmAAQAAgAKAAEAAAAmAAMAAgAKAAEAAAAmAAIAAgAKAAEAAAAmAAEAAgAKAAEAAAAlAAoAAgALAAMAAAAlAAkAAgAKAAEAAAAlAAgAAgAKAAEAAAAlAAcAAgAKAAEAAAAlAAYAAgAKAAEAAAAlAAUAAgAKAAEAAAAlAAQAAgAKAAEAAAAlAAMAAgAKAAEAAAAlAAIAAgAKAAEAAAAlAAEAAgAKAAEAAAAkAAoAAgAKAAIAAAAkAAkAAgAKAAEAAAAkAAgAAgAKAAEAAAAkAAcAAgAKAAEAAAAkAAYAAgAKAAEAAAAkAAUAAgAKAAEAAAAkAAQAAgAKAAEAAAAkAAMAAgAKAAEAAAAkAAIAAgAKAAEAAAAkAAEAAgAKAAEAAAAjAAoAAgAKAAIAAAAjAAkAAgAKAAEAAAAjAAgAAgAKAAEAAAAjAAcAAgAKAAEAAAAjAAYAAgAKAAEAAAAjAAUAAgAKAAEAAAAjAAQAAgAKAAEAAAAjAAMAAgAKAAEAAAAjAAIAAgAKAAEAAAAjAAEAAgAKAAEAAAAiAAoAAgAKAAIAAAAiAAkAAgAKAAEAAAAiAAgAAgAKAAEAAAAiAAcAAgAKAAEAAAAiAAYAAgAKAAEAAAAiAAUAAgAKAAEAAAAiAAQAAgAKAAEAAAAiAAMAAgAKAAEAAAAiAAIAAgAKAAEAAAAiAAEAAgAKAAEAAAAhAAoAAgAJAAIAAAAhAAkAAgAJAAEAAAAhAAgAAgAJAAEAAAAhAAcAAgAJAAEAAAAhAAYAAgAJAAEAAAAhAAUAAgAJAAEAAAAhAAQAAgAJAAEAAAAhAAMAAgAJAAEAAAAhAAIAAgAJAAEAAAAhAAEAAgAJAAEAAAAsAAAAAgALAAEAAAArAAAAAgAKAAEAAAAqAAAAAgAKAAEAAAApAAAAAgAKAAEAAAAoAAAAAgAKAAEAAAAnAAAAAgAKAAEAAAAmAAAAAgAKAAEAAAAlAAAAAgAKAAEAAAAkAAAAAgAKAAEAAAAjAAAAAgAKAAEAAAAiAAAAAgAKAAEAAAAhAAAAAgAJAAEAAAAoABQAAgAKAAEAAAAoABMAAgAKAAEAAAAoABIAAgAKAAEAAAAoABEAAgAKAAEAAAAoABAAAgAKAAEAAAAoAA8AAgAKAAEAAAAoAA4AAgAKAAEAAAAoAA0AAgAKAAEAAAAoAAwAAgAKAAEAAAAoAAsAAgAKAAEAAAAnABQAAgAKAAEAAAAnABMAAgAKAAEAAAAnABIAAgAKAAEAAAAnABEAAgAKAAEAAAAnABAAAgAKAAEAAAAnAA8AAgAKAAEAAAAnAA4AAgAKAAEAAAAnAA0AAgAKAAEAAAAnAAwAAgAKAAEAAAAnAAsAAgAKAAEAAAAmABQAAgAKAAEAAAAmABMAAgAKAAEAAAAmABIAAgAKAAEAAAAmABEAAgAKAAEAAAAmABAAAgAKAAEAAAAmAA8AAgAKAAEAAAAmAA4AAgAKAAEAAAAmAA0AAgAKAAEAAAAmAAwAAgAKAAEAAAAmAAsAAgAKAAEAAAAlABQAAgAJAAEAAAAlABMAAgAJAAEAAAAlABIAAgAJAAEAAAAlABEAAgAJAAEAAAAlABAAAgAJAAEAAAAlAA8AAgAJAAEAAAAlAA4AAgAJAAEAAAAlAA0AAgAJAAEAAAAlAAwAAgAJAAEAAAAlAAsAAgAJAAEAAAAsABUAAgALAAIAAAArABUAAgAKAAIAAAAqABUAAgAKAAIAAAApABUAAgAKAAIAAAAoABUAAgAKAAIAAAAnABUAAgAKAAIAAAAmABUAAgAKAAIAAAAlABUAAgAJAAIAAAAsAP//AgALAAEAAAAsAP7/AgALAAEAAAAsAP3/AgALAAAAAAArAP//AgAKAAEAAAArAP7/AgAKAAEAAAArAP3/AgAKAAAAAAAqAP//AgAKAAEAAAAqAP7/AgAKAAEAAAAqAP3/AgAKAAAAAAApAP//AgAKAAEAAAApAP7/AgAKAAEAAAApAP3/AgAKAAAAAAAoAP//AgAKAAEAAAAoAP7/AgAKAAEAAAAoAP3/AgAKAAAAAAAnAP//AgAKAAEAAAAnAP7/AgAKAAEAAAAnAP3/AgAKAAAAAAAmAP//AgAKAAEAAAAmAP7/AgAKAAEAAAAmAP3/AgAKAAAAAAAlAP//AgAKAAEAAAAlAP7/AgAKAAEAAAAlAP3/AgAKAAAAAAAkAP//AgAKAAEAAAAkAP7/AgAKAAEAAAAkAP3/AgAKAAAAAAAjAP//AgAKAAEAAAAjAP7/AgAKAAEAAAAjAP3/AgAKAAAAAAAiAP//AgAKAAEAAAAiAP7/AgAKAAEAAAAiAP3/AgAKAAAAAAAhAP//AgAJAAEAAAAhAP7/AgAJAAEAAAAhAP3/AgAJAAAAAAA=")
+tile_set = ExtResource("7_7vg7o")
 
 [node name="BlockTile" type="TileMapLayer" parent="TileMapLayers"]
 z_index = 20
-tile_set = ExtResource("7_um6p4")
+tile_set = ExtResource("8_lwkui")
 
 [node name="HurtTile" type="TileMapLayer" parent="TileMapLayers"]
-tile_set = ExtResource("8_q6eno")
 script = ExtResource("9_r541e")
 
 [node name="BGTile" type="TileMapLayer" parent="TileMapLayers"]
-tile_set = ExtResource("10_erlmr")
 
 [node name="HurtBoxs" type="Node2D" parent="."]
 
@@ -83,13 +89,23 @@ tile_set = ExtResource("10_erlmr")
 [node name="DynamicCheckpoints" type="Node2D" parent="."]
 
 [node name="1" parent="DynamicCheckpoints" instance=ExtResource("18_5whwx")]
-position = Vector2(-592, 448)
+position = Vector2(592, -80)
 checkpoint_id = "1"
 belongs_to_room = "WindValley10"
 
 [node name="2" parent="DynamicCheckpoints" instance=ExtResource("18_5whwx")]
-position = Vector2(-384, 320)
+position = Vector2(-592, -32)
 checkpoint_id = "2"
 belongs_to_room = "WindValley10"
 
 [node name="Doors" type="Node2D" parent="."]
+
+[node name="wv9wv10" parent="Doors" instance=ExtResource("11_xxx2w")]
+position = Vector2(-680, -32)
+door_id = "wv9wv10"
+target_room_id = "WindValley9"
+
+[node name="wv1wv10" parent="Doors" instance=ExtResource("11_xxx2w")]
+position = Vector2(680, -80)
+door_id = "wv1wv10"
+target_room_id = "WindValley1"

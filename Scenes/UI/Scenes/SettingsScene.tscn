@@ -18,7 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://biex1ykpn1qgq" path="res://Assets/Textures/UIs/MobieControlsUIs/跳跃2.tres" id="22_kwbpc"]
 [ext_resource type="Texture2D" uid="uid://cmqn3lq3grd75" path="res://Assets/Textures/UIs/MobieControlsUIs/冲刺2.tres" id="24_d8wvb"]
 [ext_resource type="Texture2D" uid="uid://bxip4ialo0qsl" path="res://Assets/Textures/UIs/SceneUIs/tres/音量滑块1.tres" id="24_houfj"]
-[ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/WindValley/2.png" id="25_fw62u"]
+[ext_resource type="Texture2D" uid="uid://cy2yuswokrtcg" path="res://Assets/Textures/Backgrounds/CK/2.png" id="25_fw62u"]
 [ext_resource type="Texture2D" uid="uid://dolaxw8vcjj6y" path="res://Assets/Textures/UIs/SceneUIs/tres/音量滑块2.tres" id="25_ppuk0"]
 [ext_resource type="Texture2D" uid="uid://br0syxlpkp878" path="res://Assets/Textures/UIs/MobieControlsUIs/交互2.tres" id="26_22g1o"]
 [ext_resource type="Texture2D" uid="uid://dim2f13dvnmib" path="res://Assets/Textures/UIs/MobieControlsUIs/地图1.tres" id="28_em6rb"]
@@ -767,6 +767,7 @@ text = "请按下新的按键...
 (ESC取消)"
 
 [node name="MobieControlsPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
+visible = false
 z_index = 200
 script = ExtResource("mobie_controls_script")
 
@@ -1166,7 +1167,6 @@ rounded = true
 ticks_on_borders = true
 
 [node name="GraphicsPage" type="Node2D" parent="SettingsRoot/PagesRoot"]
-visible = false
 
 [node name="EffectLevelContainer" type="VBoxContainer" parent="SettingsRoot/PagesRoot/GraphicsPage"]
 offset_left = 551.0

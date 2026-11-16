@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_m4myo"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_x1b5c"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="5_7kgu1"]
-[ext_resource type="Texture2D" uid="uid://dwpgj2yjqy8oc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景2.png" id="5_8ssuy"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_q1rpw"]
 [ext_resource type="TileSet" uid="uid://qtdk7cq6rg5m" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地伤害瓦片集.tres" id="6_jang7"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="7_x1b5c"]
 [ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地物块瓦片集.tres" id="8_8ssuy"]
@@ -56,7 +56,8 @@ source_background = NodePath("Background1")
 parallax_ratio = Vector2(0.15, 0.05)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
-texture = ExtResource("5_8ssuy")
+modulate = Color(0.14509805, 0.14509805, 0.21176471, 1)
+texture = ExtResource("5_q1rpw")
 
 [node name="FGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_x1b5c")

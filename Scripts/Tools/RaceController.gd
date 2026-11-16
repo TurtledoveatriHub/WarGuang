@@ -30,13 +30,13 @@ const PlayerUIFadeScript = preload("res://Scripts/UI/ChallengeUIController.gd")
 ## 渐亮时长（秒，结束后正式开始计时）
 @export var race_fade_in: float = 0.4
 ## 宽限期（秒）：开始后的这段时间不计时也不判负（传送落地的缓冲）
-@export var race_grace_period: float = 1.0
+@export var race_grace_period: float = 0.5
 
 @export_category("倒计时")
 ## 开始前倒计时秒数（从该数字倒数到 1，然后显示 GO！）
 @export var countdown_from: int = 3
 ## 倒计时每步时长（秒）
-@export var countdown_step: float = 0.7
+@export var countdown_step: float = 0.8
 
 @export_category("结果展示")
 ## 结果面板停留时长（秒），之后开始回程
@@ -47,6 +47,8 @@ const PlayerUIFadeScript = preload("res://Scripts/UI/ChallengeUIController.gd")
 @export var start_sfx: AudioStream
 ## 每通过一个检查点时播放
 @export var checkpoint_sfx: AudioStream
+## 每跑完一圈（过起点线）时播放；**最后一圈不播**（那一下已经有成功音效）
+@export var lap_sfx: AudioStream
 ## 倒计时每跳一个数字时播放（留空则不播）
 @export var countdown_sfx: AudioStream
 ## 挑战成功时播放
@@ -104,6 +106,12 @@ var _ui: RaceHUD = null
 var _player_ui_fade = null
 ## 结果是否已经处理过（防止成功/失败回调重复触发）
 var _result_handled: bool = false
+## 本次挑战开始前，本阶段是否已经通关过
+var _result_cleared_before: bool = false
+## 本次是否为该阶段首次通关
+var _result_first_clear: bool = false
+## 本次是否刷新了该阶段的最佳成绩
+var _result_record_broken: bool = false
 
 ## 初始化：建立玩家 HUD 助手，并把所有阶段赛道隐藏起来
 func _ready() -> void:
@@ -147,6 +155,9 @@ func start_race(stage_index: int = 0) -> void:
 	next_expected_index = 1
 	_grace_timer = 0.0
 	_result_handled = false
+	_result_cleared_before = Global.has_race_clear(active_stage_number)
+	_result_first_clear = false
+	_result_record_broken = false
 	if not _prepare_track(active_config):
 		return
 	# 从调用 start_race 那一刻起就禁操控（只禁输入，物理/状态机照常跑）：
@@ -225,6 +236,10 @@ func _teleport_player_to_start() -> void:
 	await _black_screen_fade_out()
 	player.global_position = marker.global_position
 	player.velocity = Vector2.ZERO
+	# 出生朝向固定为右（避免带着上一个房间的朝向开跑）
+	player.is_facing_right = true
+	if player.animated_sprite:
+		player.animated_sprite.flip_h = false
 	if player.has_method("sync_camera_to_player_center"):
 		player.sync_camera_to_player_center(true)
 	if race_black_hold > 0.0:
@@ -262,6 +277,9 @@ func _complete_lap() -> void:
 	if completed_laps >= maxi(active_config.lap_count, 1):
 		_finish_race()
 		return
+	# 不是最后一圈：过线（完成一圈）音效
+	if lap_sfx:
+		AudioManager.play_stream_sfx(lap_sfx)
 	for checkpoint: Node in checkpoints:
 		if checkpoint.has_method("set_activated"):
 			checkpoint.set_activated(false)
@@ -276,7 +294,11 @@ func _finish_race() -> void:
 	current_state = State.SUCCESS
 	# 注意：结算瞬间**不限操控**（玩家只是在看结果面板），黑屏传送开始前才禁
 	var total_time: float = elapsed_time
-	_record_best_time(total_time)
+	# 本阶段之前是否已经通关过（决定结果对话走「首次通关」还是「重复挑战」分支）
+	_result_cleared_before = Global.has_race_clear(active_stage_number)
+	_result_first_clear = not _result_cleared_before
+	Global.mark_race_stage_cleared(active_stage_number)
+	_result_record_broken = _record_best_time(total_time)
 	if success_sfx:
 		AudioManager.play_stream_sfx(success_sfx)
 	if _ui != null:
@@ -290,6 +312,10 @@ func _fail_race(_reason: String) -> void:
 		return
 	_result_handled = true
 	current_state = State.FAILED
+	# 已通关过的阶段再次挑战失败：走单独的结果分支
+	_result_cleared_before = Global.has_race_clear(active_stage_number)
+	_result_first_clear = false
+	_result_record_broken = false
 	if fail_sfx:
 		AudioManager.play_stream_sfx(fail_sfx)
 	if _ui != null:
@@ -335,15 +361,27 @@ func _black_screen_fade_in() -> void:
 	if FadeManager and FadeManager.has_method("fade_in"):
 		await FadeManager.fade_in(race_fade_in)
 
-## 自动触发 RaceStarter 的结果对话（成功 / 失败分支）
+## 自动触发 RaceStarter 的结果对话（分支标题按结算类型决定）
 func _start_result_dialogue() -> void:
-	if starter_npc != null and starter_npc.has_method("start_result_dialogue"):
+	if starter_npc != null and starter_npc.has_method("start_result_dialogue_title"):
 		# 交还操控由 RaceStarter 在**这一次结果对话**结束时回调 on_result_dialogue_finished()
 		_awaiting_result_dialogue = true
-		starter_npc.start_result_dialogue(current_state == State.SUCCESS)
+		starter_npc.start_result_dialogue_title(_resolve_result_dialogue_title())
 	else:
 		# 没有触发 NPC（例如直接调 start_race 测试）：自己把操控还回去，避免永久禁控
 		_unlock_player()
+
+## 根据结算类型决定自动结果对话的标题：
+##  - 首次通关：result_win_1 ~ result_win_5（每段独立）
+##  - 重复挑战成功：result_repeat_record（刷新纪录） / result_repeat_no_record（未刷新）
+##  - 重复挑战失败：result_repeat_lose
+##  - 未通关阶段的失败：result_lose
+func _resolve_result_dialogue_title() -> String:
+	if current_state == State.SUCCESS:
+		if _result_first_clear:
+			return "result_win_" + str(active_stage_number)
+		return "result_repeat_record" if _result_record_broken else "result_repeat_no_record"
+	return "result_repeat_lose" if _result_cleared_before else "result_lose"
 
 ## 结果对话结束（由 RaceStarter 回调）：交还操控
 func on_result_dialogue_finished() -> void:
@@ -370,19 +408,15 @@ func _unlock_player() -> void:
 		player.set_player_control(true)
 	_lock_owned = false
 
-## 记录最佳时间（只在更快时写入，并立即存档 + 广播给告示牌）
-func _record_best_time(total_time: float) -> void:
-	var key: String = str(active_stage_number)
-	var old_time: float = -1.0
-	if Global.race_best_times.has(key):
-		old_time = float(Global.race_best_times[key])
-	if old_time >= 0.0 and total_time >= old_time:
-		return
-	Global.race_best_times[key] = total_time
+## 记录最佳时间（只在更快时写入；返回是否刷新了记录）；刷新时立即存档 + 广播给告示牌
+func _record_best_time(total_time: float) -> bool:
+	if not Global.record_race_best_time(active_stage_number, total_time):
+		return false
 	if EventBus and EventBus.has_method("notify_race_best_time_updated"):
 		EventBus.notify_race_best_time_updated(active_stage_number, total_time)
 	if Global.current_save_slot >= 0:
 		SaveManager.save_game(Global.current_save_slot, Global.get_save_data())
+	return true
 
 ## 隐藏所有阶段的赛道
 func _hide_all_stages() -> void:

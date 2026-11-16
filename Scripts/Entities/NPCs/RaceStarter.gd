@@ -6,7 +6,6 @@ class_name RaceStarter
 ##   1. 把对话里的指令转成 RaceController.start_race(阶段索引)
 ##   2. 挑战结束后由 RaceController 回调 start_result_dialogue()，自动弹出结果对话
 ##      （成功 => result_win，失败 => result_lose），对话结束再恢复普通交互分支。
-## 没有巡逻 / 狂热状态机 —— 站着不动，玩家按交互键就能开跑。
 
 ## RaceController 的 NodePath（一般就是自己身上的子节点）
 @export_node_path var race_controller_path: NodePath = NodePath()
@@ -72,9 +71,10 @@ func _lock_player() -> void:
 	if player != null and player.has_method("set_player_control"):
 		player.set_player_control(false)
 
-## 挑战结束后的自动结果对话（由 RaceController 调用）
-func start_result_dialogue(success: bool) -> void:
-	_open_dialogue("result_win" if success else "result_lose")
+## 挑战结束后的自动结果对话（由 RaceController 调用；标题由控制器按结算类型给出：
+## result_win_1~5 / result_repeat_record / result_repeat_no_record / result_repeat_lose / result_lose）
+func start_result_dialogue_title(title: String) -> void:
+	_open_dialogue(title)
 
 ## 开始交互（覆盖 BaseNPC：对话里要用到 npc / Global / TaskManager 三个对象）
 func _start_interaction() -> void:

@@ -77,26 +77,20 @@ func _ready():
 
 ## 检测器检测到玩家进入
 func _on_detector_body_entered(body):
-	print("DestructibleWall body_entered fired, body=", body.name, " group(player)=", body.is_in_group("player"))
 	# 只处理玩家
 	if not body.is_in_group("player"):
-		print("  → return: not in player group")
 		return
 	
 	if is_destroyed:
-		print("  → return: is_destroyed=", is_destroyed)
 		return
 	
 	if not is_player_on_correct_side(body):
-		print("  → return: wrong side (facing=", facing_direction, ")")
 		return
 	
 	if not body.is_on_floor():
-		print("  → return: not on floor")
 		return
 	
 	if not body.is_running:
-		print("  → return: not running")
 		return
 
 	var player_velocity = Vector2.ZERO
@@ -105,11 +99,9 @@ func _on_detector_body_entered(body):
 	
 	var speed = abs(player_velocity.x)
 	if speed < velocity_threshold_min or speed > velocity_threshold_max:
-		print("  → return: speed out of range")
 		return
 	
 	if not is_player_touching_wall(body):
-		print("  → return: not touching wall (dist=", body.global_position.distance_to(wall_body.global_position), ")")
 		return
 	
 	_handle_impact(body)

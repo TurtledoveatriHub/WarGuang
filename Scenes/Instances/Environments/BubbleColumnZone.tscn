@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3 uid="uid://coetaoemgxdfp"]
+
+[ext_resource type="Script" uid="uid://di7dbtf056322" path="res://Scripts/Instances/Environments/BubbleColumnZone.gd" id="1_bubblecol"]
+[ext_resource type="Script" uid="uid://cd40oqnytjly3" path="res://Scripts/Instances/Environments/EnvironmentZoneVisual.gd" id="2_bubviz"]
+[ext_resource type="Texture2D" uid="uid://bn5j5b16b3bl3" path="res://Assets/Textures/FX/wind_streak.tres" id="3_streak"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bubblecol"]
+size = Vector2(64, 160)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_bubblecol"]
+particle_flag_align_y = true
+emission_shape = 3
+emission_box_extents = Vector3(32, 2, 1)
+direction = Vector3(0, -1, 0)
+spread = 6.0
+initial_velocity_min = 91.8
+initial_velocity_max = 124.2
+gravity = Vector3(0, 0, 0)
+scale_min = 0.9
+scale_max = 1.1
+color = Color(0.85, 0.95, 1, 0.55)
+
+[node name="BubbleColumnZone" type="Area2D"]
+monitoring = false
+script = ExtResource("1_bubblecol")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_bubblecol")
+
+[node name="BubbleVisual" type="GPUParticles2D" parent="."]
+texture_filter = 1
+position = Vector2(0, 68)
+amount = 28
+texture = ExtResource("3_streak")
+lifetime = 1.4814814814814814
+process_material = SubResource("ParticleProcessMaterial_bubblecol")
+script = ExtResource("2_bubviz")

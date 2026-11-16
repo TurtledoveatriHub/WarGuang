@@ -24,6 +24,10 @@ if Global.maniac_stage5_last_challenge_failed and not Global.maniac_stage5_chall
 if Global.maniac_stage6_last_challenge_failed and not Global.maniac_stage6_challenge_completed
     => stage6_failed_dialogue
 
+# 第七阶段（无尽模式）失败后的重试机会（无尽模式不会通关，所以只看失败标记）
+if Global.maniac_stage7_last_challenge_failed
+    => stage7_failed_dialogue
+
 # ==================== 检查是否第一次交互 ====================
 if TaskManager.get_npc_dialogue_count("maniac_01") == 0
     => first_interaction
@@ -188,9 +192,20 @@ do npc.launch_stage5_challenge()
 do npc.launch_stage6_challenge()
 => END
 
-# ==================== 特殊分支：六阶段全部完成 ====================
+# ==================== 特殊分支：六阶段全部完成 → 引导进入无尽挑战 ====================
 ~ post_stage6_challenge
 
 "疯子":六段全过...
-"疯子":我已经没什么能教你的了。
+"疯子":不过，最后还有一件事：无尽挑战。
+"疯子":没有终点，看看你能拿多少分。
+"疯子":想开始就再来找我。
+do npc.launch_stage7_challenge()
+=> END
+
+# ==================== 特殊分支：第七阶段（无尽模式）失败后重试 ====================
+~ stage7_failed_dialogue
+
+"疯子":分数我已经记下来了...
+"疯子":想再刷一次？随时都可以。
+do npc.launch_stage7_challenge()
 => END

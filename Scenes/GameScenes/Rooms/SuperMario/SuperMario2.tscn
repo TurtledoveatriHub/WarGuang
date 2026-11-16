@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://bmenoypaw0i4i"]
+[gd_scene load_steps=16 format=4 uid="uid://bmenoypaw0i4i"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_vbuyt"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_jksrl"]
@@ -10,7 +10,6 @@
 [ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地物块瓦片集.tres" id="8_ejcyb"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="8_v2cfe"]
 [ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="12_wumnj"]
-[ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="15_u54f5"]
 [ext_resource type="PackedScene" uid="uid://dvyyx1gsopmfx" path="res://Scenes/Instances/Items/Coin.tscn" id="17_g82si"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="18_e3q1g"]
 [ext_resource type="PackedScene" uid="uid://bq5gktnvtvvop" path="res://Scenes/Instances/HurtBoxs/IceCrystal.tscn" id="20_h06fl"]
@@ -28,7 +27,6 @@ room_bounds = NodePath("RoomBounds4")
 [node name="RoomBounds4" type="Node2D" parent="."]
 scale = Vector2(8, 4)
 script = ExtResource("2_jksrl")
-debug_color = Color(0, 0.824, 0.588, 0.235)
 metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
 
 [node name="RoomTrigger" type="Area2D" parent="."]
@@ -95,16 +93,6 @@ position = Vector2(-562, -96)
 [node name="NPCs" type="Node2D" parent="."]
 
 [node name="Doors" type="Node2D" parent="."]
-
-[node name="Door2-4" parent="Doors" instance=ExtResource("15_u54f5")]
-position = Vector2(-1320, -64)
-door_id = "2-4"
-target_room_id = "GrassLand1"
-
-[node name="4sm1" parent="Doors" instance=ExtResource("15_u54f5")]
-position = Vector2(1320, 64)
-door_id = "4sm1"
-target_room_id = "SnowMountain1"
 
 [node name="Coins" type="Node2D" parent="."]
 

@@ -1,0 +1,120 @@
+[gd_scene load_steps=15 format=3 uid="uid://jm5gfml1w2n4"]
+
+[ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_nqlsq"]
+[ext_resource type="AudioStream" uid="uid://bjv3hvygk0135" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_o1vbi"]
+[ext_resource type="PackedScene" uid="uid://d2esb7iuaq2sb" path="res://Scenes/GameScenes/SnowFX.tscn" id="3_dbv4q"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="4_vgce2"]
+[ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="5_o8pkv"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="6_3vjrs"]
+[ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="7_1utfy"]
+[ext_resource type="TileSet" uid="uid://qtdk7cq6rg5m" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地伤害瓦片集.tres" id="8_5hfli"]
+[ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="9_vjdtf"]
+[ext_resource type="TileSet" uid="uid://bpwlvdbkoxsvk" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地物块瓦片集.tres" id="10_2qaxj"]
+[ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="11_ojkok"]
+[ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="16_tgvuc"]
+[ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="17_2r3fg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
+
+[node name="SnowMountain17" type="Node2D" node_paths=PackedStringArray("room_bounds")]
+script = ExtResource("1_nqlsq")
+room_id = "SnowMountain17"
+room_bgm_stream = ExtResource("2_o1vbi")
+adjacent_rooms = Array[String](["SnowMountain16", "SnowMountain18", "SnowMountain19"])
+room_color = Color(0.80261624, 0.80261624, 0.8026162, 1)
+room_bounds = NodePath("sm17Bounds")
+
+[node name="SnowFX" parent="." instance=ExtResource("3_dbv4q")]
+
+[node name="sm17Bounds" type="Node2D" parent="."]
+scale = Vector2(2, 2)
+script = ExtResource("4_vgce2")
+metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
+
+[node name="RoomTrigger" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomTrigger"]
+shape = SubResource("RectangleShape2D_qqk48")
+
+[node name="GroundControllers" type="Node2D" parent="."]
+
+[node name="BGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
+script = ExtResource("5_o8pkv")
+target_room_id = "SnowMountain17"
+source_background = NodePath("Background1")
+parallax_ratio = Vector2(0.15, 0.05)
+
+[node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
+modulate = Color(0.53333336, 0.58431375, 0.6745098, 1)
+texture = ExtResource("6_3vjrs")
+
+[node name="FGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
+script = ExtResource("5_o8pkv")
+target_room_id = "SnowMountain17"
+source_background = NodePath("Foreground1")
+parallax_ratio = Vector2(0.25, 0.1)
+
+[node name="Foreground1" type="Sprite2D" parent="GroundControllers/FGController1"]
+z_index = 99
+scale = Vector2(2, 2)
+
+[node name="TileMapLayers" type="Node2D" parent="."]
+
+[node name="BGTileMap" type="TileMapLayer" parent="TileMapLayers"]
+tile_set = ExtResource("7_1utfy")
+
+[node name="HurtTileMap" type="TileMapLayer" parent="TileMapLayers"]
+tile_set = ExtResource("8_5hfli")
+script = ExtResource("9_vjdtf")
+
+[node name="BlockTileMap" type="TileMapLayer" parent="TileMapLayers"]
+z_index = 20
+tile_set = ExtResource("10_2qaxj")
+
+[node name="GroundTileMap" type="TileMapLayer" parent="TileMapLayers"]
+z_index = 20
+tile_set = ExtResource("11_ojkok")
+
+[node name="HurtBoxs" type="Node2D" parent="."]
+
+[node name="JumpBoxs" type="Node2D" parent="."]
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="NPCs" type="Node2D" parent="."]
+
+[node name="Doors" type="Node2D" parent="."]
+
+[node name="sm16sm17" parent="Doors" instance=ExtResource("16_tgvuc")]
+position = Vector2(0, -360)
+rotation = 1.5707964
+door_id = "sm16sm17"
+target_room_id = "SnowMountain16"
+
+[node name="sm17sm18" parent="Doors" instance=ExtResource("16_tgvuc")]
+position = Vector2(-360, -32)
+door_id = "sm17sm18"
+target_room_id = "SnowMountain18"
+
+[node name="sm17sm19" parent="Doors" instance=ExtResource("16_tgvuc")]
+position = Vector2(0, 360)
+rotation = 1.5707964
+door_id = "sm17sm19"
+target_room_id = "SnowMountain19"
+
+[node name="DynamicCheckpoints" type="Node2D" parent="."]
+
+[node name="1" parent="DynamicCheckpoints" instance=ExtResource("17_2r3fg")]
+position = Vector2(-16, -264)
+checkpoint_id = "1"
+belongs_to_room = "SnowMountain17"
+
+[node name="2" parent="DynamicCheckpoints" instance=ExtResource("17_2r3fg")]
+position = Vector2(-248, -24)
+checkpoint_id = "2"
+belongs_to_room = "SnowMountain17"
+
+[node name="3" parent="DynamicCheckpoints" instance=ExtResource("17_2r3fg")]
+position = Vector2(-16, 256)
+checkpoint_id = "3"
+belongs_to_room = "SnowMountain17"

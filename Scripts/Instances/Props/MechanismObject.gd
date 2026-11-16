@@ -31,9 +31,9 @@ class_name MechanismObject
 ## 完全开启后是否关闭碰撞体
 @export var disable_collision_when_open: bool = true
 
-## 激活（开）前的延迟（秒）：开关激活后先等这么久再开始位移；
+## 开关状态变化后的延迟（秒）：开关激活后先等这么久再开始位移；
+## 激活转关闭（关）同样延迟这么久才开始回位。
 ## 延迟期间开关反复切换会刷新这个延迟。默认 0 = 立即移动（原行为）。
-## 只影响“开”的方向；“关”仍然立即回位。
 @export var activation_delay: float = 0.0
 
 ## ── 表现 ──
@@ -62,8 +62,12 @@ var _want_open: bool = false
 var _speed: float = 0.0
 ## 本帧实际位移速度（像素/秒，供机关平台等子类对外暴露）
 var _motion_velocity: Vector2 = Vector2.ZERO
-## 激活延迟剩余时间（秒，>0 时不位移）
-var _activation_delay_left: float = 0.0
+## 开关延迟剩余时间（秒，>0 时不位移）
+var _switch_delay_left: float = 0.0
+## 延迟期间待生效的目标位置
+var _pending_target_pos: Vector2 = Vector2.ZERO
+## 当前是否有延迟结束后要生效的目标位置
+var _has_pending_target: bool = false
 
 
 func _ready() -> void:
@@ -86,15 +90,17 @@ func _physics_process(delta: float) -> void:
 
 ## 每物理帧推进移动（带加速/减速；子类可重写接管）
 func _advance_physics(delta: float) -> void:
-	# 激活延迟：到点前保持静止（不位移），到点后才把目标设为开启位置
-	if _activation_delay_left > 0.0:
-		_activation_delay_left = maxf(_activation_delay_left - delta, 0.0)
-		if _activation_delay_left > 0.0:
+	# 开关延迟：到点前保持静止（不位移），到点后才把目标位置生效
+	if _switch_delay_left > 0.0:
+		_switch_delay_left = maxf(_switch_delay_left - delta, 0.0)
+		if _switch_delay_left > 0.0:
 			_motion_velocity = Vector2.ZERO
 			_speed = 0.0
 			_on_motion_updated(false)
 			return
-		_target_pos = _open_pos
+		if _has_pending_target:
+			_has_pending_target = false
+			_target_pos = _pending_target_pos
 	var before_global: Vector2 = global_position
 	if not position.is_equal_approx(_target_pos):
 		var to_target: Vector2 = _target_pos - position
@@ -144,18 +150,25 @@ func _recompute() -> void:
 		# 开门：立即切 ON；开启过程中保留碰撞，到达后再按需关闭
 		_play_anim(ANIM_NAMES[Anim.ON])
 		_set_collision_enabled(true)
-		# 激活延迟：延迟内目标仍是当前位置（因此不会位移）；反复激活会刷新延迟
-		if activation_delay > 0.0:
-			_activation_delay_left = activation_delay
-		else:
-			_activation_delay_left = 0.0
-			_target_pos = _open_pos
+		# 开关延迟：延迟内目标不生效（因此不会位移）；反复切换会刷新延迟
+		_start_switch_delay(_open_pos)
 	else:
-		# 关门：立即切 OFF；恢复碰撞并移回初始位置（关不延迟）
+		# 关门：立即切 OFF；恢复碰撞，延迟结束后才移回初始位置
 		_play_anim(ANIM_NAMES[Anim.OFF])
-		_activation_delay_left = 0.0
-		_target_pos = _closed_pos
 		_set_collision_enabled(true)
+		_start_switch_delay(_closed_pos)
+
+
+## 启动开关延迟：延迟结束后把目标位置切到 target_pos；activation_delay <= 0 时立即生效
+func _start_switch_delay(target_pos: Vector2) -> void:
+	if activation_delay > 0.0:
+		_switch_delay_left = activation_delay
+		_pending_target_pos = target_pos
+		_has_pending_target = true
+		return
+	_switch_delay_left = 0.0
+	_has_pending_target = false
+	_target_pos = target_pos
 
 
 func _on_reached_target() -> void:

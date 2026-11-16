@@ -32,7 +32,14 @@ static func handle_state(player: Node, fixed_delta: float, move_input: float, ju
 	# 水平移动：按下输入时直接使用设定加速度，不再做过渡。
 	var target_horizontal_speed: float = player.glide_direction * player.glide_target_h_speed * player.effective_horizontal_multiplier
 	if move_input != 0:
-		var glide_accel: float = player.glide_horizontal_acceleration * player.effective_horizontal_multiplier * fixed_delta
+		## ★ 反向刹车：当前水平速度与目标方向相反时，先用 glide_turn_deceleration
+		##   （更大的加速度）把反向速度抵消到 0，抵消完成后再交回
+		##   glide_horizontal_acceleration 正常加速 —— 转向不会拖沓，也不会让正向加速变得过猛。
+		var glide_accel_value: float = player.glide_horizontal_acceleration
+		if not is_zero_approx(player.velocity.x) and not is_zero_approx(target_horizontal_speed) \
+				and signf(player.velocity.x) != signf(target_horizontal_speed):
+			glide_accel_value = player.glide_turn_deceleration
+		var glide_accel: float = glide_accel_value * player.effective_horizontal_multiplier * fixed_delta
 		player.velocity.x = move_toward(player.velocity.x, target_horizontal_speed, glide_accel)
 	else:
 		var glide_release: float = player.glide_release_deceleration * player.effective_horizontal_multiplier * fixed_delta

@@ -57,7 +57,8 @@ var _page_switch_in_progress: bool = false
 enum UiEffectLevel {
 	LOW,
 	MEDIUM,
-	HIGH
+	HIGH,
+	ULTRA
 }
 
 var ui_effect_level: int = UiEffectLevel.MEDIUM
@@ -347,6 +348,7 @@ func _populate_effect_level_options() -> void:
 	effect_level_option.add_item("低", UiEffectLevel.LOW)
 	effect_level_option.add_item("中", UiEffectLevel.MEDIUM)
 	effect_level_option.add_item("高", UiEffectLevel.HIGH)
+	effect_level_option.add_item("超高", UiEffectLevel.ULTRA)
 	effect_level_option.select(ui_effect_level)
 
 func _on_effect_level_selected(index: int) -> void:

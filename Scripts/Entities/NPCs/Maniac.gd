@@ -250,6 +250,10 @@ func launch_stage5_challenge():
 func launch_stage6_challenge():
 	_start_challenge_stage(5)
 
+## 启动第七阶段「无尽模式」挑战（索引 6，无尽模式不会通关）
+func launch_stage7_challenge():
+	_start_challenge_stage(6)
+
 ## 统一启动入口
 func _start_challenge_stage(stage_index: int) -> void:
 	if challenge_controller_path == NodePath() or challenge_controller_path.is_empty():
@@ -274,7 +278,6 @@ func _start_challenge_stage(stage_index: int) -> void:
 
 ## 挑战完成回调
 func _on_challenge_completed():
-	print("[Maniac] 挑战完成, stage=", current_challenge_stage)
 	var s = current_challenge_stage
 	if s == 1:
 		Global.maniac_challenge_completed = true
@@ -296,7 +299,6 @@ func _on_challenge_completed():
 
 ## 挑战失败回调
 func _on_challenge_failed():
-	print("[Maniac] 挑战失败, stage=", current_challenge_stage)
 	var s = current_challenge_stage
 	if s == 1:
 		Global.maniac_last_challenge_failed = true
@@ -310,6 +312,8 @@ func _on_challenge_failed():
 		Global.maniac_stage5_last_challenge_failed = true
 	elif s == 6:
 		Global.maniac_stage6_last_challenge_failed = true
+	elif s == 7:
+		Global.maniac_stage7_last_challenge_failed = true
 	
 func _play_impressed_animation():
 	if animated_sprite and animated_sprite.sprite_frames:

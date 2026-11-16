@@ -1,12 +1,11 @@
-[gd_scene load_steps=22 format=4 uid="uid://0m3ttiev545t"]
+[gd_scene load_steps=21 format=4 uid="uid://0m3ttiev545t"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_3sv2x"]
 [ext_resource type="AudioStream" uid="uid://chuvp6gn40l48" path="res://Assets/Audios/BGM/蔚蓝云.ogg" id="2_3jenr"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_r8803"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="3_p00b8"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="5_snns7"]
-[ext_resource type="Texture2D" uid="uid://bxf7ecw2hrks" path="res://Assets/Textures/Backgrounds/GrassLand/草原背景1.png" id="5_vad6y"]
-[ext_resource type="Texture2D" uid="uid://d2t3hjhhxndv" path="res://Assets/Textures/Backgrounds/GrassLand/草原背景1x2.png" id="6_2v7nf"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_vad6y"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="6_vad6y"]
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="7_2v7nf"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="8_11tu6"]
@@ -49,6 +48,7 @@ target_room_id = "GrassLand9"
 source_background = NodePath("Background1")
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
+modulate = Color(0.29238003, 0.2772, 0.36, 1)
 texture = ExtResource("5_vad6y")
 
 [node name="BGController2" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
@@ -60,7 +60,6 @@ auto_scroll_enabled = true
 auto_scroll_speed = Vector2(12, 0)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController2"]
-texture = ExtResource("6_2v7nf")
 
 [node name="FGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("3_p00b8")

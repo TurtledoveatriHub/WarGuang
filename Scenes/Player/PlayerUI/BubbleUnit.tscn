@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Player/PlayerUI/BubbleUnit.gd" id="1_bubbleunit"]
+[ext_resource type="Texture2D" path="res://Assets/Textures/Instances/泡泡.png" id="2_bubbletex"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bubble"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_bubbletex")
+}],
+"loop": true,
+"name": &"FULL",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_bubbletex")
+}],
+"loop": false,
+"name": &"POP",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_bubbletex")
+}],
+"loop": true,
+"name": &"EMPTY",
+"speed": 5.0
+}]
+
+[node name="BubbleUnit" type="Node2D"]
+script = ExtResource("1_bubbleunit")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_bubble")
+
+[node name="PopSound" type="AudioStreamPlayer" parent="."]

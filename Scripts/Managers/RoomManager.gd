@@ -316,7 +316,6 @@ func switch_room_bgm(room_id: String):
 func update_camera_limits():
 	if not rooms.has(current_room) or not player_ref:
 		return
-	
 	var room_data = rooms[current_room]
 	var camera_limits = room_data.node.get_camera_limits()
 	
@@ -345,7 +344,12 @@ func update_camera_limits():
 				"bottom": int(camera_limits.end.y)
 			})
 		else:
-			# 重置为默认的极大限制范围（相当于禁用限制）
+			# ★ 房间**有** bounds 但这一帧 get_camera_limits() 还是空的（节点刚实例化 / 世界坐标尚未校正完）：
+			#   保持现状，绝不要去禁用限制框 —— 禁用会让相机「无视房间范围」直接对准玩家为中心。
+			if room_data.node.get("room_bounds") != null:
+				_debug_room_camera_trace("update_camera_limits_skip_transient", {"room": current_room})
+				return
+			# 房间确实没配置 bounds：重置为默认的极大限制范围（相当于禁用限制）
 			player_camera.limit_left = -CAMERA_LIMIT_DISABLED
 			player_camera.limit_top = -CAMERA_LIMIT_DISABLED
 			player_camera.limit_right = CAMERA_LIMIT_DISABLED
@@ -357,6 +361,13 @@ func update_camera_limits():
 				main_camera.limit_right = CAMERA_LIMIT_DISABLED
 				main_camera.limit_bottom = CAMERA_LIMIT_DISABLED
 			_debug_room_camera_trace("update_camera_limits_disabled", {"room": current_room})
+	# ★ 房间限制刚写进去后，立刻把「正在生效的 CameraLimitZone 限制」叠加回来（区域 ∩ 房间）。
+	#   不做的话，这次写入会把区域限制框冲掉一帧 —— 表现就是「相机无视 CameraLimitZone 调整了一下」。
+	#   注意：只叠加区域限制，房间限制本身仍然是上面刚写进去的值。
+	if player_ref != null:
+		var limit_controller = player_ref.get("camera_controller")
+		if limit_controller != null and limit_controller.has_method("apply_limit_zone_over_room_limits"):
+			limit_controller.apply_limit_zone_over_room_limits()
 	# 限制框刚变过，立刻让背景九宫格按新参考点重排一次：
 	# 否则相机被夹/追镜的那一两帧里，背景会停在旧相位（移动端更容易看出来）
 	get_tree().call_group("ground_parallax", "force_realign_now")

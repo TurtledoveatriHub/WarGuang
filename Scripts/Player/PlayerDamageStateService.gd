@@ -50,16 +50,7 @@ static func start_warp_hurt_effect(player: Node, is_shadow: bool) -> void:
 static func should_start_warp_timer(damage_type: int) -> bool:
 	return damage_type == DAMAGE_WARP_NORMAL or damage_type == DAMAGE_WARP_SHADOW
 
-static func _schedule_low_health_debug(player: Node, damage_type: int) -> void:
-	var hurt_duration := 0.8
-	if player.vignette_effect and player.vignette_effect.has_method("get_hurt_duration"):
-		var is_shadow_hurt := damage_type == DAMAGE_SHADOW or damage_type == DAMAGE_WARP_SHADOW
-		hurt_duration = player.vignette_effect.get_hurt_duration(is_shadow_hurt)
-	
+static func _schedule_low_health_debug(player: Node, _damage_type: int) -> void:
 	player.get_tree().create_timer(0.05).timeout.connect(func():
 		player.is_about_to_be_hurt = false
-		player.get_tree().create_timer(hurt_duration * 0.8).timeout.connect(func():
-			if player.player_ui and player.player_ui.get_health() <= 1:
-				print("Player: 受伤效果播放中，检测到低血量，准备过渡")
-		)
 	)

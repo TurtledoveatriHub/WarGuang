@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RoomLayoutData" load_steps=2 format=3 uid="uid://dcf02f4mmx5bo"]
+[gd_resource type="Resource" script_class="RoomLayoutData" load_steps=2 format=3 uid="uid://c33rjp8rqi3cd"]
 
 [ext_resource type="Script" uid="uid://tumaf2kj85wi" path="res://Scripts/Resources/RoomLayoutData.gd" id="1"]
 
@@ -6,7 +6,8 @@
 script = ExtResource("1")
 room_positions = {
 "Cave1": Vector2(-3680, 64),
-"Cave2": Vector2(-5760, 32),
+"Cave2": Vector2(-6080, 32),
+"Cave3": Vector2(-8352, 800),
 "GrassLand1": Vector2(0, 0),
 "GrassLand10": Vector2(-2240, 64),
 "GrassLand11": Vector2(6400, -16),
@@ -16,7 +17,7 @@ room_positions = {
 "GrassLand15": Vector2(12576, 304),
 "GrassLand16": Vector2(12288, 2224),
 "GrassLand17": Vector2(8480, -2320),
-"GrassLand18": Vector2(10880, -3120),
+"GrassLand18": Vector2(11008, -3120),
 "GrassLand2": Vector2(2560, 256),
 "GrassLand3": Vector2(4480, 464),
 "GrassLand4": Vector2(4480, 2688),
@@ -26,36 +27,52 @@ room_positions = {
 "GrassLand8": Vector2(3008, 4800),
 "GrassLand9": Vector2(-3264, 4640),
 "SnowMountain1": Vector2(14400, -2000),
+"SnowMountain10": Vector2(23104, -11200),
+"SnowMountain11": Vector2(21856, -11776),
+"SnowMountain12": Vector2(19776, -11840),
+"SnowMountain13": Vector2(17008, -11712),
+"SnowMountain14": Vector2(24192, -12208),
+"SnowMountain15": Vector2(24384, -13984),
+"SnowMountain16": Vector2(26144, -13984),
+"SnowMountain17": Vector2(26688, -8200),
+"SnowMountain18": Vector2(25728, -8648),
+"SnowMountain19": Vector2(26688, -1080),
 "SnowMountain2": Vector2(17920, -2416),
+"SnowMountain20": Vector2(25312, -1080),
+"SnowMountain21": Vector2(25312, -12992),
 "SnowMountain3": Vector2(20800, -1200),
 "SnowMountain4": Vector2(22400, -2800),
 "SnowMountain5": Vector2(20528, -6992),
-"SnowMountain6": Vector2(23680, -4768),
+"SnowMountain6": Vector2(23680, -5504),
 "SnowMountain7": Vector2(17008, -8368),
-"SuperMario2": Vector2(29720, 2680),
-"Town1": Vector2(27800, -448),
-"Town2": Vector2(29160, -448),
-"Town3": Vector2(30520, -448),
-"Town4": Vector2(31880, -448),
-"Town5": Vector2(33328, -2200),
-"Town6": Vector2(34600, -448),
-"Town7": Vector2(35960, -448),
-"WindValley1": Vector2(-9000, 0),
-"WindValley10": Vector2(-21240, 0),
-"WindValley11": Vector2(-22600, 0),
-"WindValley12": Vector2(-23960, 0),
-"WindValley2": Vector2(-10360, 0),
-"WindValley3": Vector2(-11720, 0),
-"WindValley4": Vector2(-13080, 0),
-"WindValley5": Vector2(-14440, 0),
-"WindValley6": Vector2(-15800, 0),
-"WindValley7": Vector2(-17160, 0),
-"WindValley8": Vector2(-18520, 0),
-"WindValley9": Vector2(-19880, 0)
+"SnowMountain8": Vector2(19712, -9520),
+"SnowMountain9": Vector2(22816, -9904),
+"SuperMario2": Vector2(30192, 3824),
+"Town1": Vector2(28128, -1136),
+"Town2": Vector2(30384, -944),
+"Town3": Vector2(29928, -2224),
+"Town4": Vector2(31024, -3056),
+"Town5": Vector2(30768, 1520),
+"Town6": Vector2(30448, 656),
+"Town7": Vector2(29328, 880),
+"WindValley1": Vector2(-9968, 1872),
+"WindValley10": Vector2(-11584, 784),
+"WindValley11": Vector2(-8448, -480),
+"WindValley12": Vector2(-10624, -864),
+"WindValley13": Vector2(-13120, -928),
+"WindValley2": Vector2(-10176, 3968),
+"WindValley3": Vector2(-13184, 4672),
+"WindValley4": Vector2(-16320, 5184),
+"WindValley5": Vector2(-17536, 4864),
+"WindValley6": Vector2(-16248, 3264),
+"WindValley7": Vector2(-16512, 1296),
+"WindValley8": Vector2(-14656, 784),
+"WindValley9": Vector2(-13120, 336)
 }
 room_bounds_rects = {
-"Cave1": Rect2(-480, -960, 960, 1920),
-"Cave2": Rect2(-1280, -960, 2560, 1920),
+"Cave1": Rect2(-480, -1120, 960, 2240),
+"Cave2": Rect2(-1600, -960, 3200, 1920),
+"Cave3": Rect2(-480, -320, 960, 640),
 "GrassLand1": Rect2(-1280, -960, 2560, 1920),
 "GrassLand10": Rect2(-640, -960, 1280, 1920),
 "GrassLand11": Rect2(-960, -640, 1920, 1280),
@@ -75,31 +92,46 @@ room_bounds_rects = {
 "GrassLand8": Rect2(-320, -640, 640, 1280),
 "GrassLand9": Rect2(-640, -640, 1280, 1280),
 "SnowMountain1": Rect2(-1280, -960, 2560, 1920),
+"SnowMountain10": Rect2(-480, -320, 960, 640),
+"SnowMountain11": Rect2(-480, -640, 960, 1280),
+"SnowMountain12": Rect2(-1280, -480, 2560, 960),
+"SnowMountain13": Rect2(-640, -960, 1280, 1920),
+"SnowMountain14": Rect2(-320, -960, 640, 1920),
+"SnowMountain15": Rect2(-640, -480, 1280, 960),
+"SnowMountain16": Rect2(-800, -320, 1600, 640),
+"SnowMountain17": Rect2(-320, -320, 640, 640),
+"SnowMountain18": Rect2(-320, -640, 640, 1280),
+"SnowMountain19": Rect2(-480, -320, 960, 640),
 "SnowMountain2": Rect2(-1920, -640, 3840, 1280),
+"SnowMountain20": Rect2(-640, -320, 1280, 640),
+"SnowMountain21": Rect2(-480, -320, 960, 640),
 "SnowMountain3": Rect2(-640, -960, 1280, 1920),
 "SnowMountain4": Rect2(-640, -2560, 1280, 5120),
 "SnowMountain5": Rect2(-2560, -1280, 5120, 2560),
 "SnowMountain6": Rect2(-320, -2240, 640, 4480),
 "SnowMountain7": Rect2(-640, -960, 1280, 1920),
+"SnowMountain8": Rect2(-1280, -640, 2560, 1280),
+"SnowMountain9": Rect2(-960, -640, 1920, 1280),
 "SuperMario2": Rect2(-1280, -640, 2560, 1280),
-"Town1": Rect2(-640, -640, 1280, 1280),
-"Town2": Rect2(-640, -640, 1280, 1280),
-"Town3": Rect2(-640, -640, 1280, 1280),
-"Town4": Rect2(-640, -640, 1280, 1280),
-"Town5": Rect2(-1280, -960, 2560, 1920),
-"Town6": Rect2(-640, -640, 1280, 1280),
-"Town7": Rect2(-640, -640, 1280, 1280),
-"WindValley1": Rect2(-640, -640, 1280, 1280),
-"WindValley10": Rect2(-640, -640, 1280, 1280),
-"WindValley11": Rect2(-640, -640, 1280, 1280),
-"WindValley12": Rect2(-640, -640, 1280, 1280),
-"WindValley2": Rect2(-640, -640, 1280, 1280),
-"WindValley3": Rect2(-640, -640, 1280, 1280),
+"Town1": Rect2(-640, -480, 1280, 960),
+"Town2": Rect2(-1280, -640, 2560, 1280),
+"Town3": Rect2(-640, -320, 1280, 640),
+"Town4": Rect2(-640, -320, 1280, 640),
+"Town5": Rect2(-640, -320, 1280, 640),
+"Town6": Rect2(-320, -320, 640, 640),
+"Town7": Rect2(-480, -960, 960, 1920),
+"WindValley1": Rect2(-480, -1280, 960, 2560),
+"WindValley10": Rect2(-640, -320, 1280, 640),
+"WindValley11": Rect2(-320, -640, 640, 1280),
+"WindValley12": Rect2(-1600, -320, 3200, 640),
+"WindValley13": Rect2(-640, -320, 1280, 640),
+"WindValley2": Rect2(-640, -320, 1280, 640),
+"WindValley3": Rect2(-1600, -1280, 3200, 2560),
 "WindValley4": Rect2(-640, -640, 1280, 1280),
-"WindValley5": Rect2(-640, -640, 1280, 1280),
-"WindValley6": Rect2(-640, -640, 1280, 1280),
-"WindValley7": Rect2(-640, -640, 1280, 1280),
-"WindValley8": Rect2(-640, -640, 1280, 1280),
+"WindValley5": Rect2(-320, -960, 640, 1920),
+"WindValley6": Rect2(-640, -960, 1280, 1920),
+"WindValley7": Rect2(-960, -800, 1920, 1600),
+"WindValley8": Rect2(-640, -320, 1280, 640),
 "WindValley9": Rect2(-640, -640, 1280, 1280)
 }
 room_doors = {
@@ -122,12 +154,33 @@ room_doors = {
 }],
 "Cave2": [{
 "door_id": "c1c2x1",
-"position": Vector2(1320, 672),
+"position": Vector2(1640, 672),
 "target": "Cave1"
 }, {
 "door_id": "c1c2x2",
-"position": Vector2(1320, -832),
+"position": Vector2(1640, -832),
 "target": "Cave1"
+}, {
+"door_id": "c2c3",
+"position": Vector2(-1640, 736),
+"target": "Cave3"
+}, {
+"door_id": "c2wv11",
+"position": Vector2(-1640, -96),
+"target": "WindValley11"
+}],
+"Cave3": [{
+"door_id": "c2c3",
+"position": Vector2(520, -32),
+"target": "Cave2"
+}, {
+"door_id": "c3wv1",
+"position": Vector2(-520, 224),
+"target": "WindValley1"
+}, {
+"door_id": "c3wv11",
+"position": Vector2(64, -360),
+"target": "WindValley11"
 }],
 "GrassLand1": [{
 "door_id": "gl1gl2x1",
@@ -344,6 +397,108 @@ room_doors = {
 "position": Vector2(1320, -160),
 "target": "SnowMountain2"
 }],
+"SnowMountain10": [{
+"door_id": "sm9sm10",
+"position": Vector2(160, 360),
+"target": "SnowMountain9"
+}, {
+"door_id": "sm10sm11",
+"position": Vector2(-520, -96),
+"target": "SnowMountain11"
+}, {
+"door_id": "sm10sm14",
+"position": Vector2(520, -208),
+"target": "SnowMountain14"
+}],
+"SnowMountain11": [{
+"door_id": "sm10sm11",
+"position": Vector2(520, 480),
+"target": "SnowMountain10"
+}, {
+"door_id": "sm11sm12",
+"position": Vector2(-520, -416),
+"target": "SnowMountain12"
+}],
+"SnowMountain12": [{
+"door_id": "sm11sm12",
+"position": Vector2(1328, -352),
+"target": "SnowMountain11"
+}, {
+"door_id": "sm12sm13",
+"position": Vector2(-1320, -32),
+"target": "SnowMountain13"
+}],
+"SnowMountain13": [{
+"door_id": "sm12sm13",
+"position": Vector2(680, -160),
+"target": "SnowMountain12"
+}, {
+"door_id": "sm7sm13",
+"position": Vector2(-416, 1000),
+"target": "SnowMountain7"
+}],
+"SnowMountain14": [{
+"door_id": "sm10sm14",
+"position": Vector2(-360, 800),
+"target": "SnowMountain10"
+}, {
+"door_id": "sm14sm15",
+"position": Vector2(32, -1000),
+"target": "SnowMountain15"
+}],
+"SnowMountain15": [{
+"door_id": "sm14sm15",
+"position": Vector2(-160, 520),
+"target": "SnowMountain14"
+}, {
+"door_id": "sm15sm16",
+"position": Vector2(680, 32),
+"target": "SnowMountain16"
+}, {
+"door_id": "sm15sm21",
+"position": Vector2(168, 32),
+"target": "SnowMountain21"
+}],
+"SnowMountain16": [{
+"door_id": "sm15sm16",
+"position": Vector2(-840, 32),
+"target": "SnowMountain15"
+}, {
+"door_id": "sm16sm17",
+"position": Vector2(544, 368),
+"target": "SnowMountain17"
+}],
+"SnowMountain17": [{
+"door_id": "sm16sm17",
+"position": Vector2(0, -360),
+"target": "SnowMountain16"
+}, {
+"door_id": "sm17sm18",
+"position": Vector2(-360, -32),
+"target": "SnowMountain18"
+}, {
+"door_id": "sm17sm19",
+"position": Vector2(0, 360),
+"target": "SnowMountain19"
+}],
+"SnowMountain18": [{
+"door_id": "sm17sm18",
+"position": Vector2(360, 416),
+"target": "SnowMountain17"
+}],
+"SnowMountain19": [{
+"door_id": "sm17sm19",
+"position": Vector2(0, -360),
+"target": "SnowMountain17"
+}, {
+"door_id": "sm19sm20",
+"position": Vector2(-520, 224),
+"target": "SnowMountain20"
+}, {
+"door_id": "sm19t1",
+"position": Vector2(520, 224),
+"target": "Town1"
+}],
 "SnowMountain2": [{
 "door_id": "sm1sm2",
 "position": Vector2(-1960, 256),
@@ -352,6 +507,16 @@ room_doors = {
 "door_id": "sm2sm3",
 "position": Vector2(1960, 480),
 "target": "SnowMountain3"
+}],
+"SnowMountain20": [{
+"door_id": "sm19sm20",
+"position": Vector2(680, 224),
+"target": "SnowMountain19"
+}],
+"SnowMountain21": [{
+"door_id": "sm15sm21",
+"position": Vector2(-520, 160),
+"target": "SnowMountain15"
 }],
 "SnowMountain3": [{
 "door_id": "sm2sm3",
@@ -390,7 +555,7 @@ room_doors = {
 }],
 "SnowMountain6": [{
 "door_id": "sm4sm6",
-"position": Vector2(-360, 1152),
+"position": Vector2(-360, 1888),
 "target": "SnowMountain4"
 }, {
 "door_id": "sm6sm9",
@@ -409,55 +574,247 @@ room_doors = {
 "door_id": "sm7sm8",
 "position": Vector2(680, -864),
 "target": "SnowMountain8"
-}],
-"SuperMario2": [{
-"door_id": "2-4",
-"position": Vector2(-1320, -64),
-"target": "GrassLand1"
 }, {
-"door_id": "4sm1",
-"position": Vector2(1320, 64),
-"target": "SnowMountain1"
+"door_id": "sm7sm13",
+"position": Vector2(-416, -1000),
+"target": "SnowMountain13"
 }],
+"SnowMountain8": [{
+"door_id": "sm7sm8",
+"position": Vector2(-1320, 288),
+"target": "SnowMountain7"
+}, {
+"door_id": "sm8sm9",
+"position": Vector2(1320, -160),
+"target": "SnowMountain9"
+}],
+"SnowMountain9": [{
+"door_id": "sm6sm9",
+"position": Vector2(864, 680),
+"target": "SnowMountain6"
+}, {
+"door_id": "sm8sm9",
+"position": Vector2(-1000, 224),
+"target": "SnowMountain8"
+}, {
+"door_id": "sm9sm10",
+"position": Vector2(448, -680),
+"target": "SnowMountain10"
+}],
+"SuperMario2": [],
 "Town1": [{
+"door_id": "sm19t1",
+"position": Vector2(-680, 288),
+"target": "SnowMountain19"
+}, {
 "door_id": "t1t2",
-"position": Vector2(-680, 448),
+"position": Vector2(680, -32),
 "target": "Town2"
 }],
 "Town2": [{
 "door_id": "t1t2",
-"position": Vector2(680, 448),
+"position": Vector2(-1320, -224),
 "target": "Town1"
+}, {
+"door_id": "t2t3",
+"position": Vector2(-864, -680),
+"target": "Town3"
+}, {
+"door_id": "t2t5",
+"position": Vector2(608, 680),
+"target": "Town5"
 }],
-"Town3": [],
-"Town4": [],
-"Town5": [],
-"Town6": [],
-"Town7": [],
+"Town3": [{
+"door_id": "t2t3",
+"position": Vector2(-416, 360),
+"target": "Town2"
+}, {
+"door_id": "t3t4",
+"position": Vector2(288, 32),
+"target": "Town4"
+}],
+"Town4": [{
+"door_id": "t3t4",
+"position": Vector2(-680, 192),
+"target": "Town3"
+}],
+"Town5": [{
+"door_id": "t2t5",
+"position": Vector2(224, -360),
+"target": "Town2"
+}, {
+"door_id": "t5t6",
+"position": Vector2(-456, -16),
+"target": "Town6"
+}, {
+"door_id": "t5t7",
+"position": Vector2(-304, -8),
+"target": "Town7"
+}],
+"Town6": [{
+"door_id": "t5t6",
+"position": Vector2(360, -160),
+"target": "Town5"
+}],
+"Town7": [{
+"door_id": "t5t7",
+"position": Vector2(520, 480),
+"target": "Town7"
+}],
 "WindValley1": [{
+"door_id": "c3wv1",
+"position": Vector2(552, -848),
+"target": "Cave3"
+}, {
 "door_id": "wv1wv2",
-"position": Vector2(-680, 448),
+"position": Vector2(96, 1312),
 "target": "WindValley2"
+}, {
+"door_id": "wv1wv10",
+"position": Vector2(-552, -1168),
+"target": "WindValley10"
 }],
-"WindValley10": [],
-"WindValley11": [],
-"WindValley12": [],
-"WindValley2": [{
-"door_id": "wv1wv2",
-"position": Vector2(680, 448),
+"WindValley10": [{
+"door_id": "wv9wv10",
+"position": Vector2(-680, -32),
+"target": "WindValley9"
+}, {
+"door_id": "wv1wv10",
+"position": Vector2(680, -80),
 "target": "WindValley1"
 }],
-"WindValley3": [],
-"WindValley4": [],
-"WindValley5": [],
-"WindValley6": [],
-"WindValley7": [],
-"WindValley8": [],
-"WindValley9": []
+"WindValley11": [{
+"door_id": "c2wv11",
+"position": Vector2(360, 416),
+"target": "Cave2"
+}, {
+"door_id": "c3wv11",
+"position": Vector2(160, 680),
+"target": "Cave3"
+}, {
+"door_id": "wv11wv12",
+"position": Vector2(-360, -416),
+"target": "WindValley12"
+}],
+"WindValley12": [{
+"door_id": "wv11wv12",
+"position": Vector2(1640, -32),
+"target": "WindValley11"
+}, {
+"door_id": "wv12wv13",
+"position": Vector2(-1640, -96),
+"target": "WindValley13"
+}],
+"WindValley13": [{
+"door_id": "wv12wv13",
+"position": Vector2(680, -32),
+"target": "WindValley12"
+}, {
+"door_id": "wv9wv13x1",
+"position": Vector2(448, 360),
+"target": "WindValley9"
+}, {
+"door_id": "wv9wv13x2",
+"position": Vector2(-448, 360),
+"target": "WindValley9"
+}],
+"WindValley2": [{
+"door_id": "wv1wv2",
+"position": Vector2(304, -368),
+"target": "WindValley1"
+}, {
+"door_id": "wv2wv3",
+"position": Vector2(-680, -16),
+"target": "WindValley3"
+}],
+"WindValley3": [{
+"door_id": "wv2wv3",
+"position": Vector2(1640, -720),
+"target": "WindValley2"
+}, {
+"door_id": "wv3wv4",
+"position": Vector2(-1640, 672),
+"target": "WindValley4"
+}, {
+"door_id": "wv3wv6",
+"position": Vector2(-1640, -672),
+"target": "WindValley6"
+}],
+"WindValley4": [{
+"door_id": "wv3wv4",
+"position": Vector2(680, 160),
+"target": "WindValley3"
+}, {
+"door_id": "wv4wv5",
+"position": Vector2(-680, 480),
+"target": "WindValley5"
+}, {
+"door_id": "wv4wv6",
+"position": Vector2(-440, -672),
+"target": "WindValley6"
+}],
+"WindValley5": [{
+"door_id": "wv4wv5",
+"position": Vector2(360, 800),
+"target": "WindValley4"
+}],
+"WindValley6": [{
+"door_id": "wv3wv6",
+"position": Vector2(680, 736),
+"target": "WindValley3"
+}, {
+"door_id": "wv4wv6",
+"position": Vector2(-512, 992),
+"target": "WindValley4"
+}, {
+"door_id": "wv6wv7",
+"position": Vector2(496, -992),
+"target": "WindValley7"
+}],
+"WindValley7": [{
+"door_id": "wv6wv7",
+"position": Vector2(752, 832),
+"target": "WindValley6"
+}, {
+"door_id": "wv7wv8",
+"position": Vector2(1000, -544),
+"target": "WindValley8"
+}],
+"WindValley8": [{
+"door_id": "wv7wv8",
+"position": Vector2(-680, -32),
+"target": "WindValley7"
+}, {
+"door_id": "wv8wv9",
+"position": Vector2(680, -32),
+"target": "WindValley9"
+}],
+"WindValley9": [{
+"door_id": "wv8wv9",
+"position": Vector2(-680, 416),
+"target": "WindValley8"
+}, {
+"door_id": "wv9wv10",
+"position": Vector2(680, 416),
+"target": "WindValley10"
+}, {
+"door_id": "wv9wv13x1",
+"position": Vector2(448, -680),
+"target": "WindValley13"
+}, {
+"door_id": "wv9wv13x2",
+"position": Vector2(-448, -680),
+"target": "WindValley13"
+}]
 }
-map_world_origin = Vector2(-24928, -9648)
-map_texture_size = Vector2i(3866, 963)
+map_world_origin = Vector2(-18496, -15104)
+map_texture_size = Vector2i(3175, 1356)
 center_texture_on_world_origin = false
+room_display_names = {
+"GrassLand1": "西部草原",
+"GrassLand12": "草原大城镇"
+}
+map_padding_world = 640.0
 map_terrain_colors = {
 "Atlantis": Color(0.3372549, 0.5019608, 0.5882353, 1),
 "Cave": Color(0.6862745, 0.6666667, 0.7058824, 1),

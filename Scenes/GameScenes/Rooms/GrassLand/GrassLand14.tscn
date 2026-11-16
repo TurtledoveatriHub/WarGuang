@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="3_6k1m0"]
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="3_kum0g"]
 [ext_resource type="PackedScene" uid="uid://d2esb7iuaq2sb" path="res://Scenes/GameScenes/SnowFX.tscn" id="3_td6fq"]
-[ext_resource type="Texture2D" uid="uid://bxf7ecw2hrks" path="res://Assets/Textures/Backgrounds/GrassLand/草原背景1.png" id="6_tgnis"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="6_tgnis"]
 [ext_resource type="TileSet" uid="uid://ddmqsmr1batw4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原背景瓦片集.tres" id="6_ya333"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="8_4i7n3"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="9_y5vv2"]
@@ -48,6 +48,7 @@ target_room_id = "GrassLand14"
 source_background = NodePath("Background1")
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
+modulate = Color(0.639, 0.7434, 0.9, 1)
 texture = ExtResource("6_tgnis")
 
 [node name="TileMapLayers" type="Node2D" parent="."]

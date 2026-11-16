@@ -1,71 +1,114 @@
-[gd_scene load_steps=16 format=3 uid="uid://bdo6ilwaiccma"]
+[gd_scene load_steps=23 format=3 uid="uid://bdo6ilwaiccma"]
 
 [ext_resource type="Script" uid="uid://88jpwuxuxpwj" path="res://Scripts/Entities/NPCs/RaceStarter.gd" id="1_racer"]
-[ext_resource type="Texture2D" uid="uid://bx0ye7xrni3ix" path="res://Assets/Textures/Entities/NPCs/店员.png" id="3_sybhg"]
+[ext_resource type="Texture2D" uid="uid://b3kmmagyjp8yq" path="res://Assets/Textures/Entities/NPCs/飞毛腿.png" id="4_tipmx"]
 [ext_resource type="Resource" uid="uid://caw6miyhm1ai8" path="res://Assets/Dialogues/NPCs/RaceStarter.dialogue" id="5_raceres"]
-[ext_resource type="Texture2D" uid="uid://d2esp1mx0142k" path="res://Assets/Textures/Entities/NPCs/白毛.png" id="5_sybhg"]
 [ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="6_ojyfu"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_amazed"]
-atlas = ExtResource("3_sybhg")
-region = Rect2(224, 96, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_nbsh7"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(448, 64, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_idle1"]
-atlas = ExtResource("5_sybhg")
-region = Rect2(0, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_7wvct"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(128, 64, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_idle2"]
-atlas = ExtResource("5_sybhg")
-region = Rect2(32, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_buo5b"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(192, 64, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_idle3"]
-atlas = ExtResource("5_sybhg")
-region = Rect2(64, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_ox3l4"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(256, 64, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_idle4"]
-atlas = ExtResource("5_sybhg")
-region = Rect2(96, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_6viad"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(320, 64, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_idle5"]
-atlas = ExtResource("5_sybhg")
-region = Rect2(128, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_e82pq"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(384, 64, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_idle6"]
-atlas = ExtResource("5_sybhg")
-region = Rect2(160, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_nxjpw"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(0, 0, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_talk"]
-atlas = ExtResource("5_sybhg")
-region = Rect2(0, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="AtlasTexture_4r0q2"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w7jsp"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5nrri"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5lypu"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_luv7p"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i6tov"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pq2kg"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qqqff"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(0, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0mmw8"]
+atlas = ExtResource("4_tipmx")
+region = Rect2(64, 64, 64, 64)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_racer"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_amazed")
+"texture": SubResource("AtlasTexture_nbsh7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7wvct")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_buo5b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ox3l4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6viad")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e82pq")
 }],
-"loop": true,
+"loop": false,
 "name": &"AMAZED",
-"speed": 5.0
+"speed": 6.0
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_idle1")
+"texture": SubResource("AtlasTexture_nxjpw")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_idle2")
+"texture": SubResource("AtlasTexture_4r0q2")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_idle3")
+"texture": SubResource("AtlasTexture_w7jsp")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_idle4")
+"texture": SubResource("AtlasTexture_5nrri")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_idle5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_idle6")
+"texture": SubResource("AtlasTexture_5lypu")
 }],
 "loop": true,
 "name": &"IDLE",
@@ -73,15 +116,27 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_talk")
+"texture": SubResource("AtlasTexture_luv7p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i6tov")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pq2kg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qqqff")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0mmw8")
 }],
 "loop": true,
 "name": &"TALK",
-"speed": 4.0
+"speed": 6.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_racer"]
-size = Vector2(36, 24)
+size = Vector2(40, 32)
 
 [node name="RaceStarter" type="Area2D"]
 collision_layer = 64
@@ -100,5 +155,5 @@ region_rect = Rect2(96, 144, 17, 11)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 32
-position = Vector2(6, 2)
+position = Vector2(26, 7)
 shape = SubResource("RectangleShape2D_racer")

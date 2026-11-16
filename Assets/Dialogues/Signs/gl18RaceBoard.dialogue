@@ -1,7 +1,6 @@
 # 竞速成绩告示牌：成绩全部取存档里的最佳时间（Global）。
 # 五段记录由 Global.get_race_board_text() 在一次文本里返回，每条记录自带换行。
 ~ start
-
 飞毛腿的挑战榜: 竞速记录：{{Global.get_race_board_text()}}
 飞毛腿的挑战榜: 跑起来！
 => END

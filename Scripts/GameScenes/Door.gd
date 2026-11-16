@@ -16,7 +16,7 @@ extends Area2D
 ## 渐入时间（秒）
 @export var fade_in_duration: float = 0.3
 ## 黑屏时间（秒）
-@export var black_screen_duration: float = 0.1
+@export var black_screen_duration: float = 0.3
 ## 淡出时间（秒）
 @export var fade_out_duration: float = 0.2
 ## Door 非瞬移追镜时长（秒）
@@ -67,7 +67,6 @@ func _check_overlapping_player() -> void:
 		return
 	for b in get_overlapping_bodies():
 		if b.is_in_group("player") and can_teleport:
-			print("[Door] 已在区域内(延迟1s后检测): id=", door_id)
 			_on_body_entered(b)
 			break
 

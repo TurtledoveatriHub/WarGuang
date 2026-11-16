@@ -4,7 +4,7 @@
 [ext_resource type="AudioStream" uid="uid://2o54aw0j0bet" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_qa4dj"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_m6lr0"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_8ohum"]
-[ext_resource type="Texture2D" uid="uid://dwpgj2yjqy8oc" path="res://Assets/Textures/Backgrounds/SnowMountain/雪地背景2.png" id="5_02gyh"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_di1ct"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="6_x7hvm"]
 [ext_resource type="TileSet" uid="uid://qtdk7cq6rg5m" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地伤害瓦片集.tres" id="7_4kdpe"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="8_6kb3p"]
@@ -53,7 +53,8 @@ source_background = NodePath("Background1")
 parallax_ratio = Vector2(0.15, 0.05)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
-texture = ExtResource("5_02gyh")
+modulate = Color(0.14509805, 0.14509805, 0.21176471, 1)
+texture = ExtResource("5_di1ct")
 
 [node name="FGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_8ohum")

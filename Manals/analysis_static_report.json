@@ -1,0 +1,1348 @@
+{
+  "totals": {
+    "room_scenes": 63,
+    "room_ids_unique": 63,
+    "doors": 152,
+    "door_ids": 76,
+    "paired_door_ids": 76,
+    "unpaired_door_ids": 0,
+    "scene_paths_registered": 63,
+    "layout_positions": 63,
+    "layout_bounds": 63
+  },
+  "sets": {
+    "files_not_in_scenepaths": [],
+    "scenepaths_missing_file": [],
+    "files_not_in_layout": [],
+    "layout_missing_file": [],
+    "files_not_in_bounds": [],
+    "bounds_missing_file": []
+  },
+  "doors": {
+    "unpaired": {},
+    "empty_id_count": 0,
+    "target_mismatch": [
+      [
+        "t5t7",
+        "Town7",
+        "t5t6",
+        "Town7"
+      ]
+    ],
+    "adj_declared_missing_door": {
+      "GrassLand7": [
+        "GrassLand8"
+      ],
+      "SnowMountain1": [
+        "GrassLand1"
+      ],
+      "SuperMario2": [
+        "GrassLand1"
+      ],
+      "Town7": [
+        "Town6"
+      ],
+      "WindValley1": [
+        "WindValley12"
+      ],
+      "WindValley10": [
+        "WindValley11"
+      ]
+    },
+    "door_missing_in_adjacent": {
+      "GrassLand1": [
+        "GrassLand10"
+      ],
+      "GrassLand10": [
+        "Cave1"
+      ],
+      "GrassLand3": [
+        "GrassLand11"
+      ],
+      "GrassLand7": [
+        "GrassLand6",
+        "GrassLand9"
+      ],
+      "SnowMountain7": [
+        "SnowMountain13"
+      ],
+      "Town7": [
+        "Town5"
+      ],
+      "WindValley1": [
+        "WindValley10"
+      ],
+      "WindValley10": [
+        "WindValley1"
+      ]
+    }
+  },
+  "content": {
+    "thin_rooms_kb_lt_10": {
+      "SnowMountain10": 5.7,
+      "SnowMountain11": 5.5,
+      "SnowMountain12": 5.5,
+      "SnowMountain13": 5.7,
+      "SnowMountain14": 5.5,
+      "SnowMountain15": 5.7,
+      "SnowMountain16": 5.5,
+      "SnowMountain17": 5.2,
+      "SnowMountain18": 5.2,
+      "SnowMountain19": 5.3,
+      "SnowMountain20": 5.2,
+      "SnowMountain21": 4.8,
+      "SnowMountain8": 5.5,
+      "SnowMountain9": 5.7,
+      "Town1": 3.7,
+      "Town2": 4.1,
+      "Town3": 3.7,
+      "Town4": 3.6,
+      "Town5": 4.0,
+      "Town6": 3.6,
+      "Town7": 3.6,
+      "WindValley10": 7.1
+    },
+    "no_tile_layers": [],
+    "low_tile_layers_le_3": [
+      "GrassLand17",
+      "GrassLand18"
+    ],
+    "total_tile_layers": 276,
+    "instance_counts": {
+      "DynamicCheckpoint.tscn": 214,
+      "Door.tscn": 152,
+      "JumpBox.tscn": 52,
+      "IceCrystal.tscn": 32,
+      "JoystickSwitch.tscn": 29,
+      "VenusFlytrap.tscn": 28,
+      "ChairSavePoint.tscn": 27,
+      "RaceCheckpoint.tscn": 23,
+      "MechanismPlatform.tscn": 22,
+      "IcePlatform.tscn": 21,
+      "MechanismGate.tscn": 19,
+      "ButtonSwitch.tscn": 18,
+      "BreakableIcePlatform.tscn": 16,
+      "Sign.tscn": 15,
+      "Platform.tscn": 13,
+      "IceSpike.tscn": 9,
+      "CameraLimitZone.tscn": 8,
+      "TrampolineBug.tscn": 8,
+      "Coin.tscn": 7,
+      "Shuriken.tscn": 7,
+      "SnowFX.tscn": 7,
+      "TeleportPoint.tscn": 5,
+      "CameraFocusBeacon.tscn": 5,
+      "RaceStartLine.tscn": 5,
+      "WindValleyZone.tscn": 4,
+      "BreakablePlatform.tscn": 3,
+      "Snowman.tscn": 3,
+      "DestructibleWall.tscn": 3,
+      "AerialRollMaster.tscn": 2,
+      "GrassLandMerchant.tscn": 2
+    }
+  },
+  "rooms": {
+    "Cave1": {
+      "file": "Scenes/GameScenes/Rooms/Cave/Cave1.tscn",
+      "size_kb": 143.9,
+      "nodes": 31,
+      "tile_layers": 4,
+      "adjacent": [
+        "GrassLand10",
+        "Cave2"
+      ],
+      "spawns": {
+        "Platform.tscn": 1,
+        "Sign.tscn": 1,
+        "DynamicCheckpoint.tscn": 5,
+        "Door.tscn": 4
+      },
+      "doors": 4
+    },
+    "Cave2": {
+      "file": "Scenes/GameScenes/Rooms/Cave/Cave2.tscn",
+      "size_kb": 289.3,
+      "nodes": 31,
+      "tile_layers": 5,
+      "adjacent": [
+        "Cave1",
+        "Cave3",
+        "WindValley11"
+      ],
+      "spawns": {
+        "Platform.tscn": 1,
+        "DynamicCheckpoint.tscn": 5,
+        "Door.tscn": 4
+      },
+      "doors": 4
+    },
+    "Cave3": {
+      "file": "Scenes/GameScenes/Rooms/Cave/Cave3.tscn",
+      "size_kb": 66.6,
+      "nodes": 26,
+      "tile_layers": 4,
+      "adjacent": [
+        "Cave2",
+        "WindValley1",
+        "WindValley11"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "GrassLand1": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand1.tscn",
+      "size_kb": 108.7,
+      "nodes": 59,
+      "tile_layers": 5,
+      "adjacent": [
+        "GrassLand2"
+      ],
+      "spawns": {
+        "AerialRollMaster.tscn": 1,
+        "Master.tscn": 1,
+        "GrassLandMerchant.tscn": 1,
+        "Door.tscn": 5,
+        "DynamicCheckpoint.tscn": 7,
+        "Sign.tscn": 2,
+        "MechanismPlatform.tscn": 3,
+        "ButtonSwitch.tscn": 3,
+        "TeleportPoint.tscn": 1,
+        "Coin.tscn": 4,
+        "ChairSavePoint.tscn": 1,
+        "WindValleyZone.tscn": 2,
+        "UpdraftZone.tscn": 1,
+        "PixelWaterSurface.tscn": 1
+      },
+      "doors": 5
+    },
+    "GrassLand10": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand10.tscn",
+      "size_kb": 122.1,
+      "nodes": 58,
+      "tile_layers": 5,
+      "adjacent": [
+        "GrassLand1"
+      ],
+      "spawns": {
+        "VenusFlytrap.tscn": 23,
+        "Platform.tscn": 2,
+        "Sign.tscn": 1,
+        "DynamicCheckpoint.tscn": 5,
+        "Door.tscn": 5
+      },
+      "doors": 5
+    },
+    "GrassLand11": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand11.tscn",
+      "size_kb": 57.2,
+      "nodes": 41,
+      "tile_layers": 7,
+      "adjacent": [
+        "GrassLand3",
+        "GrassLand12"
+      ],
+      "spawns": {
+        "Shuriken.tscn": 2,
+        "MechanismPlatform.tscn": 4,
+        "JoystickSwitch.tscn": 1,
+        "ButtonSwitch.tscn": 3,
+        "Sign.tscn": 1,
+        "DynamicCheckpoint.tscn": 4,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "GrassLand12": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand12.tscn",
+      "size_kb": 215.3,
+      "nodes": 61,
+      "tile_layers": 7,
+      "adjacent": [
+        "GrassLand11",
+        "GrassLand13",
+        "GrassLand17",
+        "GrassLand18"
+      ],
+      "spawns": {
+        "Salesclerk.tscn": 1,
+        "Platform.tscn": 2,
+        "GrassLandMerchant.tscn": 1,
+        "CameraFocusBeacon.tscn": 1,
+        "CameraLimitZone.tscn": 2,
+        "MechanismGate.tscn": 2,
+        "JoystickSwitch.tscn": 3,
+        "MechanismPlatform.tscn": 1,
+        "Sign.tscn": 1,
+        "TeleportPoint.tscn": 1,
+        "ChairSavePoint.tscn": 1,
+        "DynamicCheckpoint.tscn": 10,
+        "Door.tscn": 6
+      },
+      "doors": 6
+    },
+    "GrassLand13": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand13.tscn",
+      "size_kb": 90.4,
+      "nodes": 37,
+      "tile_layers": 4,
+      "adjacent": [
+        "GrassLand12",
+        "GrassLand14"
+      ],
+      "spawns": {
+        "CameraFocusBeacon.tscn": 1,
+        "MechanismGate.tscn": 1,
+        "JoystickSwitch.tscn": 1,
+        "MechanismPlatform.tscn": 3,
+        "ButtonSwitch.tscn": 3,
+        "Sign.tscn": 1,
+        "DynamicCheckpoint.tscn": 4,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "GrassLand14": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand14.tscn",
+      "size_kb": 33.7,
+      "nodes": 28,
+      "tile_layers": 5,
+      "adjacent": [
+        "GrassLand13",
+        "GrassLand15",
+        "SnowMountain1"
+      ],
+      "spawns": {
+        "SnowFX.tscn": 1,
+        "TeleportPoint.tscn": 1,
+        "ChairSavePoint.tscn": 1,
+        "DynamicCheckpoint.tscn": 4,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "GrassLand15": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand15.tscn",
+      "size_kb": 73.6,
+      "nodes": 24,
+      "tile_layers": 4,
+      "adjacent": [
+        "GrassLand14",
+        "GrassLand16"
+      ],
+      "spawns": {
+        "MechanismGate.tscn": 1,
+        "JoystickSwitch.tscn": 1,
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 2
+      },
+      "doors": 2
+    },
+    "GrassLand16": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand16.tscn",
+      "size_kb": 67.7,
+      "nodes": 35,
+      "tile_layers": 4,
+      "adjacent": [
+        "GrassLand15"
+      ],
+      "spawns": {
+        "Shuriken.tscn": 1,
+        "CameraFocusBeacon.tscn": 1,
+        "MechanismGate.tscn": 2,
+        "JoystickSwitch.tscn": 4,
+        "MechanismPlatform.tscn": 1,
+        "ButtonSwitch.tscn": 1,
+        "Sign.tscn": 1,
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 1
+      },
+      "doors": 1
+    },
+    "GrassLand17": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand17.tscn",
+      "size_kb": 49.1,
+      "nodes": 68,
+      "tile_layers": 3,
+      "adjacent": [
+        "GrassLand12"
+      ],
+      "spawns": {
+        "Maniac.tscn": 1,
+        "JumpBox.tscn": 30,
+        "Sign.tscn": 2,
+        "DynamicCheckpoint.tscn": 1,
+        "Door.tscn": 1
+      },
+      "doors": 1
+    },
+    "GrassLand18": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand18.tscn",
+      "size_kb": 179.6,
+      "nodes": 82,
+      "tile_layers": 3,
+      "adjacent": [
+        "GrassLand12"
+      ],
+      "spawns": {
+        "RaceStarter.tscn": 1,
+        "RaceStartLine.tscn": 5,
+        "RaceCheckpoint.tscn": 23,
+        "Sign.tscn": 1,
+        "RaceTimeBoard.tscn": 1,
+        "DynamicCheckpoint.tscn": 1,
+        "Door.tscn": 1,
+        "CameraLimitZone.tscn": 6
+      },
+      "doors": 1
+    },
+    "GrassLand2": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand2.tscn",
+      "size_kb": 68.1,
+      "nodes": 35,
+      "tile_layers": 5,
+      "adjacent": [
+        "GrassLand1",
+        "GrassLand3"
+      ],
+      "spawns": {
+        "Platform.tscn": 3,
+        "BreakablePlatform.tscn": 3,
+        "Door.tscn": 3,
+        "DynamicCheckpoint.tscn": 3,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 3
+    },
+    "GrassLand3": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand3.tscn",
+      "size_kb": 96.8,
+      "nodes": 33,
+      "tile_layers": 6,
+      "adjacent": [
+        "GrassLand2",
+        "GrassLand4"
+      ],
+      "spawns": {
+        "Platform.tscn": 1,
+        "MechanismGate.tscn": 1,
+        "JoystickSwitch.tscn": 1,
+        "Sign.tscn": 1,
+        "DynamicCheckpoint.tscn": 4,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "GrassLand4": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand4.tscn",
+      "size_kb": 164.6,
+      "nodes": 47,
+      "tile_layers": 5,
+      "adjacent": [
+        "GrassLand3",
+        "GrassLand5",
+        "GrassLand6"
+      ],
+      "spawns": {
+        "VenusFlytrap.tscn": 2,
+        "TrampolineBug.tscn": 3,
+        "DynamicCheckpoint.tscn": 6,
+        "Door.tscn": 3,
+        "MechanismPlatform.tscn": 2,
+        "JoystickSwitch.tscn": 4,
+        "Sign.tscn": 1,
+        "MechanismGate.tscn": 2,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 3
+    },
+    "GrassLand5": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand5.tscn",
+      "size_kb": 67.4,
+      "nodes": 40,
+      "tile_layers": 4,
+      "adjacent": [
+        "GrassLand4"
+      ],
+      "spawns": {
+        "Shuriken.tscn": 2,
+        "CameraFocusBeacon.tscn": 1,
+        "MechanismGate.tscn": 2,
+        "JoystickSwitch.tscn": 4,
+        "MechanismPlatform.tscn": 3,
+        "ButtonSwitch.tscn": 3,
+        "Sign.tscn": 1,
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 1
+      },
+      "doors": 1
+    },
+    "GrassLand6": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand6.tscn",
+      "size_kb": 250.4,
+      "nodes": 55,
+      "tile_layers": 6,
+      "adjacent": [
+        "GrassLand4",
+        "GrassLand7",
+        "GrassLand8"
+      ],
+      "spawns": {
+        "VenusFlytrap.tscn": 2,
+        "TrampolineBug.tscn": 4,
+        "Platform.tscn": 2,
+        "MechanismPlatform.tscn": 3,
+        "JoystickSwitch.tscn": 5,
+        "ButtonSwitch.tscn": 1,
+        "MechanismGate.tscn": 3,
+        "Sign2.tscn": 1,
+        "Door.tscn": 3,
+        "DynamicCheckpoint.tscn": 6
+      },
+      "doors": 3
+    },
+    "GrassLand7": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand7.tscn",
+      "size_kb": 128.5,
+      "nodes": 45,
+      "tile_layers": 5,
+      "adjacent": [
+        "GrassLand8"
+      ],
+      "spawns": {
+        "VenusFlytrap.tscn": 1,
+        "Platform.tscn": 1,
+        "MechanismPlatform.tscn": 1,
+        "ButtonSwitch.tscn": 3,
+        "MechanismGate.tscn": 3,
+        "JoystickSwitch.tscn": 1,
+        "StoneBug.tscn": 1,
+        "TrampolineBug.tscn": 1,
+        "TeleportPoint.tscn": 1,
+        "ChairSavePoint.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 3
+      },
+      "doors": 2
+    },
+    "GrassLand8": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand8.tscn",
+      "size_kb": 27.7,
+      "nodes": 24,
+      "tile_layers": 4,
+      "adjacent": [
+        "GrassLand6"
+      ],
+      "spawns": {
+        "AerialRollMaster.tscn": 1,
+        "Door.tscn": 1,
+        "ChairSavePoint.tscn": 1,
+        "DynamicCheckpoint.tscn": 1
+      },
+      "doors": 1
+    },
+    "GrassLand9": {
+      "file": "Scenes/GameScenes/Rooms/GrassLand/GrassLand9.tscn",
+      "size_kb": 72.3,
+      "nodes": 36,
+      "tile_layers": 4,
+      "adjacent": [
+        "GrassLand7"
+      ],
+      "spawns": {
+        "Shuriken.tscn": 2,
+        "CameraFocusBeacon.tscn": 1,
+        "MechanismGate.tscn": 2,
+        "JoystickSwitch.tscn": 4,
+        "MechanismPlatform.tscn": 1,
+        "ButtonSwitch.tscn": 1,
+        "Sign.tscn": 1,
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 1
+      },
+      "doors": 1
+    },
+    "SnowMountain1": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain1.tscn",
+      "size_kb": 139.5,
+      "nodes": 33,
+      "tile_layers": 5,
+      "adjacent": [
+        "GrassLand1",
+        "GrassLand14",
+        "SnowMountain2"
+      ],
+      "spawns": {
+        "SnowFX.tscn": 1,
+        "IceCrystal.tscn": 1,
+        "JumpBox.tscn": 1,
+        "BreakableIcePlatform.tscn": 3,
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 3
+      },
+      "doors": 2
+    },
+    "SnowMountain10": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain10.tscn",
+      "size_kb": 5.7,
+      "nodes": 30,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain9",
+        "SnowMountain11",
+        "SnowMountain14"
+      ],
+      "spawns": {
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 3,
+        "DynamicCheckpoint.tscn": 4,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 3
+    },
+    "SnowMountain11": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain11.tscn",
+      "size_kb": 5.5,
+      "nodes": 29,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain10",
+        "SnowMountain12"
+      ],
+      "spawns": {
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 4,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 2
+    },
+    "SnowMountain12": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain12.tscn",
+      "size_kb": 5.5,
+      "nodes": 29,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain11",
+        "SnowMountain13"
+      ],
+      "spawns": {
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 4,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 2
+    },
+    "SnowMountain13": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain13.tscn",
+      "size_kb": 5.7,
+      "nodes": 30,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain7",
+        "SnowMountain12"
+      ],
+      "spawns": {
+        "SnowFX.tscn": 1,
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 4,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 2
+    },
+    "SnowMountain14": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain14.tscn",
+      "size_kb": 5.5,
+      "nodes": 29,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain10",
+        "SnowMountain15"
+      ],
+      "spawns": {
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 4,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 2
+    },
+    "SnowMountain15": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain15.tscn",
+      "size_kb": 5.7,
+      "nodes": 30,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain14",
+        "SnowMountain16",
+        "SnowMountain21"
+      ],
+      "spawns": {
+        "SnowFX.tscn": 1,
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 3,
+        "DynamicCheckpoint.tscn": 3,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 3
+    },
+    "SnowMountain16": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain16.tscn",
+      "size_kb": 5.5,
+      "nodes": 29,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain15",
+        "SnowMountain17"
+      ],
+      "spawns": {
+        "SnowFX.tscn": 1,
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 3,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 2
+    },
+    "SnowMountain17": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain17.tscn",
+      "size_kb": 5.2,
+      "nodes": 27,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain16",
+        "SnowMountain18",
+        "SnowMountain19"
+      ],
+      "spawns": {
+        "SnowFX.tscn": 1,
+        "Door.tscn": 3,
+        "DynamicCheckpoint.tscn": 3
+      },
+      "doors": 3
+    },
+    "SnowMountain18": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain18.tscn",
+      "size_kb": 5.2,
+      "nodes": 27,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain17"
+      ],
+      "spawns": {
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 1,
+        "DynamicCheckpoint.tscn": 3,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 1
+    },
+    "SnowMountain19": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain19.tscn",
+      "size_kb": 5.3,
+      "nodes": 28,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain17",
+        "SnowMountain20",
+        "Town1"
+      ],
+      "spawns": {
+        "Door.tscn": 3,
+        "DynamicCheckpoint.tscn": 3,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 3
+    },
+    "SnowMountain2": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain2.tscn",
+      "size_kb": 247.6,
+      "nodes": 50,
+      "tile_layers": 6,
+      "adjacent": [
+        "SnowMountain1",
+        "SnowMountain3"
+      ],
+      "spawns": {
+        "IceSpike.tscn": 1,
+        "IceCrystal.tscn": 5,
+        "JumpBox.tscn": 4,
+        "BreakableIcePlatform.tscn": 2,
+        "IcePlatform.tscn": 2,
+        "SnowBird.tscn": 1,
+        "Snowman.tscn": 2,
+        "Coin.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 4,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 2
+    },
+    "SnowMountain20": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain20.tscn",
+      "size_kb": 5.2,
+      "nodes": 27,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain19"
+      ],
+      "spawns": {
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 1,
+        "DynamicCheckpoint.tscn": 3,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 1
+    },
+    "SnowMountain21": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain21.tscn",
+      "size_kb": 4.8,
+      "nodes": 25,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain15"
+      ],
+      "spawns": {
+        "Door.tscn": 1,
+        "DynamicCheckpoint.tscn": 2,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 1
+    },
+    "SnowMountain3": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain3.tscn",
+      "size_kb": 124.0,
+      "nodes": 36,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain2",
+        "SnowMountain4"
+      ],
+      "spawns": {
+        "IceCrystal.tscn": 3,
+        "IceSpike.tscn": 1,
+        "JumpBox.tscn": 2,
+        "IcePlatform.tscn": 1,
+        "Coin.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 3,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 2
+    },
+    "SnowMountain4": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain4.tscn",
+      "size_kb": 257.7,
+      "nodes": 79,
+      "tile_layers": 5,
+      "adjacent": [
+        "SnowMountain3",
+        "SnowMountain5",
+        "SnowMountain6"
+      ],
+      "spawns": {
+        "DestructibleWall.tscn": 3,
+        "IcePlatform.tscn": 5,
+        "BreakableIcePlatform.tscn": 11,
+        "IceCrystal.tscn": 11,
+        "IceSpike.tscn": 5,
+        "JumpBox.tscn": 4,
+        "Snowman.tscn": 1,
+        "SnowBird.tscn": 1,
+        "SacredBird.tscn": 1,
+        "TeleportPoint.tscn": 1,
+        "Door.tscn": 3,
+        "DynamicCheckpoint.tscn": 7,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 3
+    },
+    "SnowMountain5": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain5.tscn",
+      "size_kb": 247.4,
+      "nodes": 53,
+      "tile_layers": 8,
+      "adjacent": [
+        "SnowMountain4",
+        "SnowMountain7"
+      ],
+      "spawns": {
+        "IceCrystal.tscn": 7,
+        "IceSpike.tscn": 1,
+        "JumpBox.tscn": 6,
+        "SacredBird.tscn": 1,
+        "Door.tscn": 3,
+        "DynamicCheckpoint.tscn": 5,
+        "ChairSavePoint.tscn": 1,
+        "SonwMineCart1.tscn": 1,
+        "SnowMineCart2.tscn": 1
+      },
+      "doors": 3
+    },
+    "SnowMountain6": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain6.tscn",
+      "size_kb": 151.9,
+      "nodes": 30,
+      "tile_layers": 5,
+      "adjacent": [
+        "SnowMountain4",
+        "SnowMountain9"
+      ],
+      "spawns": {
+        "JumpBox.tscn": 2,
+        "UpdraftZone.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 2
+      },
+      "doors": 2
+    },
+    "SnowMountain7": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain7.tscn",
+      "size_kb": 32.9,
+      "nodes": 39,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain5",
+        "SnowMountain8"
+      ],
+      "spawns": {
+        "SnowFX.tscn": 1,
+        "IceCrystal.tscn": 3,
+        "IceSpike.tscn": 1,
+        "JumpBox.tscn": 2,
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 4,
+        "DynamicCheckpoint.tscn": 5,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 4
+    },
+    "SnowMountain8": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain8.tscn",
+      "size_kb": 5.5,
+      "nodes": 29,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain7",
+        "SnowMountain9"
+      ],
+      "spawns": {
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 2,
+        "DynamicCheckpoint.tscn": 4,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 2
+    },
+    "SnowMountain9": {
+      "file": "Scenes/GameScenes/Rooms/SnowMountain/SnowMountain9.tscn",
+      "size_kb": 5.7,
+      "nodes": 30,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain6",
+        "SnowMountain8",
+        "SnowMountain10"
+      ],
+      "spawns": {
+        "IcePlatform.tscn": 1,
+        "Door.tscn": 3,
+        "DynamicCheckpoint.tscn": 4,
+        "ChairSavePoint.tscn": 1
+      },
+      "doors": 3
+    },
+    "SuperMario2": {
+      "file": "Scenes/GameScenes/Rooms/SuperMario/SuperMario2.tscn",
+      "size_kb": 136.3,
+      "nodes": 31,
+      "tile_layers": 4,
+      "adjacent": [
+        "GrassLand1"
+      ],
+      "spawns": {
+        "IceCrystal.tscn": 2,
+        "JumpBox.tscn": 1,
+        "Coin.tscn": 1,
+        "DynamicCheckpoint.tscn": 2,
+        "ChairSavePoint.tscn": 2
+      },
+      "doors": 0
+    },
+    "Town1": {
+      "file": "Scenes/GameScenes/Rooms/Town/Town1.tscn",
+      "size_kb": 3.7,
+      "nodes": 24,
+      "tile_layers": 4,
+      "adjacent": [
+        "SnowMountain19",
+        "Town2"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 2
+      },
+      "doors": 2
+    },
+    "Town2": {
+      "file": "Scenes/GameScenes/Rooms/Town/Town2.tscn",
+      "size_kb": 4.1,
+      "nodes": 26,
+      "tile_layers": 4,
+      "adjacent": [
+        "Town1",
+        "Town3",
+        "Town5"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "Town3": {
+      "file": "Scenes/GameScenes/Rooms/Town/Town3.tscn",
+      "size_kb": 3.7,
+      "nodes": 24,
+      "tile_layers": 4,
+      "adjacent": [
+        "Town2",
+        "Town4"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 2
+      },
+      "doors": 2
+    },
+    "Town4": {
+      "file": "Scenes/GameScenes/Rooms/Town/Town4.tscn",
+      "size_kb": 3.6,
+      "nodes": 23,
+      "tile_layers": 4,
+      "adjacent": [
+        "Town3"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 1
+      },
+      "doors": 1
+    },
+    "Town5": {
+      "file": "Scenes/GameScenes/Rooms/Town/Town5.tscn",
+      "size_kb": 4.0,
+      "nodes": 25,
+      "tile_layers": 4,
+      "adjacent": [
+        "Town2",
+        "Town6",
+        "Town7"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "Town6": {
+      "file": "Scenes/GameScenes/Rooms/Town/Town6.tscn",
+      "size_kb": 3.6,
+      "nodes": 23,
+      "tile_layers": 4,
+      "adjacent": [
+        "Town5"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 1
+      },
+      "doors": 1
+    },
+    "Town7": {
+      "file": "Scenes/GameScenes/Rooms/Town/Town7.tscn",
+      "size_kb": 3.6,
+      "nodes": 23,
+      "tile_layers": 4,
+      "adjacent": [
+        "Town6"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 1
+      },
+      "doors": 1
+    },
+    "WindValley1": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley1.tscn",
+      "size_kb": 80.6,
+      "nodes": 30,
+      "tile_layers": 4,
+      "adjacent": [
+        "Cave3",
+        "WindValley2",
+        "WindValley12"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 4,
+        "Door.tscn": 3,
+        "WindValleyZone.tscn": 2
+      },
+      "doors": 3
+    },
+    "WindValley10": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley10.tscn",
+      "size_kb": 7.1,
+      "nodes": 24,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley9",
+        "WindValley11"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 2
+      },
+      "doors": 2
+    },
+    "WindValley11": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley11.tscn",
+      "size_kb": 18.6,
+      "nodes": 26,
+      "tile_layers": 4,
+      "adjacent": [
+        "Cave2",
+        "Cave3",
+        "WindValley12"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "WindValley12": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley12.tscn",
+      "size_kb": 18.5,
+      "nodes": 25,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley11",
+        "WindValley13"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 2
+      },
+      "doors": 2
+    },
+    "WindValley13": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley13.tscn",
+      "size_kb": 16.6,
+      "nodes": 26,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley12",
+        "WindValley9"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "WindValley2": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley2.tscn",
+      "size_kb": 36.4,
+      "nodes": 24,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley1",
+        "WindValley3"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 2
+      },
+      "doors": 2
+    },
+    "WindValley3": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley3.tscn",
+      "size_kb": 66.1,
+      "nodes": 26,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley2",
+        "WindValley4",
+        "WindValley6"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "WindValley4": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley4.tscn",
+      "size_kb": 25.8,
+      "nodes": 26,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley3",
+        "WindValley5",
+        "WindValley6"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "WindValley5": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley5.tscn",
+      "size_kb": 55.8,
+      "nodes": 24,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley4"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 1
+      },
+      "doors": 1
+    },
+    "WindValley6": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley6.tscn",
+      "size_kb": 30.3,
+      "nodes": 26,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley3",
+        "WindValley4",
+        "WindValley7"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 3
+      },
+      "doors": 3
+    },
+    "WindValley7": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley7.tscn",
+      "size_kb": 30.2,
+      "nodes": 25,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley6",
+        "WindValley8"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 3,
+        "Door.tscn": 2
+      },
+      "doors": 2
+    },
+    "WindValley8": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley8.tscn",
+      "size_kb": 11.5,
+      "nodes": 24,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley7",
+        "WindValley9"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 2,
+        "Door.tscn": 2
+      },
+      "doors": 2
+    },
+    "WindValley9": {
+      "file": "Scenes/GameScenes/Rooms/WindValley/WindValley9.tscn",
+      "size_kb": 43.2,
+      "nodes": 28,
+      "tile_layers": 4,
+      "adjacent": [
+        "WindValley8",
+        "WindValley10",
+        "WindValley13"
+      ],
+      "spawns": {
+        "DynamicCheckpoint.tscn": 4,
+        "Door.tscn": 4
+      },
+      "doors": 4
+    }
+  },
+  "room_positions": [
+    "Cave1",
+    "Cave2",
+    "Cave3",
+    "GrassLand1",
+    "GrassLand10",
+    "GrassLand11",
+    "GrassLand12",
+    "GrassLand13",
+    "GrassLand14",
+    "GrassLand15",
+    "GrassLand16",
+    "GrassLand17",
+    "GrassLand18",
+    "GrassLand2",
+    "GrassLand3",
+    "GrassLand4",
+    "GrassLand5",
+    "GrassLand6",
+    "GrassLand7",
+    "GrassLand8",
+    "GrassLand9",
+    "SnowMountain1",
+    "SnowMountain10",
+    "SnowMountain11",
+    "SnowMountain12",
+    "SnowMountain13",
+    "SnowMountain14",
+    "SnowMountain15",
+    "SnowMountain16",
+    "SnowMountain17",
+    "SnowMountain18",
+    "SnowMountain19",
+    "SnowMountain2",
+    "SnowMountain20",
+    "SnowMountain21",
+    "SnowMountain3",
+    "SnowMountain4",
+    "SnowMountain5",
+    "SnowMountain6",
+    "SnowMountain7",
+    "SnowMountain8",
+    "SnowMountain9",
+    "SuperMario2",
+    "Town1",
+    "Town2",
+    "Town3",
+    "Town4",
+    "Town5",
+    "Town6",
+    "Town7",
+    "WindValley1",
+    "WindValley10",
+    "WindValley11",
+    "WindValley12",
+    "WindValley13",
+    "WindValley2",
+    "WindValley3",
+    "WindValley4",
+    "WindValley5",
+    "WindValley6",
+    "WindValley7",
+    "WindValley8",
+    "WindValley9"
+  ]
+}

@@ -34,7 +34,7 @@ static func find_vignette_effect(player: Node) -> void:
 				player.vignette_effect = child
 				break
 	if not player.vignette_effect:
-		print("Player: 警告：未找到VignetteEffect节点")
+		push_warning("Player: 未找到 VignetteEffect 节点")
 
 static func start_vignette_hurt(player: Node) -> void:
 	if player.vignette_effect and player.vignette_effect.has_method("start_hurt_effect"):

@@ -8,7 +8,7 @@ extends Node
 ## 3. 处理环境切换时的过渡效果
 ## 
 ## 数据流向：
-## WaterSurface.gd (场景脚本) → set_environment_multipliers() → Player.gd
+## PixelWaterSurface.gd / 平台脚本 (场景脚本) → set_environment_multipliers() → Player.gd
 
 ## 当前环境的乘数字典
 var current_multipliers: Dictionary = {
@@ -19,7 +19,7 @@ var current_multipliers: Dictionary = {
 	"acceleration": 1.0
 }
 
-## 设置环境乘数（由场景脚本调用，如 WaterSurface.gd）
+## 设置环境乘数（由场景脚本调用，如 PixelWaterSurface.gd）
 ## horizontal: 水平速度乘数
 ## vertical: 垂直速度乘数
 ## gravity: 重力乘数

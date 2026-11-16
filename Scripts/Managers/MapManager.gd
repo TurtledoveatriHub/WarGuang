@@ -251,6 +251,8 @@ func _redraw_generated_map() -> void:
 				entry.get("color", Color.WHITE)
 			)
 	_draw_used_door_connectors(layout)
+	if _debug_all_door_connectors_enabled:
+		_draw_all_door_connectors(layout)
 	_gen_texture.update(_gen_image)
 
 
@@ -424,12 +426,7 @@ func _collect_ground_runs(room_node: Node, layout: RoomLayoutData, room_id: Stri
 				run_length = 1
 			runs.append(_make_run_rect(layer, fallback_base, run_start, int(row_y), run_length, tile_size))
 	# room_bounds 之外的地形不画（房间外沿的补墙 / 装饰地形都不属于这张地图）
-	# 但房间边缘的精度不重要：按房间 ID 取一个固定的 0~map_edge_tolerance_px 向外放宽，
-	# 免得 room_bounds 正好切在墙中间时边缘出现整齐的缺口。
 	var bounds_rect: Rect2 = layout.get_room_world_rect(room_id)
-	var tolerance_px: int = _room_edge_tolerance_px(layout, room_id)
-	if tolerance_px > 0:
-		bounds_rect = bounds_rect.grow(float(tolerance_px) * layout.world_units_per_map_pixel)
 	if bounds_rect.size.x > 0.0 and bounds_rect.size.y > 0.0:
 		var clipped_runs: Array = []
 		for run: Variant in runs:
@@ -438,15 +435,6 @@ func _collect_ground_runs(room_node: Node, layout: RoomLayoutData, room_id: Stri
 				clipped_runs.append(clipped)
 		runs = clipped_runs
 	return runs
-
-
-## 每个房间边缘向外放宽多少像素（0~map_edge_tolerance_px）。
-## 用房间 ID 的哈希定死，保证同一个房间每次重画结果一致（不会闪烁）。
-func _room_edge_tolerance_px(layout: RoomLayoutData, room_id: String) -> int:
-	var max_tolerance: int = maxi(layout.map_edge_tolerance_px, 0)
-	if max_tolerance <= 0:
-		return 0
-	return abs(hash(room_id)) % (max_tolerance + 1)
 
 
 ## 该层是否在存档里已被记录为「永久激活消失」（从场景文件补登记时用；
@@ -640,12 +628,34 @@ func _draw_connector_line(layout: RoomLayoutData, from_world: Vector2, to_world:
 	_draw_world_line(layout, mid, to_world, to_color)
 
 
+## 取某个房间在地图上的「方块矩形」（世界坐标）。
+## ★ 用已扫描到的地面横条求并集，而不是查 RoomLayoutData.room_bounds_rects ——
+##   后者是可选字段，实际工程里是空的（房间方块本来就是扫描出来的）。
+## 还没扫到这个房间（没进去过 / 没地面层）时返回空 Rect2。
+func get_room_block_rect(room_id: String) -> Rect2:
+	var runs: Array = _room_ground_runs.get(room_id, [])
+	if runs.is_empty():
+		return Rect2()
+	var result: Rect2 = Rect2()
+	var has_any: bool = false
+	for run in runs:
+		if not (run is Rect2):
+			continue
+		var run_rect: Rect2 = run
+		if not run_rect.has_area():
+			continue
+		result = run_rect if not has_any else result.merge(run_rect)
+		has_any = true
+	return result
+
+
 ## 在贴图上画一段世界坐标直线（逐像素推进，宽度 = map_connector_width_px）
 func _draw_world_line(layout: RoomLayoutData, from_world: Vector2, to_world: Vector2, color: Color) -> void:
 	_paint_world_line_on(_gen_image, layout, from_world, to_world, color, maxi(layout.map_connector_width_px, 1))
 
 
-## 在任意 Image 上画一段世界坐标直线（生成贴图与已探索遮罩共用）
+## 在任意 Image 上画一段世界坐标直线（生成贴图与已探索遮罩共用）。
+## ★ 连线超过 map_connector_dash_threshold_px 时：两端各留一半阈值长度的实线，中间段虚线（隔一个像素画一个）。
 func _paint_world_line_on(image: Image, layout: RoomLayoutData, from_world: Vector2, to_world: Vector2, color: Color, width: int) -> void:
 	if image == null:
 		return
@@ -657,10 +667,99 @@ func _paint_world_line_on(image: Image, layout: RoomLayoutData, from_world: Vect
 	if length < 1.0:
 		return
 	var line_width: int = maxi(width, 1)
-	var steps: int = int(ceilf(length))
+	var dash_threshold: float = float(maxi(layout.map_connector_dash_threshold_px, 0))
+	var dash_middle: bool = dash_threshold > 0.0 and length > dash_threshold
+	var solid_px: float = dash_threshold * 0.5
+	## ★ 沿线路每 line_width 像素推进一次，每次填充一个 line_width×line_width 的方块；
+	## 虚线段用「块序号」交替 → 线宽 2px 时正好是 2×2 画、2×2 空（周期 4px），
+	## 且方块尺寸恒等于实线段粗细，不会出现 1px 细点。
+	var steps: int = maxi(int(ceilf(length / float(line_width))), 1)
 	for i: int in range(steps + 1):
-		var point: Vector2 = from_px + delta * (float(i) / float(steps))
+		var travelled: float = length * float(i) / float(steps)
+		if dash_middle and travelled > solid_px and travelled < length - solid_px:
+			var block_index: int = int(floorf(travelled / float(line_width)))
+			if block_index % 2 == 1:
+				continue
+		var t: float = travelled / length
+		var point: Vector2 = from_px + delta * t
 		_safe_fill_on(image, Rect2i(Vector2i(int(roundf(point.x)), int(roundf(point.y))), Vector2i(line_width, line_width)), color)
+
+## 调试：是否额外绘制「布局里全部应当出现的门连线」（完整地图用）
+var _debug_all_door_connectors_enabled: bool = false
+
+## 开关「绘制全部应当出现的门连线」并重画（调试完整地图用）
+func set_draw_all_door_connectors(enabled: bool) -> void:
+	if _debug_all_door_connectors_enabled == enabled:
+		return
+	_debug_all_door_connectors_enabled = enabled
+	_redraw_generated_map()
+
+## 绘制布局里全部应当出现的门连线：
+## 按 door_id 两端配对，两端房间不同、且两端都不落在各自 room_bounds 内部时才画
+## （门就在房间内部的那种不算，按要求跳过）。
+func _draw_all_door_connectors(layout: RoomLayoutData) -> void:
+	if layout == null:
+		return
+	var done: Dictionary = {}
+	for room_key: Variant in layout.room_doors.keys():
+		var from_room: String = str(room_key)
+		var entries: Variant = layout.room_doors[room_key]
+		if typeof(entries) != TYPE_ARRAY:
+			continue
+		for entry: Variant in entries:
+			if typeof(entry) != TYPE_DICTIONARY:
+				continue
+			var door_id: String = str((entry as Dictionary).get("door_id", ""))
+			if door_id == "" or done.has(door_id):
+				continue
+			var other_room: String = _find_room_with_door(layout, from_room, door_id)
+			if other_room == "" or other_room == from_room:
+				continue
+			done[door_id] = true
+			var from_pos: Vector2 = _door_world_pos_in_layout(layout, from_room, door_id)
+			var to_pos: Vector2 = _door_world_pos_in_layout(layout, other_room, door_id)
+			if from_pos == Vector2.ZERO or to_pos == Vector2.ZERO:
+				continue
+			if _is_inside_room_pair(layout, from_room, other_room, from_pos, to_pos):
+				continue
+			var start_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(from_room), from_pos)
+			var end_pos: Vector2 = _extend_to_room_bounds(layout.get_room_world_rect(other_room), to_pos)
+			_draw_connector_line(layout, start_pos, end_pos, layout.get_terrain_color(from_room), layout.get_terrain_color(other_room))
+
+## 在布局里找「除 except_room 之外、拥有该 door_id 的房间」
+func _find_room_with_door(layout: RoomLayoutData, except_room: String, door_id: String) -> String:
+	for room_key: Variant in layout.room_doors.keys():
+		var room_id: String = str(room_key)
+		if room_id == except_room:
+			continue
+		var entries: Variant = layout.room_doors[room_key]
+		if typeof(entries) != TYPE_ARRAY:
+			continue
+		for entry: Variant in entries:
+			if typeof(entry) == TYPE_DICTIONARY and str((entry as Dictionary).get("door_id", "")) == door_id:
+				return room_id
+	return ""
+
+## 门在布局里的世界坐标 = 房间世界原点 + 门的本地坐标（room_doors 里的 position 是房间本地坐标）
+func _door_world_pos_in_layout(layout: RoomLayoutData, room_id: String, door_id: String) -> Vector2:
+	var entries: Variant = layout.room_doors.get(room_id, [])
+	if typeof(entries) != TYPE_ARRAY:
+		return Vector2.ZERO
+	var local_pos: Vector2 = Vector2.ZERO
+	var found: bool = false
+	for entry: Variant in entries:
+		if typeof(entry) != TYPE_DICTIONARY:
+			continue
+		var item: Dictionary = entry
+		if str(item.get("door_id", "")) != door_id:
+			continue
+		local_pos = _to_vector2(item.get("position", null))
+		found = true
+		break
+	if not found:
+		return Vector2.ZERO
+	var room_origin: Vector2 = _to_vector2(layout.room_positions.get(room_id, null))
+	return room_origin + local_pos
 
 func _ready() -> void:
 	## 先把权威布局数据读进来：地图生成依赖它，
@@ -941,6 +1040,16 @@ func reveal_visited_rooms() -> void:
 		return
 	for room_id in visited_rooms:
 		reveal_room(str(room_id))
+	flush_reveal()
+
+## 调试用：把整块探索遮罩全部点亮。
+## 配合「烘焙全部房间」就是不依赖玩家探索进度的完整地图；
+## 不动 visited_rooms（不会污染存档里的已探索记录）。
+func reveal_all_mask() -> void:
+	if _reveal_image == null:
+		return
+	_reveal_image.fill(Color(1, 1, 1, 1))
+	_reveal_pending_upload = true
 	flush_reveal()
 
 ## 把挂起的填色改动一次性上传到纹理（没有改动就直接返回，不做无谓的整图上传）

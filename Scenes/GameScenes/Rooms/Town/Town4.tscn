@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=9 format=3 uid="uid://b4348fibiiv1m"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_xtu8d"]
 [ext_resource type="AudioStream" uid="uid://y2b4bofrgj85" path="res://Assets/Audios/BGM/酒吧畅想2.ogg" id="2_7alvo"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_h1qm8"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_sg4ol"]
+[ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="7_jes5t"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="8_4r3i1"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="10_4f8ep"]
 
@@ -13,12 +14,12 @@
 script = ExtResource("1_xtu8d")
 room_id = "Town4"
 room_bgm_stream = ExtResource("2_7alvo")
-adjacent_rooms = Array[String](["Town3", "Town5"])
-room_color = Color(0.74348193, 0.74348193, 0.74348193, 1)
+adjacent_rooms = Array[String](["Town3"])
+room_color = Color(0.8539175, 0.8539175, 0.8539176, 1)
 room_bounds = NodePath("t4Bounds")
 
 [node name="t4Bounds" type="Node2D" parent="."]
-scale = Vector2(4, 4)
+scale = Vector2(4, 2)
 script = ExtResource("3_h1qm8")
 metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
 
@@ -73,13 +74,18 @@ script = ExtResource("8_4r3i1")
 [node name="DynamicCheckpoints" type="Node2D" parent="."]
 
 [node name="1" parent="DynamicCheckpoints" instance=ExtResource("10_4f8ep")]
-position = Vector2(-592, 448)
+position = Vector2(-600, 192)
 checkpoint_id = "1"
 belongs_to_room = "Town4"
 
 [node name="2" parent="DynamicCheckpoints" instance=ExtResource("10_4f8ep")]
-position = Vector2(-384, 320)
+position = Vector2(-312, 176)
 checkpoint_id = "2"
 belongs_to_room = "Town4"
 
 [node name="Doors" type="Node2D" parent="."]
+
+[node name="t3t4" parent="Doors" instance=ExtResource("7_jes5t")]
+position = Vector2(-680, 192)
+door_id = "t3t4"
+target_room_id = "Town3"

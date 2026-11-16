@@ -110,7 +110,20 @@ func try_interact():
 	if interact_once and has_interacted:
 		return
 	
+	_face_player_towards_self()
 	_start_interaction()
+
+## 交互开始时让玩家面朝本 NPC（左右由 NPC 与玩家的相对位置决定）
+func _face_player_towards_self() -> void:
+	var player: Node = get_tree().get_first_node_in_group("player")
+	if player == null or not is_instance_valid(player):
+		return
+	var offset_x: float = global_position.x - player.global_position.x
+	if absf(offset_x) < 1.0:
+		return
+	player.is_facing_right = offset_x > 0.0
+	if player.animated_sprite:
+		player.animated_sprite.flip_h = not player.is_facing_right
 
 func _start_interaction():
 	owns_dialogue = true
@@ -187,6 +200,11 @@ func _on_dialogue_ended():
 		has_interacted = true
 		if interaction_prompt:
 			interaction_prompt.visible = false
+	
+	# ★ 存档改在这里（对话结束）：交互当帧写档会卡一下，
+	#   而 SaveManager.request_auto_save 有合并窗口，会在之后的空闲时刻才真正写盘。
+	if SaveManager != null:
+		SaveManager.request_auto_save(false)
 
 ## ============================ 看向玩家 ============================
 ## 设计：不做纹理镜像，而是切到另一套动画（IDLE_L/IDLE_R、TALK_L/TALK_R）。

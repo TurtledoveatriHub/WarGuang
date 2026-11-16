@@ -1,0 +1,3210 @@
+{
+  "counts": {
+    "positions": 63,
+    "bounds": 63,
+    "doors": 152,
+    "door_pairs": 76,
+    "layout_doors": 148
+  },
+  "door_pair_misaligned": [
+    {
+      "door_id": "sm17sm19",
+      "a": "SnowMountain17",
+      "b": "SnowMountain19",
+      "a_world": [
+        26688.0,
+        -7840.0
+      ],
+      "b_world": [
+        26688.0,
+        -1440.0
+      ],
+      "dist": 6400.0
+    },
+    {
+      "door_id": "sm16sm17",
+      "a": "SnowMountain16",
+      "b": "SnowMountain17",
+      "a_world": [
+        26688.0,
+        -13616.0
+      ],
+      "b_world": [
+        26688.0,
+        -8560.0
+      ],
+      "dist": 5056.0
+    },
+    {
+      "door_id": "gl6gl8",
+      "a": "GrassLand6",
+      "b": "GrassLand8",
+      "a_world": [
+        2584.0,
+        3088.0
+      ],
+      "b_world": [
+        2648.0,
+        5312.0
+      ],
+      "dist": 2224.9
+    },
+    {
+      "door_id": "gl12gl18",
+      "a": "GrassLand12",
+      "b": "GrassLand18",
+      "a_world": [
+        8216.0,
+        -272.0
+      ],
+      "b_world": [
+        9368.0,
+        -2000.0
+      ],
+      "dist": 2076.8
+    },
+    {
+      "door_id": "sm6sm9",
+      "a": "SnowMountain6",
+      "b": "SnowMountain9",
+      "a_world": [
+        23680.0,
+        -7784.0
+      ],
+      "b_world": [
+        23680.0,
+        -9224.0
+      ],
+      "dist": 1440.0
+    },
+    {
+      "door_id": "t2t5",
+      "a": "Town2",
+      "b": "Town5",
+      "a_world": [
+        30992.0,
+        -264.0
+      ],
+      "b_world": [
+        30992.0,
+        1160.0
+      ],
+      "dist": 1424.0
+    },
+    {
+      "door_id": "sm7sm13",
+      "a": "SnowMountain13",
+      "b": "SnowMountain7",
+      "a_world": [
+        16592.0,
+        -10712.0
+      ],
+      "b_world": [
+        16592.0,
+        -9368.0
+      ],
+      "dist": 1344.0
+    },
+    {
+      "door_id": "sm15sm21",
+      "a": "SnowMountain15",
+      "b": "SnowMountain21",
+      "a_world": [
+        24552.0,
+        -13952.0
+      ],
+      "b_world": [
+        24792.0,
+        -12832.0
+      ],
+      "dist": 1145.4
+    },
+    {
+      "door_id": "t5t6",
+      "a": "Town5",
+      "b": "Town6",
+      "a_world": [
+        30312.0,
+        1504.0
+      ],
+      "b_world": [
+        30808.0,
+        496.0
+      ],
+      "dist": 1123.4
+    },
+    {
+      "door_id": "gl12gl17",
+      "a": "GrassLand12",
+      "b": "GrassLand17",
+      "a_world": [
+        7960.0,
+        -976.0
+      ],
+      "b_world": [
+        7960.0,
+        -2000.0
+      ],
+      "dist": 1024.0
+    },
+    {
+      "door_id": "wv3wv4",
+      "a": "WindValley3",
+      "b": "WindValley4",
+      "a_world": [
+        -14824.0,
+        5344.0
+      ],
+      "b_world": [
+        -15640.0,
+        5344.0
+      ],
+      "dist": 816.0
+    },
+    {
+      "door_id": "sm8sm9",
+      "a": "SnowMountain8",
+      "b": "SnowMountain9",
+      "a_world": [
+        21032.0,
+        -9680.0
+      ],
+      "b_world": [
+        21816.0,
+        -9680.0
+      ],
+      "dist": 784.0
+    },
+    {
+      "door_id": "sm12sm13",
+      "a": "SnowMountain12",
+      "b": "SnowMountain13",
+      "a_world": [
+        18456.0,
+        -11872.0
+      ],
+      "b_world": [
+        17688.0,
+        -11872.0
+      ],
+      "dist": 768.0
+    },
+    {
+      "door_id": "wv3wv6",
+      "a": "WindValley3",
+      "b": "WindValley6",
+      "a_world": [
+        -14824.0,
+        4000.0
+      ],
+      "b_world": [
+        -15568.0,
+        4000.0
+      ],
+      "dist": 744.0
+    },
+    {
+      "door_id": "sm7sm8",
+      "a": "SnowMountain7",
+      "b": "SnowMountain8",
+      "a_world": [
+        17688.0,
+        -9232.0
+      ],
+      "b_world": [
+        18392.0,
+        -9232.0
+      ],
+      "dist": 704.0
+    },
+    {
+      "door_id": "wv2wv3",
+      "a": "WindValley2",
+      "b": "WindValley3",
+      "a_world": [
+        -10856.0,
+        3952.0
+      ],
+      "b_world": [
+        -11544.0,
+        3952.0
+      ],
+      "dist": 688.0
+    },
+    {
+      "door_id": "t3t4",
+      "a": "Town3",
+      "b": "Town4",
+      "a_world": [
+        30216.0,
+        -2192.0
+      ],
+      "b_world": [
+        30344.0,
+        -2864.0
+      ],
+      "dist": 684.1
+    },
+    {
+      "door_id": "t5t7",
+      "a": "Town5",
+      "b": "Town7",
+      "a_world": [
+        30464.0,
+        1512.0
+      ],
+      "b_world": [
+        29848.0,
+        1360.0
+      ],
+      "dist": 634.5
+    },
+    {
+      "door_id": "c2c3",
+      "a": "Cave2",
+      "b": "Cave3",
+      "a_world": [
+        -7720.0,
+        448.0
+      ],
+      "b_world": [
+        -7960.0,
+        960.0
+      ],
+      "dist": 565.5
+    },
+    {
+      "door_id": "c3wv11",
+      "a": "Cave3",
+      "b": "WindValley11",
+      "a_world": [
+        -8416.0,
+        632.0
+      ],
+      "b_world": [
+        -8288.0,
+        200.0
+      ],
+      "dist": 450.6
+    },
+    {
+      "door_id": "wv1wv10",
+      "a": "WindValley1",
+      "b": "WindValley10",
+      "a_world": [
+        -10504.0,
+        848.0
+      ],
+      "b_world": [
+        -10904.0,
+        944.0
+      ],
+      "dist": 411.4
+    },
+    {
+      "door_id": "c3wv1",
+      "a": "Cave3",
+      "b": "WindValley1",
+      "a_world": [
+        -9000.0,
+        1088.0
+      ],
+      "b_world": [
+        -9400.0,
+        1168.0
+      ],
+      "dist": 407.9
+    },
+    {
+      "door_id": "c2wv11",
+      "a": "Cave2",
+      "b": "WindValley11",
+      "a_world": [
+        -7720.0,
+        -64.0
+      ],
+      "b_world": [
+        -8088.0,
+        -64.0
+      ],
+      "dist": 368.0
+    },
+    {
+      "door_id": "gl4gl6",
+      "a": "GrassLand4",
+      "b": "GrassLand6",
+      "a_world": [
+        3480.0,
+        3520.0
+      ],
+      "b_world": [
+        3176.0,
+        3520.0
+      ],
+      "dist": 304.0
+    },
+    {
+      "door_id": "gl14gl15",
+      "a": "GrassLand14",
+      "b": "GrassLand15",
+      "a_world": [
+        12736.0,
+        -956.0
+      ],
+      "b_world": [
+        12736.0,
+        -676.0
+      ],
+      "dist": 280.0
+    },
+    {
+      "door_id": "sm4sm5",
+      "a": "SnowMountain4",
+      "b": "SnowMountain5",
+      "a_world": [
+        22560.0,
+        -5400.0
+      ],
+      "b_world": [
+        22560.0,
+        -5680.0
+      ],
+      "dist": 280.0
+    },
+    {
+      "door_id": "wv1wv2",
+      "a": "WindValley1",
+      "b": "WindValley2",
+      "a_world": [
+        -9904.0,
+        3328.0
+      ],
+      "b_world": [
+        -9872.0,
+        3600.0
+      ],
+      "dist": 273.9
+    },
+    {
+      "door_id": "sm9sm10",
+      "a": "SnowMountain10",
+      "b": "SnowMountain9",
+      "a_world": [
+        23264.0,
+        -10840.0
+      ],
+      "b_world": [
+        23264.0,
+        -10584.0
+      ],
+      "dist": 256.0
+    },
+    {
+      "door_id": "sm14sm15",
+      "a": "SnowMountain14",
+      "b": "SnowMountain15",
+      "a_world": [
+        24224.0,
+        -13208.0
+      ],
+      "b_world": [
+        24224.0,
+        -13464.0
+      ],
+      "dist": 256.0
+    },
+    {
+      "door_id": "t1t2",
+      "a": "Town1",
+      "b": "Town2",
+      "a_world": [
+        28808.0,
+        -1168.0
+      ],
+      "b_world": [
+        29064.0,
+        -1168.0
+      ],
+      "dist": 256.0
+    },
+    {
+      "door_id": "wv4wv6",
+      "a": "WindValley4",
+      "b": "WindValley6",
+      "a_world": [
+        -16760.0,
+        4512.0
+      ],
+      "b_world": [
+        -16760.0,
+        4256.0
+      ],
+      "dist": 256.0
+    },
+    {
+      "door_id": "gl1gl0x3",
+      "a": "GrassLand1",
+      "b": "GrassLand10",
+      "a_world": [
+        -1320.0,
+        -672.0
+      ],
+      "b_world": [
+        -1560.0,
+        -608.0
+      ],
+      "dist": 248.4
+    },
+    {
+      "door_id": "sm19t1",
+      "a": "SnowMountain19",
+      "b": "Town1",
+      "a_world": [
+        27208.0,
+        -856.0
+      ],
+      "b_world": [
+        27448.0,
+        -848.0
+      ],
+      "dist": 240.1
+    },
+    {
+      "door_id": "t2t3",
+      "a": "Town2",
+      "b": "Town3",
+      "a_world": [
+        29520.0,
+        -1624.0
+      ],
+      "b_world": [
+        29512.0,
+        -1864.0
+      ],
+      "dist": 240.1
+    },
+    {
+      "door_id": "gl10c1x1",
+      "a": "Cave1",
+      "b": "GrassLand10",
+      "a_world": [
+        -3160.0,
+        704.0
+      ],
+      "b_world": [
+        -2920.0,
+        704.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl10c1x2",
+      "a": "Cave1",
+      "b": "GrassLand10",
+      "a_world": [
+        -3160.0,
+        -800.0
+      ],
+      "b_world": [
+        -2920.0,
+        -800.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "c1c2x1",
+      "a": "Cave1",
+      "b": "Cave2",
+      "a_world": [
+        -4200.0,
+        704.0
+      ],
+      "b_world": [
+        -4440.0,
+        704.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "c1c2x2",
+      "a": "Cave1",
+      "b": "Cave2",
+      "a_world": [
+        -4200.0,
+        -800.0
+      ],
+      "b_world": [
+        -4440.0,
+        -800.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl1gl2x1",
+      "a": "GrassLand1",
+      "b": "GrassLand2",
+      "a_world": [
+        1320.0,
+        608.0
+      ],
+      "b_world": [
+        1560.0,
+        608.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl1gl2x2",
+      "a": "GrassLand1",
+      "b": "GrassLand2",
+      "a_world": [
+        1320.0,
+        96.0
+      ],
+      "b_world": [
+        1560.0,
+        96.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl1gl0x1",
+      "a": "GrassLand1",
+      "b": "GrassLand10",
+      "a_world": [
+        -1320.0,
+        704.0
+      ],
+      "b_world": [
+        -1560.0,
+        704.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl1gl0x2",
+      "a": "GrassLand1",
+      "b": "GrassLand10",
+      "a_world": [
+        -1320.0,
+        352.0
+      ],
+      "b_world": [
+        -1560.0,
+        352.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl3gl11",
+      "a": "GrassLand11",
+      "b": "GrassLand3",
+      "a_world": [
+        5400.0,
+        176.0
+      ],
+      "b_world": [
+        5160.0,
+        176.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl11gl12x1",
+      "a": "GrassLand11",
+      "b": "GrassLand12",
+      "a_world": [
+        7400.0,
+        -112.0
+      ],
+      "b_world": [
+        7640.0,
+        -112.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl11gl12x2",
+      "a": "GrassLand11",
+      "b": "GrassLand12",
+      "a_world": [
+        7400.0,
+        288.0
+      ],
+      "b_world": [
+        7640.0,
+        288.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl12gl13x1",
+      "a": "GrassLand12",
+      "b": "GrassLand13",
+      "a_world": [
+        10280.0,
+        -112.0
+      ],
+      "b_world": [
+        10520.0,
+        -112.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl12gl13x2",
+      "a": "GrassLand12",
+      "b": "GrassLand13",
+      "a_world": [
+        10280.0,
+        -880.0
+      ],
+      "b_world": [
+        10520.0,
+        -880.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl13gl14",
+      "a": "GrassLand13",
+      "b": "GrassLand14",
+      "a_world": [
+        11880.0,
+        -1136.0
+      ],
+      "b_world": [
+        12120.0,
+        -1136.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl14sm1",
+      "a": "GrassLand14",
+      "b": "SnowMountain1",
+      "a_world": [
+        12840.0,
+        -1456.0
+      ],
+      "b_world": [
+        13080.0,
+        -1456.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl15gl16",
+      "a": "GrassLand15",
+      "b": "GrassLand16",
+      "a_world": [
+        12288.0,
+        1304.0
+      ],
+      "b_world": [
+        12288.0,
+        1544.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl2gl3",
+      "a": "GrassLand2",
+      "b": "GrassLand3",
+      "a_world": [
+        3560.0,
+        240.0
+      ],
+      "b_world": [
+        3800.0,
+        240.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl6gl7",
+      "a": "GrassLand6",
+      "b": "GrassLand7",
+      "a_world": [
+        -744.0,
+        3680.0
+      ],
+      "b_world": [
+        -984.0,
+        3680.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "gl7gl9",
+      "a": "GrassLand7",
+      "b": "GrassLand9",
+      "a_world": [
+        -2344.0,
+        5088.0
+      ],
+      "b_world": [
+        -2584.0,
+        5088.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "sm1sm2",
+      "a": "SnowMountain1",
+      "b": "SnowMountain2",
+      "a_world": [
+        15720.0,
+        -2160.0
+      ],
+      "b_world": [
+        15960.0,
+        -2160.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "sm15sm16",
+      "a": "SnowMountain15",
+      "b": "SnowMountain16",
+      "a_world": [
+        25064.0,
+        -13952.0
+      ],
+      "b_world": [
+        25304.0,
+        -13952.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "sm17sm18",
+      "a": "SnowMountain17",
+      "b": "SnowMountain18",
+      "a_world": [
+        26328.0,
+        -8232.0
+      ],
+      "b_world": [
+        26088.0,
+        -8232.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "sm2sm3",
+      "a": "SnowMountain2",
+      "b": "SnowMountain3",
+      "a_world": [
+        19880.0,
+        -1936.0
+      ],
+      "b_world": [
+        20120.0,
+        -1936.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "sm3sm4",
+      "a": "SnowMountain3",
+      "b": "SnowMountain4",
+      "a_world": [
+        21480.0,
+        -400.0
+      ],
+      "b_world": [
+        21720.0,
+        -400.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "sm4sm6",
+      "a": "SnowMountain4",
+      "b": "SnowMountain6",
+      "a_world": [
+        23080.0,
+        -3616.0
+      ],
+      "b_world": [
+        23320.0,
+        -3616.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "sm5sm7x1",
+      "a": "SnowMountain5",
+      "b": "SnowMountain7",
+      "a_world": [
+        17928.0,
+        -7824.0
+      ],
+      "b_world": [
+        17688.0,
+        -7824.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "sm5sm7x2",
+      "a": "SnowMountain5",
+      "b": "SnowMountain7",
+      "a_world": [
+        17928.0,
+        -8144.0
+      ],
+      "b_world": [
+        17688.0,
+        -8144.0
+      ],
+      "dist": 240.0
+    },
+    {
+      "door_id": "sm11sm12",
+      "a": "SnowMountain11",
+      "b": "SnowMountain12",
+      "a_world": [
+        21336.0,
+        -12192.0
+      ],
+      "b_world": [
+        21104.0,
+        -12192.0
+      ],
+      "dist": 232.0
+    },
+    {
+      "door_id": "gl3gl4",
+      "a": "GrassLand3",
+      "b": "GrassLand4",
+      "a_world": [
+        4320.0,
+        1464.0
+      ],
+      "b_world": [
+        4320.0,
+        1688.0
+      ],
+      "dist": 224.0
+    },
+    {
+      "door_id": "wv9wv13x1",
+      "a": "WindValley13",
+      "b": "WindValley9",
+      "a_world": [
+        -12672.0,
+        -568.0
+      ],
+      "b_world": [
+        -12672.0,
+        -344.0
+      ],
+      "dist": 224.0
+    },
+    {
+      "door_id": "wv9wv13x2",
+      "a": "WindValley13",
+      "b": "WindValley9",
+      "a_world": [
+        -13568.0,
+        -568.0
+      ],
+      "b_world": [
+        -13568.0,
+        -344.0
+      ],
+      "dist": 224.0
+    },
+    {
+      "door_id": "sm10sm11",
+      "a": "SnowMountain10",
+      "b": "SnowMountain11",
+      "a_world": [
+        22584.0,
+        -11296.0
+      ],
+      "b_world": [
+        22376.0,
+        -11296.0
+      ],
+      "dist": 208.0
+    },
+    {
+      "door_id": "sm10sm14",
+      "a": "SnowMountain10",
+      "b": "SnowMountain14",
+      "a_world": [
+        23624.0,
+        -11408.0
+      ],
+      "b_world": [
+        23832.0,
+        -11408.0
+      ],
+      "dist": 208.0
+    },
+    {
+      "door_id": "gl4gl5",
+      "a": "GrassLand4",
+      "b": "GrassLand5",
+      "a_world": [
+        5480.0,
+        3456.0
+      ],
+      "b_world": [
+        5656.0,
+        3456.0
+      ],
+      "dist": 176.0
+    },
+    {
+      "door_id": "sm19sm20",
+      "a": "SnowMountain19",
+      "b": "SnowMountain20",
+      "a_world": [
+        26168.0,
+        -856.0
+      ],
+      "b_world": [
+        25992.0,
+        -856.0
+      ],
+      "dist": 176.0
+    },
+    {
+      "door_id": "wv9wv10",
+      "a": "WindValley10",
+      "b": "WindValley9",
+      "a_world": [
+        -12264.0,
+        752.0
+      ],
+      "b_world": [
+        -12440.0,
+        752.0
+      ],
+      "dist": 176.0
+    },
+    {
+      "door_id": "wv11wv12",
+      "a": "WindValley11",
+      "b": "WindValley12",
+      "a_world": [
+        -8808.0,
+        -896.0
+      ],
+      "b_world": [
+        -8984.0,
+        -896.0
+      ],
+      "dist": 176.0
+    },
+    {
+      "door_id": "wv12wv13",
+      "a": "WindValley12",
+      "b": "WindValley13",
+      "a_world": [
+        -12264.0,
+        -960.0
+      ],
+      "b_world": [
+        -12440.0,
+        -960.0
+      ],
+      "dist": 176.0
+    },
+    {
+      "door_id": "wv4wv5",
+      "a": "WindValley4",
+      "b": "WindValley5",
+      "a_world": [
+        -17000.0,
+        5664.0
+      ],
+      "b_world": [
+        -17176.0,
+        5664.0
+      ],
+      "dist": 176.0
+    },
+    {
+      "door_id": "wv7wv8",
+      "a": "WindValley7",
+      "b": "WindValley8",
+      "a_world": [
+        -15512.0,
+        752.0
+      ],
+      "b_world": [
+        -15336.0,
+        752.0
+      ],
+      "dist": 176.0
+    },
+    {
+      "door_id": "wv8wv9",
+      "a": "WindValley8",
+      "b": "WindValley9",
+      "a_world": [
+        -13976.0,
+        752.0
+      ],
+      "b_world": [
+        -13800.0,
+        752.0
+      ],
+      "dist": 176.0
+    },
+    {
+      "door_id": "wv6wv7",
+      "a": "WindValley6",
+      "b": "WindValley7",
+      "a_world": [
+        -15752.0,
+        2272.0
+      ],
+      "b_world": [
+        -15760.0,
+        2128.0
+      ],
+      "dist": 144.2
+    }
+  ],
+  "room_rect_overlaps": [],
+  "door_outside_room_bounds": [
+    {
+      "room": "Cave1",
+      "door_id": "gl10c1x1",
+      "node": "Doors/gl10c1x1",
+      "world": [
+        -3160,
+        704
+      ],
+      "rect": [
+        -4160,
+        -896,
+        960,
+        1920
+      ]
+    },
+    {
+      "room": "Cave1",
+      "door_id": "gl10c1x2",
+      "node": "Doors/gl10c1x2",
+      "world": [
+        -3160,
+        -800
+      ],
+      "rect": [
+        -4160,
+        -896,
+        960,
+        1920
+      ]
+    },
+    {
+      "room": "Cave1",
+      "door_id": "c1c2x1",
+      "node": "Doors/c1c2x1",
+      "world": [
+        -4200,
+        704
+      ],
+      "rect": [
+        -4160,
+        -896,
+        960,
+        1920
+      ]
+    },
+    {
+      "room": "Cave1",
+      "door_id": "c1c2x2",
+      "node": "Doors/c1c2x2",
+      "world": [
+        -4200,
+        -800
+      ],
+      "rect": [
+        -4160,
+        -896,
+        960,
+        1920
+      ]
+    },
+    {
+      "room": "Cave2",
+      "door_id": "c1c2x1",
+      "node": "Doors/c1c2x1",
+      "world": [
+        -4440,
+        704
+      ],
+      "rect": [
+        -7680,
+        -928,
+        3200,
+        1920
+      ]
+    },
+    {
+      "room": "Cave2",
+      "door_id": "c1c2x2",
+      "node": "Doors/c1c2x2",
+      "world": [
+        -4440,
+        -800
+      ],
+      "rect": [
+        -7680,
+        -928,
+        3200,
+        1920
+      ]
+    },
+    {
+      "room": "Cave2",
+      "door_id": "c2c3",
+      "node": "Doors/c2c3",
+      "world": [
+        -7720,
+        448
+      ],
+      "rect": [
+        -7680,
+        -928,
+        3200,
+        1920
+      ]
+    },
+    {
+      "room": "Cave2",
+      "door_id": "c2wv11",
+      "node": "Doors/c2wv11",
+      "world": [
+        -7720,
+        -64
+      ],
+      "rect": [
+        -7680,
+        -928,
+        3200,
+        1920
+      ]
+    },
+    {
+      "room": "Cave3",
+      "door_id": "c2c3",
+      "node": "Doors/c2c3",
+      "world": [
+        -7960,
+        960
+      ],
+      "rect": [
+        -8960,
+        672,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "Cave3",
+      "door_id": "c3wv1",
+      "node": "Doors/c3wv1",
+      "world": [
+        -9000,
+        1088
+      ],
+      "rect": [
+        -8960,
+        672,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "Cave3",
+      "door_id": "c3wv11",
+      "node": "Doors/c3wv11",
+      "world": [
+        -8416,
+        632
+      ],
+      "rect": [
+        -8960,
+        672,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "GrassLand1",
+      "door_id": "gl1gl2x1",
+      "node": "Doors/gl1gl2x1",
+      "world": [
+        1320,
+        608
+      ],
+      "rect": [
+        -1280,
+        -960,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand1",
+      "door_id": "gl1gl2x2",
+      "node": "Doors/gl1gl2x2",
+      "world": [
+        1320,
+        96
+      ],
+      "rect": [
+        -1280,
+        -960,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand1",
+      "door_id": "gl1gl0x1",
+      "node": "Doors/gl1gl0x1",
+      "world": [
+        -1320,
+        704
+      ],
+      "rect": [
+        -1280,
+        -960,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand1",
+      "door_id": "gl1gl0x2",
+      "node": "Doors/gl1gl0x2",
+      "world": [
+        -1320,
+        352
+      ],
+      "rect": [
+        -1280,
+        -960,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand1",
+      "door_id": "gl1gl0x3",
+      "node": "Doors/gl1gl0x3",
+      "world": [
+        -1320,
+        -672
+      ],
+      "rect": [
+        -1280,
+        -960,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand10",
+      "door_id": "gl1gl0x1",
+      "node": "Doors/gl1gl0x1",
+      "world": [
+        -1560,
+        704
+      ],
+      "rect": [
+        -2880,
+        -896,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand10",
+      "door_id": "gl1gl0x2",
+      "node": "Doors/gl1gl0x2",
+      "world": [
+        -1560,
+        352
+      ],
+      "rect": [
+        -2880,
+        -896,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand10",
+      "door_id": "gl1gl0x3",
+      "node": "Doors/gl1gl0x3",
+      "world": [
+        -1560,
+        -608
+      ],
+      "rect": [
+        -2880,
+        -896,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand10",
+      "door_id": "gl10c1x1",
+      "node": "Doors/gl10c1x1",
+      "world": [
+        -2920,
+        704
+      ],
+      "rect": [
+        -2880,
+        -896,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand10",
+      "door_id": "gl10c1x2",
+      "node": "Doors/gl10c1x2",
+      "world": [
+        -2920,
+        -800
+      ],
+      "rect": [
+        -2880,
+        -896,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand11",
+      "door_id": "gl3gl11",
+      "node": "Doors/gl3gl11",
+      "world": [
+        5400,
+        176
+      ],
+      "rect": [
+        5440,
+        -656,
+        1920,
+        1280
+      ]
+    },
+    {
+      "room": "GrassLand11",
+      "door_id": "gl11gl12x1",
+      "node": "Doors/gl11gl12x1",
+      "world": [
+        7400,
+        -112
+      ],
+      "rect": [
+        5440,
+        -656,
+        1920,
+        1280
+      ]
+    },
+    {
+      "room": "GrassLand11",
+      "door_id": "gl11gl12x2",
+      "node": "Doors/gl11gl12x2",
+      "world": [
+        7400,
+        288
+      ],
+      "rect": [
+        5440,
+        -656,
+        1920,
+        1280
+      ]
+    },
+    {
+      "room": "GrassLand12",
+      "door_id": "gl11gl12x1",
+      "node": "Doors/gl11gl12x1",
+      "world": [
+        7640,
+        -112
+      ],
+      "rect": [
+        7680,
+        -1520,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand12",
+      "door_id": "gl11gl12x2",
+      "node": "Doors/gl11gl12x2",
+      "world": [
+        7640,
+        288
+      ],
+      "rect": [
+        7680,
+        -1520,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand12",
+      "door_id": "gl12gl13x1",
+      "node": "Doors/gl12gl13x1",
+      "world": [
+        10280,
+        -112
+      ],
+      "rect": [
+        7680,
+        -1520,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand12",
+      "door_id": "gl12gl13x2",
+      "node": "Doors/gl12gl13x2",
+      "world": [
+        10280,
+        -880
+      ],
+      "rect": [
+        7680,
+        -1520,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand13",
+      "door_id": "gl12gl13x1",
+      "node": "Doors/gl12gl13x1",
+      "world": [
+        10520,
+        -112
+      ],
+      "rect": [
+        10560,
+        -1488,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand13",
+      "door_id": "gl12gl13x2",
+      "node": "Doors/gl12gl13x2",
+      "world": [
+        10520,
+        -880
+      ],
+      "rect": [
+        10560,
+        -1488,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand13",
+      "door_id": "gl13gl14",
+      "node": "Doors/gl13gl14",
+      "world": [
+        11880,
+        -1136
+      ],
+      "rect": [
+        10560,
+        -1488,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand14",
+      "door_id": "gl13gl14",
+      "node": "Doors/gl13gl14",
+      "world": [
+        12120,
+        -1136
+      ],
+      "rect": [
+        12160,
+        -1616,
+        640,
+        640
+      ]
+    },
+    {
+      "room": "GrassLand14",
+      "door_id": "gl14sm1",
+      "node": "Doors/gl14sm1",
+      "world": [
+        12840,
+        -1456
+      ],
+      "rect": [
+        12160,
+        -1616,
+        640,
+        640
+      ]
+    },
+    {
+      "room": "GrassLand15",
+      "door_id": "gl15gl16",
+      "node": "Doors/gl15gl16",
+      "world": [
+        12288,
+        1304
+      ],
+      "rect": [
+        11936,
+        -656,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand16",
+      "door_id": "gl15gl16",
+      "node": "Doors/gl15gl16",
+      "world": [
+        12288,
+        1544
+      ],
+      "rect": [
+        11648,
+        1584,
+        1280,
+        1280
+      ]
+    },
+    {
+      "room": "GrassLand17",
+      "door_id": "gl12gl17",
+      "node": "Doors/gl12gl17",
+      "world": [
+        7960,
+        -2000
+      ],
+      "rect": [
+        8000,
+        -2800,
+        960,
+        960
+      ]
+    },
+    {
+      "room": "GrassLand2",
+      "door_id": "gl1gl2x1",
+      "node": "Doors/gl1gl2x1",
+      "world": [
+        1560,
+        608
+      ],
+      "rect": [
+        1600,
+        -384,
+        1920,
+        1280
+      ]
+    },
+    {
+      "room": "GrassLand2",
+      "door_id": "gl1gl2x2",
+      "node": "Doors/gl1gl2x2",
+      "world": [
+        1560,
+        96
+      ],
+      "rect": [
+        1600,
+        -384,
+        1920,
+        1280
+      ]
+    },
+    {
+      "room": "GrassLand2",
+      "door_id": "gl2gl3",
+      "node": "Doors/gl2gl3",
+      "world": [
+        3560,
+        240
+      ],
+      "rect": [
+        1600,
+        -384,
+        1920,
+        1280
+      ]
+    },
+    {
+      "room": "GrassLand3",
+      "door_id": "gl2gl3",
+      "node": "Doors/gl2gl3",
+      "world": [
+        3800,
+        240
+      ],
+      "rect": [
+        3840,
+        -496,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand3",
+      "door_id": "gl3gl4",
+      "node": "Doors/gl3gl4",
+      "world": [
+        4320,
+        1464
+      ],
+      "rect": [
+        3840,
+        -496,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand3",
+      "door_id": "gl3gl11",
+      "node": "Doors/gl3gl11",
+      "world": [
+        5160,
+        176
+      ],
+      "rect": [
+        3840,
+        -496,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand4",
+      "door_id": "gl3gl4",
+      "node": "Doors/gl3gl4",
+      "world": [
+        4320,
+        1688
+      ],
+      "rect": [
+        3520,
+        1728,
+        1920,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand4",
+      "door_id": "gl4gl5",
+      "node": "Doors/gl4gl5",
+      "world": [
+        5480,
+        3456
+      ],
+      "rect": [
+        3520,
+        1728,
+        1920,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand4",
+      "door_id": "gl4gl6",
+      "node": "Doors/gl4gl6",
+      "world": [
+        3480,
+        3520
+      ],
+      "rect": [
+        3520,
+        1728,
+        1920,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand5",
+      "door_id": "gl4gl5",
+      "node": "Doors/gl4gl5",
+      "world": [
+        5656,
+        3456
+      ],
+      "rect": [
+        5696,
+        2368,
+        1280,
+        1280
+      ]
+    },
+    {
+      "room": "GrassLand6",
+      "door_id": "gl4gl6",
+      "node": "Doors/gl4gl6",
+      "world": [
+        3176,
+        3520
+      ],
+      "rect": [
+        -704,
+        1952,
+        3840,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand6",
+      "door_id": "gl6gl7",
+      "node": "Doors/gl6gl7",
+      "world": [
+        -744,
+        3680
+      ],
+      "rect": [
+        -704,
+        1952,
+        3840,
+        1920
+      ]
+    },
+    {
+      "room": "GrassLand7",
+      "door_id": "gl6gl7",
+      "node": "Doors/gl6gl7",
+      "world": [
+        -984,
+        3680
+      ],
+      "rect": [
+        -2304,
+        2688,
+        1280,
+        2560
+      ]
+    },
+    {
+      "room": "GrassLand7",
+      "door_id": "gl7gl9",
+      "node": "Doors/gl7gl9",
+      "world": [
+        -2344,
+        5088
+      ],
+      "rect": [
+        -2304,
+        2688,
+        1280,
+        2560
+      ]
+    },
+    {
+      "room": "GrassLand8",
+      "door_id": "gl6gl8",
+      "node": "Doors/gl6gl8",
+      "world": [
+        2648,
+        5312
+      ],
+      "rect": [
+        2688,
+        4160,
+        640,
+        1280
+      ]
+    },
+    {
+      "room": "GrassLand9",
+      "door_id": "gl7gl9",
+      "node": "Doors/gl7gl9",
+      "world": [
+        -2584,
+        5088
+      ],
+      "rect": [
+        -3904,
+        4000,
+        1280,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain1",
+      "door_id": "gl14sm1",
+      "node": "Doors/gl14sm1",
+      "world": [
+        13080,
+        -1456
+      ],
+      "rect": [
+        13120,
+        -2960,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain1",
+      "door_id": "sm1sm2",
+      "node": "Doors/sm1sm2",
+      "world": [
+        15720,
+        -2160
+      ],
+      "rect": [
+        13120,
+        -2960,
+        2560,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain10",
+      "door_id": "sm9sm10",
+      "node": "Doors/sm9sm10",
+      "world": [
+        23264,
+        -10840
+      ],
+      "rect": [
+        22624,
+        -11520,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain10",
+      "door_id": "sm10sm11",
+      "node": "Doors/sm10sm11",
+      "world": [
+        22584,
+        -11296
+      ],
+      "rect": [
+        22624,
+        -11520,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain10",
+      "door_id": "sm10sm14",
+      "node": "Doors/sm10sm14",
+      "world": [
+        23624,
+        -11408
+      ],
+      "rect": [
+        22624,
+        -11520,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain11",
+      "door_id": "sm10sm11",
+      "node": "Doors/sm10sm11",
+      "world": [
+        22376,
+        -11296
+      ],
+      "rect": [
+        21376,
+        -12416,
+        960,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain11",
+      "door_id": "sm11sm12",
+      "node": "Doors/sm11sm12",
+      "world": [
+        21336,
+        -12192
+      ],
+      "rect": [
+        21376,
+        -12416,
+        960,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain12",
+      "door_id": "sm11sm12",
+      "node": "Doors/sm11sm12",
+      "world": [
+        21104,
+        -12192
+      ],
+      "rect": [
+        18496,
+        -12320,
+        2560,
+        960
+      ]
+    },
+    {
+      "room": "SnowMountain12",
+      "door_id": "sm12sm13",
+      "node": "Doors/sm12sm13",
+      "world": [
+        18456,
+        -11872
+      ],
+      "rect": [
+        18496,
+        -12320,
+        2560,
+        960
+      ]
+    },
+    {
+      "room": "SnowMountain13",
+      "door_id": "sm12sm13",
+      "node": "Doors/sm12sm13",
+      "world": [
+        17688,
+        -11872
+      ],
+      "rect": [
+        16368,
+        -12672,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain13",
+      "door_id": "sm7sm13",
+      "node": "Doors/sm7sm13",
+      "world": [
+        16592,
+        -10712
+      ],
+      "rect": [
+        16368,
+        -12672,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain14",
+      "door_id": "sm10sm14",
+      "node": "Doors/sm10sm14",
+      "world": [
+        23832,
+        -11408
+      ],
+      "rect": [
+        23872,
+        -13168,
+        640,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain14",
+      "door_id": "sm14sm15",
+      "node": "Doors/sm14sm15",
+      "world": [
+        24224,
+        -13208
+      ],
+      "rect": [
+        23872,
+        -13168,
+        640,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain15",
+      "door_id": "sm14sm15",
+      "node": "Doors/sm14sm15",
+      "world": [
+        24224,
+        -13464
+      ],
+      "rect": [
+        23744,
+        -14464,
+        1280,
+        960
+      ]
+    },
+    {
+      "room": "SnowMountain15",
+      "door_id": "sm15sm16",
+      "node": "Doors/sm15sm16",
+      "world": [
+        25064,
+        -13952
+      ],
+      "rect": [
+        23744,
+        -14464,
+        1280,
+        960
+      ]
+    },
+    {
+      "room": "SnowMountain16",
+      "door_id": "sm15sm16",
+      "node": "Doors/sm15sm16",
+      "world": [
+        25304,
+        -13952
+      ],
+      "rect": [
+        25344,
+        -14304,
+        1600,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain16",
+      "door_id": "sm16sm17",
+      "node": "Doors/sm16sm17",
+      "world": [
+        26688,
+        -13616
+      ],
+      "rect": [
+        25344,
+        -14304,
+        1600,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain17",
+      "door_id": "sm16sm17",
+      "node": "Doors/sm16sm17",
+      "world": [
+        26688,
+        -8560
+      ],
+      "rect": [
+        26368,
+        -8520,
+        640,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain17",
+      "door_id": "sm17sm18",
+      "node": "Doors/sm17sm18",
+      "world": [
+        26328,
+        -8232
+      ],
+      "rect": [
+        26368,
+        -8520,
+        640,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain17",
+      "door_id": "sm17sm19",
+      "node": "Doors/sm17sm19",
+      "world": [
+        26688,
+        -7840
+      ],
+      "rect": [
+        26368,
+        -8520,
+        640,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain18",
+      "door_id": "sm17sm18",
+      "node": "Doors/sm17sm18",
+      "world": [
+        26088,
+        -8232
+      ],
+      "rect": [
+        25408,
+        -9288,
+        640,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain19",
+      "door_id": "sm17sm19",
+      "node": "Doors/sm17sm19",
+      "world": [
+        26688,
+        -1440
+      ],
+      "rect": [
+        26208,
+        -1400,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain19",
+      "door_id": "sm19sm20",
+      "node": "Doors/sm19sm20",
+      "world": [
+        26168,
+        -856
+      ],
+      "rect": [
+        26208,
+        -1400,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain19",
+      "door_id": "sm19t1",
+      "node": "Doors/sm19t1",
+      "world": [
+        27208,
+        -856
+      ],
+      "rect": [
+        26208,
+        -1400,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain2",
+      "door_id": "sm1sm2",
+      "node": "Doors/sm1sm2",
+      "world": [
+        15960,
+        -2160
+      ],
+      "rect": [
+        16000,
+        -3056,
+        3840,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain2",
+      "door_id": "sm2sm3",
+      "node": "Doors/sm2sm3",
+      "world": [
+        19880,
+        -1936
+      ],
+      "rect": [
+        16000,
+        -3056,
+        3840,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain20",
+      "door_id": "sm19sm20",
+      "node": "Doors/sm19sm20",
+      "world": [
+        25992,
+        -856
+      ],
+      "rect": [
+        24672,
+        -1400,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain21",
+      "door_id": "sm15sm21",
+      "node": "Doors/sm15sm21",
+      "world": [
+        24792,
+        -12832
+      ],
+      "rect": [
+        24832,
+        -13312,
+        960,
+        640
+      ]
+    },
+    {
+      "room": "SnowMountain3",
+      "door_id": "sm2sm3",
+      "node": "Doors/sm2sm3",
+      "world": [
+        20120,
+        -1936
+      ],
+      "rect": [
+        20160,
+        -2160,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain3",
+      "door_id": "sm3sm4",
+      "node": "Doors/sm3sm4",
+      "world": [
+        21480,
+        -400
+      ],
+      "rect": [
+        20160,
+        -2160,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain4",
+      "door_id": "sm3sm4",
+      "node": "Doors/sm3sm4",
+      "world": [
+        21720,
+        -400
+      ],
+      "rect": [
+        21760,
+        -5360,
+        1280,
+        5120
+      ]
+    },
+    {
+      "room": "SnowMountain4",
+      "door_id": "sm4sm5",
+      "node": "Doors/sm4sm5",
+      "world": [
+        22560,
+        -5400
+      ],
+      "rect": [
+        21760,
+        -5360,
+        1280,
+        5120
+      ]
+    },
+    {
+      "room": "SnowMountain4",
+      "door_id": "sm4sm6",
+      "node": "Doors/sm4sm6",
+      "world": [
+        23080,
+        -3616
+      ],
+      "rect": [
+        21760,
+        -5360,
+        1280,
+        5120
+      ]
+    },
+    {
+      "room": "SnowMountain5",
+      "door_id": "sm5sm7x1",
+      "node": "Doors/sm5sm7x1",
+      "world": [
+        17928,
+        -7824
+      ],
+      "rect": [
+        17968,
+        -8272,
+        5120,
+        2560
+      ]
+    },
+    {
+      "room": "SnowMountain5",
+      "door_id": "sm5sm7x2",
+      "node": "Doors/sm5sm7x2",
+      "world": [
+        17928,
+        -8144
+      ],
+      "rect": [
+        17968,
+        -8272,
+        5120,
+        2560
+      ]
+    },
+    {
+      "room": "SnowMountain6",
+      "door_id": "sm4sm6",
+      "node": "Doors/sm4sm6",
+      "world": [
+        23320,
+        -3616
+      ],
+      "rect": [
+        23360,
+        -7744,
+        640,
+        4480
+      ]
+    },
+    {
+      "room": "SnowMountain6",
+      "door_id": "sm6sm9",
+      "node": "Doors/sm6sm9",
+      "world": [
+        23680,
+        -7784
+      ],
+      "rect": [
+        23360,
+        -7744,
+        640,
+        4480
+      ]
+    },
+    {
+      "room": "SnowMountain7",
+      "door_id": "sm5sm7x1",
+      "node": "Doors/sm5sm7x1",
+      "world": [
+        17688,
+        -7824
+      ],
+      "rect": [
+        16368,
+        -9328,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain7",
+      "door_id": "sm5sm7x2",
+      "node": "Doors/sm5sm7x2",
+      "world": [
+        17688,
+        -8144
+      ],
+      "rect": [
+        16368,
+        -9328,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain7",
+      "door_id": "sm7sm8",
+      "node": "Doors/sm7sm8",
+      "world": [
+        17688,
+        -9232
+      ],
+      "rect": [
+        16368,
+        -9328,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain7",
+      "door_id": "sm7sm13",
+      "node": "Doors/sm7sm13",
+      "world": [
+        16592,
+        -9368
+      ],
+      "rect": [
+        16368,
+        -9328,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "SnowMountain8",
+      "door_id": "sm7sm8",
+      "node": "Doors/sm7sm8",
+      "world": [
+        18392,
+        -9232
+      ],
+      "rect": [
+        18432,
+        -10160,
+        2560,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain8",
+      "door_id": "sm8sm9",
+      "node": "Doors/sm8sm9",
+      "world": [
+        21032,
+        -9680
+      ],
+      "rect": [
+        18432,
+        -10160,
+        2560,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain9",
+      "door_id": "sm6sm9",
+      "node": "Doors/sm6sm9",
+      "world": [
+        23680,
+        -9224
+      ],
+      "rect": [
+        21856,
+        -10544,
+        1920,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain9",
+      "door_id": "sm8sm9",
+      "node": "Doors/sm8sm9",
+      "world": [
+        21816,
+        -9680
+      ],
+      "rect": [
+        21856,
+        -10544,
+        1920,
+        1280
+      ]
+    },
+    {
+      "room": "SnowMountain9",
+      "door_id": "sm9sm10",
+      "node": "Doors/sm9sm10",
+      "world": [
+        23264,
+        -10584
+      ],
+      "rect": [
+        21856,
+        -10544,
+        1920,
+        1280
+      ]
+    },
+    {
+      "room": "Town1",
+      "door_id": "sm19t1",
+      "node": "Doors/sm19t1",
+      "world": [
+        27448,
+        -848
+      ],
+      "rect": [
+        27488,
+        -1616,
+        1280,
+        960
+      ]
+    },
+    {
+      "room": "Town1",
+      "door_id": "t1t2",
+      "node": "Doors/t1t2",
+      "world": [
+        28808,
+        -1168
+      ],
+      "rect": [
+        27488,
+        -1616,
+        1280,
+        960
+      ]
+    },
+    {
+      "room": "Town2",
+      "door_id": "t1t2",
+      "node": "Doors/t1t2",
+      "world": [
+        29064,
+        -1168
+      ],
+      "rect": [
+        29104,
+        -1584,
+        2560,
+        1280
+      ]
+    },
+    {
+      "room": "Town2",
+      "door_id": "t2t3",
+      "node": "Doors/t2t3",
+      "world": [
+        29520,
+        -1624
+      ],
+      "rect": [
+        29104,
+        -1584,
+        2560,
+        1280
+      ]
+    },
+    {
+      "room": "Town2",
+      "door_id": "t2t5",
+      "node": "Doors/t2t5",
+      "world": [
+        30992,
+        -264
+      ],
+      "rect": [
+        29104,
+        -1584,
+        2560,
+        1280
+      ]
+    },
+    {
+      "room": "Town3",
+      "door_id": "t2t3",
+      "node": "Doors/t2t3",
+      "world": [
+        29512,
+        -1864
+      ],
+      "rect": [
+        29288,
+        -2544,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "Town4",
+      "door_id": "t3t4",
+      "node": "Doors/t3t4",
+      "world": [
+        30344,
+        -2864
+      ],
+      "rect": [
+        30384,
+        -3376,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "Town5",
+      "door_id": "t2t5",
+      "node": "Doors/t2t5",
+      "world": [
+        30992,
+        1160
+      ],
+      "rect": [
+        30128,
+        1200,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "Town6",
+      "door_id": "t5t6",
+      "node": "Doors/t5t6",
+      "world": [
+        30808,
+        496
+      ],
+      "rect": [
+        30128,
+        336,
+        640,
+        640
+      ]
+    },
+    {
+      "room": "Town7",
+      "door_id": "t5t7",
+      "node": "Doors/t5t6",
+      "world": [
+        29848,
+        1360
+      ],
+      "rect": [
+        28848,
+        -80,
+        960,
+        1920
+      ]
+    },
+    {
+      "room": "WindValley1",
+      "door_id": "c3wv1",
+      "node": "Doors/c3wv1",
+      "world": [
+        -9400,
+        1168
+      ],
+      "rect": [
+        -10432,
+        736,
+        960,
+        2560
+      ]
+    },
+    {
+      "room": "WindValley1",
+      "door_id": "wv1wv10",
+      "node": "Doors/wv1wv10",
+      "world": [
+        -10504,
+        848
+      ],
+      "rect": [
+        -10432,
+        736,
+        960,
+        2560
+      ]
+    },
+    {
+      "room": "WindValley10",
+      "door_id": "wv9wv10",
+      "node": "Doors/wv9wv10",
+      "world": [
+        -12264,
+        752
+      ],
+      "rect": [
+        -12224,
+        464,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "WindValley10",
+      "door_id": "wv1wv10",
+      "node": "Doors/wv1wv10",
+      "world": [
+        -10904,
+        944
+      ],
+      "rect": [
+        -12224,
+        464,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "WindValley11",
+      "door_id": "c2wv11",
+      "node": "Doors/c2wv11",
+      "world": [
+        -8088,
+        -64
+      ],
+      "rect": [
+        -8768,
+        -1120,
+        640,
+        1280
+      ]
+    },
+    {
+      "room": "WindValley11",
+      "door_id": "c3wv11",
+      "node": "Doors/c3wv11",
+      "world": [
+        -8288,
+        200
+      ],
+      "rect": [
+        -8768,
+        -1120,
+        640,
+        1280
+      ]
+    },
+    {
+      "room": "WindValley11",
+      "door_id": "wv11wv12",
+      "node": "Doors/wv11wv12",
+      "world": [
+        -8808,
+        -896
+      ],
+      "rect": [
+        -8768,
+        -1120,
+        640,
+        1280
+      ]
+    },
+    {
+      "room": "WindValley12",
+      "door_id": "wv11wv12",
+      "node": "Doors/wv11wv12",
+      "world": [
+        -8984,
+        -896
+      ],
+      "rect": [
+        -12224,
+        -1184,
+        3200,
+        640
+      ]
+    },
+    {
+      "room": "WindValley12",
+      "door_id": "wv12wv13",
+      "node": "Doors/wv12wv13",
+      "world": [
+        -12264,
+        -960
+      ],
+      "rect": [
+        -12224,
+        -1184,
+        3200,
+        640
+      ]
+    },
+    {
+      "room": "WindValley13",
+      "door_id": "wv12wv13",
+      "node": "Doors/wv12wv13",
+      "world": [
+        -12440,
+        -960
+      ],
+      "rect": [
+        -13760,
+        -1248,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "WindValley13",
+      "door_id": "wv9wv13x1",
+      "node": "Doors/wv9wv13x1",
+      "world": [
+        -12672,
+        -568
+      ],
+      "rect": [
+        -13760,
+        -1248,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "WindValley13",
+      "door_id": "wv9wv13x2",
+      "node": "Doors/wv9wv13x2",
+      "world": [
+        -13568,
+        -568
+      ],
+      "rect": [
+        -13760,
+        -1248,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "WindValley2",
+      "door_id": "wv1wv2",
+      "node": "Doors/wv1wv2",
+      "world": [
+        -9872,
+        3600
+      ],
+      "rect": [
+        -10816,
+        3648,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "WindValley2",
+      "door_id": "wv2wv3",
+      "node": "Doors/wv2wv3",
+      "world": [
+        -10856,
+        3952
+      ],
+      "rect": [
+        -10816,
+        3648,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "WindValley3",
+      "door_id": "wv2wv3",
+      "node": "Doors/wv2wv3",
+      "world": [
+        -11544,
+        3952
+      ],
+      "rect": [
+        -14784,
+        3392,
+        3200,
+        2560
+      ]
+    },
+    {
+      "room": "WindValley3",
+      "door_id": "wv3wv4",
+      "node": "Doors/wv3wv4",
+      "world": [
+        -14824,
+        5344
+      ],
+      "rect": [
+        -14784,
+        3392,
+        3200,
+        2560
+      ]
+    },
+    {
+      "room": "WindValley3",
+      "door_id": "wv3wv6",
+      "node": "Doors/wv3wv6",
+      "world": [
+        -14824,
+        4000
+      ],
+      "rect": [
+        -14784,
+        3392,
+        3200,
+        2560
+      ]
+    },
+    {
+      "room": "WindValley4",
+      "door_id": "wv3wv4",
+      "node": "Doors/wv3wv4",
+      "world": [
+        -15640,
+        5344
+      ],
+      "rect": [
+        -16960,
+        4544,
+        1280,
+        1280
+      ]
+    },
+    {
+      "room": "WindValley4",
+      "door_id": "wv4wv5",
+      "node": "Doors/wv4wv5",
+      "world": [
+        -17000,
+        5664
+      ],
+      "rect": [
+        -16960,
+        4544,
+        1280,
+        1280
+      ]
+    },
+    {
+      "room": "WindValley5",
+      "door_id": "wv4wv5",
+      "node": "Doors/wv4wv5",
+      "world": [
+        -17176,
+        5664
+      ],
+      "rect": [
+        -17856,
+        3904,
+        640,
+        1920
+      ]
+    },
+    {
+      "room": "WindValley6",
+      "door_id": "wv3wv6",
+      "node": "Doors/wv3wv6",
+      "world": [
+        -15568,
+        4000
+      ],
+      "rect": [
+        -16888,
+        2304,
+        1280,
+        1920
+      ]
+    },
+    {
+      "room": "WindValley7",
+      "door_id": "wv7wv8",
+      "node": "Doors/wv7wv8",
+      "world": [
+        -15512,
+        752
+      ],
+      "rect": [
+        -17472,
+        496,
+        1920,
+        1600
+      ]
+    },
+    {
+      "room": "WindValley8",
+      "door_id": "wv7wv8",
+      "node": "Doors/wv7wv8",
+      "world": [
+        -15336,
+        752
+      ],
+      "rect": [
+        -15296,
+        464,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "WindValley8",
+      "door_id": "wv8wv9",
+      "node": "Doors/wv8wv9",
+      "world": [
+        -13976,
+        752
+      ],
+      "rect": [
+        -15296,
+        464,
+        1280,
+        640
+      ]
+    },
+    {
+      "room": "WindValley9",
+      "door_id": "wv8wv9",
+      "node": "Doors/wv8wv9",
+      "world": [
+        -13800,
+        752
+      ],
+      "rect": [
+        -13760,
+        -304,
+        1280,
+        1280
+      ]
+    },
+    {
+      "room": "WindValley9",
+      "door_id": "wv9wv10",
+      "node": "Doors/wv9wv10",
+      "world": [
+        -12440,
+        752
+      ],
+      "rect": [
+        -13760,
+        -304,
+        1280,
+        1280
+      ]
+    },
+    {
+      "room": "WindValley9",
+      "door_id": "wv9wv13x1",
+      "node": "Doors/wv9wv13x1",
+      "world": [
+        -12672,
+        -344
+      ],
+      "rect": [
+        -13760,
+        -304,
+        1280,
+        1280
+      ]
+    },
+    {
+      "room": "WindValley9",
+      "door_id": "wv9wv13x2",
+      "node": "Doors/wv9wv13x2",
+      "world": [
+        -13568,
+        -344
+      ],
+      "rect": [
+        -13760,
+        -304,
+        1280,
+        1280
+      ]
+    }
+  ],
+  "world_bounds": [
+    -17856,
+    -14464,
+    49520,
+    20416
+  ],
+  "rooms_missing_bounds": [],
+  "rooms_missing_layout_doors": [
+    "SuperMario2",
+    "WindValley9"
+  ],
+  "layout_doors_unknown_room": [],
+  "layout_doors_mismatch_scene": [
+    {
+      "room": "Cave2",
+      "door_id": "c2c3",
+      "issue": "position",
+      "layout": [
+        -1640.0,
+        800.0
+      ],
+      "scene": [
+        -1640.0,
+        416.0
+      ]
+    },
+    {
+      "room": "Cave3",
+      "door_id": "c2c3",
+      "issue": "position",
+      "layout": [
+        520.0,
+        -160.0
+      ],
+      "scene": [
+        520.0,
+        -32.0
+      ]
+    },
+    {
+      "room": "Cave3",
+      "door_id": "c3wv11",
+      "issue": "position",
+      "layout": [
+        192.0,
+        -360.0
+      ],
+      "scene": [
+        64.0,
+        -360.0
+      ]
+    },
+    {
+      "room": "WindValley1",
+      "door_id": "c3wv1",
+      "issue": "position",
+      "layout": [
+        520.0,
+        -928.0
+      ],
+      "scene": [
+        552.0,
+        -848.0
+      ]
+    },
+    {
+      "room": "WindValley1",
+      "door_id": "wv1wv2",
+      "issue": "position",
+      "layout": [
+        80.0,
+        1312.0
+      ],
+      "scene": [
+        48.0,
+        1312.0
+      ]
+    },
+    {
+      "room": "WindValley1",
+      "door_id": "wv1wv10",
+      "issue": "position",
+      "layout": [
+        -520.0,
+        -1056.0
+      ],
+      "scene": [
+        -552.0,
+        -1168.0
+      ]
+    }
+  ]
+}

@@ -103,11 +103,10 @@ func _start_dialogue_with_mood(mood_state: String):
 	var task_manager = get_node_or_null("/root/TaskManager")
 	
 	if not player:
-		print("DEBUG: 找不到玩家节点")
 		return
 	
 	if not dialogue_resource:
-		print("DEBUG: 对话资源为空！请检查场景配置")
+		push_error("Salesclerk: dialogue_resource 未配置，无法开始对话")
 		return
 	
 	# 修复：使用继承的 balloon_scene

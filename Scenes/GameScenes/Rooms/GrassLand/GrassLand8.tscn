@@ -1,13 +1,12 @@
-[gd_scene load_steps=17 format=4 uid="uid://dcw408ecdjugq"]
+[gd_scene load_steps=16 format=4 uid="uid://dcw408ecdjugq"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_4yjim"]
 [ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_1c38w"]
 [ext_resource type="AudioStream" uid="uid://y2b4bofrgj85" path="res://Assets/Audios/BGM/酒吧畅想2.ogg" id="2_b7wgd"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="3_5r1e4"]
-[ext_resource type="Texture2D" uid="uid://bxf7ecw2hrks" path="res://Assets/Textures/Backgrounds/GrassLand/草原背景1.png" id="5_61wan"]
+[ext_resource type="Texture2D" uid="uid://4chp76cb81lv" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_61wan"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="5_b7wgd"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="6_61wan"]
-[ext_resource type="Texture2D" uid="uid://d2t3hjhhxndv" path="res://Assets/Textures/Backgrounds/GrassLand/草原背景1x2.png" id="6_bf40o"]
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="7_bf40o"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="8_duqft"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="8_qr2ue"]
@@ -44,6 +43,7 @@ target_room_id = "GrassLand8"
 source_background = NodePath("Background1")
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
+modulate = Color(0.29238003, 0.2772, 0.36, 1)
 texture = ExtResource("5_61wan")
 
 [node name="BGController2" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
@@ -55,7 +55,6 @@ auto_scroll_enabled = true
 auto_scroll_speed = Vector2(12, 0)
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController2"]
-texture = ExtResource("6_bf40o")
 
 [node name="FGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("3_5r1e4")

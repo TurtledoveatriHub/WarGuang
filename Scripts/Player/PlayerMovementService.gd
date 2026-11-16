@@ -201,8 +201,6 @@ static func try_dash(player: Node, dash_just_pressed: bool) -> bool:
 		player.dash_duration_timer_node.start(total_dash_duration)
 		player.dash_cooldown_timer_node.start(player.dash_cooldown)
 		return true
-	elif dash_just_pressed and not player.dash_unlocked:
-		print("冲刺能力尚未解锁！")
 	return false
 
 # 处理地面后撤步触发：按住下方向并按下冲刺键，方向固定为当前朝向反方向。

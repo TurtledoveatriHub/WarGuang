@@ -5,6 +5,11 @@ class_name PlayerEdgeCorrectionService
 static func apply_edge_correction(player: Node, fixed_delta: float) -> void:
 	if not is_instance_valid(player):
 		return
+	## ★ 穿越单向平台的窗口内不做任何边缘校正：
+	##   奔跑状态下「跑出边缘台阶修正」会把玩家抬回平台顶面（还会把向下速度清零），
+	##   表现就是「奔跑中按下+跳跃，人抽搐一下、没穿过去、也没跳跃」。
+	if float(player.get("_one_way_drop_timer")) > 0.0:
+		return
 	if _apply_run_off_ledge_step_up(player, fixed_delta):
 		return
 	if _apply_wall_jump_edge_correction(player, fixed_delta):

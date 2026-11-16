@@ -112,8 +112,8 @@ func _draw_origin_marker(state_color: Color) -> void:
 	draw_line(Vector2(0.0, -ORIGIN_CROSS_RADIUS), Vector2(0.0, ORIGIN_CROSS_RADIUS), cross_color, 4.0)
 	draw_circle(Vector2.ZERO, 10.0, state_color)
 
-## 绘制房间名称、尺寸与原点坐标标注
-func _draw_labels(state_color: Color) -> void:
+## 绘制房间名称、尺寸与原点坐标标注（颜色由上方已算好的矩形/原点使用）
+func _draw_labels(_state_color: Color) -> void:
 	var font: Font = ThemeDB.fallback_font
 	var title_size: int = int(clampf(bounds_local.size.y * 0.035, 28.0, 96.0))
 	var info_size: int = int(clampf(bounds_local.size.y * 0.026, 22.0, 72.0))

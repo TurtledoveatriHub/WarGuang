@@ -82,9 +82,9 @@ const OverlaySpec := preload("res://Scripts/UI/DarkOverlay.gd")
 ## 打开地图时的基础缩放倍率（在「刚好铺满窗口」的下限之上再乘）：2.0 = 默认放大两倍
 @export_range(0.1, 8.0, 0.05) var open_zoom: float = 2.0
 ## 滚轮能缩到的最小倍率
-@export_range(0.05, 8.0, 0.05) var min_zoom: float = 0.25
+@export_range(0.05, 8.0, 0.05) var min_zoom: float = 0.5
 ## 滚轮能放到的最大倍率
-@export_range(0.5, 16.0, 0.25) var max_zoom: float = 8.0
+@export_range(0.5, 16.0, 0.25) var max_zoom: float = 4.0
 ## 每一格滚轮的缩放倍率
 @export_range(1.01, 2.0, 0.01) var zoom_step: float = 1.25
 
@@ -101,13 +101,25 @@ const OverlaySpec := preload("res://Scripts/UI/DarkOverlay.gd")
 ## 揭示方式：RADIUS = 渐进揭露（走到哪亮到哪，默认）；ROOM = 进入过的房间整块点亮
 @export var fog_reveal_mode: FogRevealMode = FogRevealMode.RADIUS
 ## RADIUS 模式下的揭示半径（世界像素）
-@export var reveal_radius_world: float = 540.0
+@export var reveal_radius_world: float = 320.0
 ## RADIUS 模式下玩家移动多少世界像素后重新揭示一次
-@export var reveal_step_world: float = 20.0
+@export var reveal_step_world: float = 64.0
+
+@export_category("房间名称")
+## 地图放大倍率大于该值才显示房间名称（低于该值整层隐藏）。
+## ★ 就是打开地图后的实际缩放倍率（MapContainer 缩放；实测 MapSprite 自身缩放恒为 1）。
+##   实测：打开默认 2，可放大到 6（max_zoom），所以 4 → 大约再滚 4 格。
+@export_range(0.5, 16.0, 0.25) var room_name_min_zoom: float = 2.0
+## 房间名称字号（屏幕像素，固定不随地图缩放变大）
+@export_range(1, 128, 1) var room_name_font_size: int = 40
+## 名称相对房间方块底边的下移量（地图纹理像素）
+@export_range(0.0, 64.0, 1.0) var room_name_bottom_gap_px: float = 4.0
+## 名称使用的字体主题（默认 NormalTheme9x9）
+@export var room_name_theme: Theme = null
 
 # ════════════════════════════════════════════════════════════
 # 运行时状态
-# ════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════ 
 
 ## 地图是否处于打开状态
 var is_open: bool = false
@@ -137,6 +149,10 @@ var _canvas_modulate: CanvasModulate = null
 var _open_fallback_timer: SceneTreeTimer = null
 ## 退场动画兜底计时器（补间异常时也要完成关闭）
 var _close_fallback_timer: SceneTreeTimer = null
+## 房间名称层（挂在 MapContainer 下，跟随地图缩放）
+var _room_name_layer: Node2D = null
+## 房间 id → 名称 Label
+var _room_name_labels: Dictionary = {}
 
 
 # ════════════════════════════════════════════════════════════
@@ -156,12 +172,74 @@ func _ready() -> void:
 	_setup_materials()
 	_push_reveal_config()
 	_update_process_state()
+	# 临时调试：接上「一键显示完整地图」按钮
+	# ★ 地图内的「显示完整地图」按钮已移除（改到 PlayerUI 上）：
+	#   开图时再改贴图会现场跳变、很突兀；在 HUD 上先准备好，开图即完整。
+	#   下面这段 _debug_* 代码随之失效（节点已不存在），确认稳定后可整段删除。
 	# 任务标记增删时重建标记层（不是每帧）
 	if MapManager != null:
 		MapManager.markers_changed.connect(_refresh_quest_markers)
 	# 布局数据在 Autoload 初始化阶段可能尚未就绪，延后一帧再准备地图
 	call_deferred("_refresh_map")
 
+# ════════════════════════════════════════════════════════════════════════
+# 临时调试：一键显示完整地图
+# ★ 后续不需要时：删掉这一段 + 删掉 MapUI.tscn 里的 DebugFullMapButton 节点即可
+# ════════════════════════════════════════════════════════════════════════
+
+## 调试：是否处于「整张地图」显示模式
+var _debug_whole_map_active: bool = false
+
+## 调试按钮节点（没有该节点时整段逻辑不生效）
+@onready var _debug_full_map_button: Button = get_node_or_null("ContentRoot/DebugFullMapButton")
+
+## 连接调试按钮
+func _debug_setup_full_map_button() -> void:
+	if _debug_full_map_button == null:
+		return
+	if not _debug_full_map_button.pressed.is_connected(_on_debug_full_map_button_pressed):
+		_debug_full_map_button.pressed.connect(_on_debug_full_map_button_pressed)
+
+## 调试按钮按下：真正把「完整地图」做出来并整张缩放显示。
+## ★ 只关掉迷雾遮罩看不到变化：地图贴图是按房间逐个烘焙的，
+##   没到访过的房间根本没画进贴图里 —— 所以必须先把所有房间烘焙进去。
+## ★ 而且地图窗口平时只显示玩家附近一小块（视图对准玩家），即使贴图完整，
+##   在当前窗口范围里也看不出区别 —— 所以还要把整张地图缩放进窗口。
+func _on_debug_full_map_button_pressed() -> void:
+	if MapManager == null:
+		return
+	if ScenePaths != null:
+		for room_key in ScenePaths.ROOM_PATHS.keys():
+			var room_id: String = str(room_key)
+			MapManager.bake_room_from_scene(room_id)
+			MapManager.reveal_room(room_id)
+	if MapManager.has_method("flush_reveal"):
+		MapManager.flush_reveal()
+	_refresh_map()
+	if _map_material != null:
+		_map_material.set_shader_parameter("use_reveal_mask", false)
+	_show_whole_map()
+
+## 把整张地图缩放居中显示在窗口里（纯调试；下次开图时 open() 会把缩放重置回 open_zoom）
+func _show_whole_map() -> void:
+	if map_container == null or map_window == null or map_sprite == null or map_sprite.texture == null:
+		return
+	var content: Vector2 = _content_size()
+	var win: Vector2 = map_window.size
+	if content.x <= 0.0 or content.y <= 0.0 or win.x <= 0.0 or win.y <= 0.0:
+		return
+	# 按「容纳」而不是「铺满」计算缩放：这样整张地图都能看到（允许留白）
+	var zoom: float = minf(win.x / content.x, win.y / content.y)
+	_view_zoom = zoom
+	map_container.scale = Vector2(zoom, zoom)
+	_update_room_name_labels()
+	var tex_size: Vector2 = Vector2(map_sprite.texture.get_size())
+	var center_content: Vector2 = map_to_content(tex_size * 0.5)
+	map_container.position = _window_center() - center_content * zoom
+	_debug_whole_map_active = true
+	_update_player_icon()
+
+# ════════════════════ 临时调试段结束 ════════════════════
 
 ## 创建并挂上材质：地图精灵与地标层吃战争迷雾，玩家图标不吃迷雾
 func _setup_materials() -> void:
@@ -262,7 +340,8 @@ func _refresh_map() -> void:
 	_refresh_quest_markers()
 	_map_ready = true
 	_update_process_state()
-	# 贴图就绪后才能算「纹理像素 → 内容像素」，所以对准视野放在这里
+	# 贴图就绪后才能算「纹理像素 → 内容像素」，所以房间名称与对准视野都放在这里
+	_rebuild_room_name_labels()
 	_sync_view()
 
 
@@ -369,6 +448,7 @@ func _sync_view() -> void:
 	# 对准玩家后立即限制范围，避免玩家靠边时地图边缘跑进窗口
 	_clamp_pan()
 	_update_player_icon()
+	_update_room_name_labels()
 
 
 ## 玩家图标就钉在玩家所在的地图位置上（不是固定 UI）。
@@ -394,6 +474,7 @@ func _apply_zoom(factor: float) -> void:
 	map_container.position = _window_center() - anchor * _view_zoom
 	_clamp_pan()
 	_update_player_icon()
+	_update_room_name_labels()
 
 
 ## 重建任务标记层（只在标记增删时调一次，后面只需位置换算）
@@ -418,6 +499,81 @@ func _refresh_quest_markers() -> void:
 		marker.texture = icon
 		marker.position = map_to_content(layout.world_to_map(entry.get("world_pos", Vector2.ZERO)))
 		quest_layer.add_child(marker)
+
+
+# ════════════════════════════════════════════════════════════
+# 房间名称（放大到 room_name_min_zoom 以上才显示）
+# ════════════════════════════════════════════════════════════
+
+## 重建房间名称层。规则：
+##  - 只画 RoomLayoutData.room_display_names 里配了名字的房间（没配的不画）；
+##  - 位置 = 房间方块「底边中点」再往下 room_name_bottom_gap_px（地图纹理像素）；
+##  - 字号固定 room_name_font_size（屏幕像素），靠 1/缩放 抵消地图缩放，所以放大不会变大。
+func _rebuild_room_name_labels() -> void:
+	if map_container == null:
+		return
+	if _room_name_layer == null:
+		_room_name_layer = Node2D.new()
+		_room_name_layer.name = "RoomNameLayer"
+		map_container.add_child(_room_name_layer)
+	for child in _room_name_layer.get_children():
+		child.queue_free()
+	_room_name_labels.clear()
+	var layout: RoomLayoutData = _layout()
+	if layout == null or map_sprite == null or map_sprite.texture == null:
+		return
+	var theme_to_use: Theme = room_name_theme
+	if theme_to_use == null:
+		theme_to_use = load("res://Assets/Themes/NormalTheme9x9.tres") as Theme
+	for room_id in layout.room_display_names.keys():
+		var display_name: String = str(layout.room_display_names.get(room_id, "")).strip_edges()
+		if display_name == "":
+			continue
+		# 房间方块矩形取自 MapManager 扫描出的地面横条（世界坐标），
+		# 不用 RoomLayoutData.room_bounds_rects（该字段实际是空的）。
+		var world_rect: Rect2 = Rect2()
+		if MapManager != null and MapManager.has_method("get_room_block_rect"):
+			world_rect = MapManager.get_room_block_rect(str(room_id))
+		if not world_rect.has_area():
+			world_rect = layout.room_bounds_rects.get(room_id, Rect2())
+		if not world_rect.has_area():
+			continue
+		var top_left: Vector2 = map_to_content(layout.world_to_map(world_rect.position))
+		var bottom_right: Vector2 = map_to_content(layout.world_to_map(world_rect.position + world_rect.size))
+		var label := Label.new()
+		label.name = "RoomName_" + str(room_id)
+		label.text = display_name
+		if theme_to_use != null:
+			label.theme = theme_to_use
+		label.add_theme_font_size_override("font_size", room_name_font_size)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		label.size = Vector2(maxf(bottom_right.x - top_left.x, 16.0), float(room_name_font_size) + 8.0)
+		## ★ pivot_offset 只影响 scale/rotation，不影响 position：
+		##   position 是标签左上角，所以水平居中只能靠「左上角=方块左边 + size=方块宽度 + 文本居中」，
+		##   把 position 放在方块中心会让文字跑到方块右下方（实测就是这个现象）。
+		label.pivot_offset = Vector2(label.size.x * 0.5, 0.0)
+		var gap: float = room_name_bottom_gap_px * absf(map_sprite.scale.y)
+		label.position = Vector2(top_left.x, bottom_right.y + gap)
+		_room_name_layer.add_child(label)
+		_room_name_labels[room_id] = label
+	_update_room_name_labels()
+
+
+## 按当前倍率刷新房间名称层的可见性与缩放（低于阈值整层隐藏）
+func _update_room_name_labels() -> void:
+	if _room_name_layer == null:
+		return
+	var show_names: bool = _view_zoom >= room_name_min_zoom
+	_room_name_layer.visible = show_names
+	if not show_names:
+		return
+	## ★ 名称跟随地图一起放大缩小：不再用 1/缩放 抵消。
+	##   `room_name_font_size` 的含义因此变成「地图放大倍率为 1 时」的字号。
+	for key in _room_name_labels.keys():
+		var label := _room_name_labels[key] as Label
+		if is_instance_valid(label):
+			label.scale = Vector2.ONE
 
 
 # ════════════════════════════════════════════════════════════

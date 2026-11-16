@@ -92,8 +92,7 @@ else
 # 地图能力原来在 MasterNPC 那里解锁，现在改由本店售卖：
 # purchase("map") 内部会扣钱并 Global.unlock_ability("map")。
 ~ buy_map
-草原商铺店长: 这是整个大草原的地图，看完就不怕迷路了。
-草原商铺店长: {{npc.map_price}} 钱币，要吗？
+草原商铺店长: 这是整个大草原的地图，看完就不怕迷路了，价值{{npc.map_price}} 钱币，要吗？
 - 买
     if npc.purchase("map")
         草原商铺店长: 拿好，别弄丢了。

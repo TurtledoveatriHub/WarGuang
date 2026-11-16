@@ -109,10 +109,6 @@ static func finish_flight(player: Node) -> void:
 	player.is_invincible = true
 	player.invincible_timer = player.hurt_invincible_time
 	player.animated_sprite.modulate.a = 0.5
-	print("传送伤害飞行完成：位置=", player.global_position,
-		" 来源=", player.warp_flight_target_source,
-		" 房间=", RoomManager.current_room if RoomManager else "",
-		" 无敌时间=", player.hurt_invincible_time)
 
 static func _move_to_point(player: Node, target: Vector2, speed: float, fixed_delta: float, epsilon: float) -> bool:
 	var to_target: Vector2 = target - player.global_position

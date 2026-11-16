@@ -1,0 +1,6 @@
+# 无尽模式积分榜告示牌：历史前三积分 + 达成日期（全部取自存档里的无尽积分记录，Global）。
+# 三条记录由 Global.get_endless_board_text() 在一次文本里返回，每条记录自带换行。
+~ start
+疯子的挑战榜: 无尽积分记录：{{Global.get_endless_board_text()}}
+疯子的挑战榜: 没有终点，只有分数。
+=> END
