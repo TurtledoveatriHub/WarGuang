@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bibenb4wvm4x4"
+
+[deps]
+
+files=["res://Assets/Configs/Translations/ui_text.en.translation", "res://Assets/Configs/Translations/ui_text.ja.translation"]
+
+source_file="res://Assets/Configs/Translations/ui_text.csv"
+dest_files=["res://Assets/Configs/Translations/ui_text.en.translation", "res://Assets/Configs/Translations/ui_text.ja.translation"]
+
+[params]
+
+compress=true
+delimiter=0

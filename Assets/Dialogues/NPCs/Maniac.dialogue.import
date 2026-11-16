@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://d33f4uc2uleoh"
+path="res://.godot/imported/Maniac.dialogue-be4324e634dad69e3bf7f974e350ed8f.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/NPCs/Maniac.dialogue"
+dest_files=["res://.godot/imported/Maniac.dialogue-be4324e634dad69e3bf7f974e350ed8f.tres"]
+
+[params]
+
+defaults=true

@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://bep85a3trmx3d"
+path="res://.godot/imported/gl17ChallengeBoard.dialogue-89a357321f0dfdf4ebf417f32a11ff3e.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/Signs/gl17ChallengeBoard.dialogue"
+dest_files=["res://.godot/imported/gl17ChallengeBoard.dialogue-89a357321f0dfdf4ebf417f32a11ff3e.tres"]
+
+[params]
+
+defaults=true

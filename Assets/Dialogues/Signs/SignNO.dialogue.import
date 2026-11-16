@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://dmqnuhaq5ncuj"
+path="res://.godot/imported/SignNO.dialogue-b5189c3dc51a79f247229d04174bac6a.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/Signs/SignNO.dialogue"
+dest_files=["res://.godot/imported/SignNO.dialogue-b5189c3dc51a79f247229d04174bac6a.tres"]
+
+[params]
+
+defaults=true

@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://bwufndu6k2ve7"
+path="res://.godot/imported/RaceStarter.dialogue-7bd4ed4d4f2952fae7e4811c6dddc676.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/NPCs/RaceStarter.dialogue"
+dest_files=["res://.godot/imported/RaceStarter.dialogue-7bd4ed4d4f2952fae7e4811c6dddc676.tres"]
+
+[params]
+
+defaults=true

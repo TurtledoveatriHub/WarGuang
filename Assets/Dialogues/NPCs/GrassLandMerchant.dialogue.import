@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://rspetkti0nyf"
+path="res://.godot/imported/GrassLandMerchant.dialogue-15ec6aceed893561554030ce247d7e8d.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/NPCs/GrassLandMerchant.dialogue"
+dest_files=["res://.godot/imported/GrassLandMerchant.dialogue-15ec6aceed893561554030ce247d7e8d.tres"]
+
+[params]
+
+defaults=true

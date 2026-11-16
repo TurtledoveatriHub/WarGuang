@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://b7rnnsnjm3upj"
+path="res://.godot/imported/gl17EndlessBoard.dialogue-c14c6dc82069e673393a351132c3fd05.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/Signs/gl17EndlessBoard.dialogue"
+dest_files=["res://.godot/imported/gl17EndlessBoard.dialogue-c14c6dc82069e673393a351132c3fd05.tres"]
+
+[params]
+
+defaults=true

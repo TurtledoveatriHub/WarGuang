@@ -1,4 +1,70 @@
-# Godot 4+ specific ignores
+# ---------- Godot 4 缓存 ----------
 .godot/
-*.import
-*.translation
+.godot/**/*
+
+# ---------- 导出产物 ----------
+build/
+builds/
+dist/
+export/
+*.exe
+*.pck
+*.wasm
+*.zip
+*.apk
+*.aab
+*.html
+*.x86_64
+*.x86_32
+*.arm64
+*.arm32
+
+# Android 导入模板里的构建缓存（可达 1 GB，可随时重新生成）
+android/build/
+/tools/__pycache__/
+
+# ---------- 编辑器 / IDE / AI 工具本地配置 ----------
+.vscode/
+.idea/
+*.iml
+.cursor/
+.continue/
+.lingma/
+*.code-workspace
+*.sln
+
+# 本地 MCP 工具配置（含本机绝对路径，不要提交）
+.mcp.json
+
+# ---------- 系统与临时文件 ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+*.backup
+*~
+*.swp
+*.swo
+*.orig
+*.rej
+
+# ---------- 本地后端 / 环境配置 ----------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+.env
+.env.*
+
+# ---------- 本机专用的备份与导出目录 ----------
+recovery/
+BuidGodotGames/
+
+# ---------- 必须保留的例外（放在最后，覆盖上面的规则）----------
+!.import
+!.env.example
+
+# ---------- 不要把缓存目录里的 import 元数据“捞”回来 ----------
+.godot/**/*.import

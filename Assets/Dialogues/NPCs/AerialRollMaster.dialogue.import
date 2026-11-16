@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://clfjshntwe1q7"
+path="res://.godot/imported/AerialRollMaster.dialogue-fbb329bdf63a84b78aa42249fedadbf1.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/NPCs/AerialRollMaster.dialogue"
+dest_files=["res://.godot/imported/AerialRollMaster.dialogue-fbb329bdf63a84b78aa42249fedadbf1.tres"]
+
+[params]
+
+defaults=true

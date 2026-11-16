@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://cxs6krmp1jrsd"
+path="res://.godot/imported/gl4Sign.dialogue-42104b7aca27d5e7544f825dac2d399c.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/Signs/gl4Sign.dialogue"
+dest_files=["res://.godot/imported/gl4Sign.dialogue-42104b7aca27d5e7544f825dac2d399c.tres"]
+
+[params]
+
+defaults=true

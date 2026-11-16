@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://bxby711fsttgl"
+path="res://.godot/imported/gl18RaceBoard.dialogue-90755f9f89f9780d4fb3715e7a6bdcab.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/Signs/gl18RaceBoard.dialogue"
+dest_files=["res://.godot/imported/gl18RaceBoard.dialogue-90755f9f89f9780d4fb3715e7a6bdcab.tres"]
+
+[params]
+
+defaults=true

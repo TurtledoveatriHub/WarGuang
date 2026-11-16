@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://bl5yn4601ngq6"
+path="res://.godot/imported/gl6Sign.dialogue-ba23f47637f9780354ba8dd426a0b801.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/Signs/gl6Sign.dialogue"
+dest_files=["res://.godot/imported/gl6Sign.dialogue-ba23f47637f9780354ba8dd426a0b801.tres"]
+
+[params]
+
+defaults=true

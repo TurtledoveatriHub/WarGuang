@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://brj2bx6grxf4b"
+path="res://.godot/imported/Master.dialogue-6a81e21d35670f9ba5396561d4d5969f.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/NPCs/Master.dialogue"
+dest_files=["res://.godot/imported/Master.dialogue-6a81e21d35670f9ba5396561d4d5969f.tres"]
+
+[params]
+
+defaults=true

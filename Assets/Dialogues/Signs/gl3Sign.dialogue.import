@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://dkv5btt45qmcb"
+path="res://.godot/imported/gl3Sign.dialogue-9db4f9817d4e3dc0e50b6e6d901016ce.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/Signs/gl3Sign.dialogue"
+dest_files=["res://.godot/imported/gl3Sign.dialogue-9db4f9817d4e3dc0e50b6e6d901016ce.tres"]
+
+[params]
+
+defaults=true

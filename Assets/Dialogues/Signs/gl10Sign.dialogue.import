@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://mcat1ci2wjnk"
+path="res://.godot/imported/gl10Sign.dialogue-04e9f685225acf6665d959e1117a6175.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/Signs/gl10Sign.dialogue"
+dest_files=["res://.godot/imported/gl10Sign.dialogue-04e9f685225acf6665d959e1117a6175.tres"]
+
+[params]
+
+defaults=true

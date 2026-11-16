@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://dawf1u3446hht"
+path="res://.godot/imported/Salesclerk.dialogue-34cb1f271f30427ed891a0c0388f99fe.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/NPCs/Salesclerk.dialogue"
+dest_files=["res://.godot/imported/Salesclerk.dialogue-34cb1f271f30427ed891a0c0388f99fe.tres"]
+
+[params]
+
+defaults=true
