@@ -179,12 +179,17 @@ static func quit_game(fade_duration: float = 1.0) -> void:
 	if is_busy():
 		return
 	_set_busy(true)
+	# 先停音频再利用淡出时间：停止 Ogg 流式播放是异步的，
+	# 只有提前停、并留出足够时长，混音线程才会真正把 AudioStreamPlaybackOggVorbis 释放掉；
+	# 否则退出时引擎会报 "ObjectDB instances leaked at exit / 2 resources still in use"。
+	_release_audio_before_quit()
 	FadeManager.fade_out(fade_duration)
 	var page: Node = get_current_page()
 	if page != null and page.has_method("ui_exit"):
 		page.call("ui_exit")
 	await _tree().create_timer(fade_duration).timeout
-	_release_audio_before_quit()
+	await _tree().process_frame
+	await _tree().process_frame
 	_tree().quit()
 
 

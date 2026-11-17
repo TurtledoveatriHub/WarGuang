@@ -1,8 +1,7 @@
-[gd_scene load_steps=27 format=3 uid="uid://cnx8rqa13bm26"]
+[gd_scene load_steps=26 format=3 uid="uid://cnx8rqa13bm26"]
 
 [ext_resource type="Script" uid="uid://2jv58grmryqa" path="res://Scripts/UI/Scenes/TitleScene.gd" id="1_25ulu"]
 [ext_resource type="PackedScene" uid="uid://8vv4frjt0qmt" path="res://Scenes/UI/Scenes/SettingsScene.tscn" id="2_fkiff"]
-[ext_resource type="AudioStream" uid="uid://ck628pjg67c7p" path="res://Assets/Audios/BGM/探险.ogg" id="6_1qwxo"]
 [ext_resource type="Texture2D" uid="uid://1xy7xygxqlmf" path="res://Assets/Textures/UIs/SceneUIs/tres/title沃光标题01.tres" id="6_iwgkb"]
 [ext_resource type="Texture2D" uid="uid://dosd0gvafei6y" path="res://Assets/Textures/UIs/SceneUIs/tres/title沃光标题02.tres" id="7_syapl"]
 [ext_resource type="Texture2D" uid="uid://bfqyg51go8b8h" path="res://Assets/Textures/UIs/SceneUIs/标题.png" id="8_mmaj1"]
@@ -71,7 +70,7 @@ settings_scene_resource = ExtResource("2_fkiff")
 about_author_scene = ExtResource("21_about")
 update_notes_scene = ExtResource("22_notes")
 achievement_scene = ExtResource("23_ach")
-title_bgm_stream = ExtResource("6_1qwxo")
+title_bgm_name = "BGM0"
 
 [node name="UIFxDirector" type="Node" parent="."]
 script = ExtResource("20_mmaj1")

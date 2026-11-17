@@ -48,6 +48,8 @@ var _pending_event_bgm: AudioStream = null
 
 ## 单 BGM 播放器
 var _bgm_player: AudioStreamPlayer = null
+## 退出清理是否已执行（quit_game 与 _notification 都会触发，避免重复清理）
+var _exit_cleanup_done: bool = false
 ## 当前正在播放的 BGM 流（用于同流跳过检测）
 var _current_bgm_stream: AudioStream = null
 ## BGM 淡入淡出 Tween
@@ -467,6 +469,10 @@ func stop_all_for_exit() -> void:
 
 ## 停止 BGM 与音效池中的全部播放器并释放播放对象
 func _stop_all_players_for_exit() -> void:
+	if not _exit_cleanup_done:
+		_exit_cleanup_done = true
+	else:
+		return
 	if is_instance_valid(_bgm_player):
 		_bgm_player.stop()
 		_bgm_player.stream = null

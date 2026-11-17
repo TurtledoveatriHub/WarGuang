@@ -6,8 +6,11 @@ extends UIScene  # UI 页面统一基类（生命周期 / 输入锁 / 动效总�
 @export var about_author_scene: PackedScene
 @export var update_notes_scene: PackedScene
 @export var achievement_scene: PackedScene
-## 标题画面 BGM（在 Inspector 中拖拽 .ogg 或 .mp3 文件）
-@export var title_bgm_stream: AudioStream
+## 标题画面 BGM 名称（对应 AudioManager.bgm_paths 的键，默认 "BGM0" = 探险.ogg）。
+## 注意：不要在场景里直接把音频资源拖成 @export AudioStream——
+## 那样 .ogg 会被烘进 .tscn 的资源表，场景存活期间一直被强引用，
+## 退出时引擎会报 "ObjectDB instances leaked at exit / resources still in use"。
+@export var title_bgm_name: String = "BGM0"
 
 
 @onready var start_button = $StartButton
@@ -100,9 +103,9 @@ func _ready():
 	else:
 		auto_enter_unless_black()
 	
-	## 播放 UI BGM（在 Inspector 中拖拽 title_bgm_stream）
-	if title_bgm_stream:
-		AudioManager.play_bgm_stream(title_bgm_stream)
+	## 播放 UI BGM：按名称交给 AudioManager 运行时加载，避免音频资源被烘进场景。
+	if title_bgm_name != "":
+		AudioManager.play_bgm(title_bgm_name)
 	
 	## 修改：调用 LightingManager 的统一函数
 	LightingManager.setup_ui_breathing_effect(self)
