@@ -184,4 +184,26 @@ static func quit_game(fade_duration: float = 1.0) -> void:
 	if page != null and page.has_method("ui_exit"):
 		page.call("ui_exit")
 	await _tree().create_timer(fade_duration).timeout
+	_release_audio_before_quit()
 	_tree().quit()
+
+
+## 退出前释放音频引用。
+## 标题场景把 BGM 以 @export 强引用挂在场景实例上，直接 quit 会让 AudioStreamOggVorbis
+## 在引擎资源清理阶段仍被引用，表现为关闭游戏时打印
+## "ObjectDB instances leaked at exit" 与 "2 resources still in use"（探险.ogg）。
+static func _release_audio_before_quit() -> void:
+	var root := _tree().root
+	if root == null:
+		return
+	var audio_manager: Node = root.get_node_or_null("AudioManager")
+	if audio_manager == null:
+		return
+	if audio_manager.has_method("stop_all_for_exit"):
+		audio_manager.call("stop_all_for_exit")
+	# 释放当前 UI 页面持有的音频导出引用（例如 TitleScene.title_bgm_stream）。
+	var page: Node = get_current_page()
+	if page != null:
+		for prop in page.get_property_list():
+			if str(prop.get("name", "")).contains("bgm") and prop.get("type", 0) == TYPE_OBJECT:
+				page.set(str(prop["name"]), null)

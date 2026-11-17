@@ -44,7 +44,6 @@ TeleportManager="*res://Scripts/Managers/TeleportManager.gd"
 DarkOverlay="*res://Scenes/Managers/DarkOverlay.tscn"
 ScenePaths="*res://Scripts/Managers/ScenePaths.gd"
 AchievementManager="*res://Scripts/Managers/AchievementManager.gd"
-GodotIQRuntime="*res://addons/godotiq/godotiq_runtime.gd"
 BootCutscene="*res://Scenes/UI/BootCutscene.tscn"
 AchievementToast="*res://Scenes/Managers/AchievementToast.tscn"
 
@@ -57,7 +56,7 @@ window/stretch/scale_mode="integer"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/dialogue_manager/plugin.cfg", "res://addons/godotiq/plugin.cfg", "res://addons/phantom_camera/plugin.cfg", "res://addons/tile_copy/plugin.cfg")
+enabled=PackedStringArray("res://addons/dialogue_manager/plugin.cfg", "res://addons/phantom_camera/plugin.cfg", "res://addons/tile_copy/plugin.cfg")
 
 [importer_defaults]
 

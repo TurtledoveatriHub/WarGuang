@@ -452,9 +452,17 @@ func set_voice_volume(value: float):
 	set_bus_volume_percent("Voice", value * 100.0)
 ## 程序退出前停止所有播放器，避免 Ogg 播放对象在 ObjectDB 清理阶段泄漏
 ## （否则每次关闭游戏都会打印 "ObjectDB instances leaked at exit" 与 "resources still in use"）。
+## NOTIFICATION_EXIT_TREE 在引擎关闭阶段一定触发（--quit-after / 直接关闭窗口均覆盖），
+## 仅靠 NOTIFICATION_WM_CLOSE_REQUEST 在无窗口或命令行退出时不会触发，故两者都监听。
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
-		_stop_all_players_for_exit()
+	match what:
+		NOTIFICATION_WM_CLOSE_REQUEST, NOTIFICATION_PREDELETE, NOTIFICATION_EXIT_TREE:
+			_stop_all_players_for_exit()
+
+
+## 供退出流程显式调用的公开入口（UIRouter.quit_game 在 tree.quit() 之前调用）。
+func stop_all_for_exit() -> void:
+	_stop_all_players_for_exit()
 
 
 ## 停止 BGM 与音效池中的全部播放器并释放播放对象
@@ -466,3 +474,30 @@ func _stop_all_players_for_exit() -> void:
 		if is_instance_valid(p):
 			p.stop()
 			p.stream = null
+	# 循环音效（play_stream_looped）是挂在 AudioManager 下的独立节点，
+	# 不在 _sfx_pool 里，必须单独停止并释放，否则同样会带着 Ogg 资源泄漏。
+	for key in _looped_players.keys():
+		var looped = _looped_players[key]
+		if is_instance_valid(looped):
+			looped.stop()
+			looped.stream = null
+	# 兜底：遍历本节点下所有仍在播放的 AudioStreamPlayer*，统一停止并断开流引用。
+	for child in get_children():
+		if child is AudioStreamPlayer:
+			child.stop()
+			child.stream = null
+		elif child is AudioStreamPlayer2D or child is AudioStreamPlayer3D:
+			child.stop()
+			child.stream = null
+	# 清空 BGM 流缓存：缓存里持有 AudioStreamOggVorbis 的强引用，
+	# 不清空会在退出时表现为 "探险.ogg 仍在使用" / ObjectDB 泄漏。
+	_bgm_stream_cache.clear()
+	_looped_players.clear()
+	# _current_bgm_stream / _saved_bgm_stream / _pending_event_bgm 同样是强引用，
+	# 只把 player.stream 置空并不能释放 AudioStreamOggVorbis 与 OggPacketSequence。
+	_current_bgm_stream = null
+	_saved_bgm_stream = null
+	_pending_event_bgm = null
+	# 说明：音频资源还挂在 ResourceLoader 的全局缓存里，Godot 4.5 没有公开的
+	# “从缓存移除” API（remove_from_cache 不存在），因此这里只负责解除本管理器的全部强引用。
+	# 退出阶段剩下的 Ogg 引用属于引擎缓存，不影响游戏运行，也不会出现在编辑器的错误面板里。

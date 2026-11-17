@@ -50,7 +50,7 @@ shape = SubResource("RectangleShape2D_qqk48")
 
 [node name="BGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_b7qt5")
-target_room_id = "WindValley2"
+target_room_id = "WindValley1"
 source_background = NodePath("Background1")
 
 [node name="Background1" type="Sprite2D" parent="GroundControllers/BGController1"]
@@ -59,7 +59,7 @@ texture = ExtResource("5_ox2vf")
 
 [node name="BGController2" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_b7qt5")
-target_room_id = "WindValley2"
+target_room_id = "WindValley1"
 source_background = NodePath("Background2")
 parallax_ratio = Vector2(0.15, 0.3)
 auto_scroll_enabled = true
@@ -70,7 +70,7 @@ texture = ExtResource("6_wggag")
 
 [node name="FGController1" type="Node2D" parent="GroundControllers" node_paths=PackedStringArray("source_background")]
 script = ExtResource("4_b7qt5")
-target_room_id = "WindValley3"
+target_room_id = "WindValley1"
 source_background = NodePath("Foreground1")
 
 [node name="Foreground1" type="Sprite2D" parent="GroundControllers/FGController1"]

@@ -109,9 +109,27 @@ class AfterimageConfig:
 var canvas_group: CanvasGroup
 var pools: Dictionary = {}
 
+## 旧类型名 -> 新池名 别名表。
+## PlayerFeedbackService / PlayerAirAbilityService 里仍在使用旧名（normal/black/low/advanced/pink），
+## 池只按新名注册，若不在此处做别名，spawn() 会直接返回 null，表现就是“残影消失”。
+const TYPE_ALIASES := {
+	"normal": "dash",
+	"dash_normal": "dash",
+	"black": "black_dash",
+	"low": "dash",
+	"advanced": "super_dash",
+	"pink": "jumpbox",
+	"jumpbox_perfect": "jumpbox",
+	"jumpbox_normal": "jumpbox",
+}
+
 func _ready():
 	_ensure_canvas_group()
 	_register_default_pools()
+
+## 把外部传入的类型名统一解析成实际注册的池名。
+func resolve_pool_type(type: String) -> String:
+	return TYPE_ALIASES.get(type, type)
 
 func _ensure_canvas_group():
 	if is_instance_valid(canvas_group):
@@ -145,6 +163,7 @@ func _register_pool(type: String, color: Color, life: float, interval: float, si
 	pools[type] = pool
 
 func get_interval(type: String) -> float:
+	type = resolve_pool_type(type)
 	if not pools.has(type):
 		return 0.05
 	return pools[type].config.spawn_interval
@@ -171,7 +190,10 @@ func _is_position_in_view(pos: Vector2) -> bool:
 	return world_view_rect.has_point(pos)
 
 func spawn(type: String, spawn_position: Vector2, texture: Texture2D, flip_h: bool, custom_scale: Vector2, move_dir: Vector2, move_dist: float, target_z_index: int) -> Node2D:
+	var requested_type := type
+	type = resolve_pool_type(type)
 	if not pools.has(type):
+		push_warning("[AfterimageTrail] 未注册的残影类型 '%s'，已跳过生成" % requested_type)
 		return null
 	if texture == null:
 		return null
