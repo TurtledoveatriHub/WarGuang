@@ -111,9 +111,9 @@ const OverlaySpec := preload("res://Scripts/UI/DarkOverlay.gd")
 ##   实测：打开默认 2，可放大到 6（max_zoom），所以 4 → 大约再滚 4 格。
 @export_range(0.5, 16.0, 0.25) var room_name_min_zoom: float = 2.0
 ## 房间名称字号（屏幕像素，固定不随地图缩放变大）
-@export_range(1, 128, 1) var room_name_font_size: int = 40
+@export_range(1, 128, 1) var room_name_font_size: int = 30
 ## 名称相对房间方块底边的下移量（地图纹理像素）
-@export_range(0.0, 64.0, 1.0) var room_name_bottom_gap_px: float = 4.0
+@export_range(0.0, 64.0, 1.0) var room_name_bottom_gap_px: float = 6.0
 ## 名称使用的字体主题（默认 NormalTheme9x9）
 @export var room_name_theme: Theme = null
 

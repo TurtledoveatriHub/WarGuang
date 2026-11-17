@@ -36,13 +36,14 @@ pivot_offset = Vector2(640, 360)
 mouse_filter = 2
 
 [node name="FrameSprite" type="Sprite2D" parent="ContentRoot"]
-position = Vector2(640, 360)
+position = Vector2(641, 360)
 scale = Vector2(4.125, 4.2222)
 texture = ExtResource("4_frame")
 
 [node name="LegendSprite" type="Sprite2D" parent="ContentRoot"]
 z_index = 20
-position = Vector2(1020, 633)
+position = Vector2(952, 624)
+scale = Vector2(1.5, 1.5)
 texture = ExtResource("3_legend")
 
 [node name="MapWindow" type="Control" parent="ContentRoot"]

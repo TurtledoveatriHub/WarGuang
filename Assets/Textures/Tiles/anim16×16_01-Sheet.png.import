@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b8gqny8stbbrf"
-path="res://.godot/imported/LiZi02.png-03bc81bec76a325f830ac1574538bb2d.ctex"
+uid="uid://chhli1vqdjyu7"
+path="res://.godot/imported/anim16×16_01-Sheet.png-12e6d67f54672eeccdf4977caf7d2e82.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/LiZi02.png"
-dest_files=["res://.godot/imported/LiZi02.png-03bc81bec76a325f830ac1574538bb2d.ctex"]
+source_file="res://Assets/Textures/Tiles/anim16×16_01-Sheet.png"
+dest_files=["res://.godot/imported/anim16×16_01-Sheet.png-12e6d67f54672eeccdf4977caf7d2e82.ctex"]
 
 [params]
 
