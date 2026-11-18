@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cmnml3lnj2rqd"
-path="res://.godot/imported/eyey.png-e0a721ab6b749f5d493d61e9f27f0654.ctex"
+uid="uid://dpxh3vdd5cef"
+path="res://.godot/imported/地图框.png-f2e4436ff50bb28e8a1e4c006451c43f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/gut/images/eyey.png"
-dest_files=["res://.godot/imported/eyey.png-e0a721ab6b749f5d493d61e9f27f0654.ctex"]
+source_file="res://Assets/Textures/UIs/SceneUIs/地图框.png"
+dest_files=["res://.godot/imported/地图框.png-f2e4436ff50bb28e8a1e4c006451c43f.ctex"]
 
 [params]
 
