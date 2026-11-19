@@ -45,11 +45,18 @@ static func start_vignette_hurt(player: Node) -> void:
 		player.vignette_effect.start_hurt_effect(duration)
 		_tween_point_light_to_ratio(player, 0.25, minf(duration, 0.2))
 		# 设置定时器，在受伤效果持续时间结束后处理
+		# ★ 用 WeakRef 而不是直接捕获 player：
+		#   定时器到期时玩家可能已随房间切换/死亡重生被释放，
+		#   直接捕获会在回调时报「Lambda capture was freed」并把 null 当参数传进去。
+		var weak_player: WeakRef = weakref(player)
 		player.get_tree().create_timer(duration).timeout.connect(
 			func():
+				var p: Node = weak_player.get_ref() as Node
+				if p == null or not is_instance_valid(p):
+					return
 				# 清除即将受伤标记
-				player.is_about_to_be_hurt = false
-				player._on_hurt_duration_end(false)
+				p.is_about_to_be_hurt = false
+				p._on_hurt_duration_end(false)
 		)
 
 static func start_vignette_shadow_hurt(player: Node) -> void:
@@ -59,9 +66,13 @@ static func start_vignette_shadow_hurt(player: Node) -> void:
 		player.vignette_effect.start_shadow_hurt_effect(duration)
 		_tween_point_light_to_ratio(player, 0.25, minf(duration, 0.2))
 
+		var weak_player: WeakRef = weakref(player)
 		player.get_tree().create_timer(duration).timeout.connect(
 			func():
-				player._on_hurt_duration_end(true)
+				var p: Node = weak_player.get_ref() as Node
+				if p == null or not is_instance_valid(p):
+					return
+				p._on_hurt_duration_end(true)
 		)
 
 static func on_hurt_duration_end(player: Node, _is_shadow_hurt: bool) -> void:

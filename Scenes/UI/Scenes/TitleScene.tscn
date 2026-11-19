@@ -70,7 +70,6 @@ settings_scene_resource = ExtResource("2_fkiff")
 about_author_scene = ExtResource("21_about")
 update_notes_scene = ExtResource("22_notes")
 achievement_scene = ExtResource("23_ach")
-title_bgm_name = "BGM0"
 
 [node name="UIFxDirector" type="Node" parent="."]
 script = ExtResource("20_mmaj1")

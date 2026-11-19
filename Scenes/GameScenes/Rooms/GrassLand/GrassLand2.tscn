@@ -13,7 +13,7 @@
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="8_t5crq"]
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="9_omxng"]
 [ext_resource type="AudioStream" uid="uid://bm8l08hel60oa" path="res://Assets/Audios/SFX/Instances/存档点交互.wav" id="9_yhus0"]
-[ext_resource type="TileSet" uid="uid://00012oaf21mdm" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原隐藏瓦片集.tres" id="12_r67kf"]
+[ext_resource type="TileSet" uid="uid://ctktjcqwotds1" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原隐藏瓦片集.tres" id="12_r67kf"]
 [ext_resource type="PackedScene" uid="uid://ctgxsaoq0vrlk" path="res://Scenes/Instances/Platforms/Platform.tscn" id="15_wyed4"]
 [ext_resource type="PackedScene" uid="uid://dmxk0c6vjv6wl" path="res://Scenes/Instances/Platforms/BreakablePlatform.tscn" id="17_wyed4"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="20_wyed4"]

@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=3 uid="uid://dgm0sxuwtc7rp"]
 
-[ext_resource type="Script" uid="uid://mobfbjdy2eba" path="res://Scripts/Instances/PixelWaterSurface.gd" id="1_water"]
-[ext_resource type="Texture2D" uid="uid://dd5y02o5gkg1e" path="res://Assets/Textures/FX/water_body_tile.png" id="3_body"]
-[ext_resource type="Texture2D" uid="uid://c3iqlbqg72sra" path="res://Assets/Textures/Instances/6d45b2417c3d211c5f5f3f6cb3277890.png" id="3_t7crl"]
-[ext_resource type="Texture2D" uid="uid://dx4e52wpdyvya" path="res://Assets/Textures/FX/water_splash_dot.png" id="4_splash"]
+[ext_resource type="Script" uid="uid://mobfbjdy2eba" path="res://Scripts/Instances/Environments/PixelWaterSurface.gd" id="1_water"]
+[ext_resource type="Texture2D" uid="uid://dd5y02o5gkg1e" path="res://Assets/Textures/Instances/ALL/water_body_tile.png" id="3_body"]
+[ext_resource type="Texture2D" uid="uid://c3iqlbqg72sra" path="res://Assets/Textures/Instances/ALL/6d45b2417c3d211c5f5f3f6cb3277890.png" id="3_t7crl"]
+[ext_resource type="Texture2D" uid="uid://bj3yhqn0u2t5j" path="res://Assets/Textures/Instances/ALL/泡泡.png" id="4_h2bwy"]
 [ext_resource type="AudioStream" uid="uid://de0ke1pj8krlj" path="res://Assets/Audios/SFX/Instances/坏蛋冰激凌.wav" id="6_01nld"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_splash"]
@@ -40,24 +40,24 @@ region_rect = Rect2(0, 0, 160, 64)
 [node name="WaterSurfaceFar" type="Sprite2D" parent="WaterVisuals"]
 modulate = Color(0.5056, 0.65728, 0.79, 0.78431374)
 texture_repeat = 2
-position = Vector2(-80, -78)
+position = Vector2(-80, -77)
 texture = ExtResource("3_t7crl")
 centered = false
 region_enabled = true
-region_rect = Rect2(68.175, 0, 160, 10)
+region_rect = Rect2(71.505, 0, 160, 10)
 
 [node name="WaterSurface" type="Sprite2D" parent="WaterVisuals"]
 texture_repeat = 2
-position = Vector2(-80, -81)
+position = Vector2(-80, -80)
 texture = ExtResource("3_t7crl")
 centered = false
 region_enabled = true
-region_rect = Rect2(151.5, 0, 160, 10)
+region_rect = Rect2(158.9, 0, 160, 10)
 
 [node name="Splash" type="GPUParticles2D" parent="WaterVisuals"]
 emitting = false
 amount = 12
-texture = ExtResource("4_splash")
+texture = ExtResource("4_h2bwy")
 lifetime = 0.45
 one_shot = true
 explosiveness = 1.0

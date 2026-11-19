@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://b03jaomk2cnqd"]
+[gd_scene load_steps=37 format=3 uid="uid://b03jaomk2cnqd"]
 
 [ext_resource type="Script" uid="uid://bgd4cnk4b8qrx" path="res://Scripts/GameScenes/MainGameScene.gd" id="1_dcv5v"]
 [ext_resource type="PackedScene" uid="uid://dwj2ydwabq3n0" path="res://Scenes/Player/Player.tscn" id="1_wdg0h"]
@@ -16,7 +16,6 @@
 [ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="11_om4ip"]
 [ext_resource type="Script" uid="uid://dij1xd6xmfvis" path="res://Scripts/Events/RoomCinematicEventDirector.gd" id="11_room_cinematic"]
 [ext_resource type="Texture2D" uid="uid://biex1ykpn1qgq" path="res://Assets/Textures/UIs/MobieControlsUIs/跳跃2.tres" id="11_xf5w8"]
-[ext_resource type="Texture2D" uid="uid://cvsktirekuq1m" path="res://Assets/Textures/Backgrounds/CK/1.png" id="12_dcv5v"]
 [ext_resource type="Texture2D" uid="uid://bw8x5folvwdp1" path="res://Assets/Textures/UIs/MobieControlsUIs/交互1.tres" id="12_exifc"]
 [ext_resource type="Texture2D" uid="uid://cmqn3lq3grd75" path="res://Assets/Textures/UIs/MobieControlsUIs/冲刺2.tres" id="13_ovxli"]
 [ext_resource type="Texture2D" uid="uid://do2prxybw8u4p" path="res://Assets/Textures/UIs/MobieControlsUIs/上1.tres" id="14_7uw37"]
@@ -33,6 +32,8 @@
 [ext_resource type="Texture2D" uid="uid://8gokk5ebfx3" path="res://Assets/Textures/UIs/MobieControlsUIs/左2.tres" id="19_skrsa"]
 [ext_resource type="Texture2D" uid="uid://cvkliuiwv654w" path="res://Assets/Textures/UIs/MobieControlsUIs/右1.tres" id="20_bjlxe"]
 [ext_resource type="Texture2D" uid="uid://bsbtq67i0lbc6" path="res://Assets/Textures/UIs/MobieControlsUIs/右2.tres" id="21_r5aow"]
+[ext_resource type="Texture2D" uid="uid://cypatthx6ju15" path="res://Assets/Textures/UIs/SceneUIs/设置.png" id="32_r5aow"]
+[ext_resource type="Texture2D" uid="uid://bfqyg51go8b8h" path="res://Assets/Textures/UIs/SceneUIs/标题.png" id="33_xf5w8"]
 [ext_resource type="Script" uid="uid://c6sfk0f5l322c" path="res://Scripts/GameScenes/MobileTouchHUD.gd" id="mobile_touch_hud_script"]
 
 [sub_resource type="Environment" id="Environment_jbabp"]
@@ -264,11 +265,11 @@ script = ExtResource("9_boot_cinematic")
 script = ExtResource("10_new_save_opening")
 opening_room_id = "GrassLand1"
 intro_text_theme = ExtResource("11_om4ip")
-intro_text_lines = PackedStringArray("愿以炽爱...", "愿以睿知...", "愿以公断...", "向天序祈祷至暖之魂消解阴暗")
-intro_text_line_hold_times = PackedFloat32Array(0.4, 0.4, 0.4, 0.8)
-intro_visual_frames = Array[Texture2D]([ExtResource("12_dcv5v"), ExtResource("11_70mj8")])
-intro_visual_frame_durations = PackedFloat32Array(0.6, 0.6)
-intro_sequence_order = Array[int]([2, 0, 0, 0, 0, 1, 1, 2])
+intro_text_lines = PackedStringArray("（图先欠着）...", "愿以炽爱...", "愿以睿知...", "愿以公断...", "向天序祈祷...")
+intro_text_line_hold_times = PackedFloat32Array(0.6, 0.6, 0.6, 0.6, 0.8)
+intro_visual_frames = Array[Texture2D]([ExtResource("32_r5aow"), ExtResource("33_xf5w8")])
+intro_visual_frame_durations = PackedFloat32Array(0.6, 0.8)
+intro_sequence_order = Array[int]([0, 2, 0, 0, 0, 1, 0, 1, 2])
 
 [node name="RoomCinematicEventDirector" type="Node" parent="EventDirectors"]
 script = ExtResource("11_room_cinematic")

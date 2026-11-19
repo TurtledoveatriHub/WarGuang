@@ -20,85 +20,65 @@ class AfterimageConfig:
 	## 残影位移强度（Shader move_distance）
 	var move_distance: float = 50.0
 
-@export_group("Dash")
-## 普通冲刺残影颜色
-@export var dash_color: Color = Color(0.804, 0.804, 0.804, 1.0)
-## 普通冲刺残影生命周期（秒）
-@export var dash_lifetime: float = 0.2
-## 普通冲刺残影生成间隔（秒）
-@export var dash_interval: float = 0.03
-## 普通冲刺残影对象池大小
-@export var dash_pool_size: int = 20
-## 普通冲刺是否使用纯色渲染
-@export var dash_solid_color: bool = true
-## 普通冲刺是否启用淡出缩放效果
-@export var dash_fade_scale_effect: bool = true
-## 普通冲刺残影位移强度
-@export var dash_move_distance: float = 40.0
+## 低级残影配置：慢动作期间引用。
+@export_group("低级残影配置")
+@export var low_color: Color = Color.from_rgba8(250, 250, 250, 200)
+@export var low_lifetime: float = 0.52
+@export var low_interval: float = 0.2
+@export var low_pool_size: int = 10
+@export var low_solid_color: bool = true
+@export var low_fade_scale_effect: bool = true
+@export var low_move_distance: float = 10.0
 
-@export_group("Black Dash")
-## 黑暗冲刺残影颜色
-@export var black_dash_color: Color = Color(0.094, 0.094, 0.094, 1.0)
-## 黑暗冲刺残影生命周期（秒）
-@export var black_dash_lifetime: float = 0.25
-## 黑暗冲刺残影生成间隔（秒）
-@export var black_dash_interval: float = 0.025
-## 黑暗冲刺残影对象池大小
-@export var black_dash_pool_size: int = 25
-## 黑暗冲刺是否使用纯色渲染
-@export var black_dash_solid_color: bool = true
-## 黑暗冲刺是否启用淡出缩放效果
-@export var black_dash_fade_scale_effect: bool = true
-## 黑暗冲刺残影位移强度
-@export var black_dash_move_distance: float = 60.0
+## 普通残影配置：普通冲刺、JumpBox普通触发二段跳引用。
+@export_group("普通残影配置")
+@export var normal_color: Color = Color.from_rgba8(250, 250, 250, 200)
+@export var normal_lifetime: float = 0.22
+@export var normal_interval: float = 0.04
+@export var normal_pool_size: int = 20
+@export var normal_solid_color: bool = true
+@export var normal_fade_scale_effect: bool = true
+@export var normal_move_distance: float = 30.0
 
-@export_group("Super Dash")
-## 超级冲刺残影颜色
-@export var super_dash_color: Color = Color(0.804, 0.804, 0.804, 1.0)
-## 超级冲刺残影生命周期（秒）
-@export var super_dash_lifetime: float = 0.6
-## 超级冲刺残影生成间隔（秒）
-@export var super_dash_interval: float = 0.1
-## 超级冲刺残影对象池大小
-@export var super_dash_pool_size: int = 40
-## 超级冲刺是否使用纯色渲染
-@export var super_dash_solid_color: bool = true
-## 超级冲刺是否启用淡出缩放效果
-@export var super_dash_fade_scale_effect: bool = true
-## 超级冲刺残影位移强度
-@export var super_dash_move_distance: float = 60.0
+## 高级残影配置：超级冲刺、后撤步引用。
+@export_group("高级残影配置")
+@export var advanced_color: Color = Color.from_rgba8(250, 250, 250, 200)
+@export var advanced_lifetime: float = 0.42
+@export var advanced_interval: float = 0.08
+@export var advanced_pool_size: int = 30
+@export var advanced_solid_color: bool = true
+@export var advanced_fade_scale_effect: bool = true
+@export var advanced_move_distance: float = 40.0
 
-@export_group("JumpBox")
-## JumpBox二段跳残影颜色
-@export var jumpbox_color: Color = Color(0.902, 0.608, 1.0, 1.0)
-## JumpBox二段跳残影生命周期（秒）
-@export var jumpbox_lifetime: float = 0.3
-## JumpBox二段跳残影生成间隔（秒）
-@export var jumpbox_interval: float = 0.05
-## JumpBox二段跳残影对象池大小
-@export var jumpbox_pool_size: int = 40
-## JumpBox二段跳是否使用纯色渲染
-@export var jumpbox_solid_color: bool = true
-## JumpBox二段跳是否启用淡出缩放效果
-@export var jumpbox_fade_scale_effect: bool = true
-## JumpBox二段跳残影位移强度
-@export var jumpbox_move_distance: float = 40.0
+## 黑色残影配置：黑暗冲刺引用。
+@export_group("黑色残影配置")
+@export var black_color: Color = Color.from_rgba8(25, 25, 25, 200)
+@export var black_lifetime: float = 0.26
+@export var black_interval: float = 0.04
+@export var black_pool_size: int = 30
+@export var black_solid_color: bool = true
+@export var black_fade_scale_effect: bool = true
+@export var black_move_distance: float = 40.0
 
-@export_group("Maniac Move")
-## ManiacNPC 移动残影颜色（暗红色系）
-@export var maniac_move_color: Color = Color(0.396, 0.173, 0.184, 1.0)
-## ManiacNPC 移动残影生命周期（秒）
-@export var maniac_move_lifetime: float = 0.6
-## ManiacNPC 移动残影生成间隔（秒）
-@export var maniac_move_interval: float = 0.3
-## ManiacNPC 移动残影对象池大小
-@export var maniac_move_pool_size: int = 15
-## ManiacNPC 移动是否使用纯色渲染
-@export var maniac_move_solid_color: bool = true
-## ManiacNPC 移动是否启用淡出缩放效果
-@export var maniac_move_fade_scale_effect: bool = false
-## ManiacNPC 移动残影位移强度
-@export var maniac_move_distance: float = 40.0
+## 粉色残影配置：JumpBox完美触发二段跳引用。
+@export_group("粉色残影配置")
+@export var pink_color: Color = Color.from_rgba8(230, 155, 255, 200)
+@export var pink_lifetime: float = 0.32
+@export var pink_interval: float = 0.04
+@export var pink_pool_size: int = 30
+@export var pink_solid_color: bool = true
+@export var pink_fade_scale_effect: bool = true
+@export var pink_move_distance: float = 40.0
+
+## 暗红色残影配置：ManiacNPC 移动引用。
+@export_group("暗红色残影配置")
+@export var dark_red_color: Color = Color.from_rgba8(80, 30, 40, 200)
+@export var dark_red_lifetime: float = 0.28
+@export var dark_red_interval: float = 0.06
+@export var dark_red_pool_size: int = 20
+@export var dark_red_solid_color: bool = true
+@export var dark_red_fade_scale_effect: bool = false
+@export var dark_red_move_distance: float = 20.0
 
 @export_group("Spawn Culling")
 ## 是否启用残影视野裁剪（超出当前相机视野则不生成）
@@ -109,27 +89,9 @@ class AfterimageConfig:
 var canvas_group: CanvasGroup
 var pools: Dictionary = {}
 
-## 旧类型名 -> 新池名 别名表。
-## PlayerFeedbackService / PlayerAirAbilityService 里仍在使用旧名（normal/black/low/advanced/pink），
-## 池只按新名注册，若不在此处做别名，spawn() 会直接返回 null，表现就是“残影消失”。
-const TYPE_ALIASES := {
-	"normal": "dash",
-	"dash_normal": "dash",
-	"black": "black_dash",
-	"low": "dash",
-	"advanced": "super_dash",
-	"pink": "jumpbox",
-	"jumpbox_perfect": "jumpbox",
-	"jumpbox_normal": "jumpbox",
-}
-
 func _ready():
 	_ensure_canvas_group()
 	_register_default_pools()
-
-## 把外部传入的类型名统一解析成实际注册的池名。
-func resolve_pool_type(type: String) -> String:
-	return TYPE_ALIASES.get(type, type)
 
 func _ensure_canvas_group():
 	if is_instance_valid(canvas_group):
@@ -140,11 +102,21 @@ func _ensure_canvas_group():
 	add_child(canvas_group)
 
 func _register_default_pools():
-	_register_pool("dash", dash_color, dash_lifetime, dash_interval, dash_pool_size, dash_solid_color, dash_fade_scale_effect, dash_move_distance)
-	_register_pool("black_dash", black_dash_color, black_dash_lifetime, black_dash_interval, black_dash_pool_size, black_dash_solid_color, black_dash_fade_scale_effect, black_dash_move_distance)
-	_register_pool("super_dash", super_dash_color, super_dash_lifetime, super_dash_interval, super_dash_pool_size, super_dash_solid_color, super_dash_fade_scale_effect, super_dash_move_distance)
-	_register_pool("jumpbox", jumpbox_color, jumpbox_lifetime, jumpbox_interval, jumpbox_pool_size, jumpbox_solid_color, jumpbox_fade_scale_effect, jumpbox_move_distance)
-	_register_pool("maniac_move", maniac_move_color, maniac_move_lifetime, maniac_move_interval, maniac_move_pool_size, maniac_move_solid_color, maniac_move_fade_scale_effect, maniac_move_distance)
+	_register_pool("normal", normal_color, normal_lifetime, normal_interval, normal_pool_size, normal_solid_color, normal_fade_scale_effect, normal_move_distance)
+	_register_pool("low", low_color, low_lifetime, low_interval, low_pool_size, low_solid_color, low_fade_scale_effect, low_move_distance)
+	_register_pool("black", black_color, black_lifetime, black_interval, black_pool_size, black_solid_color, black_fade_scale_effect, black_move_distance)
+	_register_pool("advanced", advanced_color, advanced_lifetime, advanced_interval, advanced_pool_size, advanced_solid_color, advanced_fade_scale_effect, advanced_move_distance)
+	_register_pool("pink", pink_color, pink_lifetime, pink_interval, pink_pool_size, pink_solid_color, pink_fade_scale_effect, pink_move_distance)
+	_register_pool("dark_red", dark_red_color, dark_red_lifetime, dark_red_interval, dark_red_pool_size, dark_red_solid_color, dark_red_fade_scale_effect, dark_red_move_distance)
+
+	# 向后兼容旧类型名
+	_register_pool("dash", normal_color, normal_lifetime, normal_interval, normal_pool_size, normal_solid_color, normal_fade_scale_effect, normal_move_distance)
+	_register_pool("black_dash", black_color, black_lifetime, black_interval, black_pool_size, black_solid_color, black_fade_scale_effect, black_move_distance)
+	_register_pool("super_dash", advanced_color, advanced_lifetime, advanced_interval, advanced_pool_size, advanced_solid_color, advanced_fade_scale_effect, advanced_move_distance)
+	_register_pool("jumpbox_perfect", pink_color, pink_lifetime, pink_interval, pink_pool_size, pink_solid_color, pink_fade_scale_effect, pink_move_distance)
+	_register_pool("jumpbox_normal", low_color, low_lifetime, low_interval, low_pool_size, low_solid_color, low_fade_scale_effect, low_move_distance)
+	_register_pool("jumpbox", pink_color, pink_lifetime, pink_interval, pink_pool_size, pink_solid_color, pink_fade_scale_effect, pink_move_distance)
+	_register_pool("maniac_move", dark_red_color, dark_red_lifetime, dark_red_interval, dark_red_pool_size, dark_red_solid_color, dark_red_fade_scale_effect, dark_red_move_distance)
 
 func _register_pool(type: String, color: Color, life: float, interval: float, size: int, solid_color: bool, fade_scale: bool, move_distance: float):
 	var cfg = AfterimageConfig.new()
@@ -163,7 +135,6 @@ func _register_pool(type: String, color: Color, life: float, interval: float, si
 	pools[type] = pool
 
 func get_interval(type: String) -> float:
-	type = resolve_pool_type(type)
 	if not pools.has(type):
 		return 0.05
 	return pools[type].config.spawn_interval
@@ -190,10 +161,7 @@ func _is_position_in_view(pos: Vector2) -> bool:
 	return world_view_rect.has_point(pos)
 
 func spawn(type: String, spawn_position: Vector2, texture: Texture2D, flip_h: bool, custom_scale: Vector2, move_dir: Vector2, move_dist: float, target_z_index: int) -> Node2D:
-	var requested_type := type
-	type = resolve_pool_type(type)
 	if not pools.has(type):
-		push_warning("[AfterimageTrail] 未注册的残影类型 '%s'，已跳过生成" % requested_type)
 		return null
 	if texture == null:
 		return null

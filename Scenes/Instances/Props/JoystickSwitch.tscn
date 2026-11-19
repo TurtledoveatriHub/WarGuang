@@ -31,13 +31,16 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_switch"]
-size = Vector2(24, 24)
+size = Vector2(36, 32)
 
 [node name="JoystickSwitch" type="Area2D"]
 collision_layer = 32
 script = ExtResource("1_hk478")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+modulate = Color(1.353256, 1.353256, 1.353256, 1)
+position = Vector2(0, -8)
+scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_2h4en")
 animation = &"OFF"
 
@@ -46,5 +49,5 @@ visible = false
 position = Vector2(0, -24)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -4)
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_switch")

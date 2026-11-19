@@ -1,9 +1,8 @@
-[gd_scene load_steps=36 format=3 uid="uid://cm3h413lvuans"]
+[gd_scene load_steps=34 format=3 uid="uid://cm3h413lvuans"]
 
 [ext_resource type="Script" uid="uid://dq0rdjsxrddg6" path="res://Scripts/Instances/JumpBoxs/JumpBox.gd" id="1_ol2j8"]
-[ext_resource type="AudioStream" uid="uid://bngxopjd4hp71" path="res://Assets/Audios/SFX/Instances/JumpBox.wav" id="2_kowqp"]
+[ext_resource type="AudioStream" uid="uid://de0ke1pj8krlj" path="res://Assets/Audios/SFX/Instances/坏蛋冰激凌.wav" id="2_lcqpp"]
 [ext_resource type="Texture2D" uid="uid://c5enk6k86qoi7" path="res://Assets/Textures/Instances/SnowMountain/雪地JumpBox.png" id="4_jb1q7"]
-[ext_resource type="Texture2D" uid="uid://cwh1gwfexepw4" path="res://Assets/Textures/Instances/1.png" id="5_b1ty5"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jrej3"]
 atlas = ExtResource("4_jb1q7")
@@ -20,10 +19,6 @@ region = Rect2(128, 32, 32, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_tvh2e"]
 atlas = ExtResource("4_jb1q7")
 region = Rect2(160, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_t8ri6"]
-atlas = ExtResource("5_b1ty5")
-region = Rect2(64, 32, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v86o5"]
 atlas = ExtResource("4_jb1q7")
@@ -142,16 +137,16 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_t8ri6")
+"texture": null
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_t8ri6")
+"texture": null
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_t8ri6")
+"texture": null
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_t8ri6")
+"texture": null
 }],
 "loop": true,
 "name": &"NO",
@@ -251,12 +246,11 @@ animations = [{
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_jb1q7"]
-radius = 9.0
 
 [node name="JumpBox" type="Area2D"]
 script = ExtResource("1_ol2j8")
-normal_trigger_sfx = ExtResource("2_kowqp")
-perfect_trigger_sfx = ExtResource("2_kowqp")
+normal_trigger_sfx = ExtResource("2_lcqpp")
+perfect_trigger_sfx = ExtResource("2_lcqpp")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_t0krv")

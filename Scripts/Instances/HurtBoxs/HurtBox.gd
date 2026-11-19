@@ -14,6 +14,11 @@ enum LauncherState { LOAD_OPEN, ARMED, FIRING, CLOSE_PLAY, END_OFF_WAIT }
 enum TriggerState { OFF_IDLE, OPENING, ON_ACTIVE, EXIT_HOLD, CLOSING }
 ## Sprite效果（与移动方向无关，仅视觉）
 enum SpriteEffect { NONE, ROTATE, FLIP }
+## 大摆锤运动曲线
+enum PendulumCurve {
+	TRAPEZOID = 0,   ## 梯形：加速 → 匀速 → 减速（受「加速度时间」控制，角速度线性变化）
+	SINE = 1,        ## 正弦缓动：像真实重力摆一样平滑加减速（端点最慢、中点最快，忽略「加速度时间」）
+}
 
 ## 伤害设置
 @export_category("伤害设置")
@@ -43,6 +48,21 @@ enum SpriteEffect { NONE, ROTATE, FLIP }
 @export var clockwise: bool = true
 ## 是否同时旋转碰撞体（可独立启用）
 @export var rotate_collision: bool = false
+
+## ★ 大摆锤模式：开启后不再整圈旋转，而是在「初始角度 ↔ 初始角度 + 摆动度数」之间来回摆动。
+##   仅 sprite_effect = ROTATE 时生效（与 rotation_speed / rotate_collision 同一适用范围）。
+##   摆动方向沿用 clockwise；每趟「0 → 满速」加速 pendulum_accel_time 秒，接近端点用同样时长减速到 0，
+##   到达端点后停滞 pendulum_end_wait 秒再反向。
+@export var pendulum_enabled: bool = false
+## 摆动度数（90~360）：相对初始角度向 clockwise 方向张开的角度范围；超出范围自动夹到 90 或 360
+@export_range(90.0, 360.0, 1.0, "suffix:°") var pendulum_degrees: float = 180.0
+## 加速度时间（秒）：每趟从静止加速到 rotation_speed 所需时间；行程不足时自动降峰值速度
+@export_range(0.0, 10.0, 0.01, "suffix:s") var pendulum_accel_time: float = 0.5
+## 摆动曲线：TRAPEZOID=梯形（加速→匀速→减速，受「加速度时间」控制）；
+##           SINE=正弦缓动（真实重力摆，天然先慢后快再慢，「加速度时间」不生效）
+@export var pendulum_curve: PendulumCurve = PendulumCurve.TRAPEZOID
+## 端点停滞时间（秒）：到达端点后停留多久再往返回
+@export_range(0.0, 10.0, 0.01, "suffix:s") var pendulum_end_wait: float = 0.5
 
 ## 伤害周期设置
 @export_category("伤害周期设置")
@@ -151,6 +171,33 @@ var _round_trip_count: int = 0
 var _progress: float = 0.0
 var _moving_to_end: bool = true
 
+# ── 大摆锤（往返旋转）状态 ──────────────────────────
+## 当前摆动角度（0 → _pendulum_range，0 表示停在初始角度）
+var _pendulum_offset: float = 0.0
+## 摆动总度数（0~360，取绝对值）
+var _pendulum_range: float = 180.0
+## 本趟起点角度 / 终点角度（都在 0 ~ _pendulum_range 之间）
+var _pendulum_from: float = 0.0
+var _pendulum_to: float = 180.0
+## 本趟已用时长
+var _pendulum_leg_time: float = 0.0
+## 端点停滞剩余时间
+var _pendulum_wait_timer: float = 0.0
+## 本趟结束后是否需要换向（区别于「停滞中」）
+var _pendulum_need_swap: bool = false
+## 速度曲线预算：加速时长 / 匀速时长 / 单趟总时长 / 峰值角速度
+var _pendulum_ta: float = 0.0
+var _pendulum_tc: float = 0.0
+var _pendulum_total: float = 0.0
+var _pendulum_peak: float = 0.0
+## 是否已完成初始化（记录初始角度）
+var _pendulum_inited: bool = false
+## 视觉与各碰撞体在编辑器里的初始位置 / 角度（绕 HurtBox 原点摆动，见 _apply_pendulum_angle）
+var _base_sprite_pos: Vector2 = Vector2.ZERO
+var _base_sprite_rot: float = 0.0
+## 碰撞体基线：instance_id -> { "pos": Vector2, "rot": float }
+var _pendulum_shape_bases: Dictionary = {}
+
 # 移动物理变量
 var current_speed: float = 0.0
 var is_waiting: bool = false
@@ -213,6 +260,10 @@ func _ready():
 			if child is CollisionShape2D:
 				collision_shapes.append(child)
 	
+	# 大摆锤：记录视觉/碰撞体初始角度并预算速度曲线（必须在 collision_shapes 兜底之后）
+	if pendulum_enabled:
+		_init_pendulum()
+	
 	# 设置物理层：自身在 HurtBox 层(5)，监听 Player 层(1) + Enemy 层(8)
 	collision_layer = 16   # 2^4 = 层5 HurtBox
 	collision_mask = 129   # 2^0 + 2^7 = 层1 Player + 层8 Enemy
@@ -264,20 +315,25 @@ func _process(delta):
 	var rot_amount: float = rotation_speed * (1.0 if clockwise else -1.0) * scaled_delta
 	match sprite_effect:
 		SpriteEffect.ROTATE:
-			animated_sprite.rotation_degrees += rot_amount
-			if rotate_collision:
-				_for_each_shape(func(s): s.rotation_degrees += rot_amount)
-			if animated_sprite.scale.x != 1.0:
-				animated_sprite.scale.x = 1.0
+			if pendulum_enabled:
+				if not _pendulum_inited:
+					_init_pendulum()
+				_update_pendulum_rotation(scaled_delta)
+			else:
+				animated_sprite.rotation_degrees += rot_amount
+				if rotate_collision:
+					_for_each_shape(func(s): s.rotation_degrees += rot_amount)
+				_clear_sprite_flip()
 		SpriteEffect.FLIP:
 			if movement_mode != MovementMode.STATIC and end_offset.x != 0.0:
 				var moving_right: bool = (end_offset.x > 0) == _moving_to_end
-				animated_sprite.scale.x = 1.0 if moving_right else -1.0
-			elif animated_sprite.scale.x != 1.0:
-				animated_sprite.scale.x = 1.0
+				# 保留 Inspector 里设定的缩放倍数，只用符号表示翻转
+				var mag: float = absf(animated_sprite.scale.x)
+				animated_sprite.scale.x = mag if moving_right else -mag
+			else:
+				_clear_sprite_flip()
 		SpriteEffect.NONE:
-			if animated_sprite.scale.x != 1.0:
-				animated_sprite.scale.x = 1.0
+			_clear_sprite_flip()
 			if rotate_collision:
 				_for_each_shape(func(s): s.rotation_degrees += rot_amount)
 	
@@ -550,6 +606,156 @@ func _for_each_shape(action: Callable) -> void:
 	for s in collision_shapes:
 		if is_instance_valid(s):
 			action.call(s)
+
+# ── 大摆锤（往返旋转） ────────────────────────────
+
+## 记录初始角度并预算单趟速度曲线（梯形：加速 → 匀速 → 减速）。
+## 行程太短（rotation_speed × 加速时间 都走不完）时自动退化为三角曲线并降低峰值速度，
+## 保证「一定能到达端点」且速度曲线依旧连续（先慢后快再慢），不会出现瞬移或抖动。
+func _init_pendulum() -> void:
+	_pendulum_inited = true
+	_base_sprite_pos = animated_sprite.position
+	_base_sprite_rot = animated_sprite.rotation_degrees
+	_pendulum_shape_bases.clear()
+	for s in collision_shapes:
+		if is_instance_valid(s):
+			_pendulum_shape_bases[s.get_instance_id()] = {
+				"pos": s.position,
+				"rot": s.rotation_degrees,
+			}
+
+	# 度数限制在 90~360：小于 90 的摆幅看起来像抖动，大于 360 会绕回自身
+	_pendulum_range = absf(clampf(pendulum_degrees, 90.0, 360.0))
+	var v_max: float = absf(rotation_speed)
+	_pendulum_ta = maxf(pendulum_accel_time, 0.0)
+
+	if _pendulum_range <= 0.0:
+		# 度数为 0：保持在初始角度，不做任何摆动（防御性分支，正常已被上面的夹取拦住）
+		_pendulum_peak = 0.0
+		_pendulum_tc = 0.0
+		_pendulum_total = 0.0
+		_apply_pendulum_angle(0.0)
+		return
+
+	if v_max <= 0.0:
+		# 速度为 0：视为不摆动（避免除零 / 无限时长）
+		_pendulum_peak = 0.0
+		_pendulum_tc = 0.0
+		_pendulum_total = 0.0
+		_apply_pendulum_angle(0.0)
+		return
+
+	if pendulum_curve == PendulumCurve.SINE:
+		# 正弦曲线：t∈[0,T] 内 θ = D/2 * (1 - cos(πt/T))，
+		# 峰值角速度出现在行程中点 = D*π/(2T)，令其等于 rotation_speed 反解 T。
+		_pendulum_peak = v_max
+		_pendulum_ta = 0.0
+		_pendulum_tc = 0.0
+		_pendulum_total = PI * _pendulum_range / (2.0 * v_max)
+	elif _pendulum_ta > 0.0 and v_max * _pendulum_ta >= _pendulum_range:
+		# 加速段 + 减速段已经超过行程：三角曲线，峰值速度按行程反推
+		_pendulum_peak = _pendulum_range / _pendulum_ta
+		_pendulum_tc = 0.0
+		_pendulum_total = _pendulum_ta * 2.0
+	else:
+		_pendulum_peak = v_max
+		_pendulum_tc = maxf((_pendulum_range - v_max * _pendulum_ta) / v_max, 0.0)
+		_pendulum_total = _pendulum_ta * 2.0 + _pendulum_tc
+
+	# 初始状态：停在初始角度，本趟目标为满度数端点（起始不额外停滞）
+	_pendulum_offset = 0.0
+	_pendulum_from = 0.0
+	_pendulum_to = _pendulum_range
+	_pendulum_leg_time = 0.0
+	_pendulum_wait_timer = 0.0
+	_apply_pendulum_angle(0.0)
+
+
+## 单趟 t 秒时已摆过的角度（梯形/三角速度曲线的解析积分，或正弦曲线；均与帧率无关）
+func _pendulum_distance(t: float) -> float:
+	if pendulum_curve == PendulumCurve.SINE:
+		if _pendulum_total <= 0.0:
+			return 0.0
+		var p: float = clampf(t / _pendulum_total, 0.0, 1.0)
+		return 0.5 * _pendulum_range * (1.0 - cos(PI * p))
+	var ta: float = _pendulum_ta
+	if ta <= 0.0:
+		# 无加速段：全程匀速
+		return clampf(_pendulum_peak * t, 0.0, _pendulum_range)
+	var a: float = _pendulum_peak / ta
+	if t < ta:
+		return 0.5 * a * t * t
+	var acc_dist: float = 0.5 * _pendulum_peak * ta
+	if t < ta + _pendulum_tc:
+		return acc_dist + _pendulum_peak * (t - ta)
+	var t_left: float = maxf(_pendulum_total - t, 0.0)
+	return _pendulum_range - 0.5 * a * t_left * t_left
+
+
+## 只把翻转产生的负号修正回正，保留 Inspector 里设定的缩放倍数（0.5、2 倍等）
+func _clear_sprite_flip() -> void:
+	if animated_sprite.scale.x < 0.0:
+		animated_sprite.scale.x = -animated_sprite.scale.x
+
+
+## 把「相对初始角度的摆动角」写回视觉与可选碰撞体。
+## ★ 摆锤的支点 = HurtBox 节点自身的原点：子节点的 position 也一起绕原点旋转，
+##   所以只要把「刀身/摆臂」放在原点下方（position 或 Sprite 的 offset），就能得到真正的摆动轨迹，
+##   而不是原地自转。子节点 position 为 0 时退化为原地旋转（与整圈旋转表现一致）。
+func _apply_pendulum_angle(offset: float) -> void:
+	_pendulum_offset = offset
+	var signed_deg: float = offset * (1.0 if clockwise else -1.0)
+	var rad: float = deg_to_rad(signed_deg)
+	animated_sprite.position = _base_sprite_pos.rotated(rad)
+	animated_sprite.rotation_degrees = _base_sprite_rot + signed_deg
+	# ★ 不要碰 scale：美术可能在 Inspector 里设了 0.5/2 倍，
+	#   这里只负责修正翻转遗留的负号（否则会把 x 拉回 1.0，出现「x、y 缩放不一致」）
+	_clear_sprite_flip()
+	if not rotate_collision:
+		return
+	for s in collision_shapes:
+		if not is_instance_valid(s):
+			continue
+		var base: Variant = _pendulum_shape_bases.get(s.get_instance_id())
+		if base == null:
+			continue
+		s.position = (base["pos"] as Vector2).rotated(rad)
+		s.rotation_degrees = float(base["rot"]) + signed_deg
+
+
+## 换向：从当前端点摆向另一端（0 或满度数）
+func _start_pendulum_leg() -> void:
+	_pendulum_from = _pendulum_offset
+	_pendulum_to = 0.0 if _pendulum_from > _pendulum_range * 0.5 else _pendulum_range
+	_pendulum_leg_time = 0.0
+	_pendulum_need_swap = false
+
+
+## 每帧推进摆动：停滞 → 换向 → 按速度曲线前进 → 到端点后进入停滞
+func _update_pendulum_rotation(dt: float) -> void:
+	if _pendulum_total <= 0.0 or _pendulum_range <= 0.0:
+		return
+
+	# 端点停滞
+	if _pendulum_wait_timer > 0.0:
+		_pendulum_wait_timer = maxf(_pendulum_wait_timer - dt, 0.0)
+		if _pendulum_wait_timer > 0.0:
+			return
+
+	# 上趟结束 → 换向（停滞为 0 时也在同一帧完成换向，避免原地空转一帧）
+	if _pendulum_need_swap:
+		_start_pendulum_leg()
+
+	_pendulum_leg_time += dt
+	var dir: float = 1.0 if _pendulum_to >= _pendulum_from else -1.0
+	var t: float = minf(_pendulum_leg_time, _pendulum_total)
+	_apply_pendulum_angle(_pendulum_from + dir * _pendulum_distance(t))
+
+	if _pendulum_leg_time >= _pendulum_total:
+		_apply_pendulum_angle(_pendulum_to)
+		_pendulum_leg_time = 0.0
+		_pendulum_wait_timer = maxf(pendulum_end_wait, 0.0)
+		_pendulum_need_swap = true
 
 # ── 动画周期 ──────────────────────────────────────
 

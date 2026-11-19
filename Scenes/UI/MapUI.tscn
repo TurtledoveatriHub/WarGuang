@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://b5jls6ojf2s46"]
 
 [ext_resource type="Script" uid="uid://dqe1fpd8vpobx" path="res://Scripts/UI/MapUI.gd" id="1_mapui"]
+[ext_resource type="Texture2D" uid="uid://dpxh3vdd5cef" path="res://Assets/Textures/UIs/SceneUIs/地图框.png" id="3_53eeq"]
 [ext_resource type="Texture2D" uid="uid://b28mtiuib1kyv" path="res://Assets/Textures/UIs/InstanceUIs/特殊标志.png" id="3_legend"]
-[ext_resource type="Texture2D" uid="uid://chrxvtfsyndtw" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="4_frame"]
 [ext_resource type="Texture2D" uid="uid://cgglpyof6634f" path="res://Assets/Textures/UIs/SceneUIs/地图角色图标.png" id="5_53eeq"]
 [ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="6_fx"]
 
@@ -36,13 +36,14 @@ pivot_offset = Vector2(640, 360)
 mouse_filter = 2
 
 [node name="FrameSprite" type="Sprite2D" parent="ContentRoot"]
+z_index = 20
 position = Vector2(641, 360)
-scale = Vector2(4.125, 4.2222)
-texture = ExtResource("4_frame")
+scale = Vector2(4.2, 4.2)
+texture = ExtResource("3_53eeq")
 
 [node name="LegendSprite" type="Sprite2D" parent="ContentRoot"]
 z_index = 20
-position = Vector2(952, 624)
+position = Vector2(896.00006, 616)
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("3_legend")
 

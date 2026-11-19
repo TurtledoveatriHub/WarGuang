@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=4 uid="uid://ts71w4baimq1"]
+[gd_scene load_steps=17 format=4 uid="uid://ts71w4baimq1"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_mnux7"]
 [ext_resource type="AudioStream" uid="uid://wh2j8kh5ma1q" path="res://Assets/Audios/BGM/跳跃天空.ogg" id="2_dj8vp"]
@@ -10,6 +10,7 @@
 [ext_resource type="TileSet" uid="uid://bcepqj28nsvep" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原物块瓦片集.tres" id="9_7furf"]
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="10_kihq3"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="11_kuh76"]
+[ext_resource type="PackedScene" uid="uid://cyapwq01heeiv" path="res://Scenes/Instances/HurtBoxs/Hammer.tscn" id="11_qo2yg"]
 [ext_resource type="PackedScene" uid="uid://ck7fy1kuqx8h0" path="res://Scenes/Instances/Props/MechanismGate.tscn" id="12_qo2yg"]
 [ext_resource type="PackedScene" uid="uid://dekrt2dtacnvc" path="res://Scenes/Instances/Props/JoystickSwitch.tscn" id="13_mjh3g"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="20_kqj3d"]
@@ -92,6 +93,29 @@ script = ExtResource("11_kuh76")
 
 [node name="Platforms" type="Node2D" parent="."]
 position = Vector2(0, 144)
+
+[node name="HurtBoxs" type="Node2D" parent="."]
+
+[node name="Hammer" parent="HurtBoxs" instance=ExtResource("11_qo2yg")]
+position = Vector2(224, 200)
+
+[node name="Hammer2" parent="HurtBoxs" instance=ExtResource("11_qo2yg")]
+position = Vector2(256, 0)
+
+[node name="Hammer3" parent="HurtBoxs" instance=ExtResource("11_qo2yg")]
+position = Vector2(96, 0)
+
+[node name="Hammer4" parent="HurtBoxs" instance=ExtResource("11_qo2yg")]
+position = Vector2(-96, 0)
+
+[node name="Hammer5" parent="HurtBoxs" instance=ExtResource("11_qo2yg")]
+position = Vector2(144, -288)
+
+[node name="Hammer6" parent="HurtBoxs" instance=ExtResource("11_qo2yg")]
+position = Vector2(-16, -288)
+
+[node name="Hammer7" parent="HurtBoxs" instance=ExtResource("11_qo2yg")]
+position = Vector2(-208, -288)
 
 [node name="Props" type="Node2D" parent="."]
 position = Vector2(0, 144)

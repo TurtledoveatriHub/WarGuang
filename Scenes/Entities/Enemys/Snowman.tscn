@@ -263,11 +263,13 @@ muzzle_offset = Vector2(0, 0)
 bullet_parabolic = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_31ow8")
 animation = &"Run"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(1, 2)
+scale = Vector2(2, 2)
 shape = SubResource("RectangleShape2D_v1wb1")
 
 [node name="EnemyBase" type="Node2D" parent="."]

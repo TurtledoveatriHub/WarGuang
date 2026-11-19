@@ -128,23 +128,23 @@ func _ready():
 	Global.player_health_changed.connect(_on_global_health_changed)
 	Global.coins_changed.connect(_on_coins_changed)
 	Global.coins_changing.connect(_on_coins_changing)
-	_setup_debug_full_map_button()
+	#_setup_debug_full_map_button()
 
 ## ════ 临时调试：一键准备「完整地图」 ════
 ## 为什么放在 HUD 而不是地图场景：地图打开时再改贴图会瞬间变化、很突兀；
 ## 在 HUD 上先把全部房间烘焙进贴图 + 整块揭开会探索遮罩，之后开图就是完整的。
 ## 用完把这段 + 按钮一起删掉即可。
-func _setup_debug_full_map_button() -> void:
-	var button := Button.new()
-	button.name = "DebugFullMapButton"
-	button.text = "完整地图(临时)"
-	button.focus_mode = Control.FOCUS_NONE
-	button.size = Vector2(150, 38)
-	button.pressed.connect(_on_debug_full_map_pressed)
-	add_child(button)
-	_place_debug_full_map_button()
-	if get_viewport() != null and not get_viewport().size_changed.is_connected(_place_debug_full_map_button):
-		get_viewport().size_changed.connect(_place_debug_full_map_button)
+#func _setup_debug_full_map_button() -> void:
+	#var button := Button.new()
+	#button.name = "DebugFullMapButton"
+	#button.text = "完整地图(临时)"
+	#button.focus_mode = Control.FOCUS_NONE
+	#button.size = Vector2(150, 38)
+	#button.pressed.connect(_on_debug_full_map_pressed)
+	#add_child(button)
+	#_place_debug_full_map_button()
+	#if get_viewport() != null and not get_viewport().size_changed.is_connected(_place_debug_full_map_button):
+		#get_viewport().size_changed.connect(_place_debug_full_map_button)
 
 ## 把按钮摆在右上角（窗口尺寸变化时也跟着走）
 func _place_debug_full_map_button() -> void:

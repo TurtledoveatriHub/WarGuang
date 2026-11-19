@@ -231,7 +231,7 @@ warma-shadow-test/
 
 ## 开发者 (Developer)
 
-- **作者**：TurtledoveatriHub（个人独立开发）
+- **作者**：斑鸠at（个人独立开发，）
 - **GitHub**：[@TurtledoveatriHub](https://github.com/TurtledoveatriHub)
 - **联系方式**：TODO（邮箱 / B 站 / 社交主页）
 - **项目动机**：以《蔚蓝》《空洞骑士》等作品为学习对象，练习 2D 平台跳跃的手感打磨、房间制关卡设计与独立游戏完整开发流程。

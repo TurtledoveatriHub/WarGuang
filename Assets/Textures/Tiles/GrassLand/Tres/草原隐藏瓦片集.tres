@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://00012oaf21mdm"]
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://ctktjcqwotds1"]
 
 [ext_resource type="Texture2D" uid="uid://cgafqg5yx71oh" path="res://Assets/Textures/Tiles/GrassLand/草原瓦片.png" id="1_nbxfp"]
 [ext_resource type="Texture2D" uid="uid://dyo8bylav02la" path="res://Assets/Textures/Tiles/GrassLand/石砖瓦片.png" id="1_xqkio"]

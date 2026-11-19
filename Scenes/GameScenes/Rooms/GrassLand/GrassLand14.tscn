@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="10_f4s73"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="10_r4nej"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="11_bvsmf"]
-[ext_resource type="TileSet" uid="uid://00012oaf21mdm" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原隐藏瓦片集.tres" id="11_tgnis"]
+[ext_resource type="TileSet" uid="uid://ctktjcqwotds1" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原隐藏瓦片集.tres" id="11_tgnis"]
 [ext_resource type="Script" uid="uid://ky86na7armsv" path="res://Scripts/GameScenes/HiddenRegionFade.gd" id="12_td6fq"]
 [ext_resource type="PackedScene" uid="uid://cbxsbnigsn8l2" path="res://Scenes/Instances/Props/TeleportPoint.tscn" id="13_lh47h"]
 [ext_resource type="AudioStream" uid="uid://bm8l08hel60oa" path="res://Assets/Audios/SFX/Instances/存档点交互.wav" id="13_y5vv2"]

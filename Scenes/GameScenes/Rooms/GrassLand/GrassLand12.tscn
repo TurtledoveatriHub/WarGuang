@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="10_g28qu"]
 [ext_resource type="Script" uid="uid://hvsve12jskp1" path="res://Scripts/Instances/HurtBoxs/HurtboxMap.gd" id="10_oo2it"]
 [ext_resource type="TileSet" uid="uid://ddmqsmr1batw4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原背景瓦片集.tres" id="11_x6wmm"]
-[ext_resource type="TileSet" uid="uid://00012oaf21mdm" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原隐藏瓦片集.tres" id="12_ayauy"]
+[ext_resource type="TileSet" uid="uid://ctktjcqwotds1" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原隐藏瓦片集.tres" id="12_ayauy"]
 [ext_resource type="PackedScene" uid="uid://b5u66wh2js8e" path="res://Scenes/Entities/NPCs/Salesclerk.tscn" id="12_txn22"]
 [ext_resource type="Texture2D" uid="uid://bvaop67cv68a6" path="res://Assets/Textures/UIs/InstanceUIs/旧版UI2.png" id="13_kuuiu"]
 [ext_resource type="Script" uid="uid://ky86na7armsv" path="res://Scripts/GameScenes/HiddenRegionFade.gd" id="13_oo2it"]

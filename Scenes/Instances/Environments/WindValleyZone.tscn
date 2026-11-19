@@ -1,8 +1,9 @@
 [gd_scene load_steps=8 format=3 uid="uid://rosvjshqrfcj"]
 
-[ext_resource type="Script" uid="uid://du3qkebsxr42g" path="res://Scripts/Instances/EnvironmentZone.gd" id="1_envzone"]
-[ext_resource type="Script" uid="uid://cd40oqnytjly3" path="res://Scripts/Instances/EnvironmentZoneVisual.gd" id="2_envviz"]
-[ext_resource type="Texture2D" uid="uid://bn5j5b16b3bl3" path="res://Assets/Textures/FX/wind_streak.tres" id="3_streak"]
+[ext_resource type="Script" uid="uid://du3qkebsxr42g" path="res://Scripts/Instances/Environments/EnvironmentZone.gd" id="1_envzone"]
+[ext_resource type="Script" uid="uid://cd40oqnytjly3" path="res://Scripts/Instances/Environments/EnvironmentZoneVisual.gd" id="2_envviz"]
+[ext_resource type="Texture2D" uid="uid://bn5j5b16b3bl3" path="res://Assets/Textures/Instances/ALL/wind_streak.tres" id="3_streak"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tbx8o"]
 size = Vector2(128, 128)

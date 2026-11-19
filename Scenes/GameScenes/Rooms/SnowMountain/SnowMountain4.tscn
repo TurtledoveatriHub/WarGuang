@@ -320,7 +320,7 @@ trigger_effect_type = 2
 [node name="Enemys" type="Node2D" parent="."]
 
 [node name="Snowman" parent="Enemys" instance=ExtResource("19_q00c4")]
-position = Vector2(241, 1560)
+position = Vector2(416, 1440)
 
 [node name="SnowBird" parent="Enemys" instance=ExtResource("20_q4kib")]
 position = Vector2(200, 1864)
