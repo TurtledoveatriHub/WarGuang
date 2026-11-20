@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://ch04duw4ekuta" path="res://Scripts/Entities/NPCs/GrassLandMerchant.gd" id="3_glm_script"]
 [ext_resource type="AudioStream" uid="uid://bqpqfd1hb2pl3" path="res://Assets/Audios/SFX/Instances/敲钟.wav" id="3_scl0x"]
 [ext_resource type="Resource" uid="uid://rspetkti0nyf" path="res://Assets/Dialogues/NPCs/GrassLandMerchant.dialogue" id="4_glm_dialogue"]
-[ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="5_glm_balloon"]
+[ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/GameUI/MyBalloon.tscn" id="5_glm_balloon"]
 [ext_resource type="Texture2D" uid="uid://8be33leogd6g" path="res://Assets/Textures/Entities/NPCs/店员.png" id="6_yo2dy"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_62rtu"]

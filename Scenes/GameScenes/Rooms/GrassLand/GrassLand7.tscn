@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_tp3e3"]
 [ext_resource type="AudioStream" uid="uid://chuvp6gn40l48" path="res://Assets/Audios/BGM/蔚蓝云.ogg" id="2_w88no"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_y1cwc"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="2_y1cwc"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="3_t11g8"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_w88no"]
 [ext_resource type="TileSet" uid="uid://ddmqsmr1batw4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原背景瓦片集.tres" id="6_qi8c0"]
@@ -25,6 +25,7 @@
 [ext_resource type="PackedScene" uid="uid://c8p4bv4n7if4" path="res://Scenes/Entities/Neutrals/StoneBug.tscn" id="21_tijhd"]
 [ext_resource type="PackedScene" uid="uid://brlmsk1ql3b4v" path="res://Scenes/Entities/Neutrals/TrampolineBug.tscn" id="22_wulbu"]
 [ext_resource type="PackedScene" uid="uid://cbxsbnigsn8l2" path="res://Scenes/Instances/Props/TeleportPoint.tscn" id="23_3e7lp"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 

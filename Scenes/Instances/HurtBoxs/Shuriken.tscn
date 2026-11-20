@@ -53,9 +53,11 @@ script = ExtResource("1_3yudw")
 sprite_effect = 1
 rotation_speed = 540.0
 movement_mode = 1
-move_speed = 360.0
+move_speed_to_end = 360.0
+move_speed_to_start = 360.0
 end_offset = Vector2(256, 0)
-wait_time = 0.2
+wait_time_at_start = 0.2
+wait_time_at_end = 0.2
 deceleration_time = 0.0
 collision_shapes = [NodePath("CollisionShape2D")]
 

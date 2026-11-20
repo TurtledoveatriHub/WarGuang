@@ -9,8 +9,9 @@
 ##        - 弹幕：扇形同时发射(spread) 或 逐发连发(sequential，每发重新瞄准玩家)
 ##        - 肉身突进：朝玩家冲刺一段距离（可被地形阻挡，或无视地形穿越）
 ##        - 两者都开启时：每次随机选择一种
-##   5. 弹幕使用独立场景 EnemyBullet（res://Scenes/Instances/HurtBoxs/EnemyBullet.tscn），
-##      其速度/伤害/寿命等由弹幕自身外部变量控制，敌怪只负责发射几何。
+##   5. 弹幕使用独立场景（在 Inspector 的「弹幕场景」bullet_scene 里指定；脚本为
+##      Scripts/Instances/HurtBoxs/EnemyBullet.gd），其速度/伤害/寿命等由弹幕自身外部变量控制，
+##      敌怪只负责发射几何。
 ## 状态机：PATROL(悬停) → CHASE(跟随/警戒) → ATTACK(执行能力) → HURT → DIE → RESPAWN
 ## 复用 EnemyBase.gd：血量/无敌/受伤/死亡/复活/接触玩家伤害。
 ## 性能：仇恨、攻击条件等“决策”集中在低频 tick（detect_interval）里做，

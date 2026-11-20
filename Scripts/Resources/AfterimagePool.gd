@@ -1,6 +1,7 @@
 # AfterimagePool.gd
 # 残影对象池（独立脚本，避免 Godot 4.x 内部类类型问题）
 extends Node
+class_name AfterimagePool
 
 ## 残影实例池
 var pool: Array[Node2D] = []

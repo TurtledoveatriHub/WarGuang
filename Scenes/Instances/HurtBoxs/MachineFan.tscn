@@ -1,0 +1,73 @@
+[gd_scene load_steps=7 format=3 uid="uid://bbgj1h6chvtp8"]
+
+[ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_gsao7"]
+[ext_resource type="Texture2D" uid="uid://b3as41l5i2eio" path="res://Assets/Textures/Instances/GrassLand/机关风扇.png" id="2_wv41h"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_720xh"]
+atlas = ExtResource("2_wv41h")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wgy32"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"CLOSING",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": true,
+"name": &"OFF",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_720xh")
+}],
+"loop": true,
+"name": &"ON",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"OPENING",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vibpo"]
+size = Vector2(12, 186)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d4oae"]
+size = Vector2(186, 12)
+
+[node name="MachineFan" type="Area2D" node_paths=PackedStringArray("collision_shapes")]
+visibility_layer = 16
+collision_layer = 16
+collision_mask = 129
+script = ExtResource("1_gsao7")
+sprite_effect = 1
+rotation_speed = 60.0
+rotate_collision = true
+collision_shapes = [NodePath("CollisionShape2D"), NodePath("CollisionShape2D2")]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_wgy32")
+animation = &"ON"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+light_mask = 16
+shape = SubResource("RectangleShape2D_vibpo")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+visible = false
+light_mask = 16
+shape = SubResource("RectangleShape2D_d4oae")

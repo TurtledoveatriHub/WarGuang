@@ -92,8 +92,8 @@ static func _ensure_afterimage_trail(player: Node) -> void:
 		return
 	player.afterimage_trail = player.get_node_or_null("AfterimageTrail")
 	if player.afterimage_trail == null:
-		var trail_script = load("res://Scripts/Components/AfterimageTrail.gd")
-		player.afterimage_trail = trail_script.new()
+		# 直接用 class_name 引用，不再写字面量路径（脚本挪过位置也不会失效）
+		player.afterimage_trail = AfterimageTrail.new()
 		player.afterimage_trail.name = "AfterimageTrail"
 		player.add_child(player.afterimage_trail)
 	_sync_afterimage_trail_config_defaults(player)

@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dq4jgo8v4l7kq" path="res://Scenes/Instances/ObjectPools/Afterimage.tscn" id="2_t26db"]
 [ext_resource type="Script" uid="uid://bhexx6mj1xv3q" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_2d.gd" id="3_ude3g"]
 [ext_resource type="Script" uid="uid://8umksf8e80fw" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="4_jmcll"]
-[ext_resource type="Script" uid="uid://bw1fmebkjwy7o" path="res://Scripts/Components/AfterimageTrail.gd" id="5_afterimagetrail"]
+[ext_resource type="Script" uid="uid://bw1fmebkjwy7o" path="res://Scripts/Instances/ObjectPools/AfterimageTrail.gd" id="5_afterimagetrail"]
 [ext_resource type="Script" uid="uid://c6igct05krujq" path="res://Scripts/Player/PlayerCameraController.gd" id="6_camera_controller"]
 [ext_resource type="Script" uid="uid://kd5yity3l62p" path="res://Scripts/Player/PlayerFXController.gd" id="7_fx_controller"]
 [ext_resource type="Texture2D" uid="uid://bu33m03c1ntgd" path="res://Assets/Textures/Warmas/沃玛1.png" id="8_0kmp4"]

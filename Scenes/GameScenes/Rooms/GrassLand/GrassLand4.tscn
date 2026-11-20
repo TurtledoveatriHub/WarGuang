@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_n3qgl"]
 [ext_resource type="AudioStream" uid="uid://bs0ucop4s2m8h" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_fxopw"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_mtlun"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="3_mtlun"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_lux5n"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_6wqi2"]
 [ext_resource type="TileSet" uid="uid://byfj4vsmi5ff4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原伤害瓦片集.tres" id="7_n3qgl"]
@@ -23,6 +23,7 @@
 [ext_resource type="Resource" uid="uid://cxs6krmp1jrsd" path="res://Assets/Dialogues/Signs/gl4Sign.dialogue" id="18_lux5n"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="19_dfkkg"]
 [ext_resource type="PackedScene" uid="uid://ck7fy1kuqx8h0" path="res://Scenes/Instances/Props/MechanismGate.tscn" id="19_k2eek"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a4x7p"]
 

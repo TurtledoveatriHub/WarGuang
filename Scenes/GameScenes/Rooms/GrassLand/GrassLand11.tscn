@@ -1,7 +1,7 @@
 [gd_scene load_steps=23 format=4 uid="uid://b3ae84jcesttd"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_unrir"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_fsdaj"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="2_fsdaj"]
 [ext_resource type="AudioStream" uid="uid://bs0ucop4s2m8h" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_pkyhv"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_f2p7u"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_f2p7u"]
@@ -21,6 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://bywk00ct1ifc2" path="res://Scenes/Instances/Props/MechanismPlatform.tscn" id="16_k50iq"]
 [ext_resource type="PackedScene" uid="uid://dleai1y0iaa7s" path="res://Scenes/Instances/Props/ButtonSwitch.tscn" id="17_mw01j"]
 [ext_resource type="PackedScene" uid="uid://oorimac8h2bw" path="res://Scenes/Instances/Props/Sign.tscn" id="18_4tf44"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oajg5"]
 
@@ -121,12 +122,14 @@ save_id = "gl11x3"
 
 [node name="Shuriken" parent="HurtBoxs" instance=ExtResource("12_fwis1")]
 position = Vector2(-584, 464)
-move_speed = 240.0
+move_speed_to_end = 240.0
+move_speed_to_start = 240.0
 end_offset = Vector2(376, 0)
 
 [node name="Shuriken2" parent="HurtBoxs" instance=ExtResource("12_fwis1")]
 position = Vector2(-128, 400)
-move_speed = 240.0
+move_speed_to_end = 240.0
+move_speed_to_start = 240.0
 end_offset = Vector2(-512, 0)
 
 [node name="Props" type="Node2D" parent="."]

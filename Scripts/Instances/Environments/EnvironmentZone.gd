@@ -1,5 +1,5 @@
 # ★ 不加 @tool（理由见 EnvironmentZoneBase 顶部）：保证场景里的参数可自由修改
-extends "res://Scripts/Instances/Environments/EnvironmentZoneBase.gd"
+extends EnvironmentZoneBase
 class_name EnvironmentZone
 
 ## 环境效果区（在房间里任意摆放、可自定义范围大小）

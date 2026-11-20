@@ -99,7 +99,8 @@ collision_mask = 129
 script = ExtResource("1_5nrrw")
 sprite_effect = 1
 movement_mode = 3
-move_speed = 120.0
+move_speed_to_end = 120.0
+move_speed_to_start = 120.0
 end_offset = Vector2(256, 0)
 collision_shapes = [NodePath("CollisionShape2D")]
 

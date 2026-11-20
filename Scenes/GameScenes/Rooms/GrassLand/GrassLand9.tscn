@@ -1,8 +1,8 @@
-[gd_scene load_steps=21 format=4 uid="uid://0002bcb751ypv"]
+[gd_scene load_steps=21 format=4 uid="uid://ctktqysprtp6b"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_3sv2x"]
 [ext_resource type="AudioStream" uid="uid://chuvp6gn40l48" path="res://Assets/Audios/BGM/蔚蓝云.ogg" id="2_3jenr"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_r8803"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="2_r8803"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="3_p00b8"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="5_snns7"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_vad6y"]
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://bywk00ct1ifc2" path="res://Scenes/Instances/Props/MechanismPlatform.tscn" id="14_toe8y"]
 [ext_resource type="PackedScene" uid="uid://dleai1y0iaa7s" path="res://Scenes/Instances/Props/ButtonSwitch.tscn" id="15_a6n6i"]
 [ext_resource type="PackedScene" uid="uid://oorimac8h2bw" path="res://Scenes/Instances/Props/Sign.tscn" id="16_n483y"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 

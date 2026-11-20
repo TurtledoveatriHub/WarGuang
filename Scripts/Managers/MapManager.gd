@@ -767,7 +767,7 @@ func _ready() -> void:
 	get_layout_data()
 	## 预加载 MapUI 场景，并常驻场景树（关闭时仅隐藏），
 	## 这样地图的战争迷雾揭示逻辑在游戏进行中也能持续工作。
-	var map_ui_scene: PackedScene = preload("res://Scenes/UI/MapUI.tscn")
+	var map_ui_scene: PackedScene = ScenePaths.load_map_ui()
 	_map_ui_instance = map_ui_scene.instantiate()
 	## 关键：地图在游戏进行中打开，必须用 ALWAYS，否则暂停/未暂停时补间都可能不推进。
 	_map_ui_instance.process_mode = Node.PROCESS_MODE_ALWAYS

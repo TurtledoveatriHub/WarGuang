@@ -14,8 +14,8 @@ extends SceneTree
 ##   Assets/Textures/FX/water_body_tile.png     水体色阶（浅 → 深，纵向铺满）
 ##   Assets/Textures/FX/water_splash_dot.png    入水水花用的小方点
 
-## 输出目录
-const OUTPUT_DIR: String = "res://Assets/Textures/FX"
+## 输出目录（注意实际目录名是 FXs，旧名 FX 已不存在）
+const OUTPUT_DIR: String = "res://Assets/Textures/FXs"
 ## 水面条带宽度（48 = 顶边图案周期 12 的 4 倍，保证可横向平铺）
 const SURFACE_W: int = 48
 ## 水面条带高度（世界像素；1 纹素 = 1 像素）

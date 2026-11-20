@@ -11,7 +11,7 @@
 ##  - 碰撞层只含 NeutralBug（同类互检用），Player 的碰撞掩码不含该层 → 玩家可以穿过本虫，
 ##    只由顶部 BounceArea 弹起，不会与玩家产生碰撞体交互
 ##  - 加入 ignore_switch_press 组：不触发按压式开关
-extends "res://Scripts/Entities/Neutrals/NeutralBug.gd"
+extends NeutralBug
 class_name TrampolineBug
 
 ## ── 弹跳 ──

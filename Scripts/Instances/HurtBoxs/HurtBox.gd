@@ -49,12 +49,15 @@ enum PendulumCurve {
 ## 是否同时旋转碰撞体（可独立启用）
 @export var rotate_collision: bool = false
 
-## ★ 大摆锤模式：开启后不再整圈旋转，而是在「初始角度 ↔ 初始角度 + 摆动度数」之间来回摆动。
+## ★ 大摆锤模式：开启后不再整圈旋转，而是在「初始朝向 ± 度数/2」之间来回摆动。
+##   ★ 起始角居中：素材画的是垂直向下（= 0°），摆动以这个朝向为**中心**对称摆开，
+##     所以实际角度范围是 -度数/2 ~ +度数/2，出生时正好停在正中，不会一上来就歪向一边。
 ##   仅 sprite_effect = ROTATE 时生效（与 rotation_speed / rotate_collision 同一适用范围）。
-##   摆动方向沿用 clockwise；每趟「0 → 满速」加速 pendulum_accel_time 秒，接近端点用同样时长减速到 0，
-##   到达端点后停滞 pendulum_end_wait 秒再反向。
+##   摆动方向沿用 clockwise（决定第一趟往哪边摆）；每趟「0 → 满速」加速 pendulum_accel_time 秒，
+##   接近端点用同样时长减速到 0，到达端点后停滞 pendulum_end_wait 秒再反向。
 @export var pendulum_enabled: bool = false
-## 摆动度数（90~360）：相对初始角度向 clockwise 方向张开的角度范围；超出范围自动夹到 90 或 360
+## 摆动总度数（90~360）：以初始朝向为中心对称摆开，实际范围 = ±度数/2；
+## 超出范围自动夹到 90 或 360
 @export_range(90.0, 360.0, 1.0, "suffix:°") var pendulum_degrees: float = 180.0
 ## 加速度时间（秒）：每趟从静止加速到 rotation_speed 所需时间；行程不足时自动降峰值速度
 @export_range(0.0, 10.0, 0.01, "suffix:s") var pendulum_accel_time: float = 0.5
@@ -78,14 +81,18 @@ enum PendulumCurve {
 ## 0=静止，1=直线往返，2=波浪往返，3=圆周往返
 @export var movement_mode: MovementMode = MovementMode.STATIC
 
-## 移动通用参数（所有移动模式共用同一组）
+## 移动通用参数（所有移动模式共用同一组；圆周模式无「端点」，两段各自取对应方向的值）
 @export_category("移动通用参数")
-## 移动速度（像素/秒）
-@export var move_speed: float = 240.0
+## 去程速度（像素/秒）：起点 → 终点偏移
+@export var move_speed_to_end: float = 240.0
+## 回程速度（像素/秒）：终点偏移 → 起点（波浪/圆周模式同样按「去程 0→1、回程 1→0」区分）
+@export var move_speed_to_start: float = 240.0
 ## 终点偏移（相对编辑器放置位置）
 @export var end_offset: Vector2 = Vector2(0, 200)
-## 端点停留时间（秒）
-@export var wait_time: float = 0.5
+## 起点停留时间（秒）：回到起点后停多久再出发
+@export var wait_time_at_start: float = 0.5
+## 终点停留时间（秒）：到达终点偏移后停多久再返回
+@export var wait_time_at_end: float = 0.5
 ## 加速时间（秒）
 @export var acceleration_time: float = 0.5
 ## 减速时间（秒）
@@ -110,7 +117,8 @@ enum PendulumCurve {
 ## 发射器模式设置
 @export_category("发射器模式")
 ## 发射器模式：仅 LINEAR 生效；开启后自动忽略“周期性开关伤害检测”。
-## 流程：起点静止 wait_time 播 OPEN（不伤）→ 切 ON（可伤）→ 单程移动到终点偏移 → 到终点播 CLOSE 切 OFF（不伤）→ 终点静止 wait_time → 瞬移回起点切 OPEN，循环。
+## 流程：起点静止 wait_time_at_start 播 OPEN（不伤）→ 切 ON（可伤）→ 单程移动到终点偏移 → 到终点播 CLOSE 切 OFF（不伤）→ 终点静止 wait_time_at_end → 瞬移回起点切 OPEN，循环。
+## 单程发射只用「去程速度 move_speed_to_end」，回程是瞬移，不受「回程速度」影响。
 @export var enable_launcher_mode: bool = false
 ## 玩家检测（需在发射器模式基础上）：切 ON 后在起点等待，检测到“起点→终点”直线走廊内有玩家才发射。
 @export var enable_player_detect: bool = false
@@ -172,24 +180,26 @@ var _progress: float = 0.0
 var _moving_to_end: bool = true
 
 # ── 大摆锤（往返旋转）状态 ──────────────────────────
-## 当前摆动角度（0 → _pendulum_range，0 表示停在初始角度）
+## 当前摆动角（相对「素材初始朝向」的偏移，范围 -度数/2 ~ +度数/2；0 = 垂直向下）
 var _pendulum_offset: float = 0.0
-## 摆动总度数（0~360，取绝对值）
+## 摆动总度数（90~360，取绝对值）；单侧极值 = ±_pendulum_range * 0.5
 var _pendulum_range: float = 180.0
-## 本趟起点角度 / 终点角度（都在 0 ~ _pendulum_range 之间）
+## 本趟起点角度 / 终点角度（都在 ±_pendulum_range * 0.5 之间）
 var _pendulum_from: float = 0.0
-var _pendulum_to: float = 180.0
+var _pendulum_to: float = 0.0
+## 本趟行程的角度距离（= |to - from|；首趟只有半程）
+var _pendulum_leg_dist: float = 0.0
 ## 本趟已用时长
 var _pendulum_leg_time: float = 0.0
 ## 端点停滞剩余时间
 var _pendulum_wait_timer: float = 0.0
 ## 本趟结束后是否需要换向（区别于「停滞中」）
 var _pendulum_need_swap: bool = false
-## 速度曲线预算：加速时长 / 匀速时长 / 单趟总时长 / 峰值角速度
-var _pendulum_ta: float = 0.0
-var _pendulum_tc: float = 0.0
-var _pendulum_total: float = 0.0
-var _pendulum_peak: float = 0.0
+## 本趟速度曲线预算：加速时长 / 匀速时长 / 单趟总时长 / 峰值角速度
+var _pendulum_leg_ta: float = 0.0
+var _pendulum_leg_tc: float = 0.0
+var _pendulum_leg_total: float = 0.0
+var _pendulum_leg_peak: float = 0.0
 ## 是否已完成初始化（记录初始角度）
 var _pendulum_inited: bool = false
 ## 视觉与各碰撞体在编辑器里的初始位置 / 角度（绕 HurtBox 原点摆动，见 _apply_pendulum_angle）
@@ -238,7 +248,8 @@ var damage_cooldown: Dictionary = {}
 var debug_timer: float = 0.0
 
 func _ready():
-	# 路径常量（统一使用 move_speed / end_offset / wait_time / acceleration/deceleration_time）
+	# 路径常量（统一使用 move_speed_to_end / move_speed_to_start / end_offset /
+	# wait_time_at_start / wait_time_at_end / acceleration_time / deceleration_time）
 	start_pos = global_position
 	end_pos = start_pos + end_offset
 	path_length = end_offset.length()
@@ -407,8 +418,19 @@ func _on_body_exited(body):
 
 # ── 移动逻辑 ──────────────────────────────────────
 
+## 本趟的移动速度（像素/秒）：去程用 move_speed_to_end，回程用 move_speed_to_start
+func _leg_speed() -> float:
+	return move_speed_to_end if _moving_to_end else move_speed_to_start
+
+
+## 到达本趟终点后应停留的时长（秒）：去程到达 → 终点等待；回程到达 → 起点等待。
+## 必须在 _moving_to_end 翻转之前调用。
+func _arrival_wait() -> float:
+	return wait_time_at_end if _moving_to_end else wait_time_at_start
+
+
 func handle_movement(delta: float) -> void:
-	if path_length <= 0.0 or move_speed <= 0.0:
+	if path_length <= 0.0:
 		return
 	
 	# NaN 保护
@@ -430,6 +452,11 @@ func handle_movement(delta: float) -> void:
 			current_speed = 0.0
 		return
 	
+	# 本趟速度（去程/回程各自独立；速度设为 0 表示该方向不动，直接跳过避免除零与 NaN）
+	var leg_speed: float = _leg_speed()
+	if leg_speed <= 0.0:
+		return
+	
 	# 加减速判定（区分方向）
 	var dist_done: float
 	var dist_left: float
@@ -440,17 +467,18 @@ func handle_movement(delta: float) -> void:
 		dist_done = (1.0 - _progress) * path_length
 		dist_left = _progress * path_length
 	
-	var half_accel: float = acceleration_time * move_speed / 2.0
-	var half_decel: float = deceleration_time * move_speed / 2.0
-	var accel: float = move_speed / acceleration_time if acceleration_time > 0 else move_speed
-	var decel: float = move_speed / deceleration_time if deceleration_time > 0 else move_speed
+	# 加减速全部按本趟速度换算：只有一程改速度时，这一程的加减速距离与时间也跟着变
+	var half_accel: float = acceleration_time * leg_speed / 2.0
+	var half_decel: float = deceleration_time * leg_speed / 2.0
+	var accel: float = leg_speed / acceleration_time if acceleration_time > 0 else leg_speed
+	var decel: float = leg_speed / deceleration_time if deceleration_time > 0 else leg_speed
 	
 	if dist_done < half_accel:
-		current_speed = min(current_speed + accel * delta, move_speed)
+		current_speed = min(current_speed + accel * delta, leg_speed)
 	elif dist_left < half_decel:
 		current_speed = max(current_speed - decel * delta, 0.0)
 	else:
-		current_speed = move_speed
+		current_speed = leg_speed
 	
 	# ★ 根因修复：减速到 0 且接近终点时强制到达
 	if current_speed <= 0.0 and dist_left < half_decel * 0.5:
@@ -461,7 +489,7 @@ func handle_movement(delta: float) -> void:
 			_progress = 0.0
 			global_position = start_pos
 		is_waiting = true
-		wait_timer = wait_time
+		wait_timer = _arrival_wait()
 		return
 	
 	# 推进进度
@@ -479,14 +507,14 @@ func handle_movement(delta: float) -> void:
 			_progress = 1.0
 			global_position = end_pos
 			is_waiting = true
-			wait_timer = wait_time
+			wait_timer = _arrival_wait()
 			return
 	else:
 		if _progress <= arrival_eps:
 			_progress = 0.0
 			global_position = start_pos
 			is_waiting = true
-			wait_timer = wait_time
+			wait_timer = _arrival_wait()
 			return
 	
 	_progress = clampf(_progress, 0.0, 1.0)
@@ -626,70 +654,70 @@ func _init_pendulum() -> void:
 
 	# 度数限制在 90~360：小于 90 的摆幅看起来像抖动，大于 360 会绕回自身
 	_pendulum_range = absf(clampf(pendulum_degrees, 90.0, 360.0))
+
+	# 起始角居中：出生时停在正中（= 素材的垂直朝向），第一趟向 clockwise 一侧摆**半程**
+	_pendulum_offset = 0.0
+	_pendulum_wait_timer = 0.0
+	_build_pendulum_leg(0.0, _pendulum_range * 0.5)
+	_apply_pendulum_angle(0.0)
+
+
+## 本趟速度曲线预算：按本趟「实际角度距离」计算，而不是按总摆幅。
+## 这样首趟半程（0 → +D/2）与之后整程（-D/2 → +D/2）的峰值角速度一致，视觉上不会突然变快。
+func _build_pendulum_leg(from: float, to: float) -> void:
+	_pendulum_from = from
+	_pendulum_to = to
+	_pendulum_leg_time = 0.0
+	_pendulum_need_swap = false
+	_pendulum_leg_dist = absf(to - from)
+
 	var v_max: float = absf(rotation_speed)
-	_pendulum_ta = maxf(pendulum_accel_time, 0.0)
+	_pendulum_leg_ta = maxf(pendulum_accel_time, 0.0)
 
-	if _pendulum_range <= 0.0:
-		# 度数为 0：保持在初始角度，不做任何摆动（防御性分支，正常已被上面的夹取拦住）
-		_pendulum_peak = 0.0
-		_pendulum_tc = 0.0
-		_pendulum_total = 0.0
-		_apply_pendulum_angle(0.0)
-		return
-
-	if v_max <= 0.0:
-		# 速度为 0：视为不摆动（避免除零 / 无限时长）
-		_pendulum_peak = 0.0
-		_pendulum_tc = 0.0
-		_pendulum_total = 0.0
-		_apply_pendulum_angle(0.0)
+	if _pendulum_leg_dist <= 0.0 or v_max <= 0.0:
+		# 度数为 0 / 速度为 0：视为不摆动（防御性分支，避免除零与无限时长）
+		_pendulum_leg_peak = 0.0
+		_pendulum_leg_tc = 0.0
+		_pendulum_leg_total = 0.0
 		return
 
 	if pendulum_curve == PendulumCurve.SINE:
 		# 正弦曲线：t∈[0,T] 内 θ = D/2 * (1 - cos(πt/T))，
 		# 峰值角速度出现在行程中点 = D*π/(2T)，令其等于 rotation_speed 反解 T。
-		_pendulum_peak = v_max
-		_pendulum_ta = 0.0
-		_pendulum_tc = 0.0
-		_pendulum_total = PI * _pendulum_range / (2.0 * v_max)
-	elif _pendulum_ta > 0.0 and v_max * _pendulum_ta >= _pendulum_range:
+		_pendulum_leg_peak = v_max
+		_pendulum_leg_ta = 0.0
+		_pendulum_leg_tc = 0.0
+		_pendulum_leg_total = PI * _pendulum_leg_dist / (2.0 * v_max)
+	elif _pendulum_leg_ta > 0.0 and v_max * _pendulum_leg_ta >= _pendulum_leg_dist:
 		# 加速段 + 减速段已经超过行程：三角曲线，峰值速度按行程反推
-		_pendulum_peak = _pendulum_range / _pendulum_ta
-		_pendulum_tc = 0.0
-		_pendulum_total = _pendulum_ta * 2.0
+		_pendulum_leg_peak = _pendulum_leg_dist / _pendulum_leg_ta
+		_pendulum_leg_tc = 0.0
+		_pendulum_leg_total = _pendulum_leg_ta * 2.0
 	else:
-		_pendulum_peak = v_max
-		_pendulum_tc = maxf((_pendulum_range - v_max * _pendulum_ta) / v_max, 0.0)
-		_pendulum_total = _pendulum_ta * 2.0 + _pendulum_tc
-
-	# 初始状态：停在初始角度，本趟目标为满度数端点（起始不额外停滞）
-	_pendulum_offset = 0.0
-	_pendulum_from = 0.0
-	_pendulum_to = _pendulum_range
-	_pendulum_leg_time = 0.0
-	_pendulum_wait_timer = 0.0
-	_apply_pendulum_angle(0.0)
+		_pendulum_leg_peak = v_max
+		_pendulum_leg_tc = maxf((_pendulum_leg_dist - v_max * _pendulum_leg_ta) / v_max, 0.0)
+		_pendulum_leg_total = _pendulum_leg_ta * 2.0 + _pendulum_leg_tc
 
 
 ## 单趟 t 秒时已摆过的角度（梯形/三角速度曲线的解析积分，或正弦曲线；均与帧率无关）
 func _pendulum_distance(t: float) -> float:
 	if pendulum_curve == PendulumCurve.SINE:
-		if _pendulum_total <= 0.0:
+		if _pendulum_leg_total <= 0.0:
 			return 0.0
-		var p: float = clampf(t / _pendulum_total, 0.0, 1.0)
-		return 0.5 * _pendulum_range * (1.0 - cos(PI * p))
-	var ta: float = _pendulum_ta
+		var p: float = clampf(t / _pendulum_leg_total, 0.0, 1.0)
+		return 0.5 * _pendulum_leg_dist * (1.0 - cos(PI * p))
+	var ta: float = _pendulum_leg_ta
 	if ta <= 0.0:
 		# 无加速段：全程匀速
-		return clampf(_pendulum_peak * t, 0.0, _pendulum_range)
-	var a: float = _pendulum_peak / ta
+		return clampf(_pendulum_leg_peak * t, 0.0, _pendulum_leg_dist)
+	var a: float = _pendulum_leg_peak / ta
 	if t < ta:
 		return 0.5 * a * t * t
-	var acc_dist: float = 0.5 * _pendulum_peak * ta
-	if t < ta + _pendulum_tc:
-		return acc_dist + _pendulum_peak * (t - ta)
-	var t_left: float = maxf(_pendulum_total - t, 0.0)
-	return _pendulum_range - 0.5 * a * t_left * t_left
+	var acc_dist: float = 0.5 * _pendulum_leg_peak * ta
+	if t < ta + _pendulum_leg_tc:
+		return acc_dist + _pendulum_leg_peak * (t - ta)
+	var t_left: float = maxf(_pendulum_leg_total - t, 0.0)
+	return _pendulum_leg_dist - 0.5 * a * t_left * t_left
 
 
 ## 只把翻转产生的负号修正回正，保留 Inspector 里设定的缩放倍数（0.5、2 倍等）
@@ -698,7 +726,8 @@ func _clear_sprite_flip() -> void:
 		animated_sprite.scale.x = -animated_sprite.scale.x
 
 
-## 把「相对初始角度的摆动角」写回视觉与可选碰撞体。
+## 把「相对素材初始朝向的摆动角」写回视觉与可选碰撞体。
+## offset ∈ [-度数/2, +度数/2]，0 = 素材画的那个朝向（本例是垂直向下），不额外偏转。
 ## ★ 摆锤的支点 = HurtBox 节点自身的原点：子节点的 position 也一起绕原点旋转，
 ##   所以只要把「刀身/摆臂」放在原点下方（position 或 Sprite 的 offset），就能得到真正的摆动轨迹，
 ##   而不是原地自转。子节点 position 为 0 时退化为原地旋转（与整圈旋转表现一致）。
@@ -723,17 +752,16 @@ func _apply_pendulum_angle(offset: float) -> void:
 		s.rotation_degrees = float(base["rot"]) + signed_deg
 
 
-## 换向：从当前端点摆向另一端（0 或满度数）
+## 换向：从当前端点摆向另一端（+度数/2 与 -度数/2 交替，永远经过正中）
 func _start_pendulum_leg() -> void:
-	_pendulum_from = _pendulum_offset
-	_pendulum_to = 0.0 if _pendulum_from > _pendulum_range * 0.5 else _pendulum_range
-	_pendulum_leg_time = 0.0
-	_pendulum_need_swap = false
+	var half: float = _pendulum_range * 0.5
+	var to: float = -half if _pendulum_offset > 0.0 else half
+	_build_pendulum_leg(_pendulum_offset, to)
 
 
 ## 每帧推进摆动：停滞 → 换向 → 按速度曲线前进 → 到端点后进入停滞
 func _update_pendulum_rotation(dt: float) -> void:
-	if _pendulum_total <= 0.0 or _pendulum_range <= 0.0:
+	if _pendulum_leg_total <= 0.0:
 		return
 
 	# 端点停滞
@@ -745,13 +773,15 @@ func _update_pendulum_rotation(dt: float) -> void:
 	# 上趟结束 → 换向（停滞为 0 时也在同一帧完成换向，避免原地空转一帧）
 	if _pendulum_need_swap:
 		_start_pendulum_leg()
+		if _pendulum_leg_total <= 0.0:
+			return
 
 	_pendulum_leg_time += dt
 	var dir: float = 1.0 if _pendulum_to >= _pendulum_from else -1.0
-	var t: float = minf(_pendulum_leg_time, _pendulum_total)
+	var t: float = minf(_pendulum_leg_time, _pendulum_leg_total)
 	_apply_pendulum_angle(_pendulum_from + dir * _pendulum_distance(t))
 
-	if _pendulum_leg_time >= _pendulum_total:
+	if _pendulum_leg_time >= _pendulum_leg_total:
 		_apply_pendulum_angle(_pendulum_to)
 		_pendulum_leg_time = 0.0
 		_pendulum_wait_timer = maxf(pendulum_end_wait, 0.0)
@@ -833,12 +863,12 @@ func update_anim_cycle(delta: float) -> void:
 func _update_launcher(delta: float) -> void:
 	match _launcher_state:
 		LauncherState.LOAD_OPEN:
-			# 起点静止：播 OPEN（不伤），等 wait_time 且 OPEN 播完才切换。
+			# 起点静止：播 OPEN（不伤），等 wait_time_at_start 且 OPEN 播完才切换。
 			_damage_allowed = false
 			if animated_sprite.animation != "OPEN":
 				_play_open_animation()
 			_launcher_timer += delta
-			if _launcher_timer >= wait_time and not animated_sprite.is_playing():
+			if _launcher_timer >= wait_time_at_start and not animated_sprite.is_playing():
 				_launcher_timer = 0.0
 				_launcher_state = LauncherState.ARMED
 				animated_sprite.play("ON")
@@ -870,12 +900,12 @@ func _update_launcher(delta: float) -> void:
 				_launcher_timer = 0.0
 				animated_sprite.play("OFF")
 		LauncherState.END_OFF_WAIT:
-			# 终点静止（OFF，不伤），等 wait_time 后瞬移回起点进入下一轮。
+			# 终点静止（OFF，不伤），等 wait_time_at_end 后瞬移回起点进入下一轮。
 			_damage_allowed = false
 			if animated_sprite.animation != "OFF":
 				animated_sprite.play("OFF")
 			_launcher_timer += delta
-			if _launcher_timer >= wait_time:
+			if _launcher_timer >= wait_time_at_end:
 				_reset_to_start_for_next_round()
 
 func _start_firing() -> void:
@@ -887,23 +917,24 @@ func _start_firing() -> void:
 	_damage_allowed = true
 	animated_sprite.play("ON")
 
-## 单程加速/匀速/减速推进（复用 加速/减速/速度 参数）。
+## 单程加速/匀速/减速推进（复用「去程速度 + 加速/减速时间」；回程是瞬移，不用回程速度）。
 func _advance_fire(delta: float) -> void:
-	if path_length <= 0.0 or move_speed <= 0.0:
+	var leg_speed: float = move_speed_to_end
+	if path_length <= 0.0 or leg_speed <= 0.0:
 		_finish_fire()
 		return
-	var half_accel: float = acceleration_time * move_speed * 0.5
-	var half_decel: float = deceleration_time * move_speed * 0.5
-	var accel: float = move_speed / acceleration_time if acceleration_time > 0.0 else move_speed
-	var decel: float = move_speed / deceleration_time if deceleration_time > 0.0 else move_speed
+	var half_accel: float = acceleration_time * leg_speed * 0.5
+	var half_decel: float = deceleration_time * leg_speed * 0.5
+	var accel: float = leg_speed / acceleration_time if acceleration_time > 0.0 else leg_speed
+	var decel: float = leg_speed / deceleration_time if deceleration_time > 0.0 else leg_speed
 	var dist_done: float = _fire_progress * path_length
 	var dist_left: float = (1.0 - _fire_progress) * path_length
 	if dist_done < half_accel:
-		_fire_speed = min(_fire_speed + accel * delta, move_speed)
+		_fire_speed = min(_fire_speed + accel * delta, leg_speed)
 	elif dist_left < half_decel:
 		_fire_speed = max(_fire_speed - decel * delta, 0.0)
 	else:
-		_fire_speed = move_speed
+		_fire_speed = leg_speed
 	var step: float = (_fire_speed * delta) / path_length
 	_fire_progress += step
 	if _fire_progress >= 1.0 - 0.001:

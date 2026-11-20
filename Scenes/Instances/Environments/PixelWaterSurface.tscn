@@ -1,8 +1,8 @@
 [gd_scene load_steps=8 format=3 uid="uid://dgm0sxuwtc7rp"]
 
 [ext_resource type="Script" uid="uid://mobfbjdy2eba" path="res://Scripts/Instances/Environments/PixelWaterSurface.gd" id="1_water"]
-[ext_resource type="Texture2D" uid="uid://dd5y02o5gkg1e" path="res://Assets/Textures/Instances/ALL/water_body_tile.png" id="3_body"]
-[ext_resource type="Texture2D" uid="uid://c3iqlbqg72sra" path="res://Assets/Textures/Instances/ALL/6d45b2417c3d211c5f5f3f6cb3277890.png" id="3_t7crl"]
+[ext_resource type="Texture2D" uid="uid://dd5y02o5gkg1e" path="res://Assets/Textures/Instances/ALL/水体.png" id="3_body"]
+[ext_resource type="Texture2D" uid="uid://c3iqlbqg72sra" path="res://Assets/Textures/Instances/ALL/水面波浪.png" id="3_t7crl"]
 [ext_resource type="Texture2D" uid="uid://bj3yhqn0u2t5j" path="res://Assets/Textures/Instances/ALL/泡泡.png" id="4_h2bwy"]
 [ext_resource type="AudioStream" uid="uid://de0ke1pj8krlj" path="res://Assets/Audios/SFX/Instances/坏蛋冰激凌.wav" id="6_01nld"]
 

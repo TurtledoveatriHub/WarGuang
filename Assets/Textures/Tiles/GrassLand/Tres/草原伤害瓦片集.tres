@@ -1,6 +1,7 @@
-[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://byfj4vsmi5ff4"]
+[gd_resource type="TileSet" load_steps=7 format=3 uid="uid://byfj4vsmi5ff4"]
 
 [ext_resource type="Texture2D" uid="uid://66kpfdcinu2a" path="res://Assets/Textures/Tiles/GrassLand/草原伤害瓦片1.png" id="1_xs1cm"]
+[ext_resource type="Texture2D" uid="uid://ki8ddcdr2us5" path="res://Assets/Textures/Tiles/GrassLand/山洞伤害瓦片.png" id="2_6dnfb"]
 [ext_resource type="Texture2D" uid="uid://ebgopwtfk8rf" path="res://Assets/Textures/Tiles/GrassLand/草原伤害瓦片2.png" id="2_6lv66"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cau02"]
@@ -268,6 +269,24 @@ texture = ExtResource("1_xs1cm")
 9:3/0 = 0
 9:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-6, -6, 6, -6, 6, 6, -6, 6)
 9:3/0/custom_data_2 = Vector2(200, 500)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0nvq7"]
+texture = ExtResource("2_6dnfb")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-6, -4, 8, -4, 8, 8, -6, 8)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(8, -4, -8, -4, -8, 8, 8, 8)
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(6, -4, -8, -4, -8, 8, 6, 8)
+0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-6, -4, 8, -4, 8, 8, -6, 8)
+0:1/0/custom_data_1 = true
+1:1/0 = 0
+1:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(8, -4, -8, -4, -8, 8, 8, 8)
+1:1/0/custom_data_1 = true
+2:1/0 = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(6, -4, -8, -4, -8, 8, 6, 8)
+2:1/0/custom_data_1 = true
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6dnfb"]
 texture = ExtResource("2_6lv66")
@@ -585,3 +604,4 @@ custom_data_layer_2/name = "knockback"
 custom_data_layer_2/type = 5
 sources/0 = SubResource("TileSetAtlasSource_cau02")
 sources/3 = SubResource("TileSetAtlasSource_6dnfb")
+sources/1 = SubResource("TileSetAtlasSource_0nvq7")

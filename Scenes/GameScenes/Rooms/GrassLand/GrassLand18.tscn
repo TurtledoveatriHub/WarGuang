@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_atxhg"]
 [ext_resource type="AudioStream" uid="uid://wh2j8kh5ma1q" path="res://Assets/Audios/BGM/跳跃天空.ogg" id="2_4hjsf"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_qyc7w"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="3_qyc7w"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_luugu"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_4hjsf"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="6_a2b8c"]
@@ -21,7 +21,7 @@
 [ext_resource type="Resource" uid="uid://8ddsb7u5vhb" path="res://Assets/Configs/RaceStages/RaceStage3Config.tres" id="15_luugu"]
 [ext_resource type="Resource" uid="uid://du333rcnnbhwp" path="res://Assets/Configs/RaceStages/RaceStage4Config.tres" id="16_7nl56"]
 [ext_resource type="Resource" uid="uid://dnqobcs0egcv3" path="res://Assets/Configs/RaceStages/RaceStage5Config.tres" id="17_a2b8c"]
-[ext_resource type="PackedScene" path="res://Scenes/UI/RaceHUD.tscn" id="18_ctjn3"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/GameUI/RaceHUD.tscn" id="18_ctjn3"]
 [ext_resource type="PackedScene" uid="uid://nsrbmyb84i8b" path="res://Scenes/Instances/RaceCheckpoints/RaceCheckpoint.tscn" id="19_4hjsf"]
 [ext_resource type="AudioStream" uid="uid://g8qpkykl82ob" path="res://Assets/Audios/SFX/Instances/怀旧点击.wav" id="20_2a7yx"]
 [ext_resource type="AudioStream" uid="uid://bhl18ab6pechc" path="res://Assets/Audios/SFX/Box/短促挥舞.wav" id="20_a2b8c"]

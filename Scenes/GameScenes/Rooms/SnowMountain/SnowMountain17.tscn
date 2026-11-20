@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_nqlsq"]
 [ext_resource type="AudioStream" uid="uid://d2jppcmflv4dn" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_o1vbi"]
 [ext_resource type="PackedScene" uid="uid://d2esb7iuaq2sb" path="res://Scenes/GameScenes/SnowFX.tscn" id="3_dbv4q"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="4_vgce2"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="4_vgce2"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="5_o8pkv"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="6_3vjrs"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="7_1utfy"]
@@ -13,6 +13,7 @@
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="11_ojkok"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="16_tgvuc"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="17_2r3fg"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 

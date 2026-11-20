@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_tn386"]
 [ext_resource type="AudioStream" uid="uid://d2jppcmflv4dn" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_ktchu"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_p22l7"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="3_p22l7"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_o6pha"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_ktchu"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="6_5lpvl"]
@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="13_15754"]
 [ext_resource type="PackedScene" uid="uid://d3lkakeejul6f" path="res://Scenes/Instances/Environments/UpdraftZone.tscn" id="13_tn386"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="14_juidx"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 

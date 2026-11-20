@@ -30,6 +30,14 @@ class_name EnvironmentZoneVisual
 @export var emit_margin: float = 0.0
 ## 条纹飞行距离 = 区域在流动方向上的长度 × 该比例（1.0 = 正好穿过整个区域）
 @export var travel_ratio: float = 1.0
+## 粒子寿命硬上限（秒）。★ 它同时也限定了「粒子最远能飞多远」= 基准速度 × 上限。
+## 这里曾经写死 2.0 秒：默认 360×0.9 = 324 px/s，最多只能覆盖 648 px。
+## 于是 SnowMountain6 那条 80×160 × scale(4,8) = 320×1280 px 的上升气流，
+## 粒子飞到一半就到期消失 —— 玩家滑翔到上半段时风场「看起来没有了」。
+## 现在寿命由「区域长度 ÷ 基准速度」直接算出，这个上限只用来兜极端情况。
+const MAX_PARTICLE_LIFETIME: float = 30.0
+## 风向翻转时最多等多久让旧粒子飞完（等太久等于风场停摆，宁可让极少数旧粒子提前翻向）
+const MAX_DIRECTION_SWITCH_WAIT: float = 4.0
 ## 满强度参考值（用于把强度换算成 amount_ratio）
 var _full_strength: float = 120.0
 ## 运行期构建的粒子材质
@@ -97,7 +105,7 @@ func _process(delta: float) -> void:
 	## 需要反向：停止发射，开始等旧粒子飞完
 	if _pending_direction == Vector2.ZERO and direction.dot(_active_direction) < 0.0:
 		_pending_direction = direction
-		_switch_wait = _current_lifetime()
+		_switch_wait = minf(_current_lifetime(), MAX_DIRECTION_SWITCH_WAIT)
 		if emitting:
 			emitting = false
 		amount_ratio = 0.0
@@ -127,12 +135,15 @@ func _apply_direction(direction: Vector2) -> void:
 	_active_direction = direction
 	_update_emission_layout(direction)
 
-## 粒子寿命：按「满强度速度」算，保证条纹正好在区域边缘消失
+## 粒子寿命：按「满强度速度」算，保证条纹正好在区域另一端消失
 ## ★ 不能按当前瞬时强度算：效果变化到接近 0 时速度极小，寿命会被拉成好几秒，
 ##   粒子就会飘出区域（实测“像寿命被翻倍了一样飞得很远”）。
+## ★ 也不能再给寿命一个“够用就行”的小上限：寿命 = 覆盖距离 ÷ 速度，
+##   上限一小，长区域的上半段就永远没有粒子（见 MAX_PARTICLE_LIFETIME 的说明）。
 func _current_lifetime() -> float:
 	var ref_speed: float = maxf(_full_strength * speed_ratio, 1.0)
-	return clampf(_travel_distance * travel_ratio / ref_speed, 0.05, 2.0)
+	var distance: float = maxf(_travel_distance * travel_ratio, 0.0)
+	return clampf(distance / ref_speed, 0.05, MAX_PARTICLE_LIFETIME)
 
 ## 读取区域的「100% 基准强度」（用于把当前强度折算成粒子数量比例）
 func _read_base_strength() -> float:
@@ -175,6 +186,14 @@ func _update_emission_layout(direction: Vector2) -> void:
 	var signature: String = str(size)
 	rotation = 0.0
 	position = slab_position
+	## ★★ 必须显式设置 visibility_rect：GPUParticles2D **只绘制落在这个矩形里的粒子**，
+	##   默认值只有 200×200（且是节点局部坐标，会跟着节点缩放一起变）。
+	##   区域一拉长，上半段的粒子就被整个裁掉 —— 表现就是「玩家还在风场里，粒子却凭空消失」。
+	##   实测：160 高的区域只有 102 px 有粒子（64%），scale(4,8) 的 1280 高区域只有 816 px。
+	##   这里让矩形覆盖整个区域再各留 128 px 余量（兜住 align_y 旋转后的条纹）。
+	var rect_center: Vector2 = shape_node.position - position
+	var margin: Vector2 = Vector2(128.0, 128.0)
+	visibility_rect = Rect2(rect_center - size * 0.5 - margin, size + margin * 2.0)
 	_material.emission_box_extents = extents
 	_material.direction = Vector3(axis.x, axis.y, 0.0)
 	## ★ 只有「区域尺寸」变了才重置：尺寸一变，旧粒子的飞行距离就不对了。

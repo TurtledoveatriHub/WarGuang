@@ -1,0 +1,69 @@
+[gd_scene load_steps=8 format=3 uid="uid://bcyd555abjoy5"]
+
+[ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="1_ikt3o"]
+[ext_resource type="Texture2D" uid="uid://chrxvtfsyndtw" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="3_lxtln"]
+[ext_resource type="Texture2D" uid="uid://bod62woigqies" path="res://Assets/Textures/UIs/ButtonUIs/小按钮默认纹理.png" id="4_cdjc6"]
+[ext_resource type="Texture2D" uid="uid://cjvjfc6g33cgb" path="res://Assets/Textures/UIs/ButtonUIs/小按钮按下纹理.png" id="6_ikt3o"]
+[ext_resource type="Script" uid="uid://c0y4erfqf4tdh" path="res://Scripts/UI/UIFx/UIButtonFx.gd" id="7_g3bkv"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="8_h7bp1"]
+[ext_resource type="Script" uid="uid://del6qp3ylpn7b" path="res://Scripts/UI/ScenesUI/UIPopupPanel.gd" id="9_popup"]
+
+
+[node name="AboutAuthor" type="CanvasLayer"]
+layer = 100
+script = ExtResource("9_popup")
+close_button_path = NodePath("Background/ContinueButton")
+
+[node name="UIFxDirector" type="Node" parent="."]
+script = ExtResource("1_ikt3o")
+target_paths = Array[NodePath]([NodePath("../Background")])
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(640, 280)
+scale = Vector2(3, 3)
+texture = ExtResource("3_lxtln")
+
+[node name="Title" type="Label" parent="Background"]
+offset_left = -27.333344
+offset_top = -58.666668
+offset_right = 24.666656
+offset_bottom = -47.666668
+theme = ExtResource("8_h7bp1")
+theme_override_font_sizes/font_size = 10
+text = "关于作者"
+metadata/_edit_use_anchors_ = true
+
+[node name="Text" type="Label" parent="Background"]
+offset_left = -112.0
+offset_top = -40.000004
+offset_right = -3.0
+offset_bottom = -29.000004
+theme = ExtResource("8_h7bp1")
+theme_override_font_sizes/font_size = 10
+text = "这里是关于作者..."
+metadata/_edit_use_anchors_ = true
+
+[node name="ContinueButton" type="TextureButton" parent="Background"]
+offset_left = 97.333336
+offset_top = -62.666668
+offset_right = 119.333336
+offset_bottom = -40.666668
+pivot_offset = Vector2(9.333328, 8)
+texture_normal = ExtResource("4_cdjc6")
+texture_pressed = ExtResource("6_ikt3o")
+texture_hover = ExtResource("4_cdjc6")
+script = ExtResource("7_g3bkv")
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="Background/ContinueButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("8_h7bp1")
+theme_override_font_sizes/font_size = 10
+text = " X"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,23 +1,23 @@
 [gd_scene load_steps=9 format=3 uid="uid://bywk00ct1ifc2"]
 
 [ext_resource type="Script" uid="uid://dwjlh2x7ggryd" path="res://Scripts/Instances/Props/MechanismPlatform.gd" id="1_gate"]
-[ext_resource type="Texture2D" uid="uid://cos1si4kcnmon" path="res://Assets/Textures/Instances/GrassLand/石块.png" id="2_txfwg"]
+[ext_resource type="Texture2D" uid="uid://dpei37np16ppj" path="res://Assets/Textures/Instances/GrassLand/机关平台.png" id="2_txfwg"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_imi58"]
 atlas = ExtResource("2_txfwg")
-region = Rect2(0, 32, 32, 32)
+region = Rect2(32, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ey7l8"]
 atlas = ExtResource("2_txfwg")
-region = Rect2(32, 32, 32, 32)
+region = Rect2(0, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gp3a8"]
 atlas = ExtResource("2_txfwg")
-region = Rect2(0, 0, 32, 32)
+region = Rect2(32, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ng0ap"]
 atlas = ExtResource("2_txfwg")
-region = Rect2(32, 0, 32, 32)
+region = Rect2(64, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_bxywi"]
 animations = [{
@@ -57,7 +57,7 @@ disable_collision_when_open = false
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_bxywi")
-animation = &"OFF"
+animation = &"ON"
 
 [node name="Body" type="StaticBody2D" parent="."]
 collision_layer = 4

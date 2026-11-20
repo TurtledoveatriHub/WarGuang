@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_1no8b"]
 [ext_resource type="AudioStream" uid="uid://bs0ucop4s2m8h" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_52b7f"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_nep52"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="2_nep52"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_7ifny"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_spyhw"]
 [ext_resource type="Texture2D" uid="uid://cgw2wofth12nv" path="res://Assets/Textures/Backgrounds/草原背景2.png" id="6_synbo"]
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://ctgxsaoq0vrlk" path="res://Scenes/Instances/Platforms/Platform.tscn" id="16_kbyio"]
 [ext_resource type="PackedScene" uid="uid://oorimac8h2bw" path="res://Scenes/Instances/Props/Sign.tscn" id="19_a2581"]
 [ext_resource type="Resource" uid="uid://mcat1ci2wjnk" path="res://Assets/Dialogues/Signs/gl10Sign.dialogue" id="20_7ifny"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 

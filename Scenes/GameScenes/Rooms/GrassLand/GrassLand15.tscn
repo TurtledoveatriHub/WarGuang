@@ -1,7 +1,7 @@
 [gd_scene load_steps=17 format=4 uid="uid://5toe17cf27d6"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_0p1kw"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_hye2k"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="2_hye2k"]
 [ext_resource type="AudioStream" uid="uid://wh2j8kh5ma1q" path="res://Assets/Audios/BGM/跳跃天空.ogg" id="2_ot1qg"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_j2lu2"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_ot1qg"]
@@ -15,6 +15,7 @@
 [ext_resource type="TileSet" uid="uid://ddmqsmr1batw4" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原背景瓦片集.tres" id="11_xy4wf"]
 [ext_resource type="PackedScene" uid="uid://ck7fy1kuqx8h0" path="res://Scenes/Instances/Props/MechanismGate.tscn" id="12_dxxi3"]
 [ext_resource type="PackedScene" uid="uid://dekrt2dtacnvc" path="res://Scenes/Instances/Props/JoystickSwitch.tscn" id="13_0c745"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 

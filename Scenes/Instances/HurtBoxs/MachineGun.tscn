@@ -1,0 +1,71 @@
+[gd_scene load_steps=6 format=3 uid="uid://becfs4mbqx3u3"]
+
+[ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_qcdol"]
+[ext_resource type="Texture2D" uid="uid://c8rcx703yymyn" path="res://Assets/Textures/Instances/GrassLand/机关铁枪.png" id="2_qcdol"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3vwqf"]
+atlas = ExtResource("2_qcdol")
+region = Rect2(0, 0, 80, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3abc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"CLOSE",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": true,
+"name": &"OFF",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3vwqf")
+}],
+"loop": false,
+"name": &"ON",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"OPEN",
+"speed": 12.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7nlle"]
+size = Vector2(72, 20)
+
+[node name="MachineGun" type="Area2D" node_paths=PackedStringArray("collision_shapes")]
+visibility_layer = 16
+collision_layer = 16
+collision_mask = 129
+script = ExtResource("1_qcdol")
+sprite_effect = 0
+movement_mode = 1
+move_speed_to_end = 320.0
+move_speed_to_start = 320.0
+end_offset = Vector2(64, 0)
+wait_time_at_start = 0.8
+wait_time_at_end = 0.8
+acceleration_time = 0.3
+deceleration_time = 0.0
+collision_shapes = [NodePath("CollisionShape2D")]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_3abc")
+animation = &"ON"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 16
+position = Vector2(-1, 0)
+shape = SubResource("RectangleShape2D_7nlle")

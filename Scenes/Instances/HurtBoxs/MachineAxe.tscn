@@ -1,0 +1,108 @@
+[gd_scene load_steps=11 format=3 uid="uid://cyapwq01heeiv"]
+
+[ext_resource type="Script" uid="uid://bmewalhakcwxt" path="res://Scripts/Instances/HurtBoxs/HurtBox.gd" id="1_nj85i"]
+[ext_resource type="Texture2D" uid="uid://dc0oanywnkxd" path="res://Assets/Textures/Instances/GrassLand/机关铁锤.png" id="2_nj85i"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2ege3"]
+atlas = ExtResource("2_nj85i")
+region = Rect2(0, 0, 96, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a5f5c"]
+atlas = ExtResource("2_nj85i")
+region = Rect2(96, 0, 96, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nd4ns"]
+atlas = ExtResource("2_nj85i")
+region = Rect2(192, 0, 96, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_al1vm"]
+atlas = ExtResource("2_nj85i")
+region = Rect2(0, 144, 96, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vqapf"]
+atlas = ExtResource("2_nj85i")
+region = Rect2(96, 144, 96, 144)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4wrgi"]
+atlas = ExtResource("2_nj85i")
+region = Rect2(192, 144, 96, 144)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3abc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"CLOSE",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": true,
+"name": &"OFF",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2ege3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a5f5c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nd4ns")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_al1vm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vqapf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4wrgi")
+}],
+"loop": true,
+"name": &"ON",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"OPEN",
+"speed": 12.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_nj85i"]
+radius = 28.0
+height = 80.0
+
+[node name="MachineAxe" type="Area2D" node_paths=PackedStringArray("collision_shapes")]
+visibility_layer = 16
+collision_layer = 16
+collision_mask = 129
+script = ExtResource("1_nj85i")
+sprite_effect = 1
+rotation_speed = 360.0
+rotate_collision = true
+pendulum_enabled = true
+pendulum_degrees = 220.0
+pendulum_curve = 1
+pendulum_end_wait = 0.66
+collision_shapes = [NodePath("CollisionShape2D")]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, 56)
+sprite_frames = SubResource("SpriteFrames_3abc")
+animation = &"ON"
+frame = 5
+frame_progress = 0.4693838
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 16
+position = Vector2(0, 86)
+shape = SubResource("CapsuleShape2D_nj85i")

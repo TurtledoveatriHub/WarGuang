@@ -1,8 +1,8 @@
-[gd_scene load_steps=36 format=4 uid="uid://dbiq0bp6upwiq"]
+[gd_scene load_steps=34 format=4 uid="uid://dbiq0bp6upwiq"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_3rwsl"]
 [ext_resource type="AudioStream" uid="uid://bs0ucop4s2m8h" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_42a4c"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_g7pm8"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="3_g7pm8"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_nswmr"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_1iivt"]
 [ext_resource type="Texture2D" uid="uid://cgw2wofth12nv" path="res://Assets/Textures/Backgrounds/草原背景2.png" id="6_bmi8j"]
@@ -18,8 +18,6 @@
 [ext_resource type="PackedScene" uid="uid://dwy6nckbuirsr" path="res://Scenes/Entities/NPCs/AerialRollMaster.tscn" id="15_rr7q3"]
 [ext_resource type="PackedScene" uid="uid://bljm1u0f8romo" path="res://Scenes/Entities/NPCs/GrassLandMerchant.tscn" id="17_1iivt"]
 [ext_resource type="PackedScene" uid="uid://cm3h413lvuans" path="res://Scenes/Instances/JumpBoxs/JumpBox.tscn" id="19_42a4c"]
-[ext_resource type="PackedScene" uid="uid://c6x5b736ihdqj" path="res://Scenes/Instances/HurtBoxs/Shuriken.tscn" id="20_g7pm8"]
-[ext_resource type="PackedScene" uid="uid://cyapwq01heeiv" path="res://Scenes/Instances/HurtBoxs/Hammer.tscn" id="21_0rk6r"]
 [ext_resource type="PackedScene" uid="uid://bywk00ct1ifc2" path="res://Scenes/Instances/Props/MechanismPlatform.tscn" id="22_nmcgg"]
 [ext_resource type="PackedScene" uid="uid://dleai1y0iaa7s" path="res://Scenes/Instances/Props/ButtonSwitch.tscn" id="23_j3bxa"]
 [ext_resource type="Resource" uid="uid://c5ykh61wsv5os" path="res://Assets/Dialogues/Signs/gl1Signx2.dialogue" id="24_j3bxa"]
@@ -157,14 +155,7 @@ target_room_id = "GrassLand10"
 [node name="HurtBoxs" type="Node2D" parent="."]
 
 [node name="JumpBox" parent="HurtBoxs" instance=ExtResource("19_42a4c")]
-position = Vector2(424, 368)
-
-[node name="Shuriken" parent="HurtBoxs" instance=ExtResource("20_g7pm8")]
-position = Vector2(352, 352)
-movement_mode = 0
-
-[node name="Shuriken2" parent="HurtBoxs" instance=ExtResource("21_0rk6r")]
-position = Vector2(512, 424)
+position = Vector2(616, 472)
 
 [node name="DynamicCheckpoints" type="Node2D" parent="."]
 
@@ -285,17 +276,17 @@ speed_mul_left = 2.0
 wind_max_velocity = Vector2(-60, 0)
 ground_scale = 0.75
 variation_enabled = true
-variation_amplitude = 0.0
+variation_initial_value = 0.0
 variation_hold_time = 3.0
 
 [node name="UpdraftZone" parent="Environments" instance=ExtResource("28_3rwsl")]
-position = Vector2(784, 320)
-scale = Vector2(2, 4)
+position = Vector2(784, 448)
+scale = Vector2(1.5, 4)
 variation_enabled = true
 variation_mode = 1
-variation_amplitude = 1.5
+variation_initial_value = 0.0
 switches = Array[NodePath]([NodePath("../JoystickSwitch")])
 
 [node name="JoystickSwitch" parent="Environments" instance=ExtResource("26_nswmr")]
-position = Vector2(720, 120)
+position = Vector2(880, 120)
 switch_id = "glx1"

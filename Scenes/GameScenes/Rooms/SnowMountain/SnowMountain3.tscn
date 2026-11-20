@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_2gh8a"]
 [ext_resource type="AudioStream" uid="uid://d2jppcmflv4dn" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_5v8dg"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_8voo8"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="3_8voo8"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_5v8dg"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_5k2cj"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="5_sb4gf"]
@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="13_rirc1"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="14_143ef"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="15_cfguc"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 
@@ -87,7 +88,8 @@ tile_set = ExtResource("9_jkyq6")
 [node name="IceCrystal1" parent="HurtBoxs" instance=ExtResource("10_ob22t")]
 position = Vector2(200, -392)
 end_offset = Vector2(80, 0)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 enable_debug = true
@@ -95,20 +97,23 @@ enable_debug = true
 [node name="IceCrystal2" parent="HurtBoxs" instance=ExtResource("10_ob22t")]
 position = Vector2(0, 896)
 movement_mode = 1
-move_speed = 180.0
+move_speed_to_end = 180.0
+move_speed_to_start = 180.0
 end_offset = Vector2(280, 0)
 deceleration_time = 0.5
 
 [node name="IceCrystal3" parent="HurtBoxs" instance=ExtResource("10_ob22t")]
 position = Vector2(392, 36)
 movement_mode = 1
-move_speed = 180.0
+move_speed_to_end = 180.0
+move_speed_to_start = 180.0
 end_offset = Vector2(0, 256)
 deceleration_time = 0.5
 
 [node name="IceSpike" parent="HurtBoxs" instance=ExtResource("12_5k2cj")]
 position = Vector2(49, 138)
-move_speed = 540.0
+move_speed_to_end = 540.0
+move_speed_to_start = 540.0
 end_offset = Vector2(0, 330)
 
 [node name="JumpBoxs" type="Node2D" parent="."]

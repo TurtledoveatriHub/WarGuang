@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bddr22siejtsl" path="res://Scripts/Instances/Props/Sign.gd" id="1_sign"]
 [ext_resource type="Resource" uid="uid://d1gay2sy8vjny" path="res://Assets/Dialogues/Signs/gl1Signx0.dialogue" id="2_xkpgw"]
-[ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/MyBalloon.tscn" id="3_hmlcg"]
+[ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/GameUI/MyBalloon.tscn" id="3_hmlcg"]
 [ext_resource type="Texture2D" uid="uid://d4ldue6vbmpt5" path="res://Assets/Textures/Instances/GrassLand/告示牌.png" id="4_j07et"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sign"]

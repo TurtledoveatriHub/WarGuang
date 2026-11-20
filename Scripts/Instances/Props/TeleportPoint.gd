@@ -94,7 +94,7 @@ func _open_teleport_panel() -> void:
 	prompt.visible = false
 	_play_sfx(interact_sfx)
 	
-	var panel_scene: PackedScene = preload("res://Scenes/UI/TeleportPanel.tscn")
+	var panel_scene: PackedScene = ScenePaths.load_teleport_panel()
 	var panel: CanvasLayer = panel_scene.instantiate()
 	panel.source_teleport_id = teleport_id
 	get_tree().root.add_child(panel)

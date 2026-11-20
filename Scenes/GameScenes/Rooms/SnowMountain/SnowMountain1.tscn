@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_5ol86"]
 [ext_resource type="AudioStream" uid="uid://d2jppcmflv4dn" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_f6vgp"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_wllfw"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="3_wllfw"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_kxt7c"]
 [ext_resource type="TileSet" uid="uid://cgw26w3s2aaur" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地瓦片集.tres" id="5_6jb2b"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="6_cbmfw"]
@@ -99,9 +99,11 @@ save_id = "sm1"
 
 [node name="IceCrystal1" parent="HurtBoxs" instance=ExtResource("10_dfccu")]
 position = Vector2(-592, 800)
-move_speed = 90.0
+move_speed_to_end = 90.0
+move_speed_to_start = 90.0
 end_offset = Vector2(96, 0)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 

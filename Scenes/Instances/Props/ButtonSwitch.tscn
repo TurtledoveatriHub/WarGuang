@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://dleai1y0iaa7s"]
 
 [ext_resource type="Script" uid="uid://0f0qymy75vah" path="res://Scripts/Instances/Props/Switch.gd" id="1_qkht4"]
-[ext_resource type="Texture2D" uid="uid://cpy8ngi17wen5" path="res://Assets/Textures/Instances/GrassLand/开关.png" id="2_bv0hl"]
+[ext_resource type="Texture2D" uid="uid://douckmjqo0432" path="res://Assets/Textures/Instances/GrassLand/开关素材.png" id="2_bv0hl"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_kjogn"]
 atlas = ExtResource("2_bv0hl")
@@ -9,7 +9,7 @@ region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nqkoy"]
 atlas = ExtResource("2_bv0hl")
-region = Rect2(16, 0, 16, 16)
+region = Rect2(32, 0, 16, 16)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_2h4en"]
 animations = [{
@@ -19,7 +19,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"OFF",
-"speed": 5.0
+"speed": 6.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -31,7 +31,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_switch"]
-size = Vector2(16, 8)
+size = Vector2(18, 12)
 
 [node name="ButtonSwitch" type="Area2D"]
 collision_layer = 32
@@ -41,12 +41,12 @@ activation_mode = 1
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_2h4en")
-animation = &"ON"
+animation = &"OFF"
 
 [node name="InteractionPrompt" type="Sprite2D" parent="."]
 visible = false
 position = Vector2(0, -20)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 4)
+position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_switch")

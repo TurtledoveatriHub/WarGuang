@@ -4,7 +4,7 @@
 ##    Player._apply_platform_follow() 会读取 StaticBody2D 父节点的该方法使角色跟随平台移动。
 ##  - 加减速（acceleration_time / deceleration_time）由基类作用，本类不再重复实现。
 ##  - 动画表现：移动时 ON、静止时 OFF（不看开关是否激活）。
-extends "res://Scripts/Instances/Props/MechanismObject.gd"
+extends MechanismObject
 class_name MechanismPlatform
 
 ## ── 平台设置 ──

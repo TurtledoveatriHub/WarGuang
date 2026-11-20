@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cvkbvkkd77u57"]
 
-[ext_resource type="Script" uid="uid://bvhebguxecyu4" path="res://Scripts/UI/DarkOverlay.gd" id="1_yyyi2"]
+[ext_resource type="Script" uid="uid://bvhebguxecyu4" path="res://Scripts/UI/ScenesUI/DarkOverlay.gd" id="1_yyyi2"]
 
 [node name="DarkOverlay" type="CanvasLayer"]
 layer = 95

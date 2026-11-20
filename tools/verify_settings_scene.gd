@@ -1,7 +1,11 @@
 extends SceneTree
+## 冒烟测试：设置场景能否加载并实例化。
+## 用法：godot --headless --path . --script tools/verify_settings_scene.gd
+
+const ScenePathsScript := preload("res://Scripts/Managers/ScenePaths.gd")
 
 func _initialize() -> void:
-	var scene_resource = load("res://Scenes/UI/Scenes/SettingsScene.tscn")
+	var scene_resource = load(ScenePathsScript.UI_SETTINGS)
 	if scene_resource == null:
 		push_error("SettingsScene resource failed to load.")
 		quit(1)

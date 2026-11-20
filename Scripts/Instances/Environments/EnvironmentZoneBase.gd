@@ -9,17 +9,19 @@ class_name EnvironmentZoneBase
 ## 负责三件事：
 ##  1. 区域范围：从自己的 CollisionShape2D 取局部矩形，并按当前全局变换换算世界矩形（不用进出信号）。
 ##  2. 影响强度：地面/空中系数 × 效果变化系数（**可以是负数**）。
-##  3. 效果变化（两个子类共用同一套参数）：
-##       - 时间循环：在「variation_amplitude 端点」与「100% 端点」之间往复；
-##         每个端点先「持续」variation_hold_time，再用正弦过渡 variation_transition_time 秒切换到另一端点。
-##       - 开关控制：接受 Switch 实例（与机关门 MechanismObject 同逻辑：state_changed + is_on()）；
-##         开关关闭 = 100%（按参数原样），开关激活 = variation_amplitude，切换过程同样走正弦过渡。
+##  3. 效果变化（两个子类共用同一套参数）：用「初始值 ↔ 变化值」两个对称的参数描述，
+##       - 时间循环：停在「初始值」→ 正弦过渡 → 停在「变化值」→ 正弦过渡回「初始值」；
+##       - 开关控制：开关未激活 = 初始值，开关激活 = 变化值，切换过程同样走正弦过渡。
 ##
-## ★ variation_amplitude 的含义（归一化端点值）：
-##     1.0  = 完全没有变化（效果恒为 100%）
-##     0.0  = 在 0% ~ 100% 之间变化
-##    -1.0  = 在 -100% ~ 100% 之间变化（**负值 = 与设置的效果方向相反**）
-##     其他值同理外推（例如 -2.0 → -200% ~ 100%，即反向且力度加倍）
+## ★ 两个值都是「归一化倍率」，地位完全对等（谁大谁小都可以，也可以一正一负）：
+##     1.0  = 100%（按参数原样）
+##     0.0  = 完全不出效果
+##    -1.0  = 与设置的效果方向相反
+##     1.5  = 150%（更猛）
+##
+## ★ 于是「开关控制「有风 / 没风」」只需要挑两个数，两种方向都能表达，不用额外加开关：
+##     关 = 没风、开 = 有风  →  初始值 0.0，变化值 1.0
+##     关 = 有风、开 = 没风  →  初始值 1.0，变化值 0.0   （两个值对调即可）
 ##
 ## ★ 只在运行时工作（不加 @tool）：编辑器里能自由改参数比实时预览更重要。
 ##
@@ -28,8 +30,8 @@ class_name EnvironmentZoneBase
 
 ## 效果变化方式
 enum VariationMode {
-	TIME_LOOP,   ## 时间循环：在 variation_amplitude 与 100% 两个端点之间往复
-	SWITCH,      ## 开关控制：由 Switch 实例把效果从 100% 切到 variation_amplitude
+	TIME_LOOP,   ## 时间循环：在「初始值 ↔ 变化值」两个端点之间往复
+	SWITCH,      ## 开关控制：由 Switch 实例把效果从「初始值」切到「变化值」
 }
 
 @export_category("环境区")
@@ -43,16 +45,21 @@ enum VariationMode {
 @export var air_scale: float = 1.0
 
 @export_category("效果变化（可选）")
-## 是否启用效果变化：关闭 = 所有效果参数恒定 100%
+## 是否启用效果变化：关闭 = 所有效果参数恒定 100%（下面两个值都不生效）
 @export var variation_enabled: bool = false
-## 变化方式：时间循环（按时间往复）/ 开关控制（由 Switch 实例切换）
+## 变化方式：时间循环（在两个端点间往复）/ 开关控制（由 Switch 实例切换）
 @export_enum("时间循环", "开关控制") var variation_mode: int = VariationMode.TIME_LOOP
-## 变化的「端点」值（1.0 = 完全不变；0.0 = 0%~100%；-1.0 = -100%~100%，负值即反向；如 -2.0 = -200%~100%）
-@export var variation_amplitude: float = 1.0
-## 【时间循环】两个端点各自持续的时间（秒）
-@export var variation_hold_time: float = 1.5
+## 【初始值】「还没变化」时的强度倍率（时间循环的起点 / 开关未激活时）：
+## 1.0 = 100%（按参数原样）；0.0 = 完全不出效果；负值 = 与设置的效果方向相反
+@export var variation_initial_value: float = 1.0
+## 【变化值】「变化之后」的强度倍率（时间循环的另一端 / 开关激活时）：
+## 1.0 = 100%；0.0 = 完全不出效果；1.5 = 150%；负值 = 与设置的效果方向相反
+## 例：开关风场「关=没风、开=有风」→ 初始值 0.0、变化值 1.0（两个值对调即反过来）
+@export var variation_change_value: float = 1.0
 ## 【两种模式通用】端点之间的正弦过渡时长（秒）
 @export var variation_transition_time: float = 0.6
+## 【时间循环】两个端点各自持续的时间（秒）
+@export var variation_hold_time: float = 1.5
 ## 【时间循环】起始相位（0~1；摆多个区域时可以错开节奏）
 @export var variation_phase: float = 0.0
 ## 【开关控制】驱动本区域的开关（可拖拽多个 Switch，与机关门逻辑一致）
@@ -132,23 +139,23 @@ func get_variation_scale() -> float:
 	if not variation_enabled:
 		return 1.0
 	if variation_mode == VariationMode.SWITCH:
-		## 未激活端 = 100%（按参数原样）；激活端 = variation_amplitude
+		## 未激活端 = 初始值；激活端 = 变化值（两者地位对等，谁大谁小都行）
 		var eased: float = (1.0 - cos(clampf(_switch_progress, 0.0, 1.0) * PI)) * 0.5
-		return lerpf(1.0, variation_amplitude, eased)
-	## 时间循环：低端持续 → 正弦过渡 → 100% 端持续 → 正弦过渡回低端
+		return lerpf(variation_initial_value, variation_change_value, eased)
+	## 时间循环：初始值持续 → 正弦过渡 → 变化值持续 → 正弦过渡回初始值
 	var hold: float = maxf(variation_hold_time, 0.0)
 	var transition: float = maxf(variation_transition_time, 0.001)
 	var cycle: float = hold * 2.0 + transition * 2.0
 	var elapsed: float = fposmod(float(Time.get_ticks_msec()) / 1000.0 + variation_phase * cycle, cycle)
 	if elapsed < hold:
-		return variation_amplitude
+		return variation_initial_value
 	if elapsed < hold + transition:
 		var k_up: float = (elapsed - hold) / transition
-		return lerpf(variation_amplitude, 1.0, (1.0 - cos(k_up * PI)) * 0.5)
+		return lerpf(variation_initial_value, variation_change_value, (1.0 - cos(k_up * PI)) * 0.5)
 	if elapsed < hold * 2.0 + transition:
-		return 1.0
+		return variation_change_value
 	var k_down: float = (elapsed - hold * 2.0 - transition) / transition
-	return lerpf(1.0, variation_amplitude, (1.0 - cos(k_down * PI)) * 0.5)
+	return lerpf(variation_change_value, variation_initial_value, (1.0 - cos(k_down * PI)) * 0.5)
 
 ## 区域的世界矩形（每次调用都按当前形状与变换重算 —— 编辑器里改尺寸 / 挪动也能立刻生效）
 func get_zone_world_rect() -> Rect2:

@@ -3,7 +3,7 @@ extends Node
 signal room_loaded(room_id: String, previous_room: String)
 
 const CAMERA_LIMIT_DISABLED: int = 10000000
-const _ScenePathsScript = preload("res://Scripts/Managers/ScenePaths.gd")
+## ScenePaths 是 Autoload，直接按名字取；这里不再 preload 脚本路径
 const _RoomLayoutDataPath = preload("res://Assets/Configs/RoomLayoutData.tres")
 
 # 在变量声明部分添加
@@ -198,7 +198,7 @@ func unload_distant_rooms(current_room_id: String):
 
 ## 动态实例化房间（从磁盘加载 .tscn）
 func _instantiate_room(room_id: String) -> bool:
-	var scene_path: String = _ScenePathsScript.get_room_path(room_id)
+	var scene_path: String = ScenePaths.get_room_path(room_id)
 	if scene_path.is_empty():
 		return false
 	if not _room_packed_cache.has(room_id):

@@ -1,5 +1,5 @@
 # ★ 不加 @tool（理由见 EnvironmentZoneBase 顶部）：保证场景里的参数可自由修改
-extends "res://Scripts/Instances/Environments/EnvironmentZoneBase.gd"
+extends EnvironmentZoneBase
 class_name BubbleColumnZone
 
 ## 水下的「上升气泡柱」（《我的世界》式）：玩家进到里面就可以回氧（气泡立刻回满）。

@@ -1,7 +1,7 @@
 [gd_scene load_steps=26 format=4 uid="uid://bs1ylk126s0f4"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_kcxri"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_h8urx"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="2_h8urx"]
 [ext_resource type="AudioStream" uid="uid://bs0ucop4s2m8h" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_qpeok"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_3qwq0"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_tqftu"]
@@ -24,6 +24,7 @@
 [ext_resource type="PackedScene" uid="uid://dleai1y0iaa7s" path="res://Scenes/Instances/Props/ButtonSwitch.tscn" id="20_js1up"]
 [ext_resource type="PackedScene" uid="uid://dwivvxihmegmq" path="res://Scenes/Instances/Props/Sign2.tscn" id="21_y38y2"]
 [ext_resource type="Resource" uid="uid://bl5yn4601ngq6" path="res://Assets/Dialogues/Signs/gl6Sign.dialogue" id="22_tqftu"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 

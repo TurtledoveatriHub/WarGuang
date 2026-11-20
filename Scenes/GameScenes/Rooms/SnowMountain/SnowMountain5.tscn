@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_yueej"]
 [ext_resource type="AudioStream" uid="uid://bs0ucop4s2m8h" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_qa4dj"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_m6lr0"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="3_m6lr0"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_8ohum"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_di1ct"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="6_x7hvm"]
@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://dj33j0wqfbh6n" path="res://Scenes/Entities/Enemys/SacredBird.tscn" id="18_6kb3p"]
 [ext_resource type="PackedScene" uid="uid://dbsqhd2of3pjn" path="res://Scenes/Instances/MineCart/SonwMineCart1.tscn" id="21_di1ct"]
 [ext_resource type="PackedScene" uid="uid://dw28jmn0x6xdr" path="res://Scenes/Instances/MineCart/SnowMineCart2.tscn" id="23_di1ct"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 
@@ -118,41 +119,47 @@ save_id = "sm5x3"
 
 [node name="IceCrystal" parent="HurtBoxs" instance=ExtResource("15_4kdpe")]
 position = Vector2(256, 64)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 
 [node name="IceCrystal2" parent="HurtBoxs" instance=ExtResource("15_4kdpe")]
 position = Vector2(256, 64)
 end_offset = Vector2(-256, 0)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 circular_clockwise = false
 
 [node name="IceCrystal3" parent="HurtBoxs" instance=ExtResource("15_4kdpe")]
 position = Vector2(-1728, -64)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 
 [node name="IceCrystal4" parent="HurtBoxs" instance=ExtResource("15_4kdpe")]
 position = Vector2(-896, -320)
 end_offset = Vector2(-256, 0)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 
 [node name="IceCrystal5" parent="HurtBoxs" instance=ExtResource("15_4kdpe")]
 position = Vector2(-1728, -576)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 
 [node name="IceCrystal6" parent="HurtBoxs" instance=ExtResource("15_4kdpe")]
 position = Vector2(-1344, -1024)
 movement_mode = 1
-move_speed = 420.0
+move_speed_to_end = 420.0
+move_speed_to_start = 420.0
 end_offset = Vector2(0, 448)
 
 [node name="IceSpike" parent="HurtBoxs" instance=ExtResource("16_6kb3p")]
@@ -162,7 +169,8 @@ end_offset = Vector2(0, 688)
 [node name="IceCrystal7" parent="HurtBoxs" instance=ExtResource("15_4kdpe")]
 position = Vector2(-1344, 1088)
 movement_mode = 1
-move_speed = 420.0
+move_speed_to_end = 420.0
+move_speed_to_start = 420.0
 end_offset = Vector2(0, -256)
 
 [node name="JumpBoxs" type="Node2D" parent="."]

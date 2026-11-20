@@ -12,7 +12,7 @@ class_name RaceController
 ## 黑屏传送流程与 JumpBox 挑战（ChallengeController）保持一致。
 
 ## 玩家 HUD 淡入淡出助手：复用 ChallengeUIController 的 fade_out/fade_in_player_ui
-const PlayerUIFadeScript = preload("res://Scripts/UI/ChallengeUIController.gd")
+## （按 class_name 引用，不写路径：脚本在 Scripts/UI/GameUI/ 下，挪动后不需要改这里）
 
 ## ── 阶段配置 ──
 ## 各阶段竞速配置（Inspector 按顺序拖入；索引 0 = 第一阶段）
@@ -115,7 +115,7 @@ var _result_record_broken: bool = false
 
 ## 初始化：建立玩家 HUD 助手，并把所有阶段赛道隐藏起来
 func _ready() -> void:
-	_player_ui_fade = PlayerUIFadeScript.new()
+	_player_ui_fade = ChallengeUIController.new()
 	_player_ui_fade.setup(self, race_ui_scene, ui_fade_duration)
 	_hide_all_stages()
 

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://di7dbtf056322" path="res://Scripts/Instances/Environments/BubbleColumnZone.gd" id="1_bubblecol"]
 [ext_resource type="Script" uid="uid://cd40oqnytjly3" path="res://Scripts/Instances/Environments/EnvironmentZoneVisual.gd" id="2_bubviz"]
-[ext_resource type="Texture2D" uid="uid://bn5j5b16b3bl3" path="res://Assets/Textures/Instances/ALL/wind_streak.tres" id="3_streak"]
+[ext_resource type="Texture2D" uid="uid://bn5j5b16b3bl3" path="res://Assets/Textures/Instances/ALL/风特效.tres" id="3_streak"]
 
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bubblecol"]

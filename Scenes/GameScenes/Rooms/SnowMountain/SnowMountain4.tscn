@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_yav0u"]
 [ext_resource type="AudioStream" uid="uid://d2jppcmflv4dn" path="res://Assets/Audios/BGM/雪山奇迹.ogg" id="2_cvf74"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_m4myo"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="3_m4myo"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_x1b5c"]
 [ext_resource type="TileSet" uid="uid://bfhbue5xras0w" path="res://Assets/Textures/Tiles/SnowMountain/Tres/雪地背景瓦片集.tres" id="5_7kgu1"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_q1rpw"]
@@ -196,106 +196,126 @@ position = Vector2(-409, 264)
 
 [node name="IceCrystal1" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(-264, 2440)
-move_speed = 90.0
+move_speed_to_end = 90.0
+move_speed_to_start = 90.0
 end_offset = Vector2(0, 88)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 enable_debug = true
 
 [node name="IceCrystal2" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(-152, 2280)
-move_speed = 180.0
+move_speed_to_end = 180.0
+move_speed_to_start = 180.0
 end_offset = Vector2(0, -256)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 
 [node name="IceCrystal3" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(272, 784)
 end_offset = Vector2(158, 0)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 
 [node name="IceCrystal4" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(-48, 1328)
 movement_mode = 1
-move_speed = 180.0
+move_speed_to_end = 180.0
+move_speed_to_start = 180.0
 end_offset = Vector2(0, -800)
 
 [node name="IceCrystal5" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(48, 528)
 movement_mode = 1
-move_speed = 180.0
+move_speed_to_end = 180.0
+move_speed_to_start = 180.0
 end_offset = Vector2(0, 800)
 
 [node name="IceCrystal6" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(-48, 528)
 movement_mode = 1
-move_speed = 180.0
+move_speed_to_end = 180.0
+move_speed_to_start = 180.0
 end_offset = Vector2(0, -800)
 
 [node name="IceCrystal7" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(48, -272)
 movement_mode = 1
-move_speed = 180.0
+move_speed_to_end = 180.0
+move_speed_to_start = 180.0
 end_offset = Vector2(0, 800)
 
 [node name="IceCrystal8" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(-368, -2384)
-move_speed = 90.0
+move_speed_to_end = 90.0
+move_speed_to_start = 90.0
 end_offset = Vector2(64, 0)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 
 [node name="IceCrystal9" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(-112, -2384)
-move_speed = 64.0
+move_speed_to_end = 64.0
+move_speed_to_start = 64.0
 end_offset = Vector2(90, 0)
-wait_time = 0.0
+wait_time_at_start = 0.0
+wait_time_at_end = 0.0
 acceleration_time = 0.0
 deceleration_time = 0.0
 
 [node name="IceCrystal10" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(432, -2136)
 movement_mode = 1
-move_speed = 360.0
+move_speed_to_end = 360.0
+move_speed_to_start = 360.0
 end_offset = Vector2(-800, 0)
 
 [node name="IceCrystal11" parent="HurtBoxs" instance=ExtResource("10_q4kib")]
 position = Vector2(-368, -2216)
 movement_mode = 1
-move_speed = 360.0
+move_speed_to_end = 360.0
+move_speed_to_start = 360.0
 end_offset = Vector2(800, 0)
 
 [node name="IceSpike" parent="HurtBoxs" instance=ExtResource("17_8ssuy")]
 position = Vector2(-64, -1832)
-move_speed = 540.0
+move_speed_to_end = 540.0
+move_speed_to_start = 540.0
 end_offset = Vector2(0, 1296)
 acceleration_time = 0.6
 
 [node name="IceSpike2" parent="HurtBoxs" instance=ExtResource("17_8ssuy")]
 position = Vector2(459, -2488)
-move_speed = 420.0
+move_speed_to_end = 420.0
+move_speed_to_start = 420.0
 end_offset = Vector2(0, 168)
 
 [node name="IceSpike3" parent="HurtBoxs" instance=ExtResource("17_8ssuy")]
 position = Vector2(-457, 72)
-move_speed = 540.0
+move_speed_to_end = 540.0
+move_speed_to_start = 540.0
 end_offset = Vector2(0, 1472)
 acceleration_time = 0.6
 
 [node name="IceSpike4" parent="HurtBoxs" instance=ExtResource("17_8ssuy")]
 position = Vector2(-393, 72)
-move_speed = 540.0
+move_speed_to_end = 540.0
+move_speed_to_start = 540.0
 end_offset = Vector2(0, 1472)
 acceleration_time = 0.6
 
 [node name="IceSpike5" parent="HurtBoxs" instance=ExtResource("17_8ssuy")]
 position = Vector2(-345, 72)
-move_speed = 540.0
+move_speed_to_end = 540.0
+move_speed_to_start = 540.0
 end_offset = Vector2(0, 1472)
 acceleration_time = 0.6
 

@@ -3,29 +3,34 @@
 > 一款用 **Godot 4.5 + GDScript** 独立开发的 **2D 像素风平台跳跃 + 类银河恶魔城探索** 原型。
 > 核心体验：**蔚蓝式精准平台跳跃** × **空洞骑士式房间探索** × **能力解锁与回访**。
 > 无主动攻击：玩家依靠跳跃、冲刺、攀墙、滑翔、超级冲刺等移动能力穿越房间、寻找收集品、完成挑战与竞速。
-> 当前状态：**可运行原型**（2026-11），核心移动与 8 个区域、63 个房间场景、存档 / 对话 / 挑战系统已可运转，关卡内容仍在持续打磨。
+> 当前状态：**可运行原型**（2026-11）—— 19 个玩家状态、8 个区域 / 63 个房间、能力解锁、存档、对话、挑战与竞速系统均已可运转，关卡内容仍在持续打磨。
 
 <!--
   README 写作约定（保留，便于后续更新）：
-  1. 规模数据来自当前提交 2c1290e 实测（2178 个跟踪文件：191 个 .gd / 166 个 .tscn / 166 张 png），更改后请同步更新。
-  2. TODO 标记：下载链接、联系方式、素材授权说明。
-  3. 截图占位：img/ 目录下目前是占位图，请替换为实机截图与 GIF。
+  1. 规模数据实测自当前工作区：188 个 .gd、147 个 .tscn、154 张 png、7 首 ogg、125 个 wav，
+     仓库跟踪文件 1616 个（提交 6ebbb88）；改动后请同步更新「项目规模」表。
+  2. TODO 标记：下载链接（Windows / Android）。
+  3. 截图：img/ 下已有 4 张 1280×720 静态截图；演示 GIF 待录制后按占位注释替换。
+  4. 授权：本仓库为「源码可见（Source-Available）」，并非开源，条款见 LICENSE。
 -->
 
 ---
 
 ## 游戏简介
 
-《沃光》是一款以“移动手感”为核心的 2D 像素平台跳跃游戏。玩家扮演小角色沃玛，在草原、洞穴、风之谷、雪山、城镇等多个区域之间探索：
+《沃光》是一款以“操作手感”为核心、2D 像素平台跳跃 + 类银河恶魔城大地图探索的冒险游戏；
+一个架空的世界观中，玩家扮演小角色沃玛，在草原、洞穴、风之谷、雪山、城镇等多个区域之间探索，不断推进故事剧情、解锁各种能力、获得各种道具、触发各种事件，在帮助这个陌生的世界的过程中，接触世界的真相……
 
 - **房间制探索**：地图由独立房间场景组成，玩家从门进入新房间，逐步解锁能力后回到旧区域，打开此前无法到达的道路（类银河恶魔城循环）。
-- **无战斗，靠移动说话**：没有普通攻击；危险来自关卡本身（尖刺、移动机关、雪崩、水、风）与敌人发出的弹幕。玩家通过精准的跳跃、冲刺与读图来克服挑战。
+- **无战斗，靠移动说话**：没有常规攻击手段；在各种危险（尖刺、移动机关、水、火、雪崩、敌怪）中，玩家通过精准的跳跃、冲刺与读图来克服挑战。
 - **能力驱动的关卡语言**：冲刺、二段跳、滑翔、攀墙/墙跳、超级冲刺、暗影冲刺等能力解锁后，旧关卡会被重新解读。
 - **收集与挑战**：金币、生命升级道具、可破坏墙壁后的隐藏区域、JumpBox 挑战关卡、竞速计时挑战、成就系统。
 
 ---
 
 ## 游戏演示介绍 (Gameplay Preview)
+
+> 演示 GIF 待录制；当前可先看下方静态截图。下面的占位图按建议内容准备好后直接替换即可。
 
 ### 1. 精准跳跃与冲刺
 
@@ -37,12 +42,17 @@
 ![攀墙与墙跳](img/demo-02-wall.gif)
 <!-- 建议：3~6 秒 GIF，展示贴墙下滑 → 墙跳 → 在两面墙之间连续弹跳 -->
 
-### 3. 房间探索与能力解锁
+### 3. 手感修正（边缘 / 台阶 / 冲刺）
+
+![手感修正](img/demo-05-correction.gif)
+<!-- 建议：4~6 秒 GIF，展示“贴着平台边缘起跳依旧能上去”与“冲刺擦着墙角穿过”，对比关闭修正时的卡顿 -->
+
+### 4. 房间探索与能力解锁
 
 ![房间探索与能力解锁](img/demo-03-explore.gif)
 <!-- 建议：5~8 秒 GIF，展示推门进入新房间 → 获得能力 → 回到旧房间打开新路 -->
 
-### 4. 挑战 / 竞速模式
+### 5. 挑战 / 竞速模式
 
 ![挑战与竞速](img/demo-04-challenge.gif)
 <!-- 建议：5~8 秒 GIF，展示 JumpBox 挑战的“完美触发”加分，或竞速计时器与终点结算 -->
@@ -61,45 +71,58 @@
 
 ### 🎮 玩家控制器与手感
 
-- **18 个玩家状态**：`IDLE / MOVE / RUN / JUMP / DOWN / DASH / GLIDE / HURT / DIE / SLEEP / LOOKUP / LOOKDOWN / INTERACTIVE / WALLGRIP / WALLJUMP / SUPERDASHSTART / SUPERDASH`，每个状态对应一个 `handle_*_state()` 函数，由 `_physics_process` 统一分发，状态切换集中在 `change_state()` 一个入口。
-- **平台游戏经典手感参数**（均可 Inspector 调整）：
-  - 土狼时间 `coyote_time = 0.2s`、跳跃缓冲 `jump_buffer_time = 0.15s`；
-  - 可变跳跃高度（按住跳跃 `max_jump_hold_time = 0.22s` 内持续获得上升力）；
-  - 冲刺（`dash_speed = 450`，`dash_duration = 0.2s`）、超级冲刺（蓄力 `1.5s` → 最高 `3.5s`）、滑翔（下落速度倍率 `0.25`）、墙跳（水平 `320` / 垂直 `-150`，离墙后重新附着延迟 `0.2s`）。
-- **帧率一致性**：物理帧率固定（`project.godot` 中 `physics_ticks_per_second` 为工程默认 60），`_physics_process` 中对 `delta` 做上限裁剪，加速度类参数按步长归一化，避免掉帧时“手感突变”。
-- **移动平台**：`MovingPlatform` 独立控制移动，玩家与平台分离解耦，便于在场景中自由组合。
-- **打击感**：Hit Stop（时间冻结）、相机抖动（多个预设强度）、残影（Trail 组件 + 对象池）。
+- **19 个玩家状态**：`IDLE / MOVE / RUN / JUMP / DOWN / DASH / GLIDE / HURT / DIE / SLEEP / LOOKUP / LOOKDOWN / INTERACTIVE / RIDECART / WALLGRIP / WALLJUMP / SUPERDASHSTART / SUPERDASH / BACKSTEP`。
+  `Player.gd` 只保留状态数据与生命周期；逐帧分发在 `PlayerStateFlowService.handle_state()`（一个 `match` 调用 19 个 `handle_*_state()`），具体行为再下沉到 `Scripts/Player/` 下的 43 个服务脚本（移动、空中能力、滑翔、相机、残影、音效、伤害流程、房间过渡……），状态切换统一走 `change_state()` 一个入口。
+- **基础移动**：行走 `120` / 奔跑 `220`（px/s），地面加速 `0.8s`、地面减速 `0.7s`；空中加速度 `1320`、空中控制系数 `0.52`；超速时按 `360 px/s²` 衰减，避免松开冲刺后“刹不住”。
+- **跳跃**：起跳速度 `-90`、二段跳 `-60`、重力 `900`、最大下落 `480`；按住跳跃键在 `0.2s` 内持续获得 `-28` 的额外上升力，实现可变跳跃高度。
+- **手感修正（Jump / Wall-Jump / Dash Correction）**——本项目最花时间打磨的部分：
+  - **边缘修正**：每帧 `move_and_slide` 之前，先用 `PhysicsShapeQueryParameters2D` 探测“本帧位移之后的未来位置”；如果只差一个极小的角点被卡住，就沿垂直方向按 `0.5px` 一档逐级微移（跳跃 6 档 / 墙跳 8 档 / 冲刺 8 档），一找到空位立刻平移过去，动作不中断。贴着平台边缘起跳、横向冲刺擦着墙角穿过，都是靠它救回来的。
+  - **跑出边缘台阶修正**：奔跑中撞到高度 ≤ `4px` 的矮台阶时，先向前探测 `6px` 确认确实被挡住，再从 `1px` 开始逐像素抬高，找到第一个“抬上去还能继续前进”的高度就抬过去，并还原被 `move_and_slide` 清掉的水平速度——否则玩家会在台阶上“顿”一下再重新加速。
+  - **墙跳修正**：优先方向固定为“离墙方向”，避免连续墙跳时被吸回墙面。
+  - **单向平台穿越**：按下 + 跳跃会开一个 `0.2s` 的穿越窗口，窗口内所有边缘修正主动让路——否则台阶修正会把玩家抬回平台顶面，表现成“抽搐一下、既没穿过去也没跳起来”。
+  - **土狼时间 `0.1s` / 跳跃缓冲 `0.12s`**：离开边缘后短时间内仍可起跳，落地前按下的跳跃会被缓冲并自动执行。
+- **冲刺**：水平 `360` / 竖直 `300`，持续 `0.14s`（暗影冲刺 `0.16s`），起手 `0.05s` 内可微调方向；出冲刺保留 `45%` 速度（`dash_exit_speed_retention`），冷却 `0.6s`。
+- **超级冲刺**：长按蓄力 `1.2s`，最高 `420 px/s`，加速 `0.3s` / 减速 `0.6s`，最长持续 `2.5s`，带残影拖尾与输入锁。
+- **滑翔**：水平目标速度 `160`，下落速度上限压缩到 `22%`，起手悬停 `0.12s`；松手后有 `0.28s` 输入冷却，防止误触反复开合。
+- **攀墙 / 墙跳**：贴墙下滑 `280`、按住慢速下滑 `90`，贴墙判定 `0.12s`；墙跳水平 `90` / 垂直 `-160`，离墙后 `0.1s` 才能重新附着，按住可再获得 `-42` 的额外上升力。
+- **后撤步**：`0.12s` / `180 px/s`，带 `0.1s` 反击窗口与短暂无敌。
+- **帧率一致性**：`max_physics_ticks_per_second = 60` + `physics_interpolation = true`，`_physics_process` 里把 `delta` 裁到 `1/30s` 上限（并除以 `Engine.time_scale`，慢镜头下同样成立），所有加速度按步长归一化，掉帧不会造成手感突变。
+- **移动平台 / 矿车**：`Platform` / `MineCart` 各自控制位移，玩家只做“跟随 + 被推出”，不与平台源码互相耦合。
+- **打击感**：Hit Stop（时间缩放冻结）、相机抖动（`CameraShakeManager` 提供按轴向的强/弱预设，每个预设独立配强度、时长、速度与衰减曲线，并按相机限制框裁剪偏移）、残影（`AfterimageTrail` + `AfterimagePool` 对象池）、像素稳定（`PlayerPixelStabilityService`）。
 
 ### 🚪 房间系统与探索循环
 
-- **房间即场景**：每个房间是独立的 `.tscn`（根节点挂 `Room.gd`，导出 `room_id`、`adjacent_rooms` 与房间边界），共 8 个区域 63 个房间。
-- **按需加载**：`RoomManager` 只常驻“当前房间 + 相邻房间”，远处房间 `queue_free()` 释放；场景 `PackedScene` 做缓存，过门切换时先黑屏再加载，避免闪帧。
-- **双门配对**：门通过 `door_id` 成对注册到 `DoorManager`，传送时查找目标门并让玩家从对应门走出，保证房间连接的一致。
-- **检查点与存档点**：静态座椅存档点 + 动态检查点（死亡后从最近检查点复活）。
+- **房间即场景**：每个房间是独立的 `.tscn`（根节点挂 `Room.gd`，导出 `room_id`、`adjacent_rooms`、`room_bounds`、房间 BGM 与色调），共 8 个区域目录、63 个房间（草原 18 / 雪山 21 / 风之谷 13 / 城镇 7 / 洞穴 3 / 其它 1）。
+- **按需加载**：`RoomManager` 只常驻“当前房间 + 相邻房间”，远处房间 `queue_free()` 释放；场景 `PackedScene` 做缓存，过门切换先黑屏再加载，避免闪帧。
+- **双门配对**：门通过 `door_id` 成对注册到 `DoorManager`，传送时查找目标门并让玩家从对应门走出，保证房间连接一致。
+- **检查点与存档点**：静态座椅存档点 + 动态检查点（`DynamicCheckpointManager`，死亡后从最近检查点复活）。
 
 ### 🧩 能力解锁与跨系统信号
 
-- 能力（冲刺 / 二段跳 / 滑翔 / 暗影冲刺 / 攀墙 / 超级冲刺）保存在 `Global.unlocked_abilities` 中，解锁事件通过 `EventBus` 广播，玩家、UI、成就系统订阅同一信号，避免直接耦合。
-- 二段跳、冲刺、滑翔、攀墙等状态会随能力解锁实时生效，未解锁时尝试触发会被忽略。
+- 9 项能力（`dash / double_jump / glide / black_dash / wall_grip / super_dash / backstep / vertical_dash / map`）统一保存在 `Global.unlocked_abilities`，解锁通过 `EventBus` 广播，玩家、UI、成就系统订阅同一信号，避免直接耦合。
+- 二段跳、冲刺、滑翔、攀墙等状态随能力实时生效；未解锁时触发会被忽略，旧存档缺少新字段时自动补默认值。
 
 ### 🏁 挑战与竞速
 
-- **JumpBox 挑战**：挑战关卡中会按节奏生成 `ChallengeJumpBox` / `ChallengeMoveJumpBox`，踩中时判定“普通 / 完美”触发；完美触发得分更高，连续完美有额外加成。
-- **挑战配置数据驱动**：每阶段挑战使用 `ChallengeConfig.tres` 配置挑战名、生成点与冷却时间，便于调整关卡节奏。
-- **成就系统**：能力解锁类成就通过 `EventBus` 信号自动触发（仓库当前版本为成就基础框架，更多成就内容在规划中）。
+- **JumpBox 挑战**：挑战关卡中按节奏生成/激活 `JumpBox`，踩中时判定“普通 / 完美”触发（完美窗口 `0.12s`，可通过二段跳起手时间命中）；完美触发力度 ×`1.8`、水平加成 ×`1.75`、并可回血。
+- **数据驱动配置**：挑战分 7 个阶段（`Assets/Configs/ManiacStages/ManiacStage1~7Config.tres`），竞速分 5 段（`Assets/Configs/RaceStages/RaceStage1~5Config.tres`），改名、生成点、冷却都在 Resource 里调，不改代码即可调关节奏。
+- **计分**：普通触发基础分、完美触发基础分，连续完美累进加分并在第 8 次封顶（`ChallengeController`）。
+- **成就系统**：`AchievementManager` + `AchievementToast` 弹出提示，能力解锁类成就由 `EventBus` 信号自动触发（框架已就绪，内容持续补充）。
 
 ### 🔊 音频、相机与表现
 
-- **音频总线**：`Master / BGM / SFX / Voice` 四条总线，BGM 支持淡入淡出切换，音效携带空间位置（2D）。
+- **音频总线**：`Master / BGM / SFX / Voice` 四条总线（`Assets/Audios/default_bus_layout.tres`）；BGM 支持淡入淡出与 Ducking，音效带头部空间位置与优先级队列（最多 16 个并发实例、按优先级限流、对象池复用）。
 - **相机**：基于 Phantom Camera 的跟随与限制框；进房间时自动写入房间边界作为相机限制，避免镜头拍到房间外。
-- **视觉**：像素风坐标对齐（`stretch/mode=viewport` + `texture_filter=nearest`）、CanvasModulate 房间色调、Vignette 暗角（`VignetteEffect`）、残影 Shader、水面波纹 Shader。
+- **视觉**：像素风坐标对齐（`stretch/mode=viewport` + `scale_mode=integer` + `texture_filter=nearest`）、CanvasModulate 房间色调、Vignette 暗角（`VignetteEffect`）、残影（`AfterimageShader`）、地图揭示（`MapReveal`）、成就图标（`AchievementIcon`）；水面由 `PixelWaterSurface` 脚本驱动像素波纹。
+- **环境粒子**：`EnvironmentZoneBase` 统一了“区域形状 + 粒子朝向/速度 + 效果强度变化”，派生出 `UpdraftZone`（上升气流）、`EnvironmentZone`（风场/水流，可开关或时间循环）、`BubbleColumnZone`（水下气泡柱）等；粒子的 `visibility_rect` 按区域实际尺寸动态写入，超长区域也不会出现“飞到一半粒子消失”。
 
 ### 🛠 工程质量
 
-- **配置与逻辑分离**：挑战关卡、资源路径、物理层、输入映射集中管理（`ChallengeConfig.tres`、`ScenePaths`、`project.godot`）。
+- **配置与逻辑分离**：挑战/竞速配置走 `.tres`，资源路径集中在 `ScenePaths`（Autoload，唯一路径表：目录常量 + 15 个 UI 场景 + 玩家/NPC/主场景 + 63 个房间），物理层与输入映射集中在 `project.godot`；脚本之间尽量用 `class_name` 而非 `preload("res://…")` 硬编码路径。
 - **按键重映射**：玩家可在设置页重映射移动/跳跃/冲刺/超级冲刺/交互/对话键，并持久化到 `user://input_map.json`。
-- **多菜单 UI**：标题页、存档选择、设置、游戏内设置、删除确认等 UI 场景，统一 Fade 过渡。
-- **存档**：JSON 存档到 `user://saves/`，先写 `.tmp` 再改名为正式存档，降低“写一半崩溃导致存档损坏”的风险；支持多存档槽、删除与信息预览。
+- **多菜单 UI**：标题、存档选择、设置、游戏内设置、删除确认、成就、更新说明、地图、传送、竞速 HUD 等 15 个 UI 场景，统一 Fade 过渡与 `UIRouter` 路由。
+- **存档**：JSON 存档写入 `user://saves/`，先写 `.tmp` 再改名，降低“写一半崩溃导致存档损坏”的风险；支持多槽位、删除与信息预览。
+- **可验证性**：所有改动都会跑 `godot --headless --editor --quit` 做全量导入 + 编译校验，并用一次性的 headless 场景脚本验证运行期行为（本项目维护 0 error / 0 warning 的底线）。
 
 ---
 
@@ -107,17 +130,17 @@
 
 | 分类 | 说明 |
 |---|---|
-| 引擎 | **Godot 4.5 Stable**（2D，GL Compatibility 渲染后端） |
-| 语言 | **GDScript**（项目脚本 191 个 / 不含插件，全部由作者编写） |
-| 物理 | `CharacterBody2D` + 自定义状态机，固定物理步长 + 物理插值 |
-| 渲染 | 像素风 CanvasItem 渲染、Shader（残影、水面波纹）、CanvasModulate 房间色调 |
-| 音频 | AudioStreamPlayer / AudioStreamPlayer2D + 自定义总线（Master/BGM/SFX/Voice） |
+| 引擎 | **Godot 4.5.1 Stable**（2D，GL Compatibility 渲染后端，1280×720，`viewport` 拉伸 + 整数缩放） |
+| 语言 | **GDScript**（项目脚本 188 个 / 不含插件，全部由作者编写） |
+| 物理 | `CharacterBody2D` + 自定义状态机；固定物理步长（60Hz）+ `physics_interpolation` + `PhysicsShapeQueryParameters2D` 形状探测 |
+| 美术 | 使用 Aseprite、Resprite 纯手绘完成角色、场景与 UI 像素资源绘制 |
+| 渲染 | 像素风 CanvasItem 渲染、Shader（残影 / 暗角 / 地图揭示 / 成就图标）、CanvasModulate 房间色调、GPUParticles2D 环境粒子 |
+| 音频 | AudioStreamPlayer / AudioStreamPlayer2D + 自定义总线（Master/BGM/SFX/Voice）+ 优先级队列与对象池 |
 | 数据结构 | 字典 / 数组 / 枚举状态机 / Tween；自定义 `ChallengeConfig` Resource |
 | 存档 | JSON（`user://`）+ 临时文件替换 + 多槽位 |
-| 输入 | InputMap + 运行时按键重映射（JSON 持久化） |
-| UI | Control 节点 + 场景切换 + Fade 过渡 |
-| 第三方插件 | [Phantom Camera](https://github.com/ramokz/phantom-camera) 0.9.3.1（相机）、[Dialogue Manager](https://github.com/nathanhoad/godot_dialogue_manager) 3.10.2（对话）、[GodotIQ](https://godotiq.com)（开发期 AI 辅助，可在编辑器关闭） |
-| 可选测试 | [GUT](https://github.com/bitwes/Gut) 9.5.0（已放入 `addons/gut`，当前未启用） |
+| 输入 | InputMap + 运行时按键重映射（JSON 持久化）+ 移动端虚拟按键 HUD |
+| UI | Control 节点 + 场景切换 + Fade 过渡 + 统一 UIRouter |
+| 第三方插件 | [Phantom Camera](https://github.com/ramokz/phantom-camera) 0.9.3.1（相机）、[Dialogue Manager](https://github.com/nathanhoad/godot_dialogue_manager) 3.10.2（对话）、Tile Copy 1.0 by wyfyjc（TileMap 复制）、[GodotIQ](https://godotiq.com) 0.5.1（开发期 AI 辅助，可在编辑器关闭） |
 
 ---
 
@@ -125,18 +148,19 @@
 
 | 动作 | 键位 |
 |---|---|
-| 移动 | `A` / `D` |
-| 向上 / 向下（沿墙移动、斜向冲刺等组合输入） | `W` / `S` |
-| 跳跃 | `K`（按住跳得更高；空中可触发二段跳） |
+| 移动（左右） | `A` / `D` |
+| 向上 / 向下（向上冲刺、向下冲刺、沿墙移动、单向平台下穿） | `W` / `S` |
+| 跳跃 | `K`（按住跳得更高；空中再按触发二段跳） |
 | 冲刺 / 能力增强 | `L` |
 | 超级冲刺 | `O`（长按蓄力，松开释放） |
 | 攀墙 | 贴墙时朝墙方向移动 |
 | 交互（对话 / 存档 / 开门） | `U` |
 | 继续对话 | `Space` |
-| 地图 / 返回（系统默认） | `Esc` |
+| 地图 | `Tab`（需先在商人处购买「地图」能力） |
+| 返回 / 关闭界面 | `Esc` |
 
 小提示：
-- 二段跳、冲刺、滑翔、攀墙需要在游戏中先解锁对应能力（与 NPC 对话获取）。
+- 冲刺、二段跳、滑翔、攀墙、超级冲刺、暗影冲刺、后撤步、地图都需要先在游戏中解锁（与 NPC 对话获取）。
 - 所有键位均可在“设置 → 控制”中重新映射，并自动保存到本地。
 
 ---
@@ -145,7 +169,7 @@
 
 ### 方式一：直接游玩
 
-> TODO：在这里粘贴你的 **Windows 打包下载链接**（例如 GitHub Releases 或 itch.io / 网盘）。
+> TODO：在这里粘贴 **Windows 打包下载链接**（例如 GitHub Releases）。
 > 建议同时提供 **Android APK 下载链接**。
 
 1. 下载压缩包并解压；
@@ -164,7 +188,7 @@ cd WarGuang
 #    打开 Godot 项目管理器 → Import → 选择 project.godot → Import & Edit
 
 # 3. 首次导入后按 F5 运行
-#    主场景：Scenes/UI/Scenes/TitleScene.tscn
+#    主场景：Scenes/UI/ScenesUI/TitleScene.tscn
 ```
 
 也可以用命令行（Windows 示例）：
@@ -179,7 +203,21 @@ cd WarGuang
 
 **导出 Android（可选）**：需安装 Android Build Template 与 SDK/NDK，在“项目 → 导出”中选择 Android 预设。
 
-**关于插件**：`addons/godotiq` 是作者本地使用的 AI 辅助插件；如不需要，可在“项目设置 → 插件”中关闭它，不影响游戏运行。
+**关于插件**：`addons/godotiq` 是作者本地使用的 AI 辅助插件，会在编辑器里尝试占用 `6007` 端口；如不需要，可在“项目设置 → 插件”中关闭它，不影响游戏运行。
+
+---
+
+## 授权与使用条款 (License)
+
+本项目**不是开源项目**。仓库公开的目的是让人**阅读与学习**，而不是让人使用、复制或再发布。
+
+- ✅ **允许**：下载并在本地用 Godot 打开、编译、运行、调试；阅读源码学习；把其中的设计**思路**用到自己的项目；非商业的课堂 / 直播 / 文章讲解（不分发源码与资源）。
+- ❌ **禁止**：商业使用（付费、广告、内购、众筹、平台发行等）；再分发（源码 / 可执行文件 / PCK·APK / 资源包 / 修改版）；基于本项目的衍生发布；单独提取美术、音频、字体或 Shader 另作他用；移除署名与许可文件。
+- **第三方内容**：Godot 引擎与 `addons/` 下的插件（Phantom Camera / Dialogue Manager / Tile Copy / GodotIQ）遵循各自许可，不适用本协议。
+
+完整条款见 [LICENSE](LICENSE)。如需商用、发行或其它未列举的用途，请通过下方「开发者」中的联系方式向作者申请书面授权。
+
+> **历史说明**：本仓库早期提交曾使用 AGPL-3.0；自 2026-11-20 起，仓库内容改按上述协议分发。已经拿到旧版本的人对**其持有的那一份副本**仍可主张当时的许可，这一点无法追溯收回；若在意，可以把仓库改为私有（见仓库 Settings → Danger Zone）。
 
 ---
 
@@ -187,15 +225,30 @@ cd WarGuang
 
 | 指标 | 数值 |
 |---|---:|
-| GDScript 脚本 | **191 个**（含 `.uid` 配对文件则更多；不含第三方插件） |
-| 场景 `.tscn` | **166 个**（其中房间场景 63 个，覆盖 8 个区域目录） |
-| 美术/音频资源 | 166 张 PNG、7 首 OGG 背景音乐、6 个 MP3、125 个 WAV 音效 |
-| 全局自动加载单例（Autoload） | **21 个** |
-| 玩家状态 | 18 个 |
-| 仓库跟踪文件 | 2178 个（提交 `2c1290e`） |
-| 核心脚本 | `Player.gd`（约 2,953 行）、`PlayerUI.gd`、`RoomManager.gd`、`MapManager.gd`、`Global.gd`、`SaveManager.gd`、`AudioManager.gd`、`CameraShakeManager.gd`、`ChallengeController.gd` |
+| GDScript 脚本 | **188 个**（不含 `addons/`，全部由作者编写） |
+| 场景 `.tscn` | **147 个**（房间 63 个 / UI 15 个 / 实例、实体与工具场景 69 个） |
+| 美术 / 音频 | 154 张 PNG、7 首 OGG（BGM）、125 个 WAV（音效） |
+| 全局自动加载单例（Autoload） | **26 个**（23 个自研 + 3 个来自插件） |
+| 玩家状态 | 19 个（由 43 个服务脚本共同实现） |
+| 区域 / 房间 | 8 个区域目录 / 63 个房间场景 |
+| 仓库跟踪文件 | 1616 个（提交 `6ebbb88`） |
 
-> 说明：以上为当前提交 `2c1290e` 的实测数据；项目仍在持续开发，数字会随迭代变化。
+核心脚本行数：
+
+| 文件 | 行数 | 职责 |
+|---|---:|---|
+| `Player.gd` | 1824 | 玩家节点、状态数据、生命周期、对外接口 |
+| `MapManager.gd` | 1323 | 大地图烘焙与绘制、房间布局拼接 |
+| `HurtBox.gd` | 1066 | 伤害体：直线/波浪/圆周/大摆锤、发射器、触发器、周期开关 |
+| `Global.gd` | 910 | 全局进度：能力、金币、道具、Boss、存档序列化 |
+| `PlayerUI.gd` | 756 | 玩家 HUD（血量、金币、气泡、提示） |
+| `PlayerMovementService.gd` | 611 | 地面/空中移动与各状态的具体实现 |
+| `AudioManager.gd` | 509 | BGM 淡入淡出、Ducking、SFX 优先级与对象池 |
+| `CameraShakeManager.gd` | 445 | 相机抖动预设与噪声 |
+| `RoomManager.gd` | 430 | 房间按需加载、邻接、缓存 |
+| `PlayerStateFlowService.gd` | 321 | 19 个状态的逐帧分派 |
+
+> 说明：以上为当前工作区实测数据；项目仍在持续开发，数字会随迭代变化。
 
 ---
 
@@ -203,35 +256,44 @@ cd WarGuang
 
 ```text
 warma-shadow-test/
-├─ project.godot          # 工程配置：输入映射、自动加载、物理/渲染
+├─ project.godot          # 工程配置：输入映射、26 个 Autoload、物理/渲染
+├─ LICENSE                # 源码可见许可协议（非开源，仅供学习）
 ├─ Scripts/
-│  ├─ Player/             # 玩家控制器（Player.gd、PlayerUI、HUD）
-│  ├─ Managers/           # 全局管理器（房间、存档、音频、场景切换、全局状态…）
-│  ├─ GameScenes/         # 游戏场景逻辑（主场景、房间、门）
-│  ├─ Instances/          # 可放置实例（JumpBox、HurtBox、平台、存档点…）
-│  ├─ Components/         # 可复用组件（残影轨迹、挑战控制器）
-│  ├─ NPCs/               # NPC 行为与对话
-│  └─ UI/                 # UI 场景脚本
-├─ Scenes/                # 对应场景（Player、UI、房间、实例、NPC、管理器）
-├─ Assets/                # 美术、音频、字体、Shader、配置 Resource、对话文本
-└─ addons/                # 第三方插件（Phantom Camera / Dialogue Manager / GUT）
+│  ├─ Player/             # Player.gd + 43 个服务脚本；PlayerUI/ 为玩家 HUD
+│  ├─ Managers/           # 21 个管理器脚本（房间、场景、存档、音频、地图、UI 路由…）
+│  ├─ GameScenes/         # 房间基类 Room.gd、门、视差、隐藏区域
+│  ├─ Instances/          # 可放置实例：HurtBox / JumpBox / Platform / EnvironmentZone /
+│  │                      #   SavePoint / MineCart / Props / ObjectPools / TileAnim …
+│  ├─ Entities/           # 敌人 Enemys/、中立生物 Neutrals/、NPCs/
+│  ├─ UI/                 # GameUI（地图/传送/竞速 HUD/气球）、ScenesUI（标题/设置/存档…）、UIFx
+│  ├─ Resources/          # ChallengeController、ChallengeConfig、AfterimagePool
+│  ├─ Events/             # 开场演出 BootCinematicDirector
+│  └─ Tools/              # 开发期工具脚本（房间扫描、校验）
+├─ Scenes/                # 与 Scripts 一一对应的场景（UI 同样分 GameUI / ScenesUI）
+│  └─ GameScenes/Rooms/   # 8 个区域目录、63 个房间场景
+├─ Assets/                # 美术、音频、字体、Shader、Configs（挑战/竞速）、Dialogues
+├─ addons/                # 第三方插件（Phantom Camera / Dialogue Manager / Tile Copy / GodotIQ）
+├─ tools/                 # 项目外的 headless 校验脚本（不参与游戏运行）
+└─ img/                   # README 截图与 GIF
 ```
 
 ---
 
 ## 已知问题与后续计划
 
-- **房间布局仍在施工**：包含若干测试与占位房间，部分区域（如 Atlantis、Dream）只有目录，关卡尚未完成。
-- **无主动战斗**：受设计取舍影响，目前没有普通攻击；敌人以移动障碍和弹幕为主。
-- **手柄支持**：尚未配置手柄映射。
-- **测试**：尚未编写自动化测试（GUT 已放入项目，计划后续补充冒烟测试）。
-- **后续计划**：完善关卡与能力解锁顺序、补全音乐、优化手机端性能、补充演示视频与自动化测试。
+- **房间布局仍在施工**：`Atlantis`、`Dream` 两个区域目前只有目录，关卡尚未开始制作；其余区域也有测试与占位房间。
+- **无主动战斗**：受设计取舍影响，目前没有普通攻击；危险来自关卡机关与敌怪弹幕。
+- **手柄支持**：尚未配置手柄映射（键盘 + 移动端虚拟按键可用）。
+- **自动化测试**：未引入 GUT 等测试框架；当前靠 `tools/` 下的一次性 headless 脚本做行为验证，计划后续补冒烟测试。
+- **已知技术债**：`HurtBox` / `JumpBox` / `Platform` 三套往返移动代码高度相似（加减速 + 端点等待），可以抽成共享组件；`Player.gd` 仍有部分逻辑可继续下沉到服务脚本。
+- **后续计划**：完善关卡与能力解锁顺序、补全音乐与演示视频、优化手机端性能、补自动化测试。
 
 ---
 
 ## 开发者 (Developer)
 
-- **作者**：斑鸠at（个人独立开发，）
+- **作者**：斑鸠at
 - **GitHub**：[@TurtledoveatriHub](https://github.com/TurtledoveatriHub)
-- **联系方式**：TODO（邮箱 / B 站 / 社交主页）
-- **项目动机**：以《蔚蓝》《空洞骑士》等作品为学习对象，练习 2D 平台跳跃的手感打磨、房间制关卡设计与独立游戏完整开发流程。
+- **联系方式**：谷歌邮箱 turtledoveatri@gmail.com / QQ 邮箱 hzw718295@qq.com / B 站 https://space.bilibili.com/689333617
+
+> 本项目为个人独立作品 / 求职作品集项目，欢迎交流与指正；如需商用或转载请注明并联系作者。

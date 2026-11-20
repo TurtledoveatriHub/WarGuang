@@ -1,0 +1,157 @@
+[gd_scene load_steps=9 format=3 uid="uid://diylsfmb0ckg5"]
+
+[ext_resource type="Script" uid="uid://x3hbxtwnrr30" path="res://Scripts/UI/GameUI/TeleportPanel.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://chrxvtfsyndtw" path="res://Assets/Textures/UIs/InstanceUIs/对话框背景.png" id="3_juc85"]
+[ext_resource type="Theme" uid="uid://x6qv7hs1dfnn" path="res://Assets/Themes/Theme9x9.tres" id="7_ex6nn"]
+[ext_resource type="Texture2D" uid="uid://760cxaapn7og" path="res://Assets/Textures/UIs/ButtonUIs/按钮默认纹理.png" id="8_ex6nn"]
+[ext_resource type="Texture2D" uid="uid://c7oewm0yh0p6j" path="res://Assets/Textures/UIs/ButtonUIs/按钮悬停纹理.png" id="9_7alhu"]
+[ext_resource type="Script" uid="uid://dw76ryy8ii6g7" path="res://Scripts/UI/GameUI/TeleportPanelButton.gd" id="9_l5e8y"]
+[ext_resource type="Texture2D" uid="uid://diyd7rw1i2bs2" path="res://Assets/Textures/UIs/ButtonUIs/按钮按下纹理.png" id="10_pq6s8"]
+[ext_resource type="Script" uid="uid://c1oi4mtnx0ub8" path="res://Scripts/UI/UIFx/UIFxDirector.gd" id="11_fxbus"]
+
+
+[node name="TeleportPanel" type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="UIFxDirector" type="Node" parent="."]
+script = ExtResource("11_fxbus")
+transition_enter_delay = 0.0
+drive_components = false
+drive_loop = false
+target_paths = Array[NodePath]([NodePath("../PanelRoot")])
+drift_distance = Vector2(0, 16)
+exit_duration = 0.45
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="PanelRoot" type="Node2D" parent="."]
+position = Vector2(618, 330)
+
+[node name="Sprite2D" type="Sprite2D" parent="PanelRoot"]
+scale = Vector2(4, 4)
+texture = ExtResource("3_juc85")
+
+[node name="GrassLand1" type="TextureButton" parent="PanelRoot"]
+offset_left = -234.0
+offset_top = 21.0
+offset_right = -166.0
+offset_bottom = 43.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "GrassLand1"
+
+[node name="Label" type="Label" parent="PanelRoot/GrassLand1"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "初始草原"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GrassLand7" type="TextureButton" parent="PanelRoot"]
+offset_left = -317.0
+offset_top = 76.0
+offset_right = -249.0
+offset_bottom = 98.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "GrassLand7"
+
+[node name="Label" type="Label" parent="PanelRoot/GrassLand7"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "草原地下"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GrassLand12" type="TextureButton" parent="PanelRoot"]
+offset_left = -122.0
+offset_top = 15.0
+offset_right = -54.0
+offset_bottom = 37.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "GrassLand12"
+
+[node name="Label" type="Label" parent="PanelRoot/GrassLand12"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "草原城镇"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GrassLand14" type="TextureButton" parent="PanelRoot"]
+offset_left = -32.0
+offset_top = -58.0
+offset_right = 36.0
+offset_bottom = -36.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "GrassLand14"
+
+[node name="Label" type="Label" parent="PanelRoot/GrassLand14"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "草原雪山"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SnowMountain4" type="TextureButton" parent="PanelRoot"]
+offset_left = 108.0
+offset_top = -32.0
+offset_right = 176.0
+offset_bottom = -10.0
+texture_normal = ExtResource("8_ex6nn")
+texture_pressed = ExtResource("9_7alhu")
+texture_hover = ExtResource("10_pq6s8")
+stretch_mode = 0
+script = ExtResource("9_l5e8y")
+target_teleport_id = "SnowMountain4"
+
+[node name="Label" type="Label" parent="PanelRoot/SnowMountain4"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("7_ex6nn")
+theme_override_font_sizes/font_size = 10
+text = "雪山山洞"
+horizontal_alignment = 1
+vertical_alignment = 1

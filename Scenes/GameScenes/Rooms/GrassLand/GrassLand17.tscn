@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_5d5cc"]
 [ext_resource type="AudioStream" uid="uid://chuvp6gn40l48" path="res://Assets/Audios/BGM/蔚蓝云.ogg" id="2_g5kb2"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="3_14bd6"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="3_14bd6"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="4_kgkvw"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_g5kb2"]
 [ext_resource type="TileSet" uid="uid://dyotdceb6nd54" path="res://Assets/Textures/Tiles/GrassLand/Tres/草原瓦片集.tres" id="6_04sm7"]
@@ -20,8 +20,8 @@
 [ext_resource type="Resource" uid="uid://bep85a3trmx3d" path="res://Assets/Dialogues/Signs/gl17ChallengeBoard.dialogue" id="25_8d7tr"]
 [ext_resource type="Resource" uid="uid://b7rnnsnjm3upj" path="res://Assets/Dialogues/Signs/gl17EndlessBoard.dialogue" id="27_g5kb2"]
 [ext_resource type="PackedScene" uid="uid://bjlvqrcplff4s" path="res://Scenes/Entities/NPCs/Maniac.tscn" id="30_maniac"]
-[ext_resource type="Script" uid="uid://cmr8exyv7c35t" path="res://Scripts/Components/ChallengeController.gd" id="31_chalctrl"]
-[ext_resource type="PackedScene" uid="uid://cx4dhxum88xak" path="res://Scenes/UI/ChallengeCounter.tscn" id="32_ccounter"]
+[ext_resource type="Script" uid="uid://cmr8exyv7c35t" path="res://Scripts/Resources/ChallengeController.gd" id="31_chalctrl"]
+[ext_resource type="PackedScene" uid="uid://cx4dhxum88xak" path="res://Scenes/UI/GameUI/ChallengeCounter.tscn" id="32_ccounter"]
 [ext_resource type="Script" uid="uid://cjrjaqyt0i28c" path="res://Scripts/Resources/ChallengeConfig.gd" id="33_cfgs"]
 [ext_resource type="Resource" uid="uid://bxd34rllgoej0" path="res://Assets/Configs/ManiacStages/ManiacStage1Config.tres" id="34_c1"]
 [ext_resource type="Resource" uid="uid://dy6aoo3vv8biq" path="res://Assets/Configs/ManiacStages/ManiacStage2Config.tres" id="35_c2"]
@@ -29,6 +29,7 @@
 [ext_resource type="Resource" uid="uid://cemm2ey8ml5dd" path="res://Assets/Configs/ManiacStages/ManiacStage4Config.tres" id="37_c4"]
 [ext_resource type="Resource" uid="uid://c14j7lbkiqemc" path="res://Assets/Configs/ManiacStages/ManiacStage5Config.tres" id="38_c5"]
 [ext_resource type="Resource" uid="uid://dwo5albmahk4i" path="res://Assets/Configs/ManiacStages/ManiacStage6Config.tres" id="39_c6"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 

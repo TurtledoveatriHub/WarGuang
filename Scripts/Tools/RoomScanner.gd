@@ -14,7 +14,7 @@ extends RefCounted
 ## 因此直接加载脚本并读取其常量表。
 const SCENE_PATHS_SCRIPT := "res://Scripts/Managers/ScenePaths.gd"
 
-## TextArea 的默认基础尺寸（与 Scripts/UI/TextArea.gd 的默认值保持一致）
+## TextArea 的默认基础尺寸（与 Scripts/UI/GameUI/TextArea.gd 的默认值保持一致）
 const DEFAULT_BOUNDS_SIZE := Vector2(320.0, 320.0)
 
 ## 获取「房间 ID → 场景路径」注册表；失败时返回空字典

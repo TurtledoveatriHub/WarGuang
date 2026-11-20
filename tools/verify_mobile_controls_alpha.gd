@@ -1,7 +1,9 @@
 extends SceneTree
 
+const ScenePathsScript := preload("res://Scripts/Managers/ScenePaths.gd")
+
 func _initialize() -> void:
-	var settings_scene = load("res://Scenes/UI/Scenes/SettingsScene.tscn").instantiate()
+	var settings_scene = load(ScenePathsScript.UI_SETTINGS).instantiate()
 	root.add_child(settings_scene)
 	var page = settings_scene.get_node_or_null("SettingsRoot/PagesRoot/MobieControlsPage")
 	assert(page != null, "MobieControlsPage missing")

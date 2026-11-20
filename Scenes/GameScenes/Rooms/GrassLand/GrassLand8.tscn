@@ -1,7 +1,7 @@
 [gd_scene load_steps=16 format=4 uid="uid://dcw408ecdjugq"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_4yjim"]
-[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/TextArea.gd" id="2_1c38w"]
+[ext_resource type="Script" uid="uid://b8fn8fsjkwhah" path="res://Scripts/UI/GameUI/TextArea.gd" id="2_1c38w"]
 [ext_resource type="AudioStream" uid="uid://y2b4bofrgj85" path="res://Assets/Audios/BGM/酒吧畅想2.ogg" id="2_b7wgd"]
 [ext_resource type="Script" uid="uid://dg784exk0qnrc" path="res://Scripts/GameScenes/GroundParallaxController.gd" id="3_5r1e4"]
 [ext_resource type="Texture2D" uid="uid://mo1ocmwpw2k6" path="res://Assets/Textures/Backgrounds/通用白色背景.png" id="5_61wan"]
@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="10_ug2vf"]
 [ext_resource type="PackedScene" uid="uid://dwy6nckbuirsr" path="res://Scenes/Entities/NPCs/AerialRollMaster.tscn" id="11_b7wgd"]
 [ext_resource type="PackedScene" uid="uid://bfgxgslkvovs7" path="res://Scenes/Instances/SavePoints/ChairSavePoint.tscn" id="11_hd6wn"]
+
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 
