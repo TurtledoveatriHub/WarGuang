@@ -162,8 +162,9 @@ func _start_interaction():
 	
 	var dialogue_count = TaskManager.get_npc_dialogue_count(npc_id)
 	
-	var balloon = balloon_scene.instantiate()
-	get_tree().current_scene.add_child(balloon)
+	var balloon: Node = MyDialogueBalloon.acquire(get_tree().current_scene, balloon_scene)
+	if balloon == null:
+		return
 	
 	if dialogue_count == 0:
 		_grant_double_jump(player)

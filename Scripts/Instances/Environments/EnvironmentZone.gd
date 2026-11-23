@@ -49,6 +49,10 @@ class_name EnvironmentZone
 @export var wind_deceleration: float = 240.0
 ## 地面上的风强度（0 = 地面不受风，1 = 与空中相同；想模拟地面摩擦更稳可以调小）
 @export var wind_ground_scale: float = 0.7
+## 攀墙豁免阈值（像素/秒，只看水平分量）：
+## 水平风速 |wind_max_velocity.x| ≤ 此值时，玩家攀墙不受水平风影响（不会被吹离墙面）；
+## 超过此值则照常吹离（真正的「强风区无法逆风攀墙」）。设为 0 = 关闭豁免（任何风都会吹离）。
+@export var wall_grip_ignore_wind_max_x: float = 120.0
 
 ## 子类实现：区域所属组 / 名称 / 表现强度与方向 ─────────────────
 func _get_zone_group() -> String:
@@ -90,4 +94,5 @@ func get_environment_config(player: Node) -> Dictionary:
 		"wind_velocity": wind_max_velocity * wind_scale,
 		"wind_acceleration": wind_acceleration * wind_scale,
 		"wind_deceleration": wind_deceleration,
+		"wall_grip_ignore_wind_max_x": wall_grip_ignore_wind_max_x,
 	}

@@ -82,6 +82,10 @@ const HOVER_SFX_MIN_INTERVAL: float = 0.035
 var _last_hover_sfx_ms: int = -100000
 ## 音频闪避 Tween
 var audio_duck_tween: Tween
+## 闪避前 BGM 的基准音量（dB）—— 闪避是临时效果，恢复时必须回到「基准」而不是「当前音量」
+var _bgm_base_volume_db: float = 0.0
+## 是否正处于闪避周期（含闪避保持段与恢复段）；只有周期结束才允许重新采样基准音量
+var _bgm_duck_active: bool = false
 
 # ============================================================
 # 🎚 音效增益表（方案 A）
@@ -176,6 +180,9 @@ func play_bgm_stream(stream: AudioStream, fade_duration: float = BGM_FADE_IN_DUR
 	# 直接播放，不依赖 tween
 	player.stop()
 	player.stream = stream
+	## 换曲时作废正在进行的闪避：否则闪避 tween 会在换曲后继续把音量拉回旧基准
+	_cancel_bgm_duck()
+	_bgm_base_volume_db = 0.0
 	player.volume_db = 0.0
 	player.play()
 	_current_bgm_stream = stream
@@ -194,17 +201,41 @@ func _fade_in_bgm_player_bg(duration: float) -> void:
 	_bgm_fade_tween.tween_property(player, "volume_db", 0.0, duration).from_current()
 
 ## 音频闪避 — 重要音效时临时降低 BGM 音量
+##
+## ★ 恢复目标必须是「闪避前的基准音量」，不能是「调用那一刻的当前音量」。
+##   旧实现把 player.volume_db 当基准：闪避期间（音量已被压低）再次受伤时，
+##   第二次会把压低后的音量当成基准并「恢复」到它 —— BGM 就永久停留在低音量，
+##   只有换房间 / 死亡重生重新 play_bgm_stream（把音量重置为 0dB）才会恢复。
+##   现在用 _bgm_duck_active 标记周期：只有第一次闪避采样基准，后续重复触发沿用同一基准。
 func duck_bgm_for_sfx(duck_duration: float = BGM_DUCK_DURATION, duck_volume: float = BGM_DUCK_VOLUME):
 	var player = _get_bgm_player()
 	if not _current_bgm_stream or not player.playing:
 		return
-	var original_volume = player.volume_db
+	## 不在闪避周期内才采样基准音量（连续受伤时沿用第一次的基准）
+	if not _bgm_duck_active:
+		_bgm_base_volume_db = player.volume_db
+		_bgm_duck_active = true
 	if audio_duck_tween and audio_duck_tween.is_valid():
 		audio_duck_tween.kill()
 	audio_duck_tween = create_tween()
 	audio_duck_tween.tween_property(player, "volume_db", linear_to_db(duck_volume), 0.2)
 	audio_duck_tween.tween_interval(duck_duration)
-	audio_duck_tween.tween_property(player, "volume_db", original_volume, 0.5)
+	audio_duck_tween.tween_property(player, "volume_db", _bgm_base_volume_db, 0.5)
+	audio_duck_tween.tween_callback(_on_bgm_duck_finished)
+
+
+## 闪避周期正常结束：解除标记，下一次受伤重新采样基准音量
+func _on_bgm_duck_finished() -> void:
+	_bgm_duck_active = false
+	audio_duck_tween = null
+
+
+## 强行作废当前闪避周期（换曲 / 停止 BGM / 退出时调用），不改变当前音量
+func _cancel_bgm_duck() -> void:
+	if audio_duck_tween and audio_duck_tween.is_valid():
+		audio_duck_tween.kill()
+	audio_duck_tween = null
+	_bgm_duck_active = false
 
 ## 播放事件 BGM — 保存当前 BGM，切换事件 BGM
 func play_event_bgm(bgm_name: String):
@@ -252,6 +283,7 @@ func fade_out_bgm_on_death(fade_duration: float = 1.2) -> void:
 	var player = _get_bgm_player()
 	if not player.playing:
 		return
+	_cancel_bgm_duck()
 	var tween = create_tween()
 	tween.tween_property(player, "volume_db", -80.0, fade_duration)
 	tween.tween_callback(stop_bgm_stream)
@@ -274,6 +306,8 @@ func _load_bgm_compat(bgm_name: String) -> AudioStream:
 ## 停止 BGM 流播放（立即停止，无淡出）
 func stop_bgm_stream() -> void:
 	var player = _get_bgm_player()
+	_cancel_bgm_duck()
+	_bgm_base_volume_db = 0.0
 	if player.playing:
 		player.stop()
 	_current_bgm_stream = null
@@ -362,7 +396,10 @@ func play_stream_sfx_prioritized(stream: AudioStream, priority: int = SFX_PRIORI
 		return
 	var player: AudioStreamPlayer = _sfx_pool[pool_i]
 	player.stop()
-	player.stream = stream.duplicate() if stream is AudioStream else stream
+	# AudioStream 是只读资源；每个 AudioStreamPlayer 都有独立的 playback 状态，
+	# 可以安全共享同一个流。旧实现每次播放都 duplicate()，给金币这种高频短音效
+	# 带来了无意义的资源分配，移动端更容易触发 GC / 主线程抖动。
+	player.stream = stream
 	player.bus = bus
 	# ★ 套用「音效增益表」：按素材路径查 dB（查的是原始 stream，duplicate 后路径会丢）
 	player.volume_db = get_sfx_gain_db(stream)
@@ -473,6 +510,8 @@ func _stop_all_players_for_exit() -> void:
 		_exit_cleanup_done = true
 	else:
 		return
+	## 退出时先作废闪避 tween，避免它在本节点/播放器释放后再去写 volume_db
+	_cancel_bgm_duck()
 	if is_instance_valid(_bgm_player):
 		_bgm_player.stop()
 		_bgm_player.stream = null

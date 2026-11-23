@@ -35,6 +35,8 @@ static func refresh(player: Node, fixed_delta: float) -> void:
 	var wind_acceleration: float = 0.0
 	var wind_max_speed: float = 0.0
 	var wind_active: bool = false
+	## 攀墙豁免判定：只有在「每一股风都够弱」时才成立（任一股超过阈值 → 照常吹离墙面）
+	var wallgrip_wind_all_weak: bool = true
 
 	var tree: SceneTree = player.get_tree()
 	if tree != null:
@@ -56,12 +58,18 @@ static func refresh(player: Node, fixed_delta: float) -> void:
 			## 风：所有区域的风矢量相加（方向相反会自然相互抵消），加速度 / 上限取最大值
 			if bool(cfg.get("wind_enabled", false)):
 				var zone_wind: Vector2 = cfg.get("wind_velocity", Vector2.ZERO)
+				## 攀墙豁免：水平分量不超过该区域配置阈值时，这一股风不算「强风」
+				var grip_limit_x: float = absf(float(cfg.get("wall_grip_ignore_wind_max_x", 0.0)))
+				wallgrip_wind_all_weak = wallgrip_wind_all_weak and absf(zone_wind.x) <= grip_limit_x
 				wind_active = true
 				wind_target += zone_wind * influence
 				wind_acceleration = maxf(wind_acceleration, float(cfg.get("wind_acceleration", 0.0)))
 				## 上限要按「实际强度」算：反向/加倍（例如 -2.0）时风速可以超过基准值
 				wind_max_speed = maxf(wind_max_speed, zone_wind.length() * absf(influence))
 				player.env_zone_wind_deceleration = maxf(player.env_zone_wind_deceleration, float(cfg.get("wind_deceleration", 0.0)))
+
+	## 攀墙豁免结果：有风、且每一股风的水平分量都不超过阈值 → 攀墙时忽略水平风
+	player.env_wind_wallgrip_immune = wind_active and wallgrip_wind_all_weak
 
 	## 风速度推进：有风 → 按加速度逼近目标；无风 → 按衰减加速度归零
 	if wind_active and wind_max_speed > 0.0:
@@ -103,6 +111,12 @@ static func apply_environment_motion(player: Node, fixed_delta: float) -> void:
 	if player.is_control_locked:
 		return
 	var motion: Vector2 = player.env_wind_velocity * fixed_delta
+	## 攀墙时的水平风豁免：弱风（水平风速 ≤ 区域配置的 wall_grip_ignore_wind_max_x，默认 120px/s）
+	## 不会把玩家水平吹离墙面 —— 否则逐帧位移会把玩家推出墙射线范围，
+	## 让「逆风攀墙」变成「一贴墙就被吹掉」。强风（> 阈值）仍然照常吹离，保留“强风区无法攀墙”的玩法。
+	## 只屏蔽水平分量：垂直方向的风（向上/向下气流）在墙上依然生效。
+	if player.env_wind_wallgrip_immune and player.current_state == player.PlayerState.WALLGRIP:
+		motion.x = 0.0
 	## 上 / 下方向速度乘数：只补「乘数带来的额外位移」，玩家 velocity 本身保持不变
 	var vertical_mul: float = 1.0
 	if player.velocity.y < 0.0:

@@ -183,8 +183,9 @@ func _start_interaction():
 		push_error("Maniac: balloon_scene 未配置！请在 Inspector 中拖拽 MyBalloon.tscn")
 		return
 	
-	var balloon = balloon_scene.instantiate()
-	get_tree().current_scene.add_child(balloon)
+	var balloon: Node = MyDialogueBalloon.acquire(get_tree().current_scene, balloon_scene)
+	if balloon == null:
+		return
 	
 	# 传递 npc 引用，让对话文件可以调用 NPC 的方法
 	var game_states = {

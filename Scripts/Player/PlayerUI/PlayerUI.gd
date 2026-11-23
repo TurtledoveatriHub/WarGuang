@@ -108,11 +108,12 @@ var current_display_coins: int = 0
 var coin_change_amount: int = 0
 var coin_visible: bool = false
 var coin_hide_timer: float = 0.0
-var coin_tween: Tween
+var coin_fade_tween: Tween
 var coin_delay_timer: float = 0.0
 var is_waiting_for_increment: bool = false
 var is_increasing: bool = false
 var is_animating: bool = false
+var coin_tick_accumulator: float = 0.0
 
 func _ready():
 	initialize_health_display()
@@ -191,6 +192,19 @@ func _process(_delta):
 			coin_delay_timer = 0.0
 			# 关键修复：调用 play_coin_animation()
 			play_coin_animation()
+
+	# 钱币数字使用逐帧累计推进，而不是为每个金币创建一个 Tween callback。
+	# 连续拾取时只更新 pending 数量，不会在主线程反复构建/销毁 Tween。
+	if is_animating and coin_change_amount > 0:
+		coin_tick_accumulator += _delta
+		var steps: int = 0
+		while coin_change_amount > 0 and steps < 8:
+			var interval: float = _get_coin_change_interval(coin_change_amount)
+			if coin_tick_accumulator < interval:
+				break
+			coin_tick_accumulator -= interval
+			_advance_coin_animation_tick()
+			steps += 1
 	
 	# 处理钱币自动隐藏
 	if coin_visible and coin_change_amount == 0 and not is_waiting_for_increment:
@@ -483,58 +497,37 @@ func initialize_coin_display():
 	coin_visible = false
 
 func _on_coins_changed(new_amount: int):
-	if not is_animating:
-		var change = new_amount - current_display_coins
-		if change > 0:
-			coin_change_amount = change
-			is_increasing = true
-			play_coin_animation()
-	else:
-		var remaining = new_amount - current_display_coins
-		if remaining > 0:
-			coin_change_amount = remaining
-			is_increasing = true
-			coin_change_label.text = "+" + str(coin_change_amount)
-			_restart_animation()
-		else:
-			coin_change_amount = -remaining
-			is_increasing = false
-			coin_change_label.text = "-" + str(coin_change_amount)
-			_restart_animation()
+	var change: int = new_amount - current_display_coins
+	_apply_coin_change(change, not is_animating)
 
 # 处理钱币花费动画
 func _on_coins_changing(_old_amount: int, new_amount: int, _duration: float):
-	var decrease_amount = _old_amount - new_amount
-	
-	if decrease_amount > 0:
-		if not is_animating:
-			coin_change_amount = decrease_amount
-			is_increasing = false
-			play_coin_animation()
-		else:
-			var remaining = current_display_coins - new_amount
-			if remaining > 0:
-				coin_change_amount = remaining
-				is_increasing = false
-				coin_change_label.text = "-" + str(coin_change_amount)
-				_restart_animation()
-			else:
-				coin_change_amount = -remaining
-				is_increasing = true
-				coin_change_label.text = "+" + str(coin_change_amount)
-				_restart_animation()
+	var change: int = new_amount - current_display_coins
+	_apply_coin_change(change, not is_animating)
+
+## 统一处理正负钱币变化：只记录“显示值离真实值还有多少”，
+## 动画由 _process 持续推进，连续变化不再重建 Tween。
+func _apply_coin_change(change: int, start_if_idle: bool) -> void:
+	coin_change_amount = absi(change)
+	is_increasing = change >= 0
+	if start_if_idle and coin_change_amount > 0:
+		play_coin_animation()
+	elif is_animating:
+		_restart_animation()
 
 func _restart_animation():
-	# 停止当前动画
-	if coin_tween:
-		coin_tween.kill()
-		coin_tween = null
-	
-	# 重新播放
-	play_coin_animation()
+	if not is_animating:
+		play_coin_animation()
+		return
+	# 保留当前累计时间，只刷新待显示数量；下一帧由 _process 继续推进。
+	_update_coin_change_label()
 
 func play_coin_animation():
+	if coin_change_amount <= 0:
+		return
 	is_animating = true
+	# 与旧 Tween 一致：第一枚数字在下一渲染帧推进，随后按间隔继续。
+	coin_tick_accumulator = _get_coin_change_interval(coin_change_amount)
 	
 	coin_hide_timer = 0.0
 	show_coin_ui()
@@ -545,55 +538,30 @@ func play_coin_animation():
 	if coin_label:
 		coin_label.visible = true
 	
-	var amount = coin_change_amount
-	if is_increasing:
-		coin_change_label.text = "+" + str(amount)
-	else:
-		coin_change_label.text = "-" + str(amount)
+	coin_change_label.text = ("+" if is_increasing else "-") + str(coin_change_amount)
 	coin_change_label.visible = true
-	
-	if coin_tween:
-		coin_tween.kill()
-		coin_tween = null
-	
-	coin_tween = create_tween()
-	coin_tween.set_parallel(false)
-	
-	for i in range(amount):
-		var remaining = amount - i
-		var current_interval = _get_coin_change_interval(remaining)
-		
-		coin_tween.tween_callback(func(): 
-			if is_increasing:
-				coin_change_amount -= 1
-				current_display_coins += 1
-			else:
-				coin_change_amount -= 1
-				current_display_coins -= 1
-			
-			if coin_change_amount > 0:
-				if is_increasing:
-					coin_change_label.text = "+" + str(coin_change_amount)
-				else:
-					coin_change_label.text = "-" + str(coin_change_amount)
-			else:
-				coin_change_label.visible = false
-			
-			coin_label.text = str(current_display_coins)
-		)
-		coin_tween.tween_interval(current_interval)
-	
-	coin_tween.tween_callback(func():
-		is_animating = false
-		
-		coin_change_label.visible = false
-		coin_hide_timer = 2.0
-		
-		if current_display_coins != Global.player_coins:
-			print("警告：显示值", current_display_coins, "≠ 实际值", Global.player_coins)
-			current_display_coins = Global.player_coins
-			coin_label.text = str(current_display_coins)
-	)
+func _advance_coin_animation_tick() -> void:
+	if coin_change_amount <= 0:
+		return
+	coin_change_amount -= 1
+	current_display_coins += 1 if is_increasing else -1
+	coin_label.text = str(current_display_coins)
+	if coin_change_amount > 0:
+		_update_coin_change_label()
+		return
+
+	is_animating = false
+	coin_tick_accumulator = 0.0
+	coin_change_label.visible = false
+	coin_hide_timer = 0.0
+	if current_display_coins != Global.player_coins:
+		print("警告：显示值", current_display_coins, "≠ 实际值", Global.player_coins)
+		current_display_coins = Global.player_coins
+		coin_label.text = str(current_display_coins)
+
+func _update_coin_change_label() -> void:
+	coin_change_label.text = ("+" if is_increasing else "-") + str(coin_change_amount)
+	coin_change_label.visible = coin_change_amount > 0
 
 ## 根据变化数量获取间隔时间（使用外部变量）
 func _get_coin_change_interval(amount: int) -> float:
@@ -614,11 +582,11 @@ func show_coin_ui():
 	coin_visible = true
 	coin_hide_timer = 0.0
 	
-	if coin_tween:
-		coin_tween.kill()
+	if coin_fade_tween:
+		coin_fade_tween.kill()
 	
-	coin_tween = create_tween()
-	coin_tween.tween_property(coin_container, "modulate:a", 1.0, coin_fade_duration)
+	coin_fade_tween = create_tween()
+	coin_fade_tween.tween_property(coin_container, "modulate:a", 1.0, coin_fade_duration)
 
 func hide_coin_ui():
 	if not coin_visible:
@@ -626,11 +594,11 @@ func hide_coin_ui():
 	
 	coin_visible = false
 	
-	if coin_tween:
-		coin_tween.kill()
+	if coin_fade_tween:
+		coin_fade_tween.kill()
 	
-	coin_tween = create_tween()
-	coin_tween.tween_property(coin_container, "modulate:a", 0.0, coin_fade_duration)
+	coin_fade_tween = create_tween()
+	coin_fade_tween.tween_property(coin_container, "modulate:a", 0.0, coin_fade_duration)
 
 # 游戏设置相关函数
 func _on_game_setting_button_pressed():

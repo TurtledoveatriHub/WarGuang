@@ -1,19 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://dekrt2dtacnvc"]
+[gd_scene load_steps=7 format=3 uid="uid://dekrt2dtacnvc"]
 
 [ext_resource type="Script" uid="uid://0f0qymy75vah" path="res://Scripts/Instances/Props/Switch.gd" id="1_hk478"]
 [ext_resource type="Texture2D" uid="uid://douckmjqo0432" path="res://Assets/Textures/Instances/GrassLand/开关素材.png" id="2_d0waj"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_st2e8"]
-atlas = ExtResource("2_d0waj")
-region = Rect2(16, 16, 16, 16)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_72awk"]
 atlas = ExtResource("2_d0waj")
 region = Rect2(32, 16, 16, 16)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_aydmd"]
-atlas = ExtResource("2_d0waj")
-region = Rect2(16, 16, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_meb4s"]
 atlas = ExtResource("2_d0waj")
@@ -23,25 +15,19 @@ region = Rect2(0, 16, 16, 16)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_st2e8")
-}, {
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_72awk")
 }],
 "loop": false,
 "name": &"OFF",
-"speed": 6.0
+"speed": 12.0
 }, {
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_aydmd")
-}, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_meb4s")
 }],
 "loop": false,
 "name": &"ON",
-"speed": 6.0
+"speed": 12.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_switch"]
@@ -56,10 +42,9 @@ modulate = Color(1.353256, 1.353256, 1.353256, 1)
 position = Vector2(0, -4)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_2h4en")
-animation = &"ON"
+animation = &"OFF"
 
 [node name="InteractionPrompt" type="Sprite2D" parent="."]
-visible = false
 position = Vector2(0, -24)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

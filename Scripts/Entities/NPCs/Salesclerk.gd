@@ -114,8 +114,9 @@ func _start_dialogue_with_mood(mood_state: String):
 		push_error("Salesclerk: balloon_scene 未配置！请在 Inspector 中拖拽 MyBalloon.tscn")
 		return
 	
-	var balloon = balloon_scene.instantiate()
-	get_tree().current_scene.add_child(balloon)
+	var balloon: Node = MyDialogueBalloon.acquire(get_tree().current_scene, balloon_scene)
+	if balloon == null:
+		return
 	
 	# 关键修复：传递 Global 引用而不是具体的钱币数量
 	var game_states_dict = {

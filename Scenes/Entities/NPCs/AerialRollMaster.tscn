@@ -101,6 +101,7 @@ animation = &"TALK"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 light_mask = 33
+position = Vector2(32, 0)
 shape = SubResource("RectangleShape2D_g62kn")
 
 [node name="InteractionPrompt" type="Sprite2D" parent="."]

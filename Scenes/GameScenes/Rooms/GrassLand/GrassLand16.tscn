@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://c6c03adfoa4ov"]
+[gd_scene load_steps=22 format=4 uid="uid://c6c03adfoa4ov"]
 
 [ext_resource type="Script" uid="uid://driejj5w0waqn" path="res://Scripts/GameScenes/Room.gd" id="1_qjhhs"]
 [ext_resource type="AudioStream" uid="uid://bs0ucop4s2m8h" path="res://Assets/Audios/BGM/节奏梦幻.ogg" id="2_1f3mw"]
@@ -17,9 +17,9 @@
 [ext_resource type="PackedScene" uid="uid://bywk00ct1ifc2" path="res://Scenes/Instances/Props/MechanismPlatform.tscn" id="15_7m27r"]
 [ext_resource type="PackedScene" uid="uid://dleai1y0iaa7s" path="res://Scenes/Instances/Props/ButtonSwitch.tscn" id="16_prbe1"]
 [ext_resource type="PackedScene" uid="uid://oorimac8h2bw" path="res://Scenes/Instances/Props/Sign.tscn" id="17_6wole"]
+[ext_resource type="PackedScene" uid="uid://dgm0sxuwtc7rp" path="res://Scenes/Instances/Environments/PixelWaterSurface.tscn" id="18_1f3mw"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="18_l82w1"]
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="19_1xpw5"]
-
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqk48"]
 
@@ -32,7 +32,6 @@ room_color = Color(0.5884558, 0.60790163, 0.58845085, 1)
 room_bounds = NodePath("gl16Bounds")
 
 [node name="gl16Bounds" type="Node2D" parent="."]
-visible = false
 scale = Vector2(4, 4)
 script = ExtResource("3_pkc7a")
 metadata/_custom_type_script = "uid://b8fn8fsjkwhah"
@@ -144,6 +143,13 @@ position = Vector2(0, -22)
 [node name="Sign" parent="Props" instance=ExtResource("17_6wole")]
 position = Vector2(0, -16)
 interact_once = true
+
+[node name="Environments" type="Node2D" parent="."]
+
+[node name="PixelWaterSurface" parent="Environments" instance=ExtResource("18_1f3mw")]
+position = Vector2(0, -392)
+water_width = 1280.0
+water_depth = 640.0
 
 [node name="DynamicCheckpoints" type="Node2D" parent="."]
 

@@ -96,25 +96,29 @@ func _ready():
 	
 	# 现在可以显示
 	visible = true
+	# 没有受伤 / 低血量效果时完全关闭逐帧回调，避免一帧空跑。
+	set_process(false)
 	
 
 func _process(delta):
-	if effect_timer > 0:
-		effect_timer -= delta
+	if effect_timer <= 0.0:
+		set_process(false)
+		return
+	effect_timer -= delta
+
+	## 受伤效果：脉冲效果
+	if current_effect == "hurt" or current_effect == "shadow_hurt":
+		var pulse = sin(Time.get_ticks_msec() * hurt_pulse_speed) * hurt_pulse_amount
+		var base_intensity = hurt_intensity if current_effect == "hurt" else shadow_hurt_intensity
+		set_shader_param("intensity", base_intensity + pulse)
 		
-		## 受伤效果：脉冲效果
-		if current_effect == "hurt" or current_effect == "shadow_hurt":
-			var pulse = sin(Time.get_ticks_msec() * hurt_pulse_speed) * hurt_pulse_amount
-			var base_intensity = hurt_intensity if current_effect == "hurt" else shadow_hurt_intensity
-			set_shader_param("intensity", base_intensity + pulse)
-			
-			if effect_timer <= 0 and not is_transitioning:
-				## 受伤效果持续时间结束，根据玩家血量决定下一步
-				_on_hurt_duration_end()
-		
-		## 低血量效果：持续保持
-		elif current_effect == "low_health":
-			set_shader_param("intensity", low_health_intensity)
+		if effect_timer <= 0 and not is_transitioning:
+			## 受伤效果持续时间结束，根据玩家血量决定下一步
+			_on_hurt_duration_end()
+
+	## 低血量效果：持续保持
+	elif current_effect == "low_health":
+		set_shader_param("intensity", low_health_intensity)
 
 func set_shader_param(param_name: String, value):
 	if vignette_rect.material:
@@ -132,6 +136,7 @@ func start_hurt_effect(duration: float):
 	effect_timer = duration
 	is_transitioning = false
 	visible = true
+	set_process(true)
 	
 	set_shader_param("color", hurt_color)
 	set_shader_param("intensity", hurt_intensity)
@@ -145,6 +150,7 @@ func start_shadow_hurt_effect(duration: float):
 	effect_timer = duration
 	is_transitioning = false
 	visible = true
+	set_process(true)
 	
 	set_shader_param("color", shadow_hurt_color)
 	set_shader_param("intensity", shadow_hurt_intensity)
@@ -158,6 +164,7 @@ func transition_hurt_to_low_health(transition_time: float):
 		return
 	
 	is_transitioning = true
+	set_process(false)
 	
 	# 停止任何正在进行的Tween
 	if transition_tween and transition_tween.is_valid():
@@ -193,6 +200,7 @@ func start_low_health_effect():
 	effect_timer = 999999.0  ## 非常大的值，表示持续
 	is_transitioning = false
 	visible = true
+	set_process(false)
 	
 	set_shader_param("color", low_health_color)
 	set_shader_param("intensity", low_health_intensity)
@@ -211,6 +219,7 @@ func transition_to_normal(duration: float):
 	
 	is_transitioning = true
 	current_effect = ""
+	set_process(false)
 	
 	## 停止任何正在进行的Tween
 	if transition_tween and transition_tween.is_valid():
@@ -229,6 +238,7 @@ func transition_to_low_health(duration: float):
 		return
 	
 	is_transitioning = true
+	set_process(false)
 	
 	## 保存当前参数作为过渡起始值
 	var start_intensity = get_shader_param("intensity")
@@ -260,6 +270,7 @@ func transition_low_health_to_normal(duration: float):
 		return
 	
 	is_transitioning = true
+	set_process(false)
 	
 	var start_intensity = get_shader_param("intensity")
 	
@@ -279,6 +290,7 @@ func transition_low_health_to_normal(duration: float):
 func clear_all_effects():
 	current_effect = ""
 	effect_timer = 0.0
+	set_process(false)
 	visible = false
 	set_shader_param("intensity", 0.0)
 
@@ -288,6 +300,7 @@ func clear_hurt_effect_only():
 		# 如果是受伤效果，清除它
 		current_effect = ""
 		effect_timer = 0
+		set_process(false)
 		
 		# 淡出效果
 		var tween = create_tween()

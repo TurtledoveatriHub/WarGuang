@@ -20,7 +20,6 @@
 [ext_resource type="PackedScene" uid="uid://c7552ukdc1li7" path="res://Scenes/GameScenes/Door.tscn" id="27_hiqb1"]
 [ext_resource type="PackedScene" uid="uid://gij1n237uov8" path="res://Scenes/Instances/SavePoints/DynamicCheckpoint.tscn" id="29_ootgi"]
 
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a4x7p"]
 
 [node name="GrassLand2" type="Node2D" node_paths=PackedStringArray("room_bounds")]
@@ -166,5 +165,5 @@ belongs_to_room = "GrassLand2"
 [node name="ChairSavePoints" type="Node2D" parent="."]
 
 [node name="gl201" parent="ChairSavePoints" instance=ExtResource("20_wyed4")]
-position = Vector2(-755, 376)
+position = Vector2(800, 8)
 save_point_id = "gl201"

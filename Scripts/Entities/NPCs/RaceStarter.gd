@@ -98,8 +98,9 @@ func _open_dialogue(title: String) -> void:
 	var task_manager = get_node_or_null("/root/TaskManager")
 	if task_manager:
 		task_manager.record_npc_dialogue(npc_id)
-	var balloon = balloon_scene.instantiate()
-	get_tree().current_scene.add_child(balloon)
+	var balloon: Node = MyDialogueBalloon.acquire(get_tree().current_scene, balloon_scene)
+	if balloon == null:
+		return
 	var game_states = {
 		"npc": self,
 		"Global": Global,

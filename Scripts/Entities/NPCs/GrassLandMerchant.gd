@@ -74,8 +74,9 @@ func _start_interaction():
 		push_error("GrassLandMerchant: balloon_scene 未配置！")
 		return
 
-	var balloon: Node = balloon_scene.instantiate()
-	get_tree().current_scene.add_child(balloon)
+	var balloon: Node = MyDialogueBalloon.acquire(get_tree().current_scene, balloon_scene)
+	if balloon == null:
+		return
 	# 传给对话文件的 state：对话里用 npc / global / player / task_manager 这几个名字取用
 	var game_states: Dictionary = {
 		"npc": self,

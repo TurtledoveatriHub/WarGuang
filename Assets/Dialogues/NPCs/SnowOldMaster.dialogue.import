@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=15
+type="Resource"
+uid="uid://uqolt05ja2rn"
+path="res://.godot/imported/SnowOldMaster.dialogue-ec85a11ac89ddafb9b68b99328de9197.tres"
+
+[deps]
+
+source_file="res://Assets/Dialogues/NPCs/SnowOldMaster.dialogue"
+dest_files=["res://.godot/imported/SnowOldMaster.dialogue-ec85a11ac89ddafb9b68b99328de9197.tres"]
+
+[params]
+
+defaults=true

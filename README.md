@@ -16,6 +16,27 @@
 
 ---
 
+## 📌 给 AI 助手 / 新协作者的最速上手（60 秒版）
+
+> 这一节就是「让一个全新的 agent 快速接手」的入口；下面的章节是展开阅读。**先读这一节，再按需跳读。**
+
+| 项目 | 内容 |
+|---|---|
+| 引擎 | Godot **4.5.1 Standard**（非 .NET）；命令行用 `Godot_v4.5.1-stable_win64_console.exe` |
+| 入口 | 主场景 `Scenes/UI/ScenesUI/TitleScene.tscn` → 标题 → 存档 → 房间 |
+| 玩家 | `Scenes/Player/Player.tscn` + `Scripts/Player/`（`Player.gd` 只存数据/生命周期，行为在 43 个 `*Service.gd`） |
+| 全局 | 26 个 Autoload（`Global` / `EventBus` / `ScenePaths` / `RoomManager` / `AudioManager` …），列表见 `project.godot` |
+| 校验 | `godot --headless --path <项目> --editor --quit`（全量导入 + 编译，必须 0 error / 0 warning） |
+| 运行期验证 | 写一个一次性 `tools/_tmp_xxx.tscn` 场景，用 `godot --headless --path <项目> res://tools/_tmp_xxx.tscn` 跑，跑完删除 |
+
+**三条硬规则**：① 编辑器必须 **0 error / 0 warning**，不接受“已知警告先忽略”；② 任何脚本改动后都要跑一次上面的 `--editor --quit` 校验；③ 资源路径不硬编码，走 `ScenePaths` 常量或 `class_name`。
+
+**三条禁忌**：① 不用 `git reset --hard` / 丢弃别人未提交的改动；② 不在编辑器正在运行同项目时反复导出（导出会重写 `.godot` 缓存，建议先关掉编辑器实例）；③ 不把 `preload("res://…")` 当依赖注入用（会导致循环引用与路径漂移）。
+
+**汇报格式**：改了哪些文件 → 为什么改 → 怎么验证的（能给实测数字就给数字）。
+
+---
+
 ## 游戏简介
 
 《沃光》是一款以“操作手感”为核心、2D 像素平台跳跃 + 类银河恶魔城大地图探索的冒险游戏；
@@ -28,42 +49,64 @@
 
 ---
 
-## 游戏演示介绍 (Gameplay Preview)
+## 角色部分能力机制介绍 (Gameplay Preview)
 
 > 演示 GIF 待录制；当前可先看下方静态截图。下面的占位图按建议内容准备好后直接替换即可。
 
-### 1. 精准跳跃与冲刺
+### 1. 精准跳跃
 
-![精准跳跃与冲刺](img/demo-01-jump.gif)
-<!-- 建议：3~6 秒 GIF，展示“土狼时间/跳跃缓冲/边缘修正”让擦边跳变成功，或一次干净的二段跳 + 冲刺落地 -->
+![可控跳跃高度](img/demo-01-jump_text.gif)
+- 短按跳跃键起跳，长按跳得更高 -->
+![普通横向跳跃](img/demo-01-jump.gif)
+- 跳跃时按方向键可正常控制跳跃方向 -->
+![奔跑+土狼时间长跳跃](img/demo-01-run_jump.gif)
+- 奔跑状态下跳跃跳得更远，叠加“土狼时间（离开平台后短时间内仍然可以正常跳跃）”达到最长跳跃距离 -->
 
-### 2. 攀墙与墙跳
+### 2. 二段跳与jumpbox触发
 
-![攀墙与墙跳](img/demo-02-wall.gif)
-<!-- 建议：3~6 秒 GIF，展示贴墙下滑 → 墙跳 → 在两面墙之间连续弹跳 -->
+![二段跳状态可控](img/demo-02-jump2-1.gif)
+- 二段跳时如果持续按住跳跃键，则本次空中持续保持二段跳动画状态 -->
+![普通二段跳触发jumpbox](img/demo-02-jump2-2.gif)
+- 二段跳状态期间触碰jumpbox -->
+![完美二段跳触发jumpbox](img/demo-02-jump2-3.gif)
+- 进入二段跳的瞬间触碰jumpbox -->
 
-### 3. 手感修正（边缘 / 台阶 / 冲刺）
+### 3. 冲刺、纵向冲刺、黑暗冲刺
 
-![手感修正](img/demo-05-correction.gif)
-<!-- 建议：4~6 秒 GIF，展示“贴着平台边缘起跳依旧能上去”与“冲刺擦着墙角穿过”，对比关闭修正时的卡顿 -->
+![冲刺](img/demo-03-dash.gif)
+![纵向冲刺](img/demo-01-demo-03-v_dash.gif)
+![黑暗冲刺](img/demo-01-demo-03-black_dash.gif)
+- 多变的冲刺能力让操作更多样 -->
 
-### 4. 房间探索与能力解锁
+### 4. 滑翔
 
-![房间探索与能力解锁](img/demo-03-explore.gif)
-<!-- 建议：5~8 秒 GIF，展示推门进入新房间 → 获得能力 → 回到旧房间打开新路 -->
+![滑翔](img/demo-04-glide.gif)
+- 二段跳后再次按跳跃键进入滑翔 -->
 
-### 5. 挑战 / 竞速模式
+### 5. 攀墙与墙跳
 
-![挑战与竞速](img/demo-04-challenge.gif)
-<!-- 建议：5~8 秒 GIF，展示 JumpBox 挑战的“完美触发”加分，或竞速计时器与终点结算 -->
+![墙跳](img/demo-05-wall_slide.gif)
+- 获得攀墙能力后，空中接触墙体时会进入攀墙状态，在攀墙状态下按跳跃键会自动向离墙方向进行跳跃，同样可控跳跃高度，此时按住向墙方向键则可再次攀墙 -->
 
-### 静态截图
+### 6. 超级冲刺
+![超级冲刺](img/demo-06-super_dash.gif)
+- 获得超级冲刺能力后，按住超级冲刺键进行充电，达到充电时间后松开按键进行超级冲刺，超级冲刺持续0.2秒后可使用跳跃、冲刺等手段打断超级冲刺 -->
+
+### 手感修正（奔跑连续 / 边缘修正）
+
+![奔跑连贯](img/run_x-1.gif)
+- 奔跑时如果持续按住奔跑方向键，此时进行跳跃或其它动作后回到地面仍然保持奔跑状态，保证奔跑连贯性 -->
+![奔跑修正](img/run_x-2.gif)
+- 奔跑时如果遇到低矮障碍（约4px）会尝试抬升，不会因为小断口而掉落，保证奔跑连贯性 -->
+![跳跃修正](img/demo-jump_x.gif)
+![冲刺修正](img/demo-dash_x.gif)
+- 跳跃（包括墙跳）、冲刺时，如果位移方向有碰撞体，则会多次尝试小幅度偏移绕开碰撞体，但如果预测无法绕开则不会进行修正 -->
+
+### 场景简略预览
 
 | 标题界面 | 草原区域 | 雪山区域 | 风之谷区域 |
 |---|---|---|---|
 | ![标题界面](img/screen-title.png) | ![草原](img/screen-grassland.png) | ![雪山](img/screen-snow.png) | ![风之谷](img/screen-windvalley.png)|
-
-> **截取建议**：1280×720 原尺寸截图；GIF 建议 480~640 宽、10~15 FPS、单张小于 5 MB；上传到仓库根目录的 `img/` 文件夹后再修改上面路径。
 
 ---
 
@@ -85,6 +128,7 @@
 - **超级冲刺**：长按蓄力 `1.2s`，最高 `420 px/s`，加速 `0.3s` / 减速 `0.6s`，最长持续 `2.5s`，带残影拖尾与输入锁。
 - **滑翔**：水平目标速度 `160`，下落速度上限压缩到 `22%`，起手悬停 `0.12s`；松手后有 `0.28s` 输入冷却，防止误触反复开合。
 - **攀墙 / 墙跳**：贴墙下滑 `280`、按住慢速下滑 `90`，贴墙判定 `0.12s`；墙跳水平 `90` / 垂直 `-160`，离墙后 `0.1s` 才能重新附着，按住可再获得 `-42` 的额外上升力。
+  - **风场里的攀墙豁免**：在 `EnvironmentZone` 的风场中攀墙时，若该区域的水平风速 `|wind_max_velocity.x|` ≤ `wall_grip_ignore_wind_max_x`（默认 `120 px/s`），水平风不施加——否则逐帧位移会把玩家推出墙射线范围，表现为“一贴墙就被吹掉”；超过阈值则照常吹离，保留“强风区无法逆风攀墙”的关卡设计。垂直方向的风（上升/下压气流）在墙上仍然生效。
 - **后撤步**：`0.12s` / `180 px/s`，带 `0.1s` 反击窗口与短暂无敌。
 - **帧率一致性**：`max_physics_ticks_per_second = 60` + `physics_interpolation = true`，`_physics_process` 里把 `delta` 裁到 `1/30s` 上限（并除以 `Engine.time_scale`，慢镜头下同样成立），所有加速度按步长归一化，掉帧不会造成手感突变。
 - **移动平台 / 矿车**：`Platform` / `MineCart` 各自控制位移，玩家只做“跟随 + 被推出”，不与平台源码互相耦合。
@@ -111,10 +155,10 @@
 
 ### 🔊 音频、相机与表现
 
-- **音频总线**：`Master / BGM / SFX / Voice` 四条总线（`Assets/Audios/default_bus_layout.tres`）；BGM 支持淡入淡出与 Ducking，音效带头部空间位置与优先级队列（最多 16 个并发实例、按优先级限流、对象池复用）。
+- **音频总线**：`Master / BGM / SFX / Voice` 四条总线（`Assets/Audios/default_bus_layout.tres`）；BGM 支持淡入淡出与 Ducking（受伤时压低 BGM），Ducking 的恢复目标是“基准音量”而非“调用时的当前音量”，因此连续受伤不会累积压低、闪避结束后一定回到原音量；音效带头部空间位置与优先级队列（最多 16 个并发实例、按优先级限流、对象池复用）。
 - **相机**：基于 Phantom Camera 的跟随与限制框；进房间时自动写入房间边界作为相机限制，避免镜头拍到房间外。
 - **视觉**：像素风坐标对齐（`stretch/mode=viewport` + `scale_mode=integer` + `texture_filter=nearest`）、CanvasModulate 房间色调、Vignette 暗角（`VignetteEffect`）、残影（`AfterimageShader`）、地图揭示（`MapReveal`）、成就图标（`AchievementIcon`）；水面由 `PixelWaterSurface` 脚本驱动像素波纹。
-- **环境粒子**：`EnvironmentZoneBase` 统一了“区域形状 + 粒子朝向/速度 + 效果强度变化”，派生出 `UpdraftZone`（上升气流）、`EnvironmentZone`（风场/水流，可开关或时间循环）、`BubbleColumnZone`（水下气泡柱）等；粒子的 `visibility_rect` 按区域实际尺寸动态写入，超长区域也不会出现“飞到一半粒子消失”。
+- **环境粒子**：`EnvironmentZoneBase` 统一了“区域形状 + 粒子朝向/速度 + 效果强度变化”，派生出 `UpdraftZone`（上升气流）、`EnvironmentZone`（风场/水流，可开关或时间循环）、`BubbleColumnZone`（水下气泡柱）等；粒子的 `visibility_rect` 按区域实际尺寸动态写入，超长区域也不会出现“飞到一半粒子消失”。风场由 `wind_max_velocity / wind_acceleration / wind_deceleration / wind_ground_scale` 描述，另带攀墙豁免阈值 `wall_grip_ignore_wind_max_x`（默认 `120`）。
 
 ### 🛠 工程质量
 
@@ -204,22 +248,6 @@ cd WarGuang
 **导出 Android（可选）**：需安装 Android Build Template 与 SDK/NDK，在“项目 → 导出”中选择 Android 预设。
 
 **关于插件**：`addons/godotiq` 是作者本地使用的 AI 辅助插件，会在编辑器里尝试占用 `6007` 端口；如不需要，可在“项目设置 → 插件”中关闭它，不影响游戏运行。
-
----
-
-## 授权与使用条款 (License)
-
-本项目**不是开源项目**。仓库公开的目的是让人**阅读与学习**，而不是让人使用、复制或再发布。
-
-- ✅ **允许**：下载并在本地用 Godot 打开、编译、运行、调试；阅读源码学习；把其中的设计**思路**用到自己的项目；非商业的课堂 / 直播 / 文章讲解（不分发源码与资源）。
-- ❌ **禁止**：商业使用（付费、广告、内购、众筹、平台发行等）；再分发（源码 / 可执行文件 / PCK·APK / 资源包 / 修改版）；基于本项目的衍生发布；单独提取美术、音频、字体或 Shader 另作他用；移除署名与许可文件。
-- **第三方内容**：Godot 引擎与 `addons/` 下的插件（Phantom Camera / Dialogue Manager / Tile Copy / GodotIQ）遵循各自许可，不适用本协议。
-
-完整条款见 [LICENSE](LICENSE)。如需商用、发行或其它未列举的用途，请通过下方「开发者」中的联系方式向作者申请书面授权。
-
-> **历史说明**：本仓库早期提交曾使用 AGPL-3.0；自 2026-11-20 起，仓库内容改按上述协议分发。已经拿到旧版本的人对**其持有的那一份副本**仍可主张当时的许可，这一点无法追溯收回；若在意，可以把仓库改为私有（见仓库 Settings → Danger Zone）。
-
----
 
 ## 项目规模
 

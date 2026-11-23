@@ -255,11 +255,11 @@ room_doors = {
 "target": "GrassLand13"
 }, {
 "door_id": "gl12gl17",
-"position": Vector2(-1000, -416),
+"position": Vector2(-1120, -544),
 "target": "GrassLand17"
 }, {
 "door_id": "gl12gl18",
-"position": Vector2(-744, 288),
+"position": Vector2(-416, -192),
 "target": "GrassLand18"
 }],
 "GrassLand13": [{
@@ -810,6 +810,7 @@ room_doors = {
 map_world_origin = Vector2(-18496, -15104)
 map_texture_size = Vector2i(3175, 1356)
 center_texture_on_world_origin = false
+map_connector_dash_threshold_px = 16
 room_display_names = {
 "GrassLand1": "西部草原",
 "GrassLand12": "草原大城镇"

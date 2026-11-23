@@ -62,10 +62,11 @@ func _start_interaction() -> void:
 	if scene == null:
 		push_error("Sign: balloon_scene 未配置且无法加载 MyBalloon")
 		return
-	var balloon: Node = scene.instantiate()
 	var tree: SceneTree = get_tree()
 	var host: Node = tree.current_scene if tree != null and tree.current_scene != null else tree.root
-	host.add_child(balloon)
+	var balloon: Node = MyDialogueBalloon.acquire(host, scene)
+	if balloon == null:
+		return
 	if balloon.has_method("start"):
 		balloon.start(dialogue_resource, "", [])
 	elif balloon.has_method("set_dialogue"):

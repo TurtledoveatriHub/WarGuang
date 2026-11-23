@@ -11,6 +11,34 @@ var is_blocking_input: bool = false  # 是否正在阻断输入（转场时）
 var _closing: bool = false           # 已经进入「退场动画 + 销毁」流程
 var _fx_enter_played: bool = false   # 本次对话的文本框入场动画是否已播过（整段对话只播一次）
 var _advancing_response: bool = false # 选项选定后正在播退场动画（期间忽略重复点击）
+var _conversation_token: int = 0     # 复用同一实例时，防止上一段的延迟退场逻辑影响下一段
+
+## 整个游戏共享一个对话气泡实例。
+## MyBalloon 由主题、RichTextLabel、DialogueLabel、ResponsesMenu 等十余个资源组成，
+## 每次交互都 instantiate + queue_free 会在移动端形成明显的主线程尖峰。
+static var _shared_instance_ref: WeakRef = null
+
+## 获取（必要时创建）可复用的对话气泡。
+static func acquire(host: Node, source_scene: PackedScene = null) -> Node:
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if host == null and tree != null:
+		host = tree.current_scene if tree.current_scene != null else tree.root
+	if host == null:
+		return null
+	var shared: Node = _shared_instance_ref.get_ref() if _shared_instance_ref != null else null
+	if not is_instance_valid(shared):
+		if source_scene == null:
+			source_scene = load(ScenePaths.UI_MY_BALLOON)
+		if source_scene == null:
+			return null
+		shared = source_scene.instantiate()
+		shared.name = "DialogueBalloon"
+		_shared_instance_ref = weakref(shared)
+	if shared.get_parent() == null:
+		host.add_child(shared)
+	elif shared.get_parent() != host:
+		shared.reparent(host)
+	return shared
 
 var dialogue_line: DialogueLine:
 	set(value):
@@ -75,12 +103,29 @@ func _ready() -> void:
 		dialogue_label.scroll_active = true
 		if dialogue_label.custom_minimum_size.y < 80.0:
 			dialogue_label.custom_minimum_size.y = 120.0
+	visible = false
+
+## 新一段对话开始前恢复所有一次性状态。对话节点本身保留，避免重复实例化。
+func prepare_for_conversation() -> void:
+	_conversation_token += 1
+	_closing = false
+	_fx_enter_played = false
+	_advancing_response = false
+	is_waiting_for_input = false
+	is_blocking_input = false
+	layer = 90
+	visible = false
+	if balloon != null:
+		balloon.hide()
+	if responses_menu != null:
+		responses_menu.hide()
 
 ## 对话结束时先播退场动画，播完再销毁自己（否则文本框是「啪一下直接消失」）。
 func _close_balloon() -> void:
 	if _closing:
 		return
 	_closing = true
+	var close_token: int = _conversation_token
 	var seconds: float = 0.0
 	if fx_bus != null and is_instance_valid(fx_bus):
 		fx_bus.call("play_exit")
@@ -88,7 +133,13 @@ func _close_balloon() -> void:
 	if seconds > 0.0:
 		# 用「时长」等待：绝不 await Tween 信号（被 kill 的 Tween 不会发 finished）
 		await get_tree().create_timer(seconds).timeout
-	queue_free()
+	# 等待期间如果玩家已经开始下一段对话，旧退场协程不得再隐藏新气泡。
+	if close_token != _conversation_token:
+		return
+	visible = false
+	if balloon != null:
+		balloon.hide()
+	_closing = false
 
 
 ## 等 UIFxDirector 的过渡入场播完（用「时长」等待，绝不 await Tween 信号：
@@ -163,12 +214,13 @@ func apply_dialogue_line() -> void:
 
 	# 关键修复：根据是否有选项创建/移除 ClickArea
 	if dialogue_line.responses.size() > 0:
-		# 有选项时：降低层级，移除 ClickArea（如果有）
+		# 有选项时：降低层级，停用 ClickArea。气泡会复用，不能销毁它。
 		layer = 0
 		
-		var click_area = balloon.get_node_or_null("ClickArea")
-		if click_area:
-			click_area.queue_free()
+		var click_area: Control = balloon.get_node_or_null("ClickArea") as Control
+		if click_area != null:
+			click_area.visible = false
+			click_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		
 		# 确保 ResponsesMenu 和它的所有子节点都能接收鼠标事件
 		if responses_menu:
@@ -191,15 +243,19 @@ func apply_dialogue_line() -> void:
 		# 没有选项时：恢复高层级
 		layer = 90
 		
-		# 关键修复：总是创建 ClickArea（用于继续对话）
-		if not balloon.has_node("ClickArea"):
-			var click_area = ColorRect.new()
-			click_area.name = "ClickArea"
-			click_area.color = Color(0, 0, 0, 0)
-			click_area.mouse_filter = Control.MOUSE_FILTER_STOP
-			click_area.set_anchors_preset(Control.PRESET_FULL_RECT)
-			balloon.add_child(click_area)
-			click_area.gui_input.connect(_on_click_area_input)
+		# 没有选项时启用完整可点击区域（用于继续对话）；首次使用时创建并复用。
+		var click_area: Control = balloon.get_node_or_null("ClickArea") as Control
+		if click_area == null:
+			var new_click_area := ColorRect.new()
+			new_click_area.name = "ClickArea"
+			new_click_area.color = Color(0, 0, 0, 0)
+			new_click_area.mouse_filter = Control.MOUSE_FILTER_STOP
+			new_click_area.set_anchors_preset(Control.PRESET_FULL_RECT)
+			balloon.add_child(new_click_area)
+			new_click_area.gui_input.connect(_on_click_area_input)
+			click_area = new_click_area
+		click_area.visible = true
+		click_area.mouse_filter = Control.MOUSE_FILTER_STOP
 		
 		if dialogue_line.time != "":
 			var time = dialogue_line.text.length() * 0.02 if dialogue_line.time == "auto" else dialogue_line.time.to_float()
@@ -312,6 +368,8 @@ func _on_balloon_gui_input(event):
 	# 不要调用 get_viewport().set_input_as_handled()
 
 func start(dialogue_resource: DialogueResource, title: String, extra_game_states: Array = []) -> void:
+	prepare_for_conversation()
+	visible = true
 	DialogueSystem.start_dialogue()
 	
 	temporary_game_states = extra_game_states.duplicate()

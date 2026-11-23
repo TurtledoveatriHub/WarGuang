@@ -135,12 +135,9 @@ static func apply_gravity(player: Node, fixed_delta: float) -> void:
 	player.velocity.y = min(player.velocity.y, player.effective_max_fall_speed)
 
 static func update_coyote_time(player: Node) -> void:
-	if player.was_on_floor and not player.is_on_floor() and player.velocity.y >= 0 and not player.is_jumping:
-		player.coyote_time_active = true
-		player.coyote_timer.start(player.coyote_time)
-		if not player.is_jumping:
-			player.can_compensation_jump = true
-			player.compensation_jump_used = false
+	# 土狼窗口的“开始”只由 PlayerRuntimeFlowService.finalize_post_physics() 在
+	# 真正检测到上一物理帧在地面、本物理帧离地时触发。这里只负责落地后的统一重置，
+	# 避免两个服务在同一帧重复启动同一个 Timer 而产生边界时序差异。
 	if player.is_on_floor():
 		if player.current_state == player.PlayerState.SUPERDASH:
 			player.was_on_floor = player.is_on_floor()
@@ -244,6 +241,10 @@ static func handle_idle_state(player: Node, _delta: float, move_input: float, ju
 		return
 
 	if not player.is_on_floor() and not player.coyote_time_active:
+		# 土狼计时器可能在两个物理帧之间结束。此时状态仍是 IDLE，而本帧按下的
+		# 跳跃键必须先结算为二段跳 / 补偿跳，否则下面的状态切换会吞掉 just_pressed。
+		if PlayerAirAbilityServiceScript.try_double_jump(player, jump_just_pressed):
+			return
 		if player.velocity.y < 0:
 			player.change_state(player.PlayerState.JUMP)
 		else:
@@ -271,6 +272,9 @@ static func handle_idle_state(player: Node, _delta: float, move_input: float, ju
 # 处理普通移动状态的地面逻辑。
 static func handle_move_state(player: Node, delta: float, move_input: float, jump_just_pressed: bool, dash_just_pressed: bool) -> void:
 	if not player.is_on_floor() and not player.coyote_time_active:
+		# 土狼窗口刚结束的那一帧，先消费本次跳跃输入，避免切 DOWN 时吞掉二段跳。
+		if PlayerAirAbilityServiceScript.try_double_jump(player, jump_just_pressed):
+			return
 		if player.velocity.y < 0:
 			player.change_state(player.PlayerState.JUMP)
 		else:
@@ -312,6 +316,9 @@ static func handle_move_state(player: Node, delta: float, move_input: float, jum
 # 处理跑步状态的地面逻辑。
 static func handle_run_state(player: Node, delta: float, move_input: float, jump_just_pressed: bool, dash_just_pressed: bool) -> void:
 	if not player.is_on_floor() and not player.coyote_time_active:
+		# 奔跑跑出边缘时同样可能在土狼结束时仍停留一帧 RUN，本帧跳跃必须优先结算。
+		if PlayerAirAbilityServiceScript.try_double_jump(player, jump_just_pressed):
+			return
 		if player.velocity.y < 0:
 			player.change_state(player.PlayerState.JUMP)
 		else:

@@ -162,7 +162,7 @@ const PlayerFXControllerScript = preload("res://Scripts/Player/PlayerFXControlle
 ## 滑翔松开方向键时的水平减速
 @export var glide_release_deceleration: float = 180.0
 ## 滑翔最大下落速度乘数
-@export var glide_max_fall_multiplier: float = 0.22
+@export var glide_max_fall_multiplier: float = 0.21
 ## 进入滑翔后的滞空时间（秒）
 @export var glide_hover_time: float = 0.12
 ## 滑翔下落倍率过渡时间（秒）
@@ -436,6 +436,9 @@ var env_zone_max_fall_mul: float = 1.0         # 环境区最大下落速度乘�
 var env_zone_wind_target: Vector2 = Vector2.ZERO   # 风的目标速度（像素/秒，仅用于调试观察）
 var env_zone_wind_deceleration: float = 240.0      # 风离开区域后的衰减加速度（像素/秒÷秒）
 var env_wind_velocity: Vector2 = Vector2.ZERO      # 当前风速度（独立速度，只作为额外位移）
+## 攀墙时是否忽略水平风（由 PlayerEnvironmentZoneService 每帧按区域配置写入：
+## 每一股风的水平分量都不超过区域的 wall_grip_ignore_wind_max_x 时才为 true）
+var env_wind_wallgrip_immune: bool = false
 var env_updraft_velocity: float = 0.0              # 当前上升气流速度（负数 = 向上）
 var env_updraft_acceleration: float = 0.0           # 本帧上升气流加速度（0 = 无气流）
 var env_updraft_max_speed: float = 0.0              # 本帧上升气流速度上限（0 = 无气流）

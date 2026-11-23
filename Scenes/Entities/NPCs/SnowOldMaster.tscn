@@ -1,0 +1,129 @@
+[gd_scene load_steps=17 format=3 uid="uid://cyiswu0pbs3sx"]
+
+[ext_resource type="Script" uid="uid://c47hqpnmypfa2" path="res://Scripts/Entities/NPCs/SnowOldMaster.gd" id="1_e6yra"]
+[ext_resource type="Resource" uid="uid://uqolt05ja2rn" path="res://Assets/Dialogues/NPCs/SnowOldMaster.dialogue" id="2_e6yra"]
+[ext_resource type="PackedScene" uid="uid://f7j6a5p8vguo" path="res://Scenes/UI/GameUI/MyBalloon.tscn" id="3_n711k"]
+[ext_resource type="Texture2D" uid="uid://b2mhp3mudrox6" path="res://Assets/Textures/Entities/NPCs/吸烟蘑菇.png" id="4_lius4"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n4g7q"]
+atlas = ExtResource("4_lius4")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dwtlg"]
+atlas = ExtResource("4_lius4")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a2wr5"]
+atlas = ExtResource("4_lius4")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t3nai"]
+atlas = ExtResource("4_lius4")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_65eaj"]
+atlas = ExtResource("4_lius4")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j5mo2"]
+atlas = ExtResource("4_lius4")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sqg3j"]
+atlas = ExtResource("4_lius4")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_134ou"]
+atlas = ExtResource("4_lius4")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_85mt3"]
+atlas = ExtResource("4_lius4")
+region = Rect2(96, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pp62l"]
+atlas = ExtResource("4_lius4")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fvu2l"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n4g7q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dwtlg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a2wr5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t3nai")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t3nai")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t3nai")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t3nai")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_65eaj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j5mo2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sqg3j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_134ou")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_85mt3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n4g7q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n4g7q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n4g7q")
+}],
+"loop": true,
+"name": &"IDLE",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pp62l")
+}],
+"loop": true,
+"name": &"TALK",
+"speed": 4.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g62kn"]
+size = Vector2(36, 24)
+
+[node name="SnowOldMaster" type="Area2D"]
+collision_layer = 64
+script = ExtResource("1_e6yra")
+dialogue_resource = ExtResource("2_e6yra")
+balloon_scene = ExtResource("3_n711k")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_fvu2l")
+animation = &"IDLE"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 33
+position = Vector2(-2, 4)
+shape = SubResource("RectangleShape2D_g62kn")
+
+[node name="InteractionPrompt" type="Sprite2D" parent="."]
+position = Vector2(0, -24)
+region_rect = Rect2(96, 144, 17, 11)

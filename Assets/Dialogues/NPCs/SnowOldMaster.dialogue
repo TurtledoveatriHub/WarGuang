@@ -1,0 +1,16 @@
+~ first_meeting
+"雪山老者": 我在苦苦追寻...
+"雪山老者": 但时日不多了...
+"雪山老者": 我从你的身上感受到了独特的气息...
+=> END
+
+~ second_meeting
+"沃玛": 独特的气息？
+"雪山老者": 我决定将我的学识教授于你...
+do EventBus.emit_signal("vertical_dash_unlocked")
+"雪山老者": 现在，你将继承我的毕生学识！
+=> END
+
+~ no_more_teachings
+"雪山老者": 新希望...真特别的感觉...
+=> END

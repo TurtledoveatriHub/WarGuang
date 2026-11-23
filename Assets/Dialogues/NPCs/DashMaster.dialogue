@@ -1,0 +1,13 @@
+~ first_meeting
+"冲刺大师": 你好小家伙
+"冲刺大师": 你好像没有掌握冲刺？
+=> END
+
+~ second_meeting
+do EventBus.emit_signal("dash_unlocked")
+"冲刺大师": 现在，你也可以冲刺！
+=> END
+
+~ no_more_teachings
+"冲刺大师": 和我一起冲刺！
+=> END

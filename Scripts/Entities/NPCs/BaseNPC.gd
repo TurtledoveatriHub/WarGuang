@@ -53,6 +53,8 @@ var _pending_facing_right: bool = true
 var _turn_cooldown_timer: float = 0.0
 ## 是否正在播转身过渡动画
 var _turning: bool = false
+## 缓存的玩家引用，避免每个启用“看向玩家”的 NPC 每帧做组查询。
+var _cached_player: Node2D = null
 
 func _ready():
 	# 朝向玩家：初始朝向由导出决定
@@ -71,20 +73,21 @@ func _ready():
 	if interaction_prompt:
 		interaction_prompt.visible = false
 	_play_default_idle()
-	_prewarm_interaction()
+	# 房间/场景正在装配子节点时不能直接 add_child；延迟到本帧树结构稳定后预热。
+	_prewarm_interaction.call_deferred()
 
-## 气泡场景全局只预热一次（第一个 NPC 进树时）。
-static var _balloon_prewarmed: bool = false
-
-## 交互预热：按 E 那一帧的卡顿主要来自「首次 load 对话气泡场景」。
-## 这里在 NPC 进树时（房间加载阶段，画面通常还在黑幕/过场里）把它载入资源缓存，
-## 玩家按键时只剩实例化与显示。
+## 交互预热：房间加载阶段就准备好共享气泡实例。
+## 之后所有 NPC / 告示牌复用同一个节点，不再在按键当帧反复 instantiate。
 func _prewarm_interaction() -> void:
-	if _balloon_prewarmed:
-		return
-	_balloon_prewarmed = true
 	if balloon_scene == null:
 		balloon_scene = load(ScenePaths.UI_MY_BALLOON)
+	if balloon_scene == null:
+		return
+	var tree: SceneTree = get_tree()
+	if tree == null:
+		return
+	var host: Node = tree.current_scene if tree.current_scene != null else tree.root
+	MyDialogueBalloon.acquire(host, balloon_scene)
 
 func _process(delta):
 	# 看向玩家（开关打开时）：死区 + 冷却判定
@@ -115,8 +118,8 @@ func try_interact():
 
 ## 交互开始时让玩家面朝本 NPC（左右由 NPC 与玩家的相对位置决定）
 func _face_player_towards_self() -> void:
-	var player: Node = get_tree().get_first_node_in_group("player")
-	if player == null or not is_instance_valid(player):
+	var player: Node = _get_facing_player()
+	if player == null:
 		return
 	var offset_x: float = global_position.x - player.global_position.x
 	if absf(offset_x) < 1.0:
@@ -139,8 +142,12 @@ func _start_interaction():
 		push_error("BaseNPC: balloon_scene 未配置！")
 		return
 	
-	var balloon = balloon_scene.instantiate()
-	get_tree().current_scene.add_child(balloon)
+	var tree: SceneTree = get_tree()
+	var host: Node = tree.current_scene if tree != null and tree.current_scene != null else tree.root
+	var balloon: Node = MyDialogueBalloon.acquire(host, balloon_scene)
+	if balloon == null:
+		push_error("BaseNPC: 无法创建对话气泡")
+		return
 	
 	if balloon.has_method("set_dialogue"):
 		balloon.set_dialogue(dialogue_resource, self)
@@ -242,9 +249,12 @@ func _update_player_facing(delta: float) -> void:
 func _get_facing_player() -> Node2D:
 	if not is_inside_tree():
 		return null
+	if _cached_player != null and is_instance_valid(_cached_player) and _cached_player.is_inside_tree():
+		return _cached_player
 	var player: Node = get_tree().get_first_node_in_group("player")
 	if player is Node2D:
-		return player
+		_cached_player = player as Node2D
+		return _cached_player
 	return null
 
 
@@ -291,7 +301,9 @@ func _play_facing_animation(base_name: String) -> void:
 func _on_body_entered(body):
 	if body.is_in_group("player"):
 		player_in_range = true
-		var player = get_tree().get_first_node_in_group("player")
+		if body is Node2D:
+			_cached_player = body as Node2D
+		var player: Node = _get_facing_player()
 		if player and player.current_state == player.PlayerState.DASH:
 			if interaction_prompt:
 				interaction_prompt.visible = false

@@ -1,5 +1,4 @@
 ~ first_meeting
-do EventBus.emit_signal("dash_unlocked")
 do EventBus.emit_signal("glide_unlocked")
 do EventBus.emit_signal("wall_grip_unlocked")
 do EventBus.emit_signal("super_dash_unlocked")
