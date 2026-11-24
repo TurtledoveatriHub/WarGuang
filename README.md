@@ -14,29 +14,6 @@
   4. 授权：本仓库为「源码可见（Source-Available）」，并非开源，条款见 LICENSE。
 -->
 
----
-
-## 📌 给 AI 助手 / 新协作者的最速上手（60 秒版）
-
-> 这一节就是「让一个全新的 agent 快速接手」的入口；下面的章节是展开阅读。**先读这一节，再按需跳读。**
-
-| 项目 | 内容 |
-|---|---|
-| 引擎 | Godot **4.5.1 Standard**（非 .NET）；命令行用 `Godot_v4.5.1-stable_win64_console.exe` |
-| 入口 | 主场景 `Scenes/UI/ScenesUI/TitleScene.tscn` → 标题 → 存档 → 房间 |
-| 玩家 | `Scenes/Player/Player.tscn` + `Scripts/Player/`（`Player.gd` 只存数据/生命周期，行为在 43 个 `*Service.gd`） |
-| 全局 | 26 个 Autoload（`Global` / `EventBus` / `ScenePaths` / `RoomManager` / `AudioManager` …），列表见 `project.godot` |
-| 校验 | `godot --headless --path <项目> --editor --quit`（全量导入 + 编译，必须 0 error / 0 warning） |
-| 运行期验证 | 写一个一次性 `tools/_tmp_xxx.tscn` 场景，用 `godot --headless --path <项目> res://tools/_tmp_xxx.tscn` 跑，跑完删除 |
-
-**三条硬规则**：① 编辑器必须 **0 error / 0 warning**，不接受“已知警告先忽略”；② 任何脚本改动后都要跑一次上面的 `--editor --quit` 校验；③ 资源路径不硬编码，走 `ScenePaths` 常量或 `class_name`。
-
-**三条禁忌**：① 不用 `git reset --hard` / 丢弃别人未提交的改动；② 不在编辑器正在运行同项目时反复导出（导出会重写 `.godot` 缓存，建议先关掉编辑器实例）；③ 不把 `preload("res://…")` 当依赖注入用（会导致循环引用与路径漂移）。
-
-**汇报格式**：改了哪些文件 → 为什么改 → 怎么验证的（能给实测数字就给数字）。
-
----
-
 ## 游戏简介
 
 《沃光》是一款以“操作手感”为核心、2D 像素平台跳跃 + 类银河恶魔城大地图探索的冒险游戏；
@@ -55,52 +32,53 @@
 
 ### 1. 精准跳跃
 
-![可控跳跃高度](img/demo-01-jump_text.gif)
 - 短按跳跃键起跳，长按跳得更高 -->
-![普通横向跳跃](img/demo-01-jump.gif)
+![可控跳跃高度](img/demo-01-jump_text.gif)
 - 跳跃时按方向键可正常控制跳跃方向 -->
-![奔跑+土狼时间长跳跃](img/demo-01-run_jump.gif)
+![普通横向跳跃](img/demo-01-jump.gif)
 - 奔跑状态下跳跃跳得更远，叠加“土狼时间（离开平台后短时间内仍然可以正常跳跃）”达到最长跳跃距离 -->
+![奔跑+土狼时间长跳跃](img/demo-01-run_jump.gif)
 
 ### 2. 二段跳与jumpbox触发
 
-![二段跳状态可控](img/demo-02-jump2-1.gif)
 - 二段跳时如果持续按住跳跃键，则本次空中持续保持二段跳动画状态 -->
-![普通二段跳触发jumpbox](img/demo-02-jump2-2.gif)
+![二段跳状态可控](img/demo-02-jump2-1.gif)
 - 二段跳状态期间触碰jumpbox -->
-![完美二段跳触发jumpbox](img/demo-02-jump2-3.gif)
+![普通二段跳触发jumpbox](img/demo-02-jump2-2.gif)
 - 进入二段跳的瞬间触碰jumpbox -->
+![完美二段跳触发jumpbox](img/demo-02-jump2-3.gif)
 
 ### 3. 冲刺、纵向冲刺、黑暗冲刺
 
+- 多变的冲刺能力让操作更多样 -->
 ![冲刺](img/demo-03-dash.gif)
 ![纵向冲刺](img/demo-01-demo-03-v_dash.gif)
 ![黑暗冲刺](img/demo-01-demo-03-black_dash.gif)
-- 多变的冲刺能力让操作更多样 -->
 
 ### 4. 滑翔
 
-![滑翔](img/demo-04-glide.gif)
 - 二段跳后再次按跳跃键进入滑翔 -->
+![滑翔](img/demo-04-glide.gif)
 
 ### 5. 攀墙与墙跳
 
-![墙跳](img/demo-05-wall_slide.gif)
 - 获得攀墙能力后，空中接触墙体时会进入攀墙状态，在攀墙状态下按跳跃键会自动向离墙方向进行跳跃，同样可控跳跃高度，此时按住向墙方向键则可再次攀墙 -->
+![攀墙墙跳](img/demo-05-wall_slide.gif)
 
 ### 6. 超级冲刺
-![超级冲刺](img/demo-06-super_dash.gif)
+
 - 获得超级冲刺能力后，按住超级冲刺键进行充电，达到充电时间后松开按键进行超级冲刺，超级冲刺持续0.2秒后可使用跳跃、冲刺等手段打断超级冲刺 -->
+![超级冲刺](img/demo-06-super_dash.gif)
 
 ### 手感修正（奔跑连续 / 边缘修正）
 
-![奔跑连贯](img/run_x-1.gif)
 - 奔跑时如果持续按住奔跑方向键，此时进行跳跃或其它动作后回到地面仍然保持奔跑状态，保证奔跑连贯性 -->
-![奔跑修正](img/run_x-2.gif)
+![奔跑连贯](img/run_x-1.gif)
 - 奔跑时如果遇到低矮障碍（约4px）会尝试抬升，不会因为小断口而掉落，保证奔跑连贯性 -->
+![奔跑修正](img/run_x-2.gif)
+- 跳跃（包括墙跳）、冲刺时，如果位移方向有碰撞体，则会多次尝试小幅度偏移绕开碰撞体，但如果预测无法绕开则不会进行修正 -->
 ![跳跃修正](img/demo-jump_x.gif)
 ![冲刺修正](img/demo-dash_x.gif)
-- 跳跃（包括墙跳）、冲刺时，如果位移方向有碰撞体，则会多次尝试小幅度偏移绕开碰撞体，但如果预测无法绕开则不会进行修正 -->
 
 ### 场景简略预览
 
